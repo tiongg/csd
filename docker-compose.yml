@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:18
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  flyway:
+    image: flyway/flyway:10
+    depends_on:
+      - db
+    command: >
+      -url=jdbc:postgresql://db:5432/postgres
+      -user=postgres
+      -password=password
+      migrate
+    volumes:
+      - ./backend/src/main/resources/db/migration:/flyway/sql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - db
+      - flyway
+    ports:
+      - '8080:8080'
+      - '5005:5005' # Debug port
+    volumes:
+      - ./backend:/usr/src/maven
+      - maven-repo:/root/.m2
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      MAVEN_OPTS: >
+        -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+
+volumes:
+  maven-repo:
+  postgres_data:

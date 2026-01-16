@@ -1,0 +1,6 @@
+FROM maven:3.9.9-eclipse-temurin-21 AS develop
+
+WORKDIR /usr/src/maven
+
+# Dev mode via maven
+CMD ["mvn", "spring-boot:run"]
