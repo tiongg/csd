@@ -1,0 +1,7 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE account (
+  id UUID PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

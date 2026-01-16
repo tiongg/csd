@@ -9,19 +9,21 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
 
   flyway:
     image: flyway/flyway:10
-    depends_on:
-      - db
-    command: >
-      -url=jdbc:postgresql://db:5432/postgres
-      -user=postgres
-      -password=password
-      migrate
+    profiles: ['flyway']
+    env_file:
+      - backend/.env
     volumes:
       - ./backend/src/main/resources/db/migration:/flyway/sql
+    command: >
+      -X
+      -url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+      -user=${POSTGRES_USER}
+      -password=${POSTGRES_PASSWORD}
+      migrate
 
   backend:
     build:
@@ -29,7 +31,6 @@ services:
       dockerfile: Dockerfile.dev
     depends_on:
       - db
-      - flyway
     ports:
       - '8080:8080'
       - '5005:5005' # Debug port
