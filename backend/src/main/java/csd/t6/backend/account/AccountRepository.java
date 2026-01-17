@@ -22,9 +22,9 @@ public class AccountRepository {
     return dsl.selectFrom(ACCOUNT).fetch();
   }
 
-  public AccountRecord insert(UUID id, String email) {
+  public AccountRecord insert(String email) {
     AccountRecord record = dsl.newRecord(ACCOUNT);
-    record.setId(id);
+    record.setId(UUID.randomUUID());
     record.setEmail(email);
     record.store();
     return record;

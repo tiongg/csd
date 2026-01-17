@@ -22,3 +22,4 @@ export const useApiQuery = $api.useQuery;
 export const useApiMutation = $api.useMutation;
 export const useApiInfiniteQuery = $api.useInfiniteQuery;
 export const useApiSuspenseQuery = $api.useSuspenseQuery;
+export const apiQueryOptions = $api.queryOptions;
