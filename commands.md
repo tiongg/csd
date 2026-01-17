@@ -15,3 +15,9 @@ Adding shadcn packages
 ```
 docker compose exec frontend npx shadcn@latest add input
 ```
+
+Regenerating API types
+
+```
+docker compose exec frontend npm run generate-api
+```

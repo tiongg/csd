@@ -1,5 +1,4 @@
-import axiosInstance from '@/lib/axios-instance';
-import { useQuery } from '@tanstack/react-query';
+import { useApiQuery } from '@/lib/fetch-client';
 import { Link } from '@tanstack/react-router';
 
 import { Home, Menu, Network, X } from 'lucide-react';
@@ -7,13 +6,7 @@ import { useState } from 'react';
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
-  const { data } = useQuery({
-    queryKey: ['server-up'],
-    queryFn: async () => {
-      const { data } = await axiosInstance.get('/api/account');
-      return data.length;
-    },
-  });
+  const { data } = useApiQuery('get', '/api/account');
 
   return (
     <>
@@ -27,7 +20,7 @@ export default function Header() {
         </button>
         <h1 className="ml-4 text-xl font-semibold">
           <Link to="/">
-            <p>Test: {data} acocunt in db</p>
+            <p>Test: {(data ?? []).length} accounts in db</p>
           </Link>
         </h1>
       </header>

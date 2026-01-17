@@ -59,6 +59,12 @@ services:
     ports:
       - '8080:8080'
       - '5005:5005' # Debug port
+    healthcheck:
+      test: ['CMD', 'curl', 'http://backend:8080/']
+      interval: 2s
+      retries: 20
+      start_period: 10s
+      timeout: 10s
     volumes:
       - ./backend:/usr/src/maven
       - maven-repo:/root/.m2
@@ -72,6 +78,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    depends_on:
+      backend:
+        condition: service_healthy
     ports:
       - '3000:3000'
     volumes:
@@ -79,9 +88,7 @@ services:
     environment:
       NODE_ENV: development
       VITE_BACKEND_URL: http://localhost:8080
-    command: >
-      /bin/sh -c "cp -rfu /cache/node_modules/. /app/node_modules/  
-      && npm run dev"
+    command: ./dev-start.sh
 
 configs:
   pgadmin-servers:
