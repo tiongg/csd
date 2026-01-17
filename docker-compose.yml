@@ -11,6 +11,31 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  # Postgres UI
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    configs:
+      - source: pgadmin-pgpass
+        target: /config/pgpass
+        uid: '5050'
+        gid: '5050'
+        mode: 0400
+      - source: pgadmin-servers
+        target: /pgadmin4/servers.json
+        mode: 0444
+    depends_on:
+      - db
+    ports:
+      - '8888:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: password
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+      GUNICORN_ACCESS_LOGFILE: '/dev/null'
+
   flyway:
     image: flyway/flyway:10
     profiles: ['flyway']
@@ -20,9 +45,9 @@ services:
       - ./backend/src/main/resources/db/migration:/flyway/sql
     command: >
       -X
-      -url=jdbc:postgresql://${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-      -user=${POSTGRES_USER}
-      -password=${POSTGRES_PASSWORD}
+      -url=jdbc:postgresql://db:5432/postgres
+      -user=postgres
+      -password=password
       migrate
 
   backend:
@@ -41,6 +66,26 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       MAVEN_OPTS: >
         -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+
+configs:
+  pgadmin-servers:
+    content: |
+      {
+        "Servers": {
+          "1": {
+            "Name": "Local Postgres",
+            "Group": "Servers",
+            "Host": "db",
+            "Port": 5432,
+            "MaintenanceDB": "postgres",
+            "Username": "postgres",
+            "PassFile": "/config/pgpass"
+          }
+        }
+      }
+  pgadmin-pgpass:
+    content: |
+      db:5432:*:postgres:password
 
 volumes:
   maven-repo:
