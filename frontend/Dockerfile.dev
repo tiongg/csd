@@ -1,11 +1,16 @@
+# https://medium.com/@sudiptob2/properly-setting-up-react-development-environment-using-docker-a2de46464d0b
 FROM node:24.12.0-alpine AS dev
 
+# Create and define the node_modules's cache directory.
+WORKDIR /cache
+
+# install app dependencies
+COPY package.json .
+COPY package-lock.json .
+RUN npm install --silent
+
 WORKDIR /app
-
-COPY package.json package-lock.json* ./
-
-RUN --mount=type=cache,target=/root/.npm npm install
-
+ENV PATH /app/node_modules/.bin:$PATH
 COPY . .
 
 EXPOSE 3000

@@ -18,7 +18,6 @@ public class AccountRepository {
     this.dsl = dsl;
   }
 
-  // Fetch all accounts
   public List<AccountRecord> findAll() {
     return dsl.selectFrom(ACCOUNT).fetch();
   }

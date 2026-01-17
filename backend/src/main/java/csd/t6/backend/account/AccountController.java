@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import csd.t6.jooq.tables.records.AccountRecord;
+import csd.t6.jooq.tables.pojos.Account;
 
 @RestController
 @RequestMapping("/api/account")
@@ -18,7 +18,7 @@ public class AccountController {
   }
 
   @GetMapping
-  public List<AccountRecord> getAll() {
-    return accountService.getAllAccounts();
+  public List<Account> getAll() {
+    return accountService.getAllAccounts().stream().map(record -> record.into(Account.class)).toList();
   }
 }
