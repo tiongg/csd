@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/account": {
+    "/api/account/": {
         parameters: {
             query?: never;
             header?: never;
@@ -42,10 +42,8 @@ export interface components {
     schemas: {
         Account: {
             /** Format: uuid */
-            id?: string;
-            email?: string;
-            /** Format: date-time */
-            createdAt?: string;
+            id: string;
+            email: string;
         };
     };
     responses: never;
