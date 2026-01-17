@@ -1,4 +1,4 @@
-package csd.t6.backend;
+package csd.t6.backend.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

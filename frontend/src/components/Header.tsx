@@ -10,8 +10,8 @@ export default function Header() {
   const { data } = useQuery({
     queryKey: ['server-up'],
     queryFn: async () => {
-      const { data } = await axiosInstance.get('/');
-      return data;
+      const { data } = await axiosInstance.get('/api/account');
+      return data.length;
     },
   });
 
@@ -27,7 +27,7 @@ export default function Header() {
         </button>
         <h1 className="ml-4 text-xl font-semibold">
           <Link to="/">
-            <p>Test: {data}</p>
+            <p>Test: {data} acocunt in db</p>
           </Link>
         </h1>
       </header>
