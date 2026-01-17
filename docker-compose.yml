@@ -67,6 +67,18 @@ services:
       MAVEN_OPTS: >
         -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules # Anonymously mount node_modules to avoid syncing host's node_modules
+    environment:
+      NODE_ENV: development
+
 configs:
   pgadmin-servers:
     content: |
