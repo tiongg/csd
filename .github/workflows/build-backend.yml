@@ -2,7 +2,7 @@ name: Build and Push Backend
 
 on:
   push:
-    branches: [dev, ci/backend]
+    branches: [dev]
   pull_request:
     branches: [dev]
 
@@ -54,7 +54,7 @@ jobs:
             -locations="filesystem:./backend/src/main/resources/db/migration" \
             -outOfOrder=true
 
-      - name: Build Docker image (with JOOQ codegen)
+      - name: Build Docker image
         run: |
           docker build -t backend-image \
             --network=host \
