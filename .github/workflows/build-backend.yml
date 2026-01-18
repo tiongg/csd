@@ -40,16 +40,19 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Install Flyway
+        uses: red-gate/setup-flyway@v1
+        with:
+          architecture: 'java'
+
       - name: Run Flyway migrations
         run: |
-          # Download and run Flyway CLI
-          curl -L https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.18.2/flyway-commandline-10.18.2-linux-x64.tar.gz | tar xvz
-          ./flyway/flyway \
+          flyway migrate \
             -url="jdbc:postgresql://localhost:5432/postgres" \
             -user=postgres \
             -password=password \
             -locations="filesystem:./backend/src/main/resources/db/migration" \
-            migrate
+            -outOfOrder=true
 
       - name: Build Docker image (with JOOQ codegen)
         run: |
