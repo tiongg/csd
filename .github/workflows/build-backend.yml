@@ -1,0 +1,76 @@
+name: Build and Push Backend
+
+on:
+  push:
+    branches: [dev, ci/backend]
+  pull_request:
+    branches: [dev]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/backend
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run Flyway migrations
+        run: |
+          # Download and run Flyway CLI
+          curl -L https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/10.18.2/flyway-commandline-10.18.2-linux-x64.tar.gz | tar xvz
+          ./flyway/flyway \
+            -url="jdbc:postgresql://localhost:5432/postgres" \
+            -user=postgres \
+            -password=password \
+            -locations="filesystem:./backend/src/main/resources/db/migration" \
+            migrate
+
+      - name: Build Docker image (with JOOQ codegen)
+        run: |
+          docker build -t backend-image \
+            --build-arg JOOQ_JDBC_URL="jdbc:postgresql://localhost:5432/postgres" \
+            --build-arg JOOQ_JDBC_USER=postgres \
+            --build-arg JOOQ_JDBC_PASSWORD=password \
+            ./backend
+
+      - name: Log in to Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT }}
+
+      - name: Push to Container Registry
+        if: github.event_name == 'push'
+        run: |
+          docker tag backend-image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker tag backend-image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
