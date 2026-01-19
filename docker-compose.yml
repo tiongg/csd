@@ -21,7 +21,6 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4
-    restart: always
     configs:
       - source: pgadmin-pgpass
         target: /config/pgpass
