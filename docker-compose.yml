@@ -10,6 +10,12 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   # Postgres UI
   pgadmin:
@@ -38,11 +44,11 @@ services:
 
   flyway:
     image: flyway/flyway:10
-    profiles: ['flyway']
-    env_file:
-      - backend/.env
     volumes:
       - ./backend/src/main/resources/db/migration:/flyway/sql
+    depends_on:
+      db:
+        condition: service_healthy
     command: >
       -X
       -url=jdbc:postgresql://db:5432/postgres
@@ -50,12 +56,27 @@ services:
       -password=password
       migrate
 
+  # To run manual flyway commands
+  flyway-manual:
+    image: flyway/flyway:10
+    container_name: flyway-manual
+    profiles: ['manual']
+    env_file:
+      - backend/.env
+    volumes:
+      - ./backend/src/main/resources/db/migration:/flyway/sql
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: ['flyway']
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
     depends_on:
       - db
+      - flyway
     container_name: backend
     ports:
       - '8080:8080'

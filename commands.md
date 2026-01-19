@@ -1,7 +1,10 @@
 Run migrations
 
 ```
-docker compose --profile flyway run --rm flyway
+docker compose run --rm flyway-manual migrate \
+  -url=jdbc:postgresql://db:5432/postgres \
+  -user=postgres \
+  -password=password
 ```
 
 Installing packages on FE
