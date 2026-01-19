@@ -36,3 +36,9 @@ docker run \
   -p 8080:8080 \
   ghcr.io/tiongg/csd/backend
 ```
+
+Sometimes, backend `target` is created by root, breaking dev reload. To solve this, change the owner
+
+```
+sudo chown -R $USER:$USER ./backend/target
+```
