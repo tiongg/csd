@@ -76,19 +76,15 @@ services:
     depends_on:
       - db
       - flyway
+      - frontend
     container_name: backend
     ports:
       - '8080:8080'
       - '5005:5005' # Debug port
-    healthcheck:
-      test: ['CMD', 'curl', 'http://backend:8080/']
-      interval: 2s
-      retries: 20
-      start_period: 10s
-      timeout: 10s
     volumes:
       - ./backend:/usr/src/maven
       - maven-repo:/root/.m2
+      - /var/run/docker.sock:/var/run/docker.sock 
     environment:
       SPRING_PROFILES_ACTIVE: dev
       MAVEN_OPTS: >
@@ -99,16 +95,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    depends_on:
-      backend:
-        condition: service_healthy
     container_name: frontend
     ports:
       - '3000:3000'
     volumes:
       - ./frontend:/app
-      # To regenerate API routes on save
-      - ./backend:/backend
     environment:
       NODE_ENV: development
       VITE_BACKEND_URL: http://localhost:8080
