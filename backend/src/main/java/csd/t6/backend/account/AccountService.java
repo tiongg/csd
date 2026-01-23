@@ -1,6 +1,6 @@
 package csd.t6.backend.account;
 
-import static csd.t6.jooq.auth.tables.Account.ACCOUNT;
+import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import csd.t6.backend.account.dto.AccountCreateRequest;
 import csd.t6.backend.exceptions.BadRequestException;
-import csd.t6.jooq.auth.tables.records.AccountRecord;
+import csd.t6.jooq.accounts.tables.records.AccountRecord;
 
 @Service
 public class AccountService {
