@@ -117,7 +117,14 @@
 					<generator>
 						<database>
 							<name>org.jooq.meta.postgres.PostgresDatabase</name>
-							<inputSchema>public</inputSchema>
+							<schemata>
+								<schema>
+									<inputSchema>public</inputSchema>
+								</schema>
+								<schema>
+									<inputSchema>auth</inputSchema>
+								</schema>
+							</schemata>
 						</database>
 						<generate>
 							<pojos>true</pojos>

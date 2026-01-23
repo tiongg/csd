@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import csd.t6.jooq.tables.records.AccountRecord;
+import csd.t6.jooq.auth.tables.records.AccountRecord;
 
 @Service
 public class AccountService {
