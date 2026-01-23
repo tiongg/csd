@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.springframework.stereotype.Repository;
 
 import csd.t6.jooq.auth.enums.Roles;
@@ -38,22 +39,23 @@ public class AccountRepository {
     return record;
   }
 
-  public int updateEmail(UUID id, String newEmail) {
-    return dsl.update(ACCOUNT)
-        .set(ACCOUNT.EMAIL, newEmail)
-        .where(ACCOUNT.ID.eq(id))
-        .execute();
-  }
-
   public int delete(UUID id) {
     return dsl.deleteFrom(ACCOUNT)
         .where(ACCOUNT.ID.eq(id))
         .execute();
   }
 
-  public boolean usernameExists(String username) {
-    return dsl.fetchExists(dsl.selectOne()
-        .from(ACCOUNT)
-        .where(ACCOUNT.USERNAME.eq(username)));
+  /**
+   * Generic method to check if a value exists in a specified field.
+   * 
+   * @param field - the field to check
+   * @param value - the value to look for
+   * @return true if an entity with the value in the field exists, false otherwise
+   */
+  public <T> boolean exists(Field<T> field, T value) {
+    return dsl.fetchExists(
+        dsl.selectOne()
+            .from(ACCOUNT)
+            .where(field.eq(value)));
   }
 }

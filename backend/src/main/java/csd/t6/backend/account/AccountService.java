@@ -1,5 +1,7 @@
 package csd.t6.backend.account;
 
+import static csd.t6.jooq.auth.tables.Account.ACCOUNT;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +24,7 @@ public class AccountService {
   }
 
   public AccountRecord createNewAccount(AccountCreateRequest createDTO) {
-    if (this.accountRepository.usernameExists(createDTO.username())) {
+    if (!this.accountRepository.exists(ACCOUNT.USERNAME, createDTO.username())) {
       throw new BadRequestException("Username already exists");
     }
 
@@ -33,6 +35,9 @@ public class AccountService {
   }
 
   public void deleteAccount(UUID id) {
+    if (!this.accountRepository.exists(ACCOUNT.ID, id)) {
+      throw new BadRequestException("Account does not exist");
+    }
     this.accountRepository.delete(id);
   }
 }

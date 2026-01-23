@@ -9,14 +9,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.AccountCreateRequest;
 import csd.t6.backend.account.dto.AccountResponseDTO;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import csd.t6.backend.decorators.responses.CreatedResponse;
+import csd.t6.backend.decorators.responses.NoContentResponse;
 
 @RestController
 @RequestMapping("/api/account")
@@ -33,16 +32,15 @@ public class AccountController {
   }
 
   @PostMapping("/")
-  @ResponseStatus(code = org.springframework.http.HttpStatus.CREATED)
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "Account created successfully"),
-  })
+  @CreatedResponse()
   @BadRequestResponse()
   public AccountResponseDTO createAccount(@RequestBody AccountCreateRequest createDTO) {
     return new AccountResponseDTO(accountService.createNewAccount(createDTO));
   }
 
   @DeleteMapping("/{accountId}")
+  @BadRequestResponse()
+  @NoContentResponse()
   public void deleteAccount(@PathVariable String accountId) {
     accountService.deleteAccount(UUID.fromString(accountId));
   }
