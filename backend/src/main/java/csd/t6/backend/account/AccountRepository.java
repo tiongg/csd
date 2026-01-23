@@ -23,13 +23,16 @@ public class AccountRepository {
     return dsl.selectFrom(ACCOUNT).fetch();
   }
 
-  public AccountRecord insert(String email) {
+  public AccountRecord insert(
+      String email,
+      String username,
+      String passwordHash) {
     AccountRecord record = dsl.newRecord(ACCOUNT);
     record.setId(UUID.randomUUID());
     record.setEmail(email);
-    record.setPasswordHash("");
+    record.setPasswordHash(passwordHash);
     record.setUserRole(Roles.LEARNER);
-    record.setUsername(email);
+    record.setUsername(username);
 
     record.store();
     return record;
@@ -46,5 +49,11 @@ public class AccountRepository {
     return dsl.deleteFrom(ACCOUNT)
         .where(ACCOUNT.ID.eq(id))
         .execute();
+  }
+
+  public boolean usernameExists(String username) {
+    return dsl.fetchExists(dsl.selectOne()
+        .from(ACCOUNT)
+        .where(ACCOUNT.USERNAME.eq(username)));
   }
 }

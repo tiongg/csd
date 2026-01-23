@@ -31,6 +31,8 @@ function App() {
       {
         body: {
           email: emailField,
+          username: emailField.split('@')[0]!,
+          password: 'defaultpassword',
         },
       },
       {
@@ -38,6 +40,9 @@ function App() {
           await queryClient.invalidateQueries({
             queryKey: apiQueryOptions('get', '/api/account/').queryKey,
           });
+        },
+        onError: (error) => {
+          alert(`Error creating account: ${error.message}`);
         },
       },
     );
@@ -77,6 +82,7 @@ function App() {
         {(data ?? []).map((account) => (
           <div key={account.id} className="flex justify-between">
             <p>{account.email}</p>
+            <p>{account.username}</p>
             <Button
               variant="destructive"
               onClick={() => onDeleteAccount(account.id)}

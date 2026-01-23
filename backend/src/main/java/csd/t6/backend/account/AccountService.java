@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import csd.t6.backend.account.dto.AccountCreateRequest;
+import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.jooq.auth.tables.records.AccountRecord;
 
 @Service
@@ -19,8 +21,15 @@ public class AccountService {
     return this.accountRepository.findAll();
   }
 
-  public AccountRecord createNewAccount(String email) {
-    return this.accountRepository.insert(email);
+  public AccountRecord createNewAccount(AccountCreateRequest createDTO) {
+    if (this.accountRepository.usernameExists(createDTO.username())) {
+      throw new BadRequestException("Username already exists");
+    }
+
+    return this.accountRepository.insert(
+        createDTO.email(),
+        createDTO.username(),
+        createDTO.password());
   }
 
   public void deleteAccount(UUID id) {

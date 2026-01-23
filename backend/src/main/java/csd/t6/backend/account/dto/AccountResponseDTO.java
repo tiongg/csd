@@ -9,8 +9,9 @@ import jakarta.validation.constraints.NotNull;
 @Schema(name = "Account")
 public record AccountResponseDTO(
     @NotNull UUID id,
-    @NotNull String email) {
+    @NotNull String email,
+    @NotNull String username) {
   public AccountResponseDTO(AccountRecord account) {
-    this(account.getId(), account.getEmail());
+    this(account.getId(), account.getEmail(), account.getUsername());
   }
 }
