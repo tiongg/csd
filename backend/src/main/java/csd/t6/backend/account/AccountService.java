@@ -31,12 +31,13 @@ public class AccountService {
       throw new BadRequestException("Username already exists");
     }
 
+    if (this.accountRepository.exists(ACCOUNT.EMAIL, createDTO.email())) {
+      throw new BadRequestException("Email already exists");
+    }
+
     String hashedPassword = this.passwordEncoder.encode(createDTO.password());
 
-    return this.accountRepository.insert(
-        createDTO.email(),
-        createDTO.username(),
-        hashedPassword);
+    return this.accountRepository.insert(createDTO.email(), createDTO.username(), hashedPassword);
   }
 
   public void deleteAccount(UUID id) {
