@@ -1,5 +1,6 @@
 {
   "java.compile.nullAnalysis.mode": "automatic",
   "java.configuration.updateBuildConfiguration": "automatic",
-  "files.eol": "\n"
+  "files.eol": "\n",
+  "java.format.settings.url": ".vscode/java-formatter.xml"
 }
