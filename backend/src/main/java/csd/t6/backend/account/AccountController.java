@@ -16,6 +16,7 @@ import csd.t6.backend.account.dto.AccountResponseDTO;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/account")
@@ -34,7 +35,7 @@ public class AccountController {
   @PostMapping("/")
   @CreatedResponse()
   @BadRequestResponse()
-  public AccountResponseDTO createAccount(@RequestBody AccountCreateRequest createDTO) {
+  public AccountResponseDTO createAccount(@RequestBody @Valid AccountCreateRequest createDTO) {
     return new AccountResponseDTO(accountService.createNewAccount(createDTO));
   }
 
