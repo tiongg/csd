@@ -13,6 +13,9 @@
     "generate-api": "npx openapi-typescript http://backend:8080/v3/api-docs.yaml -o ./src/generated/api.d.ts"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.7.0",
@@ -28,9 +31,11 @@
     "openapi-react-query": "^0.5.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-hook-form": "^7.71.1",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.0.6",
-    "tw-animate-css": "^1.3.6"
+    "tw-animate-css": "^1.3.6",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tanstack/devtools-vite": "^0.3.11",
@@ -45,6 +50,7 @@
     "openapi-typescript": "^7.10.1",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "shadcn": "^3.7.0",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
     "vitest": "^3.0.5",
