@@ -24,7 +24,7 @@ public class AccountService {
   }
 
   public AccountRecord createNewAccount(AccountCreateRequest createDTO) {
-    if (!this.accountRepository.exists(ACCOUNT.USERNAME, createDTO.username())) {
+    if (this.accountRepository.exists(ACCOUNT.USERNAME, createDTO.username())) {
       throw new BadRequestException("Username already exists");
     }
 
