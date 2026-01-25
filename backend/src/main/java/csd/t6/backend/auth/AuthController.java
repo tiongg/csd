@@ -29,6 +29,8 @@ public class AuthController {
   private final AuthenticationManager authenticationManager;
   private final JwtService jwtService;
 
+  private static final int THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
+
   public AuthController(AuthenticationManager authenticationManager, JwtService jwtService) {
     this.authenticationManager = authenticationManager;
     this.jwtService = jwtService;
@@ -54,12 +56,8 @@ public class AuthController {
     String refreshToken = jwtService.generateRefreshToken(accountId);
 
     // Set refresh token in httpOnly cookie
-    Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
-    refreshCookie.setHttpOnly(true);
-    refreshCookie.setSecure(true);
-    refreshCookie.setPath("/");
-    refreshCookie.setAttribute("SameSite", "None");
-    refreshCookie.setMaxAge(60 * 60 * 24 * 30); // 30 days
+    Cookie refreshCookie = this.createRefreshTokenCookie(refreshToken);
+    refreshCookie.setMaxAge(THIRTY_DAYS_IN_SECONDS);
     response.addCookie(refreshCookie);
 
     return new LoginResponseDto(accessToken, new AccountResponseDTO(userDetails.getAccount()));
@@ -69,11 +67,7 @@ public class AuthController {
   @NoContentResponse()
   public void logout(HttpServletResponse response) {
     // Clear refresh token cookie
-    Cookie refreshCookie = new Cookie("refresh_token", "");
-    refreshCookie.setHttpOnly(true);
-    refreshCookie.setSecure(true);
-    refreshCookie.setPath("/");
-    refreshCookie.setAttribute("SameSite", "None");
+    Cookie refreshCookie = this.createRefreshTokenCookie("");
     refreshCookie.setMaxAge(0);
     response.addCookie(refreshCookie);
   }
@@ -97,5 +91,14 @@ public class AuthController {
       throw new BadRequestException("User is not authenticated");
     }
     return new AccountResponseDTO(user.getAccount());
+  }
+
+  private Cookie createRefreshTokenCookie(String refreshToken) {
+    Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
+    refreshCookie.setHttpOnly(true);
+    refreshCookie.setSecure(true);
+    refreshCookie.setPath("/");
+    refreshCookie.setAttribute("SameSite", "None");
+    return refreshCookie;
   }
 }
