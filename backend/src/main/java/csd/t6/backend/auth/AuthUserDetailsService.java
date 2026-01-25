@@ -21,7 +21,7 @@ public class AuthUserDetailsService implements UserDetailsService {
   public AuthUserDetails loadUserByUsername(String usernameOrEmail) {
     AccountRecord accountRecord = this.accountRepository.findBy(ACCOUNT.USERNAME, usernameOrEmail)
         .or(() -> this.accountRepository.findBy(ACCOUNT.EMAIL, usernameOrEmail))
-        .orElseThrow(() -> new BadRequestException("User not found with username or email"));
+        .orElseThrow(() -> new BadRequestException("Invalid credentials"));
 
     return new AuthUserDetails(accountRecord);
   }

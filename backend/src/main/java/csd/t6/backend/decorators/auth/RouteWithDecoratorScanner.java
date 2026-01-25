@@ -28,8 +28,7 @@ public class RouteWithDecoratorScanner {
 
     // Get all controllers
     Set<String> controllerBeans = applicationContext
-        .getBeansWithAnnotation(org.springframework.web.bind.annotation.RestController.class)
-        .keySet();
+        .getBeansWithAnnotation(org.springframework.web.bind.annotation.RestController.class).keySet();
 
     for (String beanName : controllerBeans) {
       Object controller = applicationContext.getBean(beanName);
@@ -45,8 +44,8 @@ public class RouteWithDecoratorScanner {
           if (methodPath != null) {
             String fullPath = classPath + methodPath;
             routes.add(fullPath);
-            // Also add wildcard version for path variables
-            if (!methodPath.endsWith("/**")) {
+            // Also add wildcard version for paths with path variables
+            if (fullPath.contains("{") && !fullPath.endsWith("/**")) {
               routes.add(fullPath + "/**");
             }
           }
@@ -67,11 +66,7 @@ public class RouteWithDecoratorScanner {
 
   private String getMethodRoute(Method method) {
     Class<? extends Annotation>[] mappingAnnotations = new Class[] {
-        GetMapping.class,
-        PostMapping.class,
-        PutMapping.class,
-        DeleteMapping.class,
-        PatchMapping.class,
+        GetMapping.class, PostMapping.class, PutMapping.class, DeleteMapping.class, PatchMapping.class,
         RequestMapping.class
     };
 

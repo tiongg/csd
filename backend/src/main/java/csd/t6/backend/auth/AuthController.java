@@ -22,6 +22,7 @@ import csd.t6.backend.decorators.responses.OkResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -38,12 +39,9 @@ public class AuthController {
   @PublicDecorator()
   @OkResponse()
   @BadRequestResponse()
-  public LoginResponseDto loginWithPassword(
-      @RequestBody LoginDto loginDto,
-      HttpServletResponse response) {
+  public LoginResponseDto loginWithPassword(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
 
-    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-        loginDto.usernameOrEmail(),
+    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginDto.usernameOrEmail(),
         loginDto.password());
 
     Authentication auth = this.authenticationManager.authenticate(authToken);
@@ -73,8 +71,7 @@ public class AuthController {
   @PostMapping("/refresh")
   @OkResponse()
   @BadRequestResponse()
-  public LoginResponseDto refresh(
-      @AuthenticationPrincipal AuthUserDetails userDetails) {
+  public LoginResponseDto refresh(@AuthenticationPrincipal AuthUserDetails userDetails) {
     UUID accountId = userDetails.getAccount().getId();
     String accessToken = jwtService.generateAccessToken(accountId);
 
