@@ -6,8 +6,10 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/context/AuthContext';
 import { useApiMutation } from '@/lib/fetch-client';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from '@tanstack/react-router';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -48,6 +50,9 @@ export default function RegistrationForm() {
     },
   });
 
+  const { loginWithPassword } = useAuth();
+  const navigate = useNavigate();
+
   const { mutateAsync: createAccount } = useApiMutation(
     'post',
     '/api/account/',
@@ -70,6 +75,8 @@ export default function RegistrationForm() {
       await createAccount({
         body: accountData,
       });
+      loginWithPassword(data.username, data.password);
+      navigate({ to: '/' });
     } catch (err) {
       // Noop, error is handled in onError of useApiMutation
     }

@@ -6,7 +6,9 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
+import { constructAuthUrl } from '@/lib/auth-urls';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from '@tanstack/react-router';
 import { Controller, useForm } from 'react-hook-form';
@@ -113,6 +115,21 @@ export default function LoginForm() {
           {isSubmitting ? 'Logging in...' : 'Login'}
         </Button>
       </form>
+
+      <Separator />
+
+      <Button variant="outline" className="w-full" asChild>
+        <a href={constructAuthUrl('google')}>Login with Google</a>
+      </Button>
+
+      <Separator />
+
+      <div className="text-muted-foreground text-center text-sm">
+        Don't have an account?{' '}
+        <a href="/register" className="text-primary hover:underline">
+          Register here
+        </a>
+      </div>
     </div>
   );
 }
