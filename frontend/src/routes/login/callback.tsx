@@ -6,16 +6,16 @@ export const Route = createFileRoute('/login/callback')({
 });
 
 function RouteComponent() {
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
   const { accessToken } = Route.useSearch() as { accessToken: string };
   const [, setAccessToken] = useToken();
   useEffect(() => {
     if (!accessToken) return;
     setAccessToken(accessToken);
-    naviagte({
+    navigate({
       to: '/',
     });
-  }, [accessToken, naviagte, setAccessToken]);
+  }, [accessToken, navigate, setAccessToken]);
 
   return <div>Redirecting...</div>;
 }
