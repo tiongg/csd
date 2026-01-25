@@ -39,6 +39,6 @@ export function getTokenExpiry(token: string) {
 
 export function getTokenExpiryInMs(token: string) {
   const expiry = getTokenExpiry(token);
-  if (!expiry) return;
+  if (!expiry) return 0;
   return expiry - Date.now();
 }

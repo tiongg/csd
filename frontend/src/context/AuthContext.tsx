@@ -1,7 +1,6 @@
 import type { components } from '@/generated/api';
 import { fetchClient, useApiMutation } from '@/lib/fetch-client';
 import { getToken, getTokenExpiryInMs, useToken } from '@/lib/token';
-import { useQueryClient } from '@tanstack/react-query';
 import {
   createContext,
   type PropsWithChildren,
@@ -26,10 +25,11 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 type AuthProviderProps = PropsWithChildren<{}>;
 
-export function AuthProvider({ children }: AuthProviderProps) {
-  const [accessToken, setAccessToken] = useToken();
-  const queryClient = useQueryClient();
-  const [user, setUser] = useState<Account>();
+function useRefreshTimer(
+  accessToken: string,
+  onTokenRefresh: (accessToken: string, account: Account) => void,
+  onTokenRefreshFail: () => void,
+) {
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   function clearRefreshTimer() {
@@ -43,9 +43,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     clearRefreshTimer();
 
     const timeUntilExpiry = getTokenExpiryInMs(token);
-    if (!timeUntilExpiry || timeUntilExpiry <= 0) {
-      return;
-    }
 
     // Refresh 5 minutes before expiry
     const refreshThreshold = 5 * 60 * 1000;
@@ -56,13 +53,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     refreshTimerRef.current = setTimeout(async () => {
       const { data: tokenData } = await fetchClient.POST('/api/auth/refresh');
-      if (tokenData?.accessToken) {
-        setAccessToken(tokenData.accessToken);
-        scheduleTokenRefresh(tokenData.accessToken);
+      if (tokenData) {
+        const { accessToken, account } = tokenData;
+        scheduleTokenRefresh(accessToken);
+        onTokenRefresh(accessToken, account);
       } else {
-        // Refresh failed, clear token and user
-        setAccessToken('');
-        setUser(undefined);
+        onTokenRefreshFail();
       }
     }, refreshDelay);
   }
@@ -76,7 +72,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     return () => clearRefreshTimer();
-  }, [accessToken]);
+  }, [accessToken, scheduleTokenRefresh]);
+}
+
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [accessToken, setAccessToken] = useToken();
+  const [user, setUser] = useState<Account>();
+  useRefreshTimer(
+    accessToken,
+    (newToken, account) => {
+      setAccessToken(newToken);
+      setUser(account);
+    },
+    () => {
+      setAccessToken('');
+      setUser(undefined);
+    },
+  );
 
   // On mount, check if token exists and fetch user
   useEffect(() => {
@@ -89,20 +101,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
         if (user) {
           setUser(user);
-          return;
         }
-
-        // Try refresh token flow
-        const { data: tokenData } = await fetchClient
-          .POST('/api/auth/refresh')
-          .catch(() => ({ data: undefined }));
-        if (!tokenData) {
-          setAccessToken('');
-          return;
-        }
-        const { accessToken: newAccessToken, account } = tokenData;
-        setAccessToken(newAccessToken);
-        setUser(account);
       }
     })();
   }, []);
