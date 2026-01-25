@@ -14,13 +14,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 /**
  * Annotation to indicate that a method or class returns a 200 OK response.
  * 
- * Unnecessary most of the time since 200 OK is the default, but can be used for
- * clarity.
+ * Unnecessary most of the time since 200 OK is the default, but having other
+ * annotations (Such as @BadRequestResponse) causes the default to be
+ * overridden. This annotation can be used to explicitly specify a 200 OK
+ * response in such cases.
  */
-@Target({ ElementType.METHOD, ElementType.TYPE })
+@Target({
+    ElementType.METHOD, ElementType.TYPE
+})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @ResponseStatus(code = HttpStatus.OK)
 @ApiResponse(responseCode = "200", description = "OK")
-public @interface OkResponse {
-}
+public @interface OkResponse {}
