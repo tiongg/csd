@@ -10,3 +10,11 @@ spring:
 
   jooq:
     sql-dialect: POSTGRES
+
+jwt:
+  secret: shikanokonokonokokoshitantanshikanokonokonokokoshitantanshikanokonokonokokoshitantan
+  # In hours
+  access-token:
+    expiration: 1
+  refresh-token:
+    expiration: 720
