@@ -84,7 +84,9 @@ services:
     volumes:
       - ./backend:/usr/src/maven
       - maven-repo:/root/.m2
-      - /var/run/docker.sock:/var/run/docker.sock 
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - .env
     environment:
       SPRING_PROFILES_ACTIVE: dev
       MAVEN_OPTS: >
