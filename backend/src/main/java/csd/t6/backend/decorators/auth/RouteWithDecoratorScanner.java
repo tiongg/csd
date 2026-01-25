@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+record MappingAnnotation(Class<? extends Annotation> annotationClass, HttpMethod httpMethod) {}
 
 public class RouteWithDecoratorScanner {
   private final ApplicationContext applicationContext;
@@ -23,12 +27,11 @@ public class RouteWithDecoratorScanner {
     this.decorator = decorator;
   }
 
-  protected List<String> scanRoutes() {
-    List<String> routes = new ArrayList<>();
+  protected List<RouteInfo> scanRoutes() {
+    List<RouteInfo> routes = new ArrayList<>();
 
     // Get all controllers
-    Set<String> controllerBeans = applicationContext
-        .getBeansWithAnnotation(org.springframework.web.bind.annotation.RestController.class).keySet();
+    Set<String> controllerBeans = applicationContext.getBeansWithAnnotation(RestController.class).keySet();
 
     for (String beanName : controllerBeans) {
       Object controller = applicationContext.getBean(beanName);
@@ -40,13 +43,13 @@ public class RouteWithDecoratorScanner {
       // Scan all methods
       for (Method method : controllerClass.getDeclaredMethods()) {
         if (method.isAnnotationPresent(decorator)) {
-          String methodPath = getMethodRoute(method);
-          if (methodPath != null) {
-            String fullPath = classPath + methodPath;
-            routes.add(fullPath);
+          RouteInfo route = getRouteInfo(method);
+          if (route != null) {
+            String fullPath = classPath + route.path();
+            routes.add(new RouteInfo(fullPath, route.httpMethod()));
             // Also add wildcard version for paths with path variables
             if (fullPath.contains("{") && !fullPath.endsWith("/**")) {
-              routes.add(fullPath + "/**");
+              routes.add(new RouteInfo(fullPath + "/**", route.httpMethod()));
             }
           }
         }
@@ -64,16 +67,24 @@ public class RouteWithDecoratorScanner {
     return "";
   }
 
-  private String getMethodRoute(Method method) {
-    List<Class<? extends Annotation>> mappingAnnotations = List.of(GetMapping.class, PostMapping.class,
-        PutMapping.class, DeleteMapping.class, PatchMapping.class, RequestMapping.class);
+  private RouteInfo getRouteInfo(Method method) {
+    // @formatter:off
+    List<MappingAnnotation> mappingAnnotations = List.of(
+      new MappingAnnotation(GetMapping.class, HttpMethod.GET) ,
+      new MappingAnnotation(PostMapping.class, HttpMethod.POST) ,
+      new MappingAnnotation(PutMapping.class, HttpMethod.PUT) ,
+      new MappingAnnotation(DeleteMapping.class, HttpMethod.DELETE) ,
+      new MappingAnnotation(PatchMapping.class, HttpMethod.PATCH) ,
+      new MappingAnnotation(RequestMapping.class, null) 
+    );
+    // @formatter:on
 
-    for (Class<? extends Annotation> annotationClass : mappingAnnotations) {
-      if (method.isAnnotationPresent(annotationClass)) {
-        Annotation annotation = method.getAnnotation(annotationClass);
+    for (MappingAnnotation mappingAnnotation : mappingAnnotations) {
+      if (method.isAnnotationPresent(mappingAnnotation.annotationClass())) {
+        Annotation annotation = method.getAnnotation(mappingAnnotation.annotationClass());
         try {
           String[] value = (String[]) annotation.annotationType().getMethod("value").invoke(annotation);
-          return value.length > 0 ? value[0] : "";
+          return value.length > 0 ? new RouteInfo(value[0], mappingAnnotation.httpMethod()) : null;
         } catch (Exception e) {
           return null;
         }

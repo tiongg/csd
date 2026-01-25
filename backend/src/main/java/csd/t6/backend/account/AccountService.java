@@ -5,40 +5,49 @@ import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import csd.t6.backend.account.dto.AccountCreateRequest;
 import csd.t6.backend.account.dto.AccountUpdateRequest;
+import csd.t6.backend.auth.OAuth2ProviderRepository;
 import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.jooq.accounts.enums.OauthProvider;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
+import csd.t6.jooq.accounts.tables.records.OauthConnectionRecord;
 
 @Service
 public class AccountService {
   private final AccountRepository accountRepository;
-  private final PasswordEncoder passwordEncoder;
+  private final OAuth2ProviderRepository oAuthProviderRepository;
 
-  public AccountService(AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
+  public AccountService(AccountRepository accountRepository, OAuth2ProviderRepository oAuthProviderRepository) {
     this.accountRepository = accountRepository;
-    this.passwordEncoder = passwordEncoder;
+    this.oAuthProviderRepository = oAuthProviderRepository;
   }
 
   public List<AccountRecord> getAllAccounts() {
     return this.accountRepository.findAll();
   }
 
-  public AccountRecord createNewAccount(AccountCreateRequest createDTO) {
-    if (this.accountRepository.exists(ACCOUNT.USERNAME, createDTO.username())) {
+  public AccountRecord createNewAccount(String username, String email, String hashedPassword) {
+    if (this.accountRepository.exists(ACCOUNT.USERNAME, username)) {
       throw new BadRequestException("Username already exists");
     }
 
-    if (this.accountRepository.exists(ACCOUNT.EMAIL, createDTO.email())) {
+    if (this.accountRepository.exists(ACCOUNT.EMAIL, email)) {
       throw new BadRequestException("Email already exists");
     }
 
-    String hashedPassword = this.passwordEncoder.encode(createDTO.password());
+    return this.accountRepository.insert(email, username, hashedPassword);
+  }
 
-    return this.accountRepository.insert(createDTO.email(), createDTO.username(), hashedPassword);
+  public OauthConnectionRecord createWithOAuthLogin(String email, String realName, OauthProvider provider,
+      String providerId) {
+
+    AccountRecord account = this.accountRepository.findBy(ACCOUNT.EMAIL, email)
+        .orElseGet(() -> this.accountRepository.insert(email, realName, null));
+    OauthConnectionRecord oauthAccount = this.oAuthProviderRepository.insert(account.getId(), provider, providerId,
+        email);
+    return oauthAccount;
   }
 
   public AccountRecord updateAccount(UUID id, AccountUpdateRequest updateDTO) {

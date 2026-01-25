@@ -68,12 +68,15 @@ public class AuthController {
   @PublicDecorator() // Potentially can be called without access token, but cookie instead
   @OkResponse()
   @BadRequestResponse()
-  public LoginResponseDto refresh(@CookieValue(name = "refresh_token", required = false) String refreshTokenCookie) {
+  public LoginResponseDto refresh(@CookieValue(name = "refresh_token", required = false) String refreshTokenCookie,
+      HttpServletResponse response) {
     if (refreshTokenCookie == null || !jwtService.isTokenValid(refreshTokenCookie)) {
       throw new BadRequestException("Invalid refresh token");
     }
+
     UUID accountId = jwtService.extractAccountId(refreshTokenCookie);
     TokenData tokenData = this.authService.generateTokenData(accountId);
+    response.addCookie(tokenData.refreshCookie());
     return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDTO(tokenData.account()));
   }
 

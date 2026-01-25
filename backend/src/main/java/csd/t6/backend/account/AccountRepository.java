@@ -68,4 +68,28 @@ public class AccountRepository {
     accountRecord.store();
     return accountRecord;
   }
+
+  /**
+   * Insert a new account via OAuth2 (without password).
+   * The username is derived from the email prefix.
+   */
+  public AccountRecord insertOAuth2(String email, String realName) {
+    // Generate username from email (e.g., "user@gmail.com" -> "user_gmail")
+    String baseUsername = email.split("@")[0].replaceAll("[^a-zA-Z0-9]", "_");
+    String username = baseUsername;
+    int counter = 1;
+    while (exists(ACCOUNT.USERNAME, username)) {
+      username = baseUsername + "_" + counter++;
+    }
+
+    AccountRecord record = dsl.newRecord(ACCOUNT);
+    record.setId(UUID.randomUUID());
+    record.setEmail(email);
+    record.setUsername(username);
+    record.setRealName(realName);
+    record.setUserRole(Roles.LEARNER);
+    // password_hash is null for OAuth-only users
+    record.store();
+    return record;
+  }
 }
