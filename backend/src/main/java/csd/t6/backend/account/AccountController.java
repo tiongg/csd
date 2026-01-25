@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.AccountCreateRequest;
 import csd.t6.backend.account.dto.AccountResponseDTO;
+import csd.t6.backend.decorators.responses.BadRequestResponse;
+import csd.t6.backend.decorators.responses.CreatedResponse;
+import csd.t6.backend.decorators.responses.NoContentResponse;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/account")
@@ -29,11 +33,15 @@ public class AccountController {
   }
 
   @PostMapping("/")
-  public AccountResponseDTO createAccount(@RequestBody AccountCreateRequest entity) {
-    return new AccountResponseDTO(accountService.createNewAccount(entity.email()));
+  @CreatedResponse()
+  @BadRequestResponse()
+  public AccountResponseDTO createAccount(@RequestBody @Valid AccountCreateRequest createDTO) {
+    return new AccountResponseDTO(accountService.createNewAccount(createDTO));
   }
 
   @DeleteMapping("/{accountId}")
+  @BadRequestResponse()
+  @NoContentResponse()
   public void deleteAccount(@PathVariable String accountId) {
     accountService.deleteAccount(UUID.fromString(accountId));
   }

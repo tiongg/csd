@@ -58,11 +58,23 @@ export interface components {
     schemas: {
         AccountCreateRequest: {
             email: string;
+            username: string;
+            password: string;
+        };
+        HttpErrorPayload: {
+            /** Format: int64 */
+            timestamp: number;
+            /** Format: int32 */
+            status: number;
+            error: string;
+            message: string;
+            path: string;
         };
         Account: {
             /** Format: uuid */
             id: string;
             email: string;
+            username: string;
         };
     };
     responses: never;
@@ -106,13 +118,22 @@ export interface operations {
             };
         };
         responses: {
-            /** @description OK */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "*/*": components["schemas"]["Account"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
                 };
             };
         };
@@ -148,12 +169,21 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description OK */
-            200: {
+            /** @description No Content */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
             };
         };
     };
