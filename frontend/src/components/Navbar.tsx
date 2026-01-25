@@ -27,7 +27,7 @@ export default function Navbar() {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link to="/profile" className="w-full">
                 My Account
               </Link>
