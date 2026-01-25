@@ -34,9 +34,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         apiQueryOptions('get', '/api/auth/me').queryKey,
         account,
       );
-      await queryClient.invalidateQueries(
-        apiQueryOptions('get', '/api/auth/me'),
-      );
     },
   });
   const { mutateAsync: logoutCall } = useApiMutation(
@@ -60,6 +57,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   );
 
   async function loginWithPassword(usernameOrEmail: string, password: string) {
+    // TODO: This loses error information. Improve it later.
     try {
       await login({
         body: {
