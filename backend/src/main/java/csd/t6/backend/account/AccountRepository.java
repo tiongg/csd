@@ -3,6 +3,7 @@ package csd.t6.backend.account;
 import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
@@ -57,5 +58,19 @@ public class AccountRepository {
         dsl.selectOne()
             .from(ACCOUNT)
             .where(field.eq(value)));
+  }
+
+  /**
+   * Generic method to find an account by a specified field.
+   * 
+   * @param field - the field to find by
+   * @param value - the value to look for
+   * @return the AccountRecord if found, null otherwise
+   */
+  public <T> Optional<AccountRecord> findBy(Field<T> field, T value) {
+    AccountRecord found = dsl.selectFrom(ACCOUNT)
+        .where(field.eq(value))
+        .fetchOne();
+    return Optional.ofNullable(found);
   }
 }
