@@ -43,8 +43,16 @@ public class AccountService {
   public OauthConnectionRecord createWithOAuthLogin(String email, String realName, OauthProvider provider,
       String providerId) {
 
-    AccountRecord account = this.accountRepository.findBy(ACCOUNT.EMAIL, email)
-        .orElseGet(() -> this.accountRepository.insert(email, realName, null));
+    AccountRecord account = this.accountRepository.findBy(ACCOUNT.EMAIL, email).orElseGet(() -> {
+      String usernameBase = email.split("@")[0];
+      String username = usernameBase;
+      int suffix = 1;
+      while (this.accountRepository.exists(ACCOUNT.USERNAME, username)) {
+        username = usernameBase + "_" + suffix;
+        suffix++;
+      }
+      return this.accountRepository.insert(email, username, null);
+    });
     OauthConnectionRecord oauthAccount = this.oAuthProviderRepository.insert(account.getId(), provider, providerId,
         email);
     return oauthAccount;
