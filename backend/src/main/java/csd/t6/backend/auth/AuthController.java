@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import csd.t6.backend.account.dto.AccountResponseDTO;
 import csd.t6.backend.auth.dto.LoginDto;
 import csd.t6.backend.auth.dto.LoginResponseDto;
+import csd.t6.backend.decorators.auth.PublicDecorator;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
 import csd.t6.backend.decorators.responses.OkResponse;
@@ -34,6 +35,7 @@ public class AuthController {
   }
 
   @PostMapping("/login")
+  @PublicDecorator()
   @OkResponse()
   @BadRequestResponse()
   public LoginResponseDto loginWithPassword(
