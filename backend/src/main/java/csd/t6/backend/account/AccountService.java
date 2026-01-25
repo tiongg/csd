@@ -45,7 +45,7 @@ public class AccountService {
     AccountRecord existingAccount = this.accountRepository.findBy(ACCOUNT.ID, id)
         .orElseThrow(() -> new BadRequestException("Account does not exist"));
 
-    if (!existingAccount.getUsername().equals(updateDTO.username())
+    if (updateDTO.username() != null && !existingAccount.getUsername().equals(updateDTO.username())
         && this.accountRepository.exists(ACCOUNT.USERNAME, updateDTO.username())) {
       throw new BadRequestException("Username already exists");
     }
