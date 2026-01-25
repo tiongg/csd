@@ -1,20 +1,20 @@
 import type { paths } from '@/generated/api';
-import createFetchClient from 'openapi-fetch';
+import createFetchClient, { type Middleware } from 'openapi-fetch';
 import createClient from 'openapi-react-query';
+import { getToken } from './token';
 
 const fetchClient = createFetchClient<paths>({
   baseUrl: import.meta.env.VITE_BACKEND_URL,
 });
 
-// When we do auth
-// const authMiddleware: Middleware = {
-//   async onRequest({ request, options }) {
-//     request.headers.set('Authentication', 'bar');
-//     return request;
-//   },
-// };
+const authMiddleware: Middleware = {
+  async onRequest({ request }) {
+    request.headers.set('Authorization', `Bearer ${getToken()}`);
+    return request;
+  },
+};
 
-// fetchClient.use(authMiddleware);
+fetchClient.use(authMiddleware);
 
 const $api = createClient(fetchClient);
 
