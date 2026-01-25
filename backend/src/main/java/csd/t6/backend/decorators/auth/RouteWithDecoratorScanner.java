@@ -65,10 +65,8 @@ public class RouteWithDecoratorScanner {
   }
 
   private String getMethodRoute(Method method) {
-    Class<? extends Annotation>[] mappingAnnotations = new Class[] {
-        GetMapping.class, PostMapping.class, PutMapping.class, DeleteMapping.class, PatchMapping.class,
-        RequestMapping.class
-    };
+    List<Class<? extends Annotation>> mappingAnnotations = List.of(GetMapping.class, PostMapping.class,
+        PutMapping.class, DeleteMapping.class, PatchMapping.class, RequestMapping.class);
 
     for (Class<? extends Annotation> annotationClass : mappingAnnotations) {
       if (method.isAnnotationPresent(annotationClass)) {
