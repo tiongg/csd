@@ -3,8 +3,9 @@ import createFetchClient, { type Middleware } from 'openapi-fetch';
 import createClient from 'openapi-react-query';
 import { getToken } from './token';
 
-const fetchClient = createFetchClient<paths>({
+export const fetchClient = createFetchClient<paths>({
   baseUrl: import.meta.env.VITE_BACKEND_URL,
+  credentials: 'include',
 });
 
 const authMiddleware: Middleware = {

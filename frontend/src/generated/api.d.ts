@@ -162,7 +162,9 @@ export interface operations {
             query?: never;
             header?: never;
             path?: never;
-            cookie?: never;
+            cookie?: {
+                refresh_token?: string;
+            };
         };
         requestBody?: never;
         responses: {
