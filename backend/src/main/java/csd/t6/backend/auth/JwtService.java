@@ -42,12 +42,8 @@ public class JwtService {
     Instant now = Instant.now();
     Instant expiry = now.plus(expiration, unit);
 
-    return Jwts.builder()
-        .subject(accountId.toString())
-        .issuedAt(Date.from(now))
-        .expiration(Date.from(expiry))
-        .signWith(getSigningKey())
-        .compact();
+    return Jwts.builder().subject(accountId.toString()).issuedAt(Date.from(now)).expiration(Date.from(expiry))
+        .signWith(getSigningKey()).compact();
   }
 
   public UUID extractAccountId(String token) {
@@ -65,14 +61,14 @@ public class JwtService {
   }
 
   private Claims extractAllClaims(String token) {
-    return Jwts.parser()
-        .verifyWith(getSigningKey())
-        .build()
-        .parseSignedClaims(token)
-        .getPayload();
+    return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload();
   }
 
   public long getAccessTokenExpirationHours() {
     return accessTokenExpirationHours;
+  }
+
+  public long getRefreshTokenExpirationHours() {
+    return refreshTokenExpirationHours;
   }
 }

@@ -29,8 +29,6 @@ public class AuthController {
   private final AuthenticationManager authenticationManager;
   private final JwtService jwtService;
 
-  private static final int THIRTY_DAYS_IN_SECONDS = 30 * 24 * 60 * 60;
-
   public AuthController(AuthenticationManager authenticationManager, JwtService jwtService) {
     this.authenticationManager = authenticationManager;
     this.jwtService = jwtService;
@@ -57,7 +55,7 @@ public class AuthController {
 
     // Set refresh token in httpOnly cookie
     Cookie refreshCookie = this.createRefreshTokenCookie(refreshToken);
-    refreshCookie.setMaxAge(THIRTY_DAYS_IN_SECONDS);
+    refreshCookie.setMaxAge((int) jwtService.getRefreshTokenExpirationHours() * 3600);
     response.addCookie(refreshCookie);
 
     return new LoginResponseDto(accessToken, new AccountResponseDTO(userDetails.getAccount()));
