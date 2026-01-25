@@ -134,7 +134,7 @@ export interface components {
             id: string;
             email: string;
             username: string;
-            realName: string;
+            realname: string;
         };
         LoginResponseDto: {
             accessToken: string;

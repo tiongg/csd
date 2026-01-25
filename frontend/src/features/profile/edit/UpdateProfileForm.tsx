@@ -16,7 +16,10 @@ import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 const updateSchema = z.object({
-  username: z.string().min(3, 'Username must be at least 3 characters'),
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters')
+    .optional(),
   realName: z.string().optional(),
 });
 
@@ -33,10 +36,6 @@ async function getGravatarUrl(email: string, size = 120) {
   return `https://www.gravatar.com/avatar/${hashedEmail}?s=${size}&d=identicon`;
 }
 
-function getGravatarProfileUrl(email: string) {
-  return `https://www.gravatar.com/profile/${email}`;
-}
-
 export default function UpdateProfileForm() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -51,8 +50,8 @@ export default function UpdateProfileForm() {
   } = useForm<UpdateFormValues>({
     resolver: zodResolver(updateSchema),
     defaultValues: {
-      username: user?.username ?? '',
-      realName: user?.realName ?? '',
+      username: user?.username,
+      realName: user?.realname,
     },
   });
 
@@ -82,7 +81,6 @@ export default function UpdateProfileForm() {
   };
 
   getGravatarUrl(user.email).then((url) => setGravatarUrl(url));
-  const gravatarProfileUrl = getGravatarProfileUrl(user.email);
 
   return (
     <div className="w-full max-w-lg space-y-6">
@@ -98,7 +96,7 @@ export default function UpdateProfileForm() {
           </div>
           <div className="flex flex-1 flex-col gap-1 text-center sm:text-left">
             <h2 className="text-xl font-semibold">
-              {user?.realName || 'No name set'}
+              {user?.realname || 'No name set'}
             </h2>
             <p className="text-muted-foreground">@{user?.username}</p>
             <p className="text-muted-foreground text-sm">{user?.email}</p>
@@ -108,7 +106,7 @@ export default function UpdateProfileForm() {
         <Separator className="my-4" />
 
         <a
-          href={gravatarProfileUrl}
+          href="https://www.gravatar.com/profile/"
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary hover:text-primary/80 inline-flex items-center justify-center text-sm transition-colors"
