@@ -11,7 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -49,10 +49,6 @@ export default function UpdateProfileForm() {
     reset,
   } = useForm<UpdateFormValues>({
     resolver: zodResolver(updateSchema),
-    defaultValues: {
-      username: user?.username,
-      realName: user?.realname,
-    },
   });
 
   const { mutateAsync: updateAccount } = useApiMutation(
@@ -72,6 +68,13 @@ export default function UpdateProfileForm() {
     },
   );
 
+  useEffect(() => {
+    if (!user?.email) {
+      return;
+    }
+    getGravatarUrl(user.email).then((url) => setGravatarUrl(url));
+  }, [user, setGravatarUrl]);
+
   if (!user) {
     return null;
   }
@@ -79,8 +82,6 @@ export default function UpdateProfileForm() {
   const onSubmit = async (data: UpdateFormValues) => {
     await updateAccount({ body: data });
   };
-
-  getGravatarUrl(user.email).then((url) => setGravatarUrl(url));
 
   return (
     <div className="w-full max-w-lg space-y-6">
