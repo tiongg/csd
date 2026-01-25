@@ -65,7 +65,7 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        patch: operations["updateAccount"];
         trace?: never;
     };
     "/api/auth/me": {
@@ -134,6 +134,7 @@ export interface components {
             id: string;
             email: string;
             username: string;
+            realName: string;
         };
         LoginResponseDto: {
             accessToken: string;
@@ -147,6 +148,10 @@ export interface components {
             email: string;
             username: string;
             password: string;
+        };
+        AccountUpdateRequest: {
+            username?: string;
+            realName?: string;
         };
     };
     responses: never;
@@ -274,6 +279,39 @@ export interface operations {
         responses: {
             /** @description Created */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Account"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    updateAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -3,8 +3,10 @@ package csd.t6.backend.account;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,10 +15,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.AccountCreateRequest;
 import csd.t6.backend.account.dto.AccountResponseDTO;
+import csd.t6.backend.account.dto.AccountUpdateRequest;
+import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.decorators.auth.PublicDecorator;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
+import csd.t6.backend.decorators.responses.OkResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -46,5 +51,13 @@ public class AccountController {
   @NoContentResponse()
   public void deleteAccount(@PathVariable String accountId) {
     accountService.deleteAccount(UUID.fromString(accountId));
+  }
+
+  @PatchMapping("/")
+  @BadRequestResponse()
+  @OkResponse()
+  public AccountResponseDTO updateAccount(@AuthenticationPrincipal AuthUserDetails user,
+      @RequestBody @Valid AccountUpdateRequest updateDTO) {
+    return new AccountResponseDTO(accountService.updateAccount(user.getAccount().getId(), updateDTO));
   }
 }
