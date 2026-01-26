@@ -2,6 +2,7 @@ import { useApiQuery } from '@/lib/fetch-client';
 import { useToken } from '@/lib/token';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
+
 export const Route = createFileRoute('/login/callback')({
   component: RouteComponent,
 });
