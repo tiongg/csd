@@ -17,8 +17,9 @@ import {
 
 export type Account = components['schemas']['Account'];
 
-type AuthContextType = {
+export type AuthContextType = {
   user: Account | undefined;
+  isLoggedIn: boolean;
   loginWithPassword: (
     usernameOrEmail: string,
     password: string,
@@ -83,7 +84,8 @@ function useRefreshTimer(
 export function AuthProvider({ children }: AuthProviderProps) {
   const [accessToken, setAccessToken] = useToken();
   const queryClient = useQueryClient();
-  const { data: user } = useApiQuery(
+
+  const { data: user, isPending: isLoggingIn } = useApiQuery(
     'get',
     '/api/auth/me',
     {},
@@ -151,6 +153,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         user,
         loginWithPassword,
         logout: () => logoutCall({}),
+        isLoggedIn: !!user || (isLoggingIn && !!accessToken),
       }}
     >
       {children}
