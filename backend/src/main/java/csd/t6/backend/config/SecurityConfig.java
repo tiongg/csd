@@ -1,5 +1,7 @@
 package csd.t6.backend.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +24,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
+  private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final PublicEndpointScanner publicEndpointScanner;
   private final OAuth2SuccessHandler oAuth2SuccessHandler;
@@ -41,7 +45,7 @@ public class SecurityConfig {
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
       .authorizeHttpRequests((requests) ->{
         for(RouteInfo route : publicEndpointScanner.getPublicRoutes()) {
-          System.out.println("Permitting public route: " + route);
+          log.info("Permitting public route: " + route);
           if(route.httpMethod() != null) {
             requests.requestMatchers(route.httpMethod(), route.path()).permitAll();
           } else {
