@@ -10,9 +10,8 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import csd.t6.backend.account.AccountService;
-import csd.t6.backend.auth.AuthService;
 import csd.t6.backend.auth.OAuth2ProviderRepository;
-import csd.t6.backend.auth.dto.TokenData;
+import csd.t6.backend.auth.OAuthCodeService;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.jooq.accounts.enums.OauthProvider;
 import csd.t6.jooq.accounts.tables.records.OauthConnectionRecord;
@@ -27,12 +26,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
   private String frontendUrl;
 
   private final OAuth2ProviderRepository oauth2ProviderRepository;
-  private final AuthService authService;
+  private final OAuthCodeService oauthCodeService;
   private final AccountService accountService;
 
-  public OAuth2SuccessHandler(AuthService authService, AccountService accountService,
+  public OAuth2SuccessHandler(OAuthCodeService oauthCodeService, AccountService accountService,
       OAuth2ProviderRepository oauth2ProviderRepository) {
-    this.authService = authService;
+    this.oauthCodeService = oauthCodeService;
     this.accountService = accountService;
     this.oauth2ProviderRepository = oauth2ProviderRepository;
   }
@@ -52,10 +51,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         .findByProviderAndProviderId(provider, userInfo.providerId()).orElseGet(() -> this.accountService
             .createWithOAuthLogin(userInfo.email(), userInfo.name(), provider, userInfo.providerId()));
 
-    TokenData tokenData = authService.generateTokenData(account.getAccountId());
-
-    response.addCookie(tokenData.refreshCookie());
-    String redirectUrl = String.format("%s/login/callback?accessToken=%s", frontendUrl, tokenData.accessToken());
+    String code = oauthCodeService.createCode(account.getAccountId());
+    String redirectUrl = String.format("%s/login/callback?code=%s", frontendUrl, code);
 
     getRedirectStrategy().sendRedirect(request, response, redirectUrl);
   }

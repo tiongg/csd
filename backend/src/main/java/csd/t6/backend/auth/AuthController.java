@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.AccountResponseDTO;
+import csd.t6.backend.auth.dto.ExchangeCodeDto;
 import csd.t6.backend.auth.dto.LoginDto;
 import csd.t6.backend.auth.dto.LoginResponseDto;
 import csd.t6.backend.auth.dto.TokenData;
@@ -32,11 +33,14 @@ public class AuthController {
   private final AuthenticationManager authenticationManager;
   private final JwtService jwtService;
   private final AuthService authService;
+  private final OAuthCodeService oauthCodeService;
 
-  public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, AuthService authService) {
+  public AuthController(AuthenticationManager authenticationManager, JwtService jwtService, AuthService authService,
+      OAuthCodeService oauthCodeService) {
     this.authenticationManager = authenticationManager;
     this.jwtService = jwtService;
     this.authService = authService;
+    this.oauthCodeService = oauthCodeService;
   }
 
   @PostMapping("/login")
@@ -88,5 +92,17 @@ public class AuthController {
       throw new BadRequestException("User is not authenticated");
     }
     return new AccountResponseDTO(user.getAccount());
+  }
+
+  @PostMapping("/exchange")
+  @PublicDecorator()
+  @OkResponse()
+  @BadRequestResponse()
+  public LoginResponseDto exchangeCode(@RequestBody @Valid ExchangeCodeDto exchangeCodeDto,
+      HttpServletResponse response) {
+    UUID accountId = oauthCodeService.consumeCode(exchangeCodeDto.code());
+    TokenData tokenData = authService.generateTokenData(accountId);
+    response.addCookie(tokenData.refreshCookie());
+    return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDTO(tokenData.account()));
   }
 }

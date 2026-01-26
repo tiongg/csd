@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/exchange": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["exchangeCode"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/account/": {
         parameters: {
             query?: never;
@@ -144,6 +160,9 @@ export interface components {
             usernameOrEmail: string;
             password: string;
         };
+        ExchangeCodeDto: {
+            code: string;
+        };
         AccountCreateRequest: {
             email: string;
             username: string;
@@ -221,6 +240,39 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["LoginDto"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LoginResponseDto"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    exchangeCode: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExchangeCodeDto"];
             };
         };
         responses: {
