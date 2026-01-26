@@ -75,11 +75,11 @@ export default function RegistrationForm() {
       await createAccount({
         body: accountData,
       });
-      loginWithPassword(data.username, data.password);
-      navigate({ to: '/' });
     } catch (err) {
-      // Noop, error is handled in onError of useApiMutation
+      return;
     }
+    loginWithPassword(data.username, data.password);
+    navigate({ to: '/' });
   };
 
   return (
