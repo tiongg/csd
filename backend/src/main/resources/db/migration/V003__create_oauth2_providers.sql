@@ -10,7 +10,8 @@ CREATE TABLE accounts.oauth_connection (
   provider_id TEXT NOT NULL,
   email TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE (provider, provider_id)
+  UNIQUE (provider, provider_id),
+  UNIQUE (account_id, provider)
 );
 
 -- Index for fast lookups by provider and provider_id
