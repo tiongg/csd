@@ -26,12 +26,17 @@ public class AccountRepository {
   }
 
   public AccountRecord insert(String email, String username, String passwordHash) {
+    return insert(email, username, passwordHash, null);
+  }
+
+  public AccountRecord insert(String email, String username, String passwordHash, String realname) {
     AccountRecord record = dsl.newRecord(ACCOUNT);
     record.setId(UUID.randomUUID());
     record.setEmail(email);
     record.setPasswordHash(passwordHash);
     record.setUserRole(Roles.LEARNER);
     record.setUsername(username);
+    record.setRealName(realname);
 
     record.store();
     return record;

@@ -38,7 +38,7 @@ public class SecurityConfig {
     // @formatter:off
     http
       .cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable())
-      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
       .authorizeHttpRequests((requests) ->{
         for(RouteInfo route : publicEndpointScanner.getPublicRoutes()) {
           System.out.println("Permitting public route: " + route);

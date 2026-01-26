@@ -40,9 +40,8 @@ public class AccountService {
     return this.accountRepository.insert(email, username, hashedPassword);
   }
 
-  public OauthConnectionRecord createWithOAuthLogin(String email, String realName, OauthProvider provider,
+  public OauthConnectionRecord createWithOAuthLogin(String email, String realname, OauthProvider provider,
       String providerId) {
-
     AccountRecord account = this.accountRepository.findBy(ACCOUNT.EMAIL, email).orElseGet(() -> {
       String usernameBase = email.split("@")[0];
       String username = usernameBase;
@@ -51,7 +50,7 @@ public class AccountService {
         username = usernameBase + "_" + suffix;
         suffix++;
       }
-      return this.accountRepository.insert(email, username, null);
+      return this.accountRepository.insert(email, username, null, realname);
     });
     OauthConnectionRecord oauthAccount = this.oAuthProviderRepository.insert(account.getId(), provider, providerId,
         email);
