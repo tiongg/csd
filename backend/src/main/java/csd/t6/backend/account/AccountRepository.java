@@ -25,10 +25,7 @@ public class AccountRepository {
     return dsl.selectFrom(ACCOUNT).fetch();
   }
 
-  public AccountRecord insert(
-      String email,
-      String username,
-      String passwordHash) {
+  public AccountRecord insert(String email, String username, String passwordHash) {
     AccountRecord record = dsl.newRecord(ACCOUNT);
     record.setId(UUID.randomUUID());
     record.setEmail(email);
@@ -41,9 +38,7 @@ public class AccountRepository {
   }
 
   public int delete(UUID id) {
-    return dsl.deleteFrom(ACCOUNT)
-        .where(ACCOUNT.ID.eq(id))
-        .execute();
+    return dsl.deleteFrom(ACCOUNT).where(ACCOUNT.ID.eq(id)).execute();
   }
 
   /**
@@ -54,10 +49,7 @@ public class AccountRepository {
    * @return true if an entity with the value in the field exists, false otherwise
    */
   public <T> boolean exists(Field<T> field, T value) {
-    return dsl.fetchExists(
-        dsl.selectOne()
-            .from(ACCOUNT)
-            .where(field.eq(value)));
+    return dsl.fetchExists(dsl.selectOne().from(ACCOUNT).where(field.eq(value)));
   }
 
   /**
@@ -68,9 +60,12 @@ public class AccountRepository {
    * @return the AccountRecord if found, null otherwise
    */
   public <T> Optional<AccountRecord> findBy(Field<T> field, T value) {
-    AccountRecord found = dsl.selectFrom(ACCOUNT)
-        .where(field.eq(value))
-        .fetchOne();
+    AccountRecord found = dsl.selectFrom(ACCOUNT).where(field.eq(value)).fetchOne();
     return Optional.ofNullable(found);
+  }
+
+  public AccountRecord update(AccountRecord accountRecord) {
+    accountRecord.store();
+    return accountRecord;
   }
 }

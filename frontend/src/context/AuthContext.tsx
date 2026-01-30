@@ -1,13 +1,18 @@
 import type { components } from '@/generated/api';
-import { fetchClient, useApiMutation } from '@/lib/fetch-client';
-import { getToken, getTokenExpiryInMs, useToken } from '@/lib/token';
+import {
+  apiQueryOptions,
+  fetchClient,
+  useApiMutation,
+  useApiQuery,
+} from '@/lib/fetch-client';
+import { getTokenExpiryInMs, useToken } from '@/lib/token';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   createContext,
   type PropsWithChildren,
   useContext,
   useEffect,
   useRef,
-  useState,
 } from 'react';
 
 export type Account = components['schemas']['Account'];
@@ -77,40 +82,43 @@ function useRefreshTimer(
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [accessToken, setAccessToken] = useToken();
-  const [user, setUser] = useState<Account>();
+  const queryClient = useQueryClient();
+  const { data: user } = useApiQuery(
+    'get',
+    '/api/auth/me',
+    {},
+    {
+      enabled: !!accessToken,
+    },
+  );
+
+  function clearAuthData() {
+    setAccessToken('');
+    queryClient.removeQueries({
+      queryKey: apiQueryOptions('get', '/api/auth/me').queryKey,
+    });
+  }
+
   useRefreshTimer(
     accessToken,
     (newToken, account) => {
       setAccessToken(newToken);
-      setUser(account);
+      queryClient.setQueryData(
+        apiQueryOptions('get', '/api/auth/me').queryKey,
+        account,
+      );
     },
-    () => {
-      setAccessToken('');
-      setUser(undefined);
-    },
+    clearAuthData,
   );
-
-  // On mount, check if token exists and fetch user
-  useEffect(() => {
-    (async () => {
-      const token = getToken();
-      if (token) {
-        const { data: user } = await fetchClient
-          .GET('/api/auth/me')
-          .catch(() => ({ data: undefined }));
-
-        if (user) {
-          setUser(user);
-        }
-      }
-    })();
-  }, []);
 
   const { mutateAsync: login } = useApiMutation('post', '/api/auth/login', {
     onSuccess: async (data) => {
       const { accessToken, account } = data;
       setAccessToken(accessToken);
-      setUser(account);
+      queryClient.setQueryData(
+        apiQueryOptions('get', '/api/auth/me').queryKey,
+        account,
+      );
     },
   });
 
@@ -118,10 +126,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     'post',
     '/api/auth/logout',
     {
-      onSuccess: () => {
-        setAccessToken('');
-        setUser(undefined);
-      },
+      onSuccess: clearAuthData,
     },
   );
 
