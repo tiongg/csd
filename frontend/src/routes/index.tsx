@@ -21,7 +21,7 @@ function App() {
     '/api/account/',
     {},
     {
-      enabled: !!user,
+      // enabled: !!user,
     },
   );
   const { mutateAsync: deleteAccount } = useApiMutation(

@@ -101,12 +101,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useRefreshTimer(
     accessToken,
-    (newToken, account) => {
+    (newToken) => {
       setAccessToken(newToken);
-      queryClient.setQueryData(
-        apiQueryOptions('get', '/api/auth/me').queryKey,
-        account,
-      );
+      // TODO: For some reason set query data doesnt work here?
+      queryClient.invalidateQueries({
+        queryKey: apiQueryOptions('get', '/api/auth/me').queryKey,
+      });
     },
     clearAuthData,
   );

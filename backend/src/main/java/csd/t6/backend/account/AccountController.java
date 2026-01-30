@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,9 +29,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/account")
 public class AccountController {
   private final AccountService accountService;
+  private final PasswordEncoder passwordEncoder;
 
-  public AccountController(AccountService accountService) {
+  public AccountController(AccountService accountService, PasswordEncoder passwordEncoder) {
     this.accountService = accountService;
+    this.passwordEncoder = passwordEncoder;
   }
 
   @GetMapping("/")
@@ -43,7 +46,9 @@ public class AccountController {
   @CreatedResponse()
   @BadRequestResponse()
   public AccountResponseDTO createAccount(@RequestBody @Valid AccountCreateRequest createDTO) {
-    return new AccountResponseDTO(accountService.createNewAccount(createDTO));
+    String hashedPassword = passwordEncoder.encode(createDTO.password());
+    return new AccountResponseDTO(
+        accountService.createNewAccount(createDTO.username(), createDTO.email(), hashedPassword));
   }
 
   @DeleteMapping("/{accountId}")

@@ -1,5 +1,7 @@
 package csd.t6.backend.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,32 +16,55 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import csd.t6.backend.auth.JwtAuthenticationFilter;
+import csd.t6.backend.auth.oauth.OAuth2SuccessHandler;
 import csd.t6.backend.decorators.auth.PublicEndpointScanner;
+import csd.t6.backend.decorators.auth.RouteInfo;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
+  private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
   private final PublicEndpointScanner publicEndpointScanner;
+  private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-  public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, PublicEndpointScanner publicEndpointScanner) {
+  public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, PublicEndpointScanner publicEndpointScanner,
+      OAuth2SuccessHandler oAuth2SuccessHandler) {
     this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     this.publicEndpointScanner = publicEndpointScanner;
+    this.oAuth2SuccessHandler = oAuth2SuccessHandler;
   }
 
   @Bean
-  SecurityFilterChain securityFilterChain(HttpSecurity http) {
+  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    // @formatter:off
     http
-        .cors(Customizer.withDefaults())
-        .csrf(csrf -> csrf.disable())
-        .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests((requests) -> requests
-            // Public endpoints (swagger + @PublicDecorator annotated methods)
-            .requestMatchers(publicEndpointScanner.getPublicPaths()).permitAll()
-            .anyRequest().authenticated())
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+      .cors(Customizer.withDefaults()).csrf(csrf -> csrf.disable())
+      .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+      .authorizeHttpRequests((requests) ->{
+        for(RouteInfo route : publicEndpointScanner.getPublicRoutes()) {
+          log.info("Permitting public route: " + route);
+          if(route.httpMethod() != null) {
+            requests.requestMatchers(route.httpMethod(), route.path()).permitAll();
+          } else {
+            requests.requestMatchers(route.path()).permitAll();
+          }
+        }
 
+        // Default: secure all other endpoints
+        requests.anyRequest().authenticated();
+      })
+      .oauth2Login(oauth2 -> oauth2.successHandler(oAuth2SuccessHandler))
+      .exceptionHandling(exception -> exception
+        .authenticationEntryPoint((req, res, authEx) -> {
+            // Return 401 for API requests instead of redirecting
+            res.sendError(HttpServletResponse.SC_UNAUTHORIZED, authEx.getMessage());
+        })
+      )
+      .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    // @formatter:on
     return http.build();
   }
 
