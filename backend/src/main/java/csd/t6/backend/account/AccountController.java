@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.AccountCreateRequest;
 import csd.t6.backend.account.dto.AccountResponseDTO;
+import csd.t6.backend.decorators.auth.PublicDecorator;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -33,6 +34,7 @@ public class AccountController {
   }
 
   @PostMapping("/")
+  @PublicDecorator()
   @CreatedResponse()
   @BadRequestResponse()
   public AccountResponseDTO createAccount(@RequestBody @Valid AccountCreateRequest createDTO) {
