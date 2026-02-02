@@ -7,13 +7,14 @@
 body {
   @apply m-0;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    "Geist", -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
     'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply text-sky-900;
 }
 
-code {
+code, .font-mono {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
@@ -135,4 +136,36 @@ code {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+h1, h2, h3, h4 {
+  @apply font-bold text-sky-950 w-fit;
+  font-family: "Kreon", serif;
+}
+
+h1 {
+  @apply text-3xl;
+  background: linear-gradient(var(--color-sky-200), var(--color-sky-200)) 0 90% / 100% 10px no-repeat;
+}
+
+h2 {
+  @apply text-2xl;
+}
+
+h3 {
+  @apply text-xl;
+}
+
+h4 {
+  @apply text-lg;
+}
+
+p {
+  @apply text-sky-900;
+}
+
+.subtitle {
+  font-family: "Kreon", serif;
+  @apply text-slate-500;
+  margin: 0.25em 0;
 }
