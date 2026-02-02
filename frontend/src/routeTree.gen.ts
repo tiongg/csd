@@ -14,6 +14,9 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as LoginCallbackRouteImport } from './routes/login/callback'
+import { Route as LearnerDashboardRouteImport } from './routes/learner/dashboard'
+import { Route as ContributorDashboardRouteImport } from './routes/contributor/dashboard'
+import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 
 const RegisterRoute = RegisterRouteImport.update({
@@ -40,6 +43,21 @@ const LoginCallbackRoute = LoginCallbackRouteImport.update({
   path: '/login/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
+  id: '/learner/dashboard',
+  path: '/learner/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContributorDashboardRoute = ContributorDashboardRouteImport.update({
+  id: '/contributor/dashboard',
+  path: '/contributor/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/admin/dashboard',
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -50,6 +68,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/contributor/dashboard': typeof ContributorDashboardRoute
+  '/learner/dashboard': typeof LearnerDashboardRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login': typeof LoginIndexRoute
 }
@@ -57,6 +78,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/contributor/dashboard': typeof ContributorDashboardRoute
+  '/learner/dashboard': typeof LearnerDashboardRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login': typeof LoginIndexRoute
 }
@@ -66,20 +90,42 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/register': typeof RegisterRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/contributor/dashboard': typeof ContributorDashboardRoute
+  '/learner/dashboard': typeof LearnerDashboardRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login/': typeof LoginIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/register' | '/profile' | '/login/callback' | '/login'
+  fullPaths:
+    | '/'
+    | '/register'
+    | '/profile'
+    | '/admin/dashboard'
+    | '/contributor/dashboard'
+    | '/learner/dashboard'
+    | '/login/callback'
+    | '/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/register' | '/profile' | '/login/callback' | '/login'
+  to:
+    | '/'
+    | '/register'
+    | '/profile'
+    | '/admin/dashboard'
+    | '/contributor/dashboard'
+    | '/learner/dashboard'
+    | '/login/callback'
+    | '/login'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/register'
     | '/_authenticated/profile'
+    | '/admin/dashboard'
+    | '/contributor/dashboard'
+    | '/learner/dashboard'
     | '/login/callback'
     | '/login/'
   fileRoutesById: FileRoutesById
@@ -88,6 +134,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   RegisterRoute: typeof RegisterRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  ContributorDashboardRoute: typeof ContributorDashboardRoute
+  LearnerDashboardRoute: typeof LearnerDashboardRoute
   LoginCallbackRoute: typeof LoginCallbackRoute
   LoginIndexRoute: typeof LoginIndexRoute
 }
@@ -129,6 +178,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learner/dashboard': {
+      id: '/learner/dashboard'
+      path: '/learner/dashboard'
+      fullPath: '/learner/dashboard'
+      preLoaderRoute: typeof LearnerDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contributor/dashboard': {
+      id: '/contributor/dashboard'
+      path: '/contributor/dashboard'
+      fullPath: '/contributor/dashboard'
+      preLoaderRoute: typeof ContributorDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -155,6 +225,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   RegisterRoute: RegisterRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  ContributorDashboardRoute: ContributorDashboardRoute,
+  LearnerDashboardRoute: LearnerDashboardRoute,
   LoginCallbackRoute: LoginCallbackRoute,
   LoginIndexRoute: LoginIndexRoute,
 }
