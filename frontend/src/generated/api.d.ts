@@ -151,6 +151,8 @@ export interface components {
             email: string;
             username: string;
             realname?: string;
+            /** @enum {string} */
+            role: "LEARNER" | "CONTRIBUTOR" | "ADMIN";
         };
         LoginResponseDto: {
             accessToken: string;
