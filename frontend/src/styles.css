@@ -169,3 +169,7 @@ p {
   @apply text-slate-500;
   margin: 0.25em 0;
 }
+
+hr {
+  @apply border-0 border-t-2 border-slate-400;
+}
