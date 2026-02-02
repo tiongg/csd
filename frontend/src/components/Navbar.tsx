@@ -30,7 +30,7 @@ export default function Navbar() {
           <DropdownMenuContent>
             <DropdownMenuItem asChild>
               <Link to="/profile" className="w-full">
-                My Account
+                My Account ({user.role.toLowerCase()})
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
