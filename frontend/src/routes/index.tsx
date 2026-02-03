@@ -20,23 +20,19 @@ function App() {
   const courses = [
     {
       title: "How to Muh Hee Ow - The Basics",
-      instructor: "Cotton Cat",
-      rating: 5
+      instructor: "Cotton Cat"
     },
     {
       title: "Muh Hee Ow - Advanced",
-      instructor: "Cotton Cat",
-      rating: 5
+      instructor: "Cotton Cat"
     },
     {
       title: "Muh Hee Ow (Extreme)",
-      instructor: "Cotton Cat",
-      rating: 4
+      instructor: "Cotton Cat"
     },
     {
       title: "Collaborative Software Development",
-      instructor: "Christoph Treude",
-      rating: 5
+      instructor: "Christoph Treude"
     }
   ]
   
@@ -81,7 +77,7 @@ function App() {
               courses.map((course) => {
                 return (
                   <CarouselItem className='basis-1/3' key={course.title}>
-                    <CoursePreview title={course.title} instructor={course.instructor} rating={course.rating}/>
+                    <CoursePreview title={course.title} instructor={course.instructor}/>
                   </CarouselItem>
                 )
               })
