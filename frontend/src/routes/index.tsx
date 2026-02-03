@@ -116,7 +116,7 @@ function App() {
             {
               courses.map((course) => {
                 return (
-                  <CarouselItem className='basis-1/3'>
+                  <CarouselItem className='basis-1/3' key={course.title}>
                     <CoursePreview title={course.title} instructor={course.instructor} rating={course.rating}/>
                   </CarouselItem>
                 )
