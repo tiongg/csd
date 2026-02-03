@@ -14,7 +14,7 @@ export default function Navbar() {
   const [navClicked, setNavClicked] = useState(false);
 
   return (
-    <header className="flex items-center justify-between bg-white p-2 px-8 shadow-lg">
+    <header className="flex items-center justify-between bg-white/50 p-2 px-8 shadow-lg absolute w-full">
       {/* Logo placeholder */}
       <Link
         className="aspect-square size-8 rounded-full bg-sky-600"
@@ -24,7 +24,7 @@ export default function Navbar() {
       {user ? (
         <DropdownMenu onOpenChange={setNavClicked}>
           <DropdownMenuTrigger asChild>
-            <div className="flex cursor-pointer items-center justify-center rounded bg-white border py-1 px-4">
+            <div className="flex cursor-pointer items-center justify-between rounded bg-white border py-1 px-4 h-[30px] w-40">
               {
                 user.role !== "LEARNER" ? (
                   <span>
