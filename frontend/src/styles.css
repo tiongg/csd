@@ -140,7 +140,7 @@ code, .font-mono {
 
 h1, h2, h3, h4 {
   @apply font-bold text-sky-950 w-fit;
-  font-family: "Kreon", serif;
+  font-family: "Noto Sans", sans-serif;
 }
 
 h1 {
@@ -165,7 +165,7 @@ p {
 }
 
 .subtitle {
-  font-family: "Kreon", serif;
+  font-family: "Noto Sans", sans-serif;
   @apply text-slate-500;
   margin: 0.25em 0;
 }
