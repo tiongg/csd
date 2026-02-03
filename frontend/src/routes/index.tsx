@@ -6,7 +6,7 @@ import {
   useApiQuery,
 } from '@/lib/fetch-client';
 import { useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import CoursePreview from '@/components/CoursePreview';
 
 import {
@@ -16,6 +16,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { useEffect } from 'react';
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -48,6 +49,7 @@ function App() {
   
   const queryClient = useQueryClient();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const { data } = useApiQuery(
     'get',
@@ -78,6 +80,18 @@ function App() {
       },
     );
   }
+
+  useEffect(() => {
+    if (user) {
+      if (user.role === "ADMIN") {
+        navigate({ to: '/admin/dashboard' });
+      } else if (user.role === "CONTRIBUTOR") {
+        navigate({ to: '/contributor/dashboard' });
+      } else {
+        navigate({ to: '/learner/dashboard' });
+      }
+    }
+  })
 
   return (
     <div className='flex flex-1 justify-center flex-col items-center'>
