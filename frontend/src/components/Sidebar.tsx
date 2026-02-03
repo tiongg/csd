@@ -1,18 +1,32 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { P, match } from "ts-pattern";
+import {
+    BookOpenIcon,
+    Cog6ToothIcon,
+    DocumentTextIcon,
+    PencilSquareIcon,
+    QuestionMarkCircleIcon,
+    RectangleGroupIcon,
+    TrophyIcon,
+    UserIcon,
+    UsersIcon
+} from "@heroicons/react/24/outline"
 import { Button } from "./ui/button";
+import type React from "react";
 import type { Account } from '@/context/AuthContext';
 import { useAuth } from '@/context/AuthContext';
 
 interface NavItemProps {
     title: string;
     link: string;
+    icon?: React.ReactNode
 }
 
-function NavItem({ title, link }: NavItemProps) {
+function NavItem({ title, link, icon }: NavItemProps) {
     return (
         <div className="py-2">
             <Button variant="ghost" className="rounded-full cursor-pointer text-slate-700">
+                {icon}
                 <Link to={link}>
                     {title}
                 </Link>
@@ -28,25 +42,25 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
     return match([role, dir])
         .with(["ADMIN", "ADMIN"], () =>
             <div>
-                <NavItem title="Dashboard" link="/admin/dashboard" />
+                <NavItem title="Dashboard" link="/admin/dashboard" icon={<RectangleGroupIcon />} />
 
-                <NavItem title="User Moderation" link="" />
+                <NavItem title="User Moderation" link="" icon={<UserIcon />} />
 
-                <NavItem title="Course Moderation" link="" />
+                <NavItem title="Course Moderation" link="" icon={<DocumentTextIcon />} />
             </div>)
         .with([P.not("LEARNER"), "CONTRIBUTOR"], () =>
             <div>
-                <NavItem title="Dashboard" link="/contributor/dashboard" />
+                <NavItem title="Dashboard" link="/contributor/dashboard" icon={<RectangleGroupIcon />} />
 
-                <NavItem title="Teams" link="" />
+                <NavItem title="Teams" link="" icon={<UsersIcon />} />
 
-                <NavItem title="Courses" link="" />
+                <NavItem title="Courses" link="" icon={<BookOpenIcon />} />
             </div>)
         .otherwise(() =>
             <div>
-                <NavItem title="Dashboard" link="/learner/dashboard" />
-                <NavItem title="Challenges" link="" />
-                <NavItem title="My Courses" link="" />
+                <NavItem title="Dashboard" link="/learner/dashboard" icon={<RectangleGroupIcon />} />
+                <NavItem title="Challenges" link="" icon={<TrophyIcon />} />
+                <NavItem title="My Courses" link="" icon={<PencilSquareIcon />} />
             </div>)
 }
 
@@ -70,8 +84,8 @@ export default function Sidebar() {
                 <div className="px-8 py-4">
                     <p className="subtitle tracking-wider">SYSTEM</p>
 
-                    <NavItem title="Settings" link="" />
-                    <NavItem title="Help & Support" link="" />
+                    <NavItem title="Settings" link="" icon={<Cog6ToothIcon />} />
+                    <NavItem title="Help & Support" link="" icon={<QuestionMarkCircleIcon />} />
 
                     <Button variant="default" onClick={async () => {
                         await logout();
