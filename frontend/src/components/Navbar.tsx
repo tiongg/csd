@@ -1,18 +1,16 @@
+import { Link } from '@tanstack/react-router';
+import { useState } from 'react';
+import { Button } from './ui/button';
+import { useAuth } from '@/context/AuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/context/AuthContext';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { Button } from './ui/button';
-import { useState } from 'react';
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const [navClicked, setNavClicked] = useState(false);
 
   return (
@@ -79,26 +77,6 @@ export default function Navbar() {
                     Learner
                   </Link>
                 </DropdownMenuItem>
-
-
-                {/* to clean up later */}
-                {/* <DropdownMenuItem asChild>
-              <Link to="/profile" className="w-full text-sky-900">
-                My Account
-              </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator /> */}
-
-                {/* <DropdownMenuItem
-                  onClick={async () => {
-                    await logout();
-                    navigate({ to: '/' });
-                  }}
-                  asChild
-                >
-                  <span className='text-sky-900'>Logout</span>
-                </DropdownMenuItem> */}
               </DropdownMenuContent>
             ) : null
           }
@@ -113,11 +91,6 @@ export default function Navbar() {
           </Button>
         </div>
       )}
-      {/* also to clean up later */}
-      {/* <button onClick={async () => {
-        await logout();
-        navigate({ to: '/' });
-      }}>logout temp</button> */}
     </header>
   );
 }
