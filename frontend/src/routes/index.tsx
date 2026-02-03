@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import CoursePreview from '@/components/CoursePreview';
 import {
   Carousel,
   CarouselContent,
@@ -14,6 +13,25 @@ import { Separator } from '@/components/ui/separator';
 export const Route = createFileRoute('/')({
   component: App,
 });
+
+interface CoursePreviewProps {
+  title: string;
+  instructor: string;
+}
+
+function CoursePreview({ title, instructor }: CoursePreviewProps) {
+  return (
+    <div>
+      <div className="lg:h-[300px] h-[100px] bg-slate-200">
+        {/* image goes here */}
+      </div>
+      <div className="py-2">
+        <h2>{title}</h2>
+        <p className="subtitle">{instructor}</p>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   // placeholder courses
@@ -35,14 +53,14 @@ function App() {
       instructor: "Christoph Treude"
     }
   ]
-  
+
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) {
-      switch(user.role) {
-        case "ADMIN": 
+      switch (user.role) {
+        case "ADMIN":
           navigate({ to: '/admin/dashboard' });
           break;
         case "CONTRIBUTOR":
@@ -63,7 +81,7 @@ function App() {
         </div>
       </div>
 
-      <Separator/>
+      <Separator />
 
       <div className='p-5 w-9/10'>
         <div className='py-4'>
@@ -77,7 +95,7 @@ function App() {
               courses.map((course) => {
                 return (
                   <CarouselItem className='basis-1/3' key={course.title}>
-                    <CoursePreview title={course.title} instructor={course.instructor}/>
+                    <CoursePreview title={course.title} instructor={course.instructor} />
                   </CarouselItem>
                 )
               })
@@ -87,8 +105,8 @@ function App() {
           <CarouselNext />
         </Carousel>
       </div>
-      
-      <Separator/>
+
+      <Separator />
 
       <div className='pt-6 pb-16'>
         <h2>Contact Us</h2>
