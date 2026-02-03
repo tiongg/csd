@@ -9,6 +9,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
+import { Separator } from '@/components/ui/separator';
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -44,27 +45,29 @@ function App() {
 
   useEffect(() => {
     if (user) {
-      if (user.role === "ADMIN") {
-        navigate({ to: '/admin/dashboard' });
-      } else if (user.role === "CONTRIBUTOR") {
-        navigate({ to: '/contributor/dashboard' });
-      } else {
-        navigate({ to: '/learner/dashboard' });
+      switch(user.role) {
+        case "ADMIN": 
+          navigate({ to: '/admin/dashboard' });
+          break;
+        case "CONTRIBUTOR":
+          navigate({ to: '/contributor/dashboard' });
+          break;
+        default:
+          navigate({ to: '/learner/dashboard' });
+
       }
     }
   })
 
   return (
-    <div className='flex flex-1 justify-center flex-col items-center'>
-      <div className='bg-slate-200 lg:h-[500px] h-[200px] w-9/10 m-5 text-center flex items-end justify-center'>
+    <div className='flex flex-1 justify-center flex-col items-center pt-16'>
+      <div className='bg-slate-200 lg:h-125 h-50 w-9/10 m-5 text-center flex items-end justify-center'>
         <div className='mb-8'>
           <h1>Get Started</h1>
         </div>
       </div>
 
-      <div className='h-1 w-full p-4'>
-        <hr />
-      </div>
+      <Separator/>
 
       <div className='p-5 w-9/10'>
         <div className='py-4'>
@@ -88,11 +91,8 @@ function App() {
           <CarouselNext />
         </Carousel>
       </div>
-
-      <div className='h-1 w-full p-4'>
-        <hr />
-      </div>
-
+      
+      <Separator/>
 
       <div className='pt-6 pb-16'>
         <h2>Contact Us</h2>

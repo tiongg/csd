@@ -59,7 +59,7 @@ export default function Sidebar() {
     }
 
     return (
-        <div className="w-1/5 min-w-[220px] h-screen shadow-lg bg-white/50 pt-16 flex flex-col justify-between">
+        <div className="w-1/5 min-w-55 h-screen shadow-lg bg-white/50 pt-16 flex flex-col justify-between">
             <div>
                 <div className="px-8 py-4">
                     <p className="subtitle tracking-wider">MAIN MENU</p>

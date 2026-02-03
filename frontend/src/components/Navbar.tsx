@@ -35,7 +35,7 @@ export default function Navbar() {
         ) : user.role !== "LEARNER" && (
         <DropdownMenu onOpenChange={setNavClicked}>
           <DropdownMenuTrigger asChild>
-            <div className="flex cursor-pointer items-center justify-between rounded bg-white border py-1 px-4 h-[30px] w-40">
+            <div className="flex cursor-pointer items-center justify-between rounded bg-white border py-1 px-4 h-7.5 w-40">
               <span>
                 {dir.charAt(0).toUpperCase() + dir.slice(1).toLowerCase()}
               </span>
