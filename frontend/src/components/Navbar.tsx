@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useLocation } from '@tanstack/react-router';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -12,6 +12,8 @@ import {
 export default function Navbar() {
   const { user } = useAuth();
   const [navClicked, setNavClicked] = useState(false);
+  const location = useLocation();
+  const dir = location.href.split("/")[1]?.toUpperCase() ?? "LEARNER";
 
   return (
     <header className="flex items-center justify-between bg-white/50 p-2 px-8 shadow-lg absolute w-full">
@@ -28,14 +30,14 @@ export default function Navbar() {
               {
                 user.role !== "LEARNER" ? (
                   <span>
-                    {user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase()}
+                    {dir.charAt(0).toUpperCase() + dir.slice(1).toLowerCase()}
                   </span>
                 ) : (
                   <Link to="/learner/dashboard" className="w-full text-sky-900">Learner</Link>
                 )
               }
               {
-                user.role !== "LEARNER" ?
+                user.role !== "LEARNER" &&
                   (
                     navClicked ? (
                       <div className='inline-block w-0 h-0 border-l-8 border-r-8 border-l-transparent border-r-transparent border-b-5 border-b-slate-400 ml-8'>
@@ -46,39 +48,35 @@ export default function Navbar() {
                         <span className='sr-only'>Dropdown</span>
                       </div>
                     )
-                  ) : null
+                  ) 
               }
 
             </div>
           </DropdownMenuTrigger>
           {
-            user.role !== "LEARNER" ? (
+            user.role !== "LEARNER" && (
               <DropdownMenuContent>
                 {
-                  user.role === "ADMIN" ? (
+                  user.role === "ADMIN" && (
                     <DropdownMenuItem asChild>
                       <Link to="/admin/dashboard" className="w-full text-sky-900">
                         Admin
                       </Link>
                     </DropdownMenuItem>
-                  ) : null
+                  )
                 }
-                {
-                  user.role === "ADMIN" || user.role === "CONTRIBUTOR" ? (
-                    <DropdownMenuItem asChild>
-                      <Link to="/contributor/dashboard" className="w-full text-sky-900">
-                        Contributor
-                      </Link>
-                    </DropdownMenuItem>
-                  ) : null
-                }
+                <DropdownMenuItem asChild>
+                  <Link to="/contributor/dashboard" className="w-full text-sky-900">
+                    Contributor
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/learner/dashboard" className="w-full text-sky-900">
                     Learner
                   </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            ) : null
+            )
           }
         </DropdownMenu>
       ) : (
