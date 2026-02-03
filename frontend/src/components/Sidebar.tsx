@@ -59,7 +59,7 @@ export default function Sidebar() {
     }
 
     return (
-        <div className="w-1/5 min-w-55 h-screen shadow-lg bg-white/50 pt-16 flex flex-col justify-between">
+        <div className="w-1/6 min-w-50 h-screen shadow-lg bg-white/50 pt-16 flex flex-col justify-between">
             <div>
                 <div className="px-8 py-4">
                     <p className="subtitle tracking-wider">MAIN MENU</p>
@@ -92,10 +92,6 @@ export default function Sidebar() {
                     <div className="text-slate-500 text-xs">
                         {user.role.charAt(0) + user.role.slice(1).toLowerCase()}
                     </div>
-                </div>
-
-                <div className='inline-block w-0 h-0 border-l-8 border-r-8 border-l-transparent border-r-transparent border-t-5 border-t-slate-400 ml-8'>
-                    <span className='sr-only'>Dropdown</span>
                 </div>
             </div>
 
