@@ -9,7 +9,7 @@ import {
   UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
-import { Link, useLocation, useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
 import type { Account } from '@/context/AuthContext';
@@ -17,6 +17,7 @@ import type React from 'react';
 import type { LinkOptions } from '@tanstack/react-router';
 import { useAuth } from '@/context/AuthContext';
 import { capitalizeFirst } from '@/lib/utils';
+import useDirectory from '@/hooks/useDirectory';
 
 type NavItemProps = {
   title: string;
@@ -42,8 +43,7 @@ function NavItem({ title, link, icon }: NavItemProps) {
 }
 
 function SidebarByRole({ role }: { role: Account['role'] }) {
-  const location = useLocation();
-  const dir = location.href.split('/')[1]?.toUpperCase() ?? 'LEARNER';
+  const dir = useDirectory();
 
   return match([role, dir])
     .with(['ADMIN', 'ADMIN'], () => (

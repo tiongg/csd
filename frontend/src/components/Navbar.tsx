@@ -9,12 +9,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { capitalizeFirst } from '@/lib/utils';
+import useDirectory from '@/hooks/useDirectory';
 
 export default function Navbar() {
   const { user } = useAuth();
   const [navClicked, setNavClicked] = useState(false);
-  const location = useLocation();
-  const dir = location.href.split('/')[1]?.toUpperCase() ?? 'LEARNER';
+  const dir = useDirectory();
 
   return (
     <header className="flex w-full items-center justify-between bg-white/50 p-2 px-8 shadow-lg">
