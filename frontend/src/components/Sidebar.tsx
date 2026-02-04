@@ -25,13 +25,16 @@ type NavItemProps = {
 
 function NavItem({ title, link, icon }: NavItemProps) {
   return (
-    <div className="py-2">
+    <div className="w-full">
       <Button
         variant="ghost"
-        className="cursor-pointer rounded-full text-slate-700"
+        className="w-full cursor-pointer justify-start rounded-full text-slate-700"
+        asChild
       >
-        {icon}
-        <Link to={link}>{title}</Link>
+        <Link to={link}>
+          {icon}
+          {title}
+        </Link>
       </Button>
     </div>
   );
@@ -43,7 +46,7 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
 
   return match([role, dir])
     .with(['ADMIN', 'ADMIN'], () => (
-      <div>
+      <>
         <NavItem
           title="Dashboard"
           link="/admin/dashboard"
@@ -57,10 +60,10 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           link="/"
           icon={<DocumentTextIcon />}
         />
-      </div>
+      </>
     ))
     .with([P.not('LEARNER'), 'CONTRIBUTOR'], () => (
-      <div>
+      <>
         <NavItem
           title="Dashboard"
           link="/contributor/dashboard"
@@ -70,10 +73,10 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
         <NavItem title="Teams" link="/" icon={<UsersIcon />} />
 
         <NavItem title="Courses" link="/" icon={<BookOpenIcon />} />
-      </div>
+      </>
     ))
     .otherwise(() => (
-      <div>
+      <>
         <NavItem
           title="Dashboard"
           link="/learner/dashboard"
@@ -81,7 +84,7 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
         />
         <NavItem title="Challenges" link="/" icon={<TrophyIcon />} />
         <NavItem title="My Courses" link="/" icon={<PencilSquareIcon />} />
-      </div>
+      </>
     ));
 }
 
@@ -98,19 +101,23 @@ export default function Sidebar() {
       <div>
         <div className="px-8 py-4">
           <p className="font-subtitle tracking-wider">MAIN MENU</p>
-
-          <SidebarByRole role={user.role} />
+          <div className='flex flex-col gap-y-4 py-4'>
+            <SidebarByRole role={user.role} />
+          </div>
         </div>
 
         <div className="px-8 py-4">
           <p className="font-subtitle tracking-wider">SYSTEM</p>
 
-          <NavItem title="Settings" link="/" icon={<Cog6ToothIcon />} />
-          <NavItem
-            title="Help & Support"
-            link="/"
-            icon={<QuestionMarkCircleIcon />}
-          />
+          <div className='flex flex-col gap-y-4 py-4'>
+            <NavItem title="Settings" link="/" icon={<Cog6ToothIcon />} />
+            <NavItem
+              title="Help & Support"
+              link="/"
+              icon={<QuestionMarkCircleIcon />}
+            />
+          </div>
+
 
           <Button
             variant="default"
