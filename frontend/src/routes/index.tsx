@@ -1,83 +1,114 @@
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useEffect } from 'react';
 import {
-  apiQueryOptions,
-  useApiMutation,
-  useApiQuery,
-} from '@/lib/fetch-client';
-import { useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, Link } from '@tanstack/react-router';
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/context/AuthContext';
+import { Heading1, Heading2 } from '@/components/ui/typography';
 
 export const Route = createFileRoute('/')({
   component: App,
 });
 
+type CoursePreviewProps = {
+  title: string;
+  instructor: string;
+}
+
+function CoursePreview({ title, instructor }: CoursePreviewProps) {
+  return (
+    <div>
+      <div className="h-[100px] bg-slate-200 lg:h-[300px]">
+        {/* image goes here */}
+      </div>
+      <div className="py-2">
+        <Heading2>{title}</Heading2>
+        <p className="font-subtitle">{instructor}</p>
+      </div>
+    </div>
+  );
+}
+
 function App() {
-  const queryClient = useQueryClient();
-  const { user, logout } = useAuth();
-
-  const { data } = useApiQuery(
-    'get',
-    '/api/account/',
-    {},
+  // placeholder courses
+  const courses = [
     {
-      // enabled: !!user,
+      title: 'How to Muh Hee Ow - The Basics',
+      instructor: 'Cotton Cat',
     },
-  );
-  const { mutateAsync: deleteAccount } = useApiMutation(
-    'delete',
-    '/api/account/{accountId}',
-  );
+    {
+      title: 'Muh Hee Ow - Advanced',
+      instructor: 'Cotton Cat',
+    },
+    {
+      title: 'Muh Hee Ow (Extreme)',
+      instructor: 'Cotton Cat',
+    },
+    {
+      title: 'Collaborative Software Development',
+      instructor: 'Christoph Treude',
+    },
+  ];
 
-  function onDeleteAccount(accountId: string) {
-    return deleteAccount(
-      {
-        params: {
-          path: { accountId },
-        },
-      },
-      {
-        onSuccess: async () => {
-          await queryClient.invalidateQueries({
-            queryKey: apiQueryOptions('get', '/api/account/').queryKey,
-          });
-        },
-      },
-    );
-  }
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      switch (user.role) {
+        case 'ADMIN':
+          navigate({ to: '/admin/dashboard' });
+          break;
+        case 'CONTRIBUTOR':
+          navigate({ to: '/contributor/dashboard' });
+          break;
+        default:
+          navigate({ to: '/learner/dashboard' });
+      }
+    }
+  }, [user, navigate]);
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center">
-      {user ? (
-        <div className="mb-4 flex items-center gap-4">
-          <p>Logged in as {user.username}</p>
-          <Button onClick={logout}>Logout</Button>
+    <div className="flex flex-1 flex-col items-center justify-center pt-16">
+      <div className="m-5 flex h-50 w-9/10 items-end justify-center bg-slate-200 text-center lg:h-125">
+        <div className="mb-8">
+          <Heading1>Get Started</Heading1>
         </div>
-      ) : (
-        <>
-          <Link to="/login" className="mb-4 text-blue-500 underline">
-            Go to Login Page
-          </Link>
-          <Link to="/register" className="mb-4 text-blue-500 underline">
-            Go to Register Page
-          </Link>
-        </>
-      )}
+      </div>
 
-      <div className="flex w-[400px] flex-col gap-2 rounded-lg border border-gray-200 p-4">
-        <p className="font-bold">Existing emails</p>
-        {(data ?? []).map((account) => (
-          <div key={account.id} className="flex justify-between">
-            <p>{account.email}</p>
-            <p>{account.username}</p>
-            <Button
-              variant="destructive"
-              onClick={() => onDeleteAccount(account.id)}
-            >
-              Delete
-            </Button>
-          </div>
-        ))}
+      <Separator />
+
+      <div className="w-9/10 p-5">
+        <div className="py-4">
+          <Heading1>Trending now</Heading1>
+          <p className="font-subtitle text-lg">Most popular courses</p>
+        </div>
+
+        <Carousel>
+          <CarouselContent>
+            {courses.map((course) =>
+              <CarouselItem className="basis-1/3" key={course.title}>
+                <CoursePreview
+                  title={course.title}
+                  instructor={course.instructor}
+                />
+              </CarouselItem>
+            )}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </div>
+
+      <Separator />
+
+      <div className="pt-6 pb-16">
+        <Heading2>Contact Us</Heading2>
       </div>
     </div>
   );
