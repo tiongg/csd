@@ -21,9 +21,9 @@ import useActiveRole from '@/hooks/useActiveRole';
 
 type NavItemProps = {
   title: string;
-  link: LinkOptions["to"];
+  link: LinkOptions['to'];
   icon?: React.ReactNode;
-}
+};
 
 function NavItem({ title, link, icon }: NavItemProps) {
   return (
@@ -102,7 +102,7 @@ export default function Sidebar() {
       <div>
         <div className="px-8 py-4">
           <p className="font-subtitle tracking-wider">MAIN MENU</p>
-          <div className='flex flex-col gap-y-4 py-4'>
+          <div className="flex flex-col gap-y-4 py-4">
             <SidebarByRole role={user.role} />
           </div>
         </div>
@@ -110,15 +110,34 @@ export default function Sidebar() {
         <div className="px-8 py-4">
           <p className="font-subtitle tracking-wider">SYSTEM</p>
 
-          <div className='flex flex-col gap-y-4 py-4'>
-            <NavItem title="Settings" link="/learner/settings" icon={<Cog6ToothIcon />} />
+          <div className="flex flex-col gap-y-4 py-4">
+            {user.role === 'LEARNER' && (
+              <NavItem
+                title="Settings"
+                link="/learner/settings"
+                icon={<Cog6ToothIcon />}
+              />
+            )}
+            {user.role === 'CONTRIBUTOR' && (
+              <NavItem
+                title="Settings"
+                link="/contributor/settings"
+                icon={<Cog6ToothIcon />}
+              />
+            )}
+            {user.role === 'ADMIN' && (
+              <NavItem
+                title="Settings"
+                link="/admin/settings"
+                icon={<Cog6ToothIcon />}
+              />
+            )}
             <NavItem
               title="Help & Support"
               link="/"
               icon={<QuestionMarkCircleIcon />}
             />
           </div>
-
 
           <Button
             variant="default"

@@ -16,7 +16,9 @@ import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as LoginCallbackRouteImport } from './routes/login/callback'
 import { Route as LearnerSettingsRouteImport } from './routes/learner/settings'
 import { Route as LearnerDashboardRouteImport } from './routes/learner/dashboard'
+import { Route as ContributorSettingsRouteImport } from './routes/contributor/settings'
 import { Route as ContributorDashboardRouteImport } from './routes/contributor/dashboard'
+import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 
@@ -54,9 +56,19 @@ const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
   path: '/learner/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContributorSettingsRoute = ContributorSettingsRouteImport.update({
+  id: '/contributor/settings',
+  path: '/contributor/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContributorDashboardRoute = ContributorDashboardRouteImport.update({
   id: '/contributor/dashboard',
   path: '/contributor/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/admin/settings',
+  path: '/admin/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -75,7 +87,9 @@ export interface FileRoutesByFullPath {
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
+  '/contributor/settings': typeof ContributorSettingsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -86,7 +100,9 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
+  '/contributor/settings': typeof ContributorSettingsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -99,7 +115,9 @@ export interface FileRoutesById {
   '/register': typeof RegisterRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/settings': typeof AdminSettingsRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
+  '/contributor/settings': typeof ContributorSettingsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -112,7 +130,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/profile'
     | '/admin/dashboard'
+    | '/admin/settings'
     | '/contributor/dashboard'
+    | '/contributor/settings'
     | '/learner/dashboard'
     | '/learner/settings'
     | '/login/callback'
@@ -123,7 +143,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/profile'
     | '/admin/dashboard'
+    | '/admin/settings'
     | '/contributor/dashboard'
+    | '/contributor/settings'
     | '/learner/dashboard'
     | '/learner/settings'
     | '/login/callback'
@@ -135,7 +157,9 @@ export interface FileRouteTypes {
     | '/register'
     | '/_authenticated/profile'
     | '/admin/dashboard'
+    | '/admin/settings'
     | '/contributor/dashboard'
+    | '/contributor/settings'
     | '/learner/dashboard'
     | '/learner/settings'
     | '/login/callback'
@@ -147,7 +171,9 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   RegisterRoute: typeof RegisterRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
   ContributorDashboardRoute: typeof ContributorDashboardRoute
+  ContributorSettingsRoute: typeof ContributorSettingsRoute
   LearnerDashboardRoute: typeof LearnerDashboardRoute
   LearnerSettingsRoute: typeof LearnerSettingsRoute
   LoginCallbackRoute: typeof LoginCallbackRoute
@@ -205,11 +231,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnerDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contributor/settings': {
+      id: '/contributor/settings'
+      path: '/contributor/settings'
+      fullPath: '/contributor/settings'
+      preLoaderRoute: typeof ContributorSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contributor/dashboard': {
       id: '/contributor/dashboard'
       path: '/contributor/dashboard'
       fullPath: '/contributor/dashboard'
       preLoaderRoute: typeof ContributorDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/dashboard': {
@@ -246,7 +286,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   RegisterRoute: RegisterRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
   ContributorDashboardRoute: ContributorDashboardRoute,
+  ContributorSettingsRoute: ContributorSettingsRoute,
   LearnerDashboardRoute: LearnerDashboardRoute,
   LearnerSettingsRoute: LearnerSettingsRoute,
   LoginCallbackRoute: LoginCallbackRoute,
