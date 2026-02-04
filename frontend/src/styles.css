@@ -14,7 +14,8 @@ body {
   @apply text-sky-900;
 }
 
-code, .font-mono {
+code,
+.font-mono {
   font-family:
     source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
@@ -133,43 +134,14 @@ code, .font-mono {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
-h1, h2, h3, h4 {
-  @apply font-bold text-sky-950 w-fit;
-  font-family: "Noto Sans", sans-serif;
-}
-
-h1 {
-  @apply text-3xl;
-  background: linear-gradient(var(--color-sky-200), var(--color-sky-200)) 0 90% / 100% 10px no-repeat;
-}
-
-h2 {
-  @apply text-2xl;
-}
-
-h3 {
-  @apply text-xl;
-}
-
-h4 {
-  @apply text-lg;
-}
-
-p {
-  @apply text-sky-900;
-}
-
-.subtitle {
+@utility font-subtitle {
   font-family: "Noto Sans", sans-serif;
   @apply text-slate-500;
   margin: 0.25em 0;
-}
-
-hr {
-  @apply border-0 border-t-2 border-slate-400;
 }

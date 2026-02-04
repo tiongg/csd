@@ -96,13 +96,13 @@ export default function Sidebar() {
     <div className="flex h-[calc(100vh-3rem)] w-1/6 min-w-50 flex-col justify-between bg-white/50 shadow-lg">
       <div>
         <div className="px-8 py-4">
-          <p className="subtitle tracking-wider">MAIN MENU</p>
+          <p className="font-subtitle tracking-wider">MAIN MENU</p>
 
           <SidebarByRole role={user.role} />
         </div>
 
         <div className="px-8 py-4">
-          <p className="subtitle tracking-wider">SYSTEM</p>
+          <p className="font-subtitle tracking-wider">SYSTEM</p>
 
           <NavItem title="Settings" link="" icon={<Cog6ToothIcon />} />
           <NavItem
