@@ -71,7 +71,7 @@ function App() {
           navigate({ to: '/learner/dashboard' });
       }
     }
-  });
+  }, [user, navigate]);
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center pt-16">
