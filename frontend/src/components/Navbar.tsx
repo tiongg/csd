@@ -14,7 +14,7 @@ import useDirectory from '@/hooks/useDirectory';
 export default function Navbar() {
   const { user } = useAuth();
   const [navClicked, setNavClicked] = useState(false);
-  const dir = useDirectory();
+  const dir = useDirectory() ?? "";
 
   return (
     <header className="flex w-full items-center justify-between bg-white/50 p-2 px-8 shadow-lg">

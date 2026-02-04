@@ -1,6 +1,11 @@
 import { useLocation } from "@tanstack/react-router";
+import type { Account } from "@/context/AuthContext";
 
 export default function useDirectory() {
+    const roles = ["ADMIN", "CONTRIBUTOR", "LEARNER"];
+
     const location = useLocation();
-    return location.href.split('/')[1]?.toUpperCase() ?? 'LEARNER';
+    const dir = location.href.split('/')[1]?.toUpperCase() ?? "LEARNER";
+    if (!roles.includes(dir)) return null;
+    return dir as Account["role"];
 }
