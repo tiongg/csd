@@ -91,16 +91,14 @@ function App() {
 
         <Carousel>
           <CarouselContent>
-            {courses.map((course) => {
-              return (
-                <CarouselItem className="basis-1/3" key={course.title}>
-                  <CoursePreview
-                    title={course.title}
-                    instructor={course.instructor}
-                  />
-                </CarouselItem>
-              );
-            })}
+            {courses.map((course) =>
+              <CarouselItem className="basis-1/3" key={course.title}>
+                <CoursePreview
+                  title={course.title}
+                  instructor={course.instructor}
+                />
+              </CarouselItem>
+            )}
           </CarouselContent>
           <CarouselPrevious />
           <CarouselNext />
