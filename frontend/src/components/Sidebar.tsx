@@ -111,7 +111,7 @@ export default function Sidebar() {
           <p className="font-subtitle tracking-wider">SYSTEM</p>
 
           <div className='flex flex-col gap-y-4 py-4'>
-            <NavItem title="Settings" link="/" icon={<Cog6ToothIcon />} />
+            <NavItem title="Settings" link="/learner/settings" icon={<Cog6ToothIcon />} />
             <NavItem
               title="Help & Support"
               link="/"

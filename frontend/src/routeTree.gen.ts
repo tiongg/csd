@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as LoginCallbackRouteImport } from './routes/login/callback'
+import { Route as LearnerSettingsRouteImport } from './routes/learner/settings'
 import { Route as LearnerDashboardRouteImport } from './routes/learner/dashboard'
 import { Route as ContributorDashboardRouteImport } from './routes/contributor/dashboard'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
@@ -41,6 +42,11 @@ const LoginIndexRoute = LoginIndexRouteImport.update({
 const LoginCallbackRoute = LoginCallbackRouteImport.update({
   id: '/login/callback',
   path: '/login/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnerSettingsRoute = LearnerSettingsRouteImport.update({
+  id: '/learner/settings',
+  path: '/learner/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
+  '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login': typeof LoginIndexRoute
 }
@@ -81,6 +88,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
+  '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login': typeof LoginIndexRoute
 }
@@ -93,6 +101,7 @@ export interface FileRoutesById {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
+  '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login/': typeof LoginIndexRoute
 }
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/contributor/dashboard'
     | '/learner/dashboard'
+    | '/learner/settings'
     | '/login/callback'
     | '/login'
   fileRoutesByTo: FileRoutesByTo
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/contributor/dashboard'
     | '/learner/dashboard'
+    | '/learner/settings'
     | '/login/callback'
     | '/login'
   id:
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/contributor/dashboard'
     | '/learner/dashboard'
+    | '/learner/settings'
     | '/login/callback'
     | '/login/'
   fileRoutesById: FileRoutesById
@@ -137,6 +149,7 @@ export interface RootRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
   ContributorDashboardRoute: typeof ContributorDashboardRoute
   LearnerDashboardRoute: typeof LearnerDashboardRoute
+  LearnerSettingsRoute: typeof LearnerSettingsRoute
   LoginCallbackRoute: typeof LoginCallbackRoute
   LoginIndexRoute: typeof LoginIndexRoute
 }
@@ -176,6 +189,13 @@ declare module '@tanstack/react-router' {
       path: '/login/callback'
       fullPath: '/login/callback'
       preLoaderRoute: typeof LoginCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learner/settings': {
+      id: '/learner/settings'
+      path: '/learner/settings'
+      fullPath: '/learner/settings'
+      preLoaderRoute: typeof LearnerSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learner/dashboard': {
@@ -228,6 +248,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   ContributorDashboardRoute: ContributorDashboardRoute,
   LearnerDashboardRoute: LearnerDashboardRoute,
+  LearnerSettingsRoute: LearnerSettingsRoute,
   LoginCallbackRoute: LoginCallbackRoute,
   LoginIndexRoute: LoginIndexRoute,
 }
