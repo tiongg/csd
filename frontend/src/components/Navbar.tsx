@@ -1,13 +1,14 @@
+import { Link, useLocation } from '@tanstack/react-router';
+import { useState } from 'react';
+import { Button } from './ui/button';
+import { useAuth } from '@/context/AuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/context/AuthContext';
-import { Link, useLocation } from '@tanstack/react-router';
-import { useState } from 'react';
-import { Button } from './ui/button';
+import { capitalizeFirst } from '@/lib/utils';
 
 export default function Navbar() {
   const { user } = useAuth();
@@ -35,7 +36,7 @@ export default function Navbar() {
             <DropdownMenuTrigger asChild>
               <div className="flex h-7.5 w-40 cursor-pointer items-center justify-between rounded border bg-white px-4 py-1">
                 <span>
-                  {dir.charAt(0).toUpperCase() + dir.slice(1).toLowerCase()}
+                  {capitalizeFirst(dir)}
                 </span>
                 {navClicked ? (
                   <div className="ml-8 inline-block h-0 w-0 border-r-8 border-b-5 border-l-8 border-r-transparent border-b-slate-400 border-l-transparent">

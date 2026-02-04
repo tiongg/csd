@@ -16,6 +16,7 @@ import type { Account } from '@/context/AuthContext';
 import type React from 'react';
 import type { LinkOptions } from '@tanstack/react-router';
 import { useAuth } from '@/context/AuthContext';
+import { capitalizeFirst } from '@/lib/utils';
 
 type NavItemProps = {
   title: string;
@@ -140,7 +141,7 @@ export default function Sidebar() {
             {user.realname}
           </div>
           <div className="text-xs text-slate-500">
-            {user.role.charAt(0) + user.role.slice(1).toLowerCase()}
+            {capitalizeFirst(user.role)}
           </div>
         </div>
       </div>
