@@ -17,7 +17,7 @@ import type React from 'react';
 import type { LinkOptions } from '@tanstack/react-router';
 import { useAuth } from '@/context/AuthContext';
 import { capitalizeFirst } from '@/lib/utils';
-import useDirectory from '@/hooks/useDirectory';
+import useActiveRole from '@/hooks/useActiveRole';
 
 type NavItemProps = {
   title: string;
@@ -43,7 +43,7 @@ function NavItem({ title, link, icon }: NavItemProps) {
 }
 
 function SidebarByRole({ role }: { role: Account['role'] }) {
-  const dir = useDirectory();
+  const dir = useActiveRole();
 
   return match([role, dir])
     .with(['ADMIN', 'ADMIN'], () => (

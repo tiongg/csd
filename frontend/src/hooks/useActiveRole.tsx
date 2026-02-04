@@ -1,7 +1,7 @@
 import { useLocation } from "@tanstack/react-router";
 import type { Account } from "@/context/AuthContext";
 
-export default function useDirectory() {
+export default function useActiveRole() {
     const roles = ["ADMIN", "CONTRIBUTOR", "LEARNER"];
 
     const location = useLocation();
