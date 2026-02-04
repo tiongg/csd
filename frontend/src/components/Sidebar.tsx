@@ -1,5 +1,3 @@
-import type { Account } from '@/context/AuthContext';
-import { useAuth } from '@/context/AuthContext';
 import {
   BookOpenIcon,
   Cog6ToothIcon,
@@ -14,8 +12,10 @@ import {
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
+import type { Account } from '@/context/AuthContext';
 import type React from 'react';
 import type { LinkOptions } from '@tanstack/react-router';
+import { useAuth } from '@/context/AuthContext';
 
 type NavItemProps = {
   title: string;
