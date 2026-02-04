@@ -1,17 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
-import Sidebar from '@/components/Sidebar'
+import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/learner/dashboard')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   return (
-    <div className='flex'>
-      <Sidebar />
-      <div className='pt-16'>
-        Hello "/learner/dashboard"!
-      </div>
-    </div>
-  )
+    <PageWithSideBar>
+      <div>Hello "/learner/dashboard"!</div>
+    </PageWithSideBar>
+  );
 }

@@ -1,114 +1,141 @@
-import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { P, match } from "ts-pattern";
-import {
-    BookOpenIcon,
-    Cog6ToothIcon,
-    DocumentTextIcon,
-    PencilSquareIcon,
-    QuestionMarkCircleIcon,
-    RectangleGroupIcon,
-    TrophyIcon,
-    UserIcon,
-    UsersIcon
-} from "@heroicons/react/24/outline"
-import { Button } from "./ui/button";
-import type React from "react";
 import type { Account } from '@/context/AuthContext';
 import { useAuth } from '@/context/AuthContext';
+import {
+  BookOpenIcon,
+  Cog6ToothIcon,
+  DocumentTextIcon,
+  PencilSquareIcon,
+  QuestionMarkCircleIcon,
+  RectangleGroupIcon,
+  TrophyIcon,
+  UserIcon,
+  UsersIcon,
+} from '@heroicons/react/24/outline';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
+import type React from 'react';
+import { P, match } from 'ts-pattern';
+import { Button } from './ui/button';
 
 interface NavItemProps {
-    title: string;
-    link: string;
-    icon?: React.ReactNode
+  title: string;
+  link: string;
+  icon?: React.ReactNode;
 }
 
 function NavItem({ title, link, icon }: NavItemProps) {
-    return (
-        <div className="py-2">
-            <Button variant="ghost" className="rounded-full cursor-pointer text-slate-700">
-                {icon}
-                <Link to={link}>
-                    {title}
-                </Link>
-            </Button>
-        </div>
-    )
+  return (
+    <div className="py-2">
+      <Button
+        variant="ghost"
+        className="cursor-pointer rounded-full text-slate-700"
+      >
+        {icon}
+        <Link to={link}>{title}</Link>
+      </Button>
+    </div>
+  );
 }
 
 function SidebarByRole({ role }: { role: Account['role'] }) {
-    const location = useLocation();
-    const dir = location.href.split("/")[1]?.toUpperCase() ?? "LEARNER";
+  const location = useLocation();
+  const dir = location.href.split('/')[1]?.toUpperCase() ?? 'LEARNER';
 
-    return match([role, dir])
-        .with(["ADMIN", "ADMIN"], () =>
-            <div>
-                <NavItem title="Dashboard" link="/admin/dashboard" icon={<RectangleGroupIcon />} />
+  return match([role, dir])
+    .with(['ADMIN', 'ADMIN'], () => (
+      <div>
+        <NavItem
+          title="Dashboard"
+          link="/admin/dashboard"
+          icon={<RectangleGroupIcon />}
+        />
 
-                <NavItem title="User Moderation" link="" icon={<UserIcon />} />
+        <NavItem title="User Moderation" link="" icon={<UserIcon />} />
 
-                <NavItem title="Course Moderation" link="" icon={<DocumentTextIcon />} />
-            </div>)
-        .with([P.not("LEARNER"), "CONTRIBUTOR"], () =>
-            <div>
-                <NavItem title="Dashboard" link="/contributor/dashboard" icon={<RectangleGroupIcon />} />
+        <NavItem
+          title="Course Moderation"
+          link=""
+          icon={<DocumentTextIcon />}
+        />
+      </div>
+    ))
+    .with([P.not('LEARNER'), 'CONTRIBUTOR'], () => (
+      <div>
+        <NavItem
+          title="Dashboard"
+          link="/contributor/dashboard"
+          icon={<RectangleGroupIcon />}
+        />
 
-                <NavItem title="Teams" link="" icon={<UsersIcon />} />
+        <NavItem title="Teams" link="" icon={<UsersIcon />} />
 
-                <NavItem title="Courses" link="" icon={<BookOpenIcon />} />
-            </div>)
-        .otherwise(() =>
-            <div>
-                <NavItem title="Dashboard" link="/learner/dashboard" icon={<RectangleGroupIcon />} />
-                <NavItem title="Challenges" link="" icon={<TrophyIcon />} />
-                <NavItem title="My Courses" link="" icon={<PencilSquareIcon />} />
-            </div>)
+        <NavItem title="Courses" link="" icon={<BookOpenIcon />} />
+      </div>
+    ))
+    .otherwise(() => (
+      <div>
+        <NavItem
+          title="Dashboard"
+          link="/learner/dashboard"
+          icon={<RectangleGroupIcon />}
+        />
+        <NavItem title="Challenges" link="" icon={<TrophyIcon />} />
+        <NavItem title="My Courses" link="" icon={<PencilSquareIcon />} />
+      </div>
+    ));
 }
 
 export default function Sidebar() {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-    if (!user) {
-        return null;
-    }
+  if (!user) {
+    return null;
+  }
 
-    return (
-        <div className="w-1/6 min-w-50 h-screen shadow-lg bg-white/50 pt-16 flex flex-col justify-between">
-            <div>
-                <div className="px-8 py-4">
-                    <p className="subtitle tracking-wider">MAIN MENU</p>
+  return (
+    <div className="flex h-[calc(100vh-3rem)] w-1/6 min-w-50 flex-col justify-between bg-white/50 shadow-lg">
+      <div>
+        <div className="px-8 py-4">
+          <p className="subtitle tracking-wider">MAIN MENU</p>
 
-                    <SidebarByRole role={user.role} />
-                </div>
-
-                <div className="px-8 py-4">
-                    <p className="subtitle tracking-wider">SYSTEM</p>
-
-                    <NavItem title="Settings" link="" icon={<Cog6ToothIcon />} />
-                    <NavItem title="Help & Support" link="" icon={<QuestionMarkCircleIcon />} />
-
-                    <Button variant="default" onClick={async () => {
-                        await logout();
-                        navigate({ to: '/' });
-                    }} className="cursor-pointer w-full my-2">
-                        Log out
-                    </Button>
-                </div>
-            </div>
-
-            <div className="items-center py-1 px-4 flex justify-around border-t-slate-300 border-t-2">
-                <div className="aspect-square size-10 rounded-full bg-sky-600"></div>
-
-                <div className="p-4 flex flex-col">
-                    <div className="text-slate-700 font-bold text-sm">
-                        {user.realname}
-                    </div>
-                    <div className="text-slate-500 text-xs">
-                        {user.role.charAt(0) + user.role.slice(1).toLowerCase()}
-                    </div>
-                </div>
-            </div>
-
+          <SidebarByRole role={user.role} />
         </div>
-    )
+
+        <div className="px-8 py-4">
+          <p className="subtitle tracking-wider">SYSTEM</p>
+
+          <NavItem title="Settings" link="" icon={<Cog6ToothIcon />} />
+          <NavItem
+            title="Help & Support"
+            link=""
+            icon={<QuestionMarkCircleIcon />}
+          />
+
+          <Button
+            variant="default"
+            onClick={async () => {
+              await logout();
+              navigate({ to: '/' });
+            }}
+            className="my-2 w-full cursor-pointer"
+          >
+            Log out
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-around border-t-2 border-t-slate-300 px-4 py-1">
+        <div className="aspect-square size-10 rounded-full bg-sky-600"></div>
+
+        <div className="flex flex-col p-4">
+          <div className="text-sm font-bold text-slate-700">
+            {user.realname}
+          </div>
+          <div className="text-xs text-slate-500">
+            {user.role.charAt(0) + user.role.slice(1).toLowerCase()}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
