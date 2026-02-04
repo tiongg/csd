@@ -12,13 +12,14 @@ import {
   UsersIcon,
 } from '@heroicons/react/24/outline';
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
-import type React from 'react';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
+import type React from 'react';
+import type { LinkOptions } from '@tanstack/react-router';
 
-interface NavItemProps {
+type NavItemProps = {
   title: string;
-  link: string;
+  link: LinkOptions["to"];
   icon?: React.ReactNode;
 }
 
@@ -49,11 +50,11 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           icon={<RectangleGroupIcon />}
         />
 
-        <NavItem title="User Moderation" link="" icon={<UserIcon />} />
+        <NavItem title="User Moderation" link="/" icon={<UserIcon />} />
 
         <NavItem
           title="Course Moderation"
-          link=""
+          link="/"
           icon={<DocumentTextIcon />}
         />
       </div>
@@ -66,9 +67,9 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           icon={<RectangleGroupIcon />}
         />
 
-        <NavItem title="Teams" link="" icon={<UsersIcon />} />
+        <NavItem title="Teams" link="/" icon={<UsersIcon />} />
 
-        <NavItem title="Courses" link="" icon={<BookOpenIcon />} />
+        <NavItem title="Courses" link="/" icon={<BookOpenIcon />} />
       </div>
     ))
     .otherwise(() => (
@@ -78,8 +79,8 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           link="/learner/dashboard"
           icon={<RectangleGroupIcon />}
         />
-        <NavItem title="Challenges" link="" icon={<TrophyIcon />} />
-        <NavItem title="My Courses" link="" icon={<PencilSquareIcon />} />
+        <NavItem title="Challenges" link="/" icon={<TrophyIcon />} />
+        <NavItem title="My Courses" link="/" icon={<PencilSquareIcon />} />
       </div>
     ));
 }
@@ -104,10 +105,10 @@ export default function Sidebar() {
         <div className="px-8 py-4">
           <p className="font-subtitle tracking-wider">SYSTEM</p>
 
-          <NavItem title="Settings" link="" icon={<Cog6ToothIcon />} />
+          <NavItem title="Settings" link="/" icon={<Cog6ToothIcon />} />
           <NavItem
             title="Help & Support"
-            link=""
+            link="/"
             icon={<QuestionMarkCircleIcon />}
           />
 

@@ -15,7 +15,7 @@ export const Route = createFileRoute('/')({
   component: App,
 });
 
-interface CoursePreviewProps {
+type CoursePreviewProps = {
   title: string;
   instructor: string;
 }
