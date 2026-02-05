@@ -1,3 +1,9 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Link, useNavigate } from '@tanstack/react-router';
+import { Controller, useForm } from 'react-hook-form';
+import z from 'zod';
+import { FcGoogle } from 'react-icons/fc';
+import { Heading1 } from '@/components/ui/typography';
 import { Button } from '@/components/ui/button';
 import {
   Field,
@@ -9,10 +15,6 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { constructAuthUrl } from '@/lib/auth-urls';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useNavigate } from '@tanstack/react-router';
-import { Controller, useForm } from 'react-hook-form';
-import z from 'zod';
 
 const loginSchema = z.object({
   usernameOrEmail: z.string().min(3, 'Username must be at least 3 characters'),
@@ -53,82 +55,93 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-md space-y-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight">Login</h1>
-        <p className="text-muted-foreground mt-2 text-sm">
-          Welcome back! Please enter your credentials to log in.
-        </p>
+
+    <div className='h-full w-full flex flex-row-reverse'>
+      <div className='h-full w-1/2 bg-slate-200'>
+        {/* image here */}
       </div>
+      <div className='h-full w-1/2 flex justify-center'>
+        <div className='p-18 w-8/10 min-w-[500px]'>
+          <div className='flex justify-center'>
+            <Heading1>Log in</Heading1>
+          </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <FieldGroup>
-          <Controller
-            control={control}
-            name="usernameOrEmail"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="email-or-username">
-                  Email/Username
-                </FieldLabel>
-                <Input
-                  {...field}
-                  id="email-or-username"
-                  aria-invalid={fieldState.invalid}
-                  placeholder="your@email.com"
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
+          <form onSubmit={handleSubmit(onSubmit)} className="py-8 space-y-4">
+            <FieldGroup>
+              <Controller
+                control={control}
+                name="usernameOrEmail"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <Input
+                      {...field}
+                      id="email-or-username"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Email or Username"
+                      className='text-slate-700'
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
                 )}
-              </Field>
-            )}
-          />
-        </FieldGroup>
+              />
+            </FieldGroup>
 
-        <FieldGroup>
-          <Controller
-            control={control}
-            name="password"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Input
-                  {...field}
-                  id="password"
-                  type="password"
-                  aria-invalid={fieldState.invalid}
-                  placeholder="••••••••"
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
+            <FieldGroup>
+              <Controller
+                control={control}
+                name="password"
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <Input
+                      {...field}
+                      id="password"
+                      type="password"
+                      aria-invalid={fieldState.invalid}
+                      placeholder="Password"
+                      className='text-slate-700'
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
                 )}
-              </Field>
+              />
+            </FieldGroup>
+
+            {errors.root && (
+              <div className="text-destructive text-sm">{errors.root.message}</div>
             )}
-          />
-        </FieldGroup>
 
-        {errors.root && (
-          <div className="text-destructive text-sm">{errors.root.message}</div>
-        )}
+            <Button type="submit" className="w-full my-4" disabled={isSubmitting}>
+              {isSubmitting ? 'Logging in...' : 'Login'}
+            </Button>
+          </form>
 
-        <Button type="submit" className="w-full" disabled={isSubmitting}>
-          {isSubmitting ? 'Logging in...' : 'Login'}
-        </Button>
-      </form>
+          <div className='flex justify-center w-8/10 mx-auto'>
+            <div className='w-1/6'>
+              <Separator className='inline-block bg-slate-500' />
+            </div>
+            <p className='font-subtitle inline-block w-2/3 px-4 text-center'>
+              Other log in options
+            </p>
+            <div className='w-1/6'>
+              <Separator className='inline-block bg-slate-500' />
+            </div>
+          </div>
+          <div className='flex justify-center'>
+            <Button variant="outline" className="size-16 m-4" size="icon-lg" asChild>
+              <a href={constructAuthUrl('google')}>
+                <FcGoogle className='size-8' />
+              </a>
+            </Button>
+          </div>
 
-      <Separator />
-
-      <Button variant="outline" className="w-full" asChild>
-        <a href={constructAuthUrl('google')}>Login with Google</a>
-      </Button>
-
-      <Separator />
-
-      <div className="text-muted-foreground text-center text-sm">
-        Don't have an account?{' '}
-        <a href="/register" className="text-primary hover:underline">
-          Register here
-        </a>
+          <div className='font-[Noto_Sans] font-bold text-slate-700 text-center'>
+            Don't have an account? <Link to="/register" className='underline'>Sign up</Link>
+          </div>
+        </div>
       </div>
     </div>
   );
