@@ -44,7 +44,6 @@ function NavItem({ title, link, icon }: NavItemProps) {
 
 function SidebarByRole({ role }: { role: Account['role'] }) {
   const dir = useActiveRole();
-
   return match([role, dir])
     .with(['ADMIN', 'ADMIN'], () => (
       <>
@@ -90,6 +89,7 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
 }
 
 export default function Sidebar() {
+  const currentActiveRole = useActiveRole();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -111,21 +111,21 @@ export default function Sidebar() {
           <p className="font-subtitle tracking-wider">SYSTEM</p>
 
           <div className="flex flex-col gap-y-4 py-4">
-            {user.role === 'LEARNER' && (
+            {currentActiveRole === 'LEARNER' && (
               <NavItem
                 title="Settings"
                 link="/learner/settings"
                 icon={<Cog6ToothIcon />}
               />
             )}
-            {user.role === 'CONTRIBUTOR' && (
+            {currentActiveRole === 'CONTRIBUTOR' && (
               <NavItem
                 title="Settings"
                 link="/contributor/settings"
                 icon={<Cog6ToothIcon />}
               />
             )}
-            {user.role === 'ADMIN' && (
+            {currentActiveRole === 'ADMIN' && (
               <NavItem
                 title="Settings"
                 link="/admin/settings"
