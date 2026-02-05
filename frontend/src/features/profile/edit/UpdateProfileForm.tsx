@@ -132,7 +132,7 @@ export default function UpdateProfileForm() {
           Update your profile information
         </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
           <FieldGroup>
             <Controller
               control={control}
