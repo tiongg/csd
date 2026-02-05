@@ -79,6 +79,7 @@ export default function LoginForm() {
                       aria-invalid={fieldState.invalid}
                       placeholder="Email or Username"
                       className='text-slate-700'
+                      aria-label='Email or Username'
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -101,6 +102,7 @@ export default function LoginForm() {
                       aria-invalid={fieldState.invalid}
                       placeholder="Password"
                       className='text-slate-700'
+                      aria-label='Password'
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />

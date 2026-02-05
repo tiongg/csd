@@ -110,6 +110,7 @@ export default function RegistrationForm() {
                       aria-invalid={fieldState.invalid}
                       placeholder="Username"
                       className='text-slate-700'
+                      aria-label="Username"
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -131,6 +132,7 @@ export default function RegistrationForm() {
                       aria-invalid={fieldState.invalid}
                       placeholder="Email address"
                       className='text-slate-700'
+                      aria-label="Email"
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -153,6 +155,7 @@ export default function RegistrationForm() {
                       aria-invalid={fieldState.invalid}
                       placeholder="Password"
                       className='text-slate-700'
+                      aria-label='Password'
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -175,6 +178,7 @@ export default function RegistrationForm() {
                       aria-invalid={fieldState.invalid}
                       placeholder="Confirm password"
                       className='text-slate-700'
+                      aria-label='Confirm password'
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
