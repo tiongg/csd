@@ -61,83 +61,85 @@ export default function LoginForm() {
         {/* image here */}
       </div>
       <div className='h-full w-1/2 flex justify-center'>
-        <div className='p-18 w-8/10 min-w-[500px]'>
-          <div className='flex justify-center'>
-            <Heading1>Log in</Heading1>
-          </div>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="py-8 space-y-4">
-            <FieldGroup>
-              <Controller
-                control={control}
-                name="usernameOrEmail"
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <Input
-                      {...field}
-                      id="email-or-username"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Email or Username"
-                      className='text-slate-700'
-                      aria-label='Email or Username'
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-
-            <FieldGroup>
-              <Controller
-                control={control}
-                name="password"
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <Input
-                      {...field}
-                      id="password"
-                      type="password"
-                      aria-invalid={fieldState.invalid}
-                      placeholder="Password"
-                      className='text-slate-700'
-                      aria-label='Password'
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-
-            {errors.root && (
-              <div className="text-destructive text-sm">{errors.root.message}</div>
-            )}
-
-            <Button type="submit" className="w-full my-4" disabled={isSubmitting}>
-              {isSubmitting ? 'Logging in...' : 'Login'}
-            </Button>
-          </form>
-
-          <div className='flex justify-center w-8/10 mx-auto'>
-            <div className='w-1/6'>
-              <Separator className='inline-block bg-slate-500' />
+        <div className='p-18 w-8/10 min-w-[500px] flex flex-col justify-between'>
+          <div>
+            <div className='flex justify-center'>
+              <Heading1>Log in</Heading1>
             </div>
-            <p className='font-subtitle inline-block w-2/3 px-4 text-center'>
-              Other log in options
-            </p>
-            <div className='w-1/6'>
-              <Separator className='inline-block bg-slate-500' />
+
+            <form onSubmit={handleSubmit(onSubmit)} className="py-8 space-y-4">
+              <FieldGroup>
+                <Controller
+                  control={control}
+                  name="usernameOrEmail"
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Input
+                        {...field}
+                        id="email-or-username"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Email or Username"
+                        className='text-slate-700'
+                        aria-label='Email or Username'
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+
+              <FieldGroup>
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <Input
+                        {...field}
+                        id="password"
+                        type="password"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="Password"
+                        className='text-slate-700'
+                        aria-label='Password'
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+
+              {errors.root && (
+                <div className="text-destructive text-sm">{errors.root.message}</div>
+              )}
+
+              <Button type="submit" className="w-full my-4" disabled={isSubmitting}>
+                {isSubmitting ? 'Logging in...' : 'Login'}
+              </Button>
+            </form>
+
+            <div className='flex justify-center w-8/10 mx-auto'>
+              <div className='w-1/6'>
+                <Separator className='inline-block bg-slate-500' />
+              </div>
+              <p className='font-subtitle inline-block w-2/3 px-4 text-center'>
+                Other log in options
+              </p>
+              <div className='w-1/6'>
+                <Separator className='inline-block bg-slate-500' />
+              </div>
             </div>
-          </div>
-          <div className='flex justify-center'>
-            <Button variant="outline" className="size-16 m-4" size="icon-lg" asChild>
-              <a href={constructAuthUrl('google')}>
-                <FcGoogle className='size-8' />
-              </a>
-            </Button>
+            <div className='flex justify-center'>
+              <Button variant="outline" className="size-16 m-4" size="icon-lg" asChild>
+                <a href={constructAuthUrl('google')}>
+                  <FcGoogle className='size-8' />
+                </a>
+              </Button>
+            </div>
           </div>
 
           <div className='font-[Noto_Sans] font-bold text-slate-700 text-center'>
