@@ -1,14 +1,17 @@
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
-import { createFileRoute } from '@tanstack/react-router'
+import UpdateProfileForm from '@/features/profile/edit/UpdateProfileForm';
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/admin/settings')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <div>You're in admin settings!</div>
+      <div className="mx-auto flex w-100 items-center">
+        <UpdateProfileForm />
+      </div>
     </PageWithSideBar>
   );
 }

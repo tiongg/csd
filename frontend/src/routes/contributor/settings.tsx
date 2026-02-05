@@ -1,4 +1,5 @@
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import UpdateProfileForm from '@/features/profile/edit/UpdateProfileForm';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/contributor/settings')({
@@ -8,7 +9,9 @@ export const Route = createFileRoute('/contributor/settings')({
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <div>You're in contributor settings!</div>
+      <div className="mx-auto flex w-100 items-center">
+        <UpdateProfileForm />
+      </div>
     </PageWithSideBar>
   );
 }
