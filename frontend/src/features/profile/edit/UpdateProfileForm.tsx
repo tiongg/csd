@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 const updateSchema = z.object({
@@ -74,9 +75,11 @@ export default function UpdateProfileForm() {
     '/api/contributor/apply',
     {
       onError: (error) => {
-        console.log(error);
+        toast.error(error.message);
       },
       onSuccess: () => {
+        toast.success('Request sent!');
+
         // TODO: Put toast
       },
     },

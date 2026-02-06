@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 
 import { type AuthContextType } from '@/context/AuthContext';
 import type { QueryClient } from '@tanstack/react-query';
+import { Toaster } from 'sonner';
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -15,6 +16,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     <main className="flex min-h-dvh w-full flex-col">
       <Navbar />
       <Outlet />
+      <Toaster/>
     </main>
   ),
 });
