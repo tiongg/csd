@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
+import { capitalizeFirst } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -103,7 +104,9 @@ export default function UpdateProfileForm() {
             <h2 className="text-xl font-semibold">
               {user?.realname || 'No name set'}
             </h2>
-            <p className="text-muted-foreground">@{user?.username}</p>
+            <p className="text-muted-foreground">
+              @{user?.username} ({capitalizeFirst(user?.role)})
+            </p>
             <p className="text-muted-foreground text-sm">{user?.email}</p>
             {user.role === 'LEARNER' && (
               <p className="text-sm underline" onClick={applyContributor}>
@@ -170,25 +173,6 @@ export default function UpdateProfileForm() {
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
-          <FieldGroup>
-            <Controller
-              control={control}
-              name="userRole"
-              render={({ field }) => (
-                <Field>
-                  <FieldLabel htmlFor="role">Role</FieldLabel>
-                  <Input
-                    {...field}
-                    id="userRole"
-                    placeholder={user.role}
-                    readOnly
-                    disabled
-                  />
                 </Field>
               )}
             />
