@@ -23,10 +23,10 @@ export default function Navbar() {
 
       {!user ? (
         <div>
-          <Button className="mx-2 rounded-full" variant="outline">
+          <Button className="mx-2 rounded-full" variant="outline" asChild>
             <Link to="/login">Log In</Link>
           </Button>
-          <Button className="mx-2 rounded-full">
+          <Button className="mx-2 rounded-full" asChild>
             <Link to="/register">Sign Up</Link>
           </Button>
         </div>
