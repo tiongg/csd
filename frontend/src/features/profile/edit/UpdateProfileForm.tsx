@@ -37,10 +37,6 @@ async function getGravatarUrl(email: string, size = 120) {
   return `https://www.gravatar.com/avatar/${hashedEmail}?s=${size}&d=identicon`;
 }
 
-async function applyContributor() {
-  console.log('Applying to be contributor');
-}
-
 export default function UpdateProfileForm() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -69,6 +65,19 @@ export default function UpdateProfileForm() {
         queryClient.invalidateQueries({
           queryKey: apiQueryOptions('get', '/api/auth/me').queryKey,
         });
+      },
+    },
+  );
+
+  const { mutateAsync: applyContributor } = useApiMutation(
+    'post',
+    '/api/contributor/apply',
+    {
+      onError: (error) => {
+        console.log(error);
+      },
+      onSuccess: () => {
+        // TODO: Put toast
       },
     },
   );
@@ -109,7 +118,12 @@ export default function UpdateProfileForm() {
             </p>
             <p className="text-muted-foreground text-sm">{user?.email}</p>
             {user.role === 'LEARNER' && (
-              <p className="text-sm underline" onClick={applyContributor}>
+              <p
+                className="cursor-pointer text-sm underline"
+                onClick={() => {
+                  applyContributor({});
+                }}
+              >
                 Apply to be contributor
               </p>
             )}
