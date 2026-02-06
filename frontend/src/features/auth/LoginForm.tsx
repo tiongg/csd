@@ -79,7 +79,7 @@ export default function LoginForm() {
                         id="email-or-username"
                         aria-invalid={fieldState.invalid}
                         placeholder="Email or Username"
-                        className='text-slate-700'
+                        className='text-slate-700 h-12'
                         aria-label='Email or Username'
                       />
                       {fieldState.invalid && (
@@ -102,7 +102,7 @@ export default function LoginForm() {
                         type="password"
                         aria-invalid={fieldState.invalid}
                         placeholder="Password"
-                        className='text-slate-700'
+                        className='text-slate-700 h-12'
                         aria-label='Password'
                       />
                       {fieldState.invalid && (
