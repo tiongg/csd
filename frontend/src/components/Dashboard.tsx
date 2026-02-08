@@ -1,43 +1,59 @@
 import { match } from "ts-pattern";
 import { Heading1 } from "./ui/typography";
-import type React from "react";
 import useActiveRole from "@/hooks/useActiveRole";
 import { cn } from "@/lib/utils";
 
-export default function DashboardByRole() {
+function CardsByRole() {
     const dir = useActiveRole() ?? "LEARNER";
 
     return match(dir)
         .with("ADMIN", () => (
-            <DashboardTemplate content={<div>admin placeholder</div>}>
+            <>
                 <Card title="Pending Approvals" value="4" color="red" />
                 <Card title="Total Learners" value="10,000" color="black" />
                 <Card title="Total Courses" value="1000" color="black" />
-            </DashboardTemplate>
+            </>
         ))
         .with("CONTRIBUTOR", () => (
-            <DashboardTemplate content={<div>contributor placeholder</div>}>
+            <>
                 <Card title="Awaiting Approvals" value="4" color="orange" />
                 <Card title="Total Learners" value="10,000" color="black" />
                 <Card title="Total Courses" value="1000" color="black" />
-            </DashboardTemplate>
+            </>
         ))
         .with("LEARNER", () => (
-            <DashboardTemplate content={<div>learner placeholder</div>}>
+            <>
                 <Card title="Daily streak" value="4" color="red" />
                 <Card title="Current Rank" value="Top 10%" color="black" />
                 <Card title="Total Courses" value="1000" color="black" />
-            </DashboardTemplate>
+            </>
         ))
         .exhaustive();
 }
 
-type DashboardTemplateProps = {
-    content: React.ReactNode;
-    children: React.ReactNode;
+function ContentByRole() {
+    const dir = useActiveRole() ?? "LEARNER";
+
+    return match(dir)
+        .with("ADMIN", () => (
+            <>
+                admin placeholder
+            </>
+        ))
+        .with("CONTRIBUTOR", () => (
+            <>
+                contributor placeholder
+            </>
+        ))
+        .with("LEARNER", () => (
+            <>
+                learner placeholder
+            </>
+        ))
+        .exhaustive();
 }
 
-function DashboardTemplate({content, children}: DashboardTemplateProps) {
+export default function Dashboard() {
     return (
         <div className="p-16 w-full h-full flex flex-col gap-8">
             <div>
@@ -46,12 +62,12 @@ function DashboardTemplate({content, children}: DashboardTemplateProps) {
             </div>
 
             <div className="flex gap-4 lg:gap-12 justify-between">
-                {children}
+                <CardsByRole />
             </div>
 
             <div className="bg-slate-200 h-full flex justify-center items-center">
                 {/* something goes here depending on role (not designed yet) */}
-                {content}
+                <ContentByRole/>
             </div>
         </div>
     )
