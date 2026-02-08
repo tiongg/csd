@@ -1,5 +1,6 @@
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { createFileRoute } from '@tanstack/react-router';
+import DashboardByRole from '@/components/DashboardByRole';
+import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 
 export const Route = createFileRoute('/learner/dashboard')({
   component: RouteComponent,
@@ -8,7 +9,9 @@ export const Route = createFileRoute('/learner/dashboard')({
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <div>Hello "/learner/dashboard"!</div>
+      <div className='h-[calc(100vh-52px)] w-full'>
+        <DashboardByRole />
+      </div>
     </PageWithSideBar>
   );
 }
