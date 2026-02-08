@@ -40,8 +40,8 @@ export default function TeamsList() {
                 <Heading1>Your Teams</Heading1>
                 <p className="font-subtitle">Here's what's happening today!</p>
             </div>
-            <div className="flex flex-wrap gap-4 lg:gap-12 justify-start py-4">
-                <Card className="w-100 border-2 cursor-pointer transition hover:border-slate-500 hover:shadow-lg">
+            <div className="grid grid-cols-3 gap-4 lg:gap-12 justify-start py-4">
+                <Card className="col-span-1 border-2 cursor-pointer transition hover:border-slate-500 hover:shadow-lg">
                     <CardContent className="flex justify-center items-center flex-col h-full gap-y-8">
                         <PlusCircleIcon className="size-28" />
                         <Heading3>Add New Team</Heading3>
@@ -65,7 +65,7 @@ type TeamCardProps = {
 
 function TeamCard({ name, size }: TeamCardProps) {
     return (
-        <Card className="flex flex-col justify-between overflow-hidden pt-0 w-100 border-2 cursor-pointer transition hover:border-slate-500 hover:shadow-lg">
+        <Card className="flex flex-col justify-between col-span-1 overflow-hidden pt-0 border-2 cursor-pointer transition hover:border-slate-500 hover:shadow-lg">
             <div className="h-50 bg-sky-200 flex flex-col justify-between">
                 <CardContent>
                     {/* image (if any) goes here, otherwise just do solid colour bg */}
