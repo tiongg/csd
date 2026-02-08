@@ -9,7 +9,7 @@ export const Route = createFileRoute('/admin/settings')({
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <div className="mx-auto flex w-100 items-center">
+      <div className="mx-auto flex w-full flex-1 items-center">
         <UpdateProfileForm />
       </div>
     </PageWithSideBar>

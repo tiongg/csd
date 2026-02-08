@@ -9,7 +9,7 @@ import {
   UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
-import { Link, linkOptions, useNavigate } from '@tanstack/react-router';
+import { Link,useNavigate } from '@tanstack/react-router';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
 import type { Account } from '@/context/AuthContext';
