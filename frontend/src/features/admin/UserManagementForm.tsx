@@ -143,7 +143,7 @@ function AllAdmins() {
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>
-                                <XMarkIcon className="cursor-pointer" color="red" height="2em" />
+                                <XMarkIcon className="cursor-pointer" color="red" height="1.5em" />
                             </TableCell>
                         </TableRow>
                     ))}
@@ -180,7 +180,7 @@ function AllUsers() {
                             <TableCell>{user.name}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>
-                                <PencilIcon className="cursor-pointer" height="2em" />
+                                <PencilIcon className="cursor-pointer" height="1.5em" />
                             </TableCell>
                         </TableRow>
                     ))}
