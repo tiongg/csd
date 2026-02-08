@@ -18,6 +18,7 @@ import { Route as LearnerSettingsRouteImport } from './routes/learner/settings'
 import { Route as LearnerDashboardRouteImport } from './routes/learner/dashboard'
 import { Route as ContributorSettingsRouteImport } from './routes/contributor/settings'
 import { Route as ContributorDashboardRouteImport } from './routes/contributor/dashboard'
+import { Route as AdminUserManagementRouteImport } from './routes/admin/user-management'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -66,6 +67,11 @@ const ContributorDashboardRoute = ContributorDashboardRouteImport.update({
   path: '/contributor/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUserManagementRoute = AdminUserManagementRouteImport.update({
+  id: '/admin/user-management',
+  path: '/admin/user-management',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/admin/settings',
   path: '/admin/settings',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/user-management': typeof AdminUserManagementRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/user-management': typeof AdminUserManagementRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/settings': typeof AdminSettingsRoute
+  '/admin/user-management': typeof AdminUserManagementRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/admin/dashboard'
     | '/admin/settings'
+    | '/admin/user-management'
     | '/contributor/dashboard'
     | '/contributor/settings'
     | '/learner/dashboard'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/admin/dashboard'
     | '/admin/settings'
+    | '/admin/user-management'
     | '/contributor/dashboard'
     | '/contributor/settings'
     | '/learner/dashboard'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/admin/dashboard'
     | '/admin/settings'
+    | '/admin/user-management'
     | '/contributor/dashboard'
     | '/contributor/settings'
     | '/learner/dashboard'
@@ -172,6 +184,7 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminUserManagementRoute: typeof AdminUserManagementRoute
   ContributorDashboardRoute: typeof ContributorDashboardRoute
   ContributorSettingsRoute: typeof ContributorSettingsRoute
   LearnerDashboardRoute: typeof LearnerDashboardRoute
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContributorDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/user-management': {
+      id: '/admin/user-management'
+      path: '/admin/user-management'
+      fullPath: '/admin/user-management'
+      preLoaderRoute: typeof AdminUserManagementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/settings': {
       id: '/admin/settings'
       path: '/admin/settings'
@@ -287,6 +307,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminSettingsRoute: AdminSettingsRoute,
+  AdminUserManagementRoute: AdminUserManagementRoute,
   ContributorDashboardRoute: ContributorDashboardRoute,
   ContributorSettingsRoute: ContributorSettingsRoute,
   LearnerDashboardRoute: LearnerDashboardRoute,
