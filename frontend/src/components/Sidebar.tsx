@@ -70,7 +70,7 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           icon={<RectangleGroupIcon />}
         />
 
-        <NavItem title="Teams" link="/" icon={<UsersIcon />} />
+        <NavItem title="Teams" link="/contributor/teams" icon={<UsersIcon />} />
 
         <NavItem title="Courses" link="/" icon={<BookOpenIcon />} />
       </>

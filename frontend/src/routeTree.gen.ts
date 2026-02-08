@@ -16,6 +16,7 @@ import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as LoginCallbackRouteImport } from './routes/login/callback'
 import { Route as LearnerSettingsRouteImport } from './routes/learner/settings'
 import { Route as LearnerDashboardRouteImport } from './routes/learner/dashboard'
+import { Route as ContributorTeamsRouteImport } from './routes/contributor/teams'
 import { Route as ContributorSettingsRouteImport } from './routes/contributor/settings'
 import { Route as ContributorDashboardRouteImport } from './routes/contributor/dashboard'
 import { Route as AdminUserManagementRouteImport } from './routes/admin/user-management'
@@ -56,6 +57,11 @@ const LearnerSettingsRoute = LearnerSettingsRouteImport.update({
 const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
   id: '/learner/dashboard',
   path: '/learner/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContributorTeamsRoute = ContributorTeamsRouteImport.update({
+  id: '/contributor/teams',
+  path: '/contributor/teams',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContributorSettingsRoute = ContributorSettingsRouteImport.update({
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/admin/user-management': typeof AdminUserManagementRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
+  '/contributor/teams': typeof ContributorTeamsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/admin/user-management': typeof AdminUserManagementRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
+  '/contributor/teams': typeof ContributorTeamsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/admin/user-management': typeof AdminUserManagementRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
+  '/contributor/teams': typeof ContributorTeamsRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/admin/user-management'
     | '/contributor/dashboard'
     | '/contributor/settings'
+    | '/contributor/teams'
     | '/learner/dashboard'
     | '/learner/settings'
     | '/login/callback'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/admin/user-management'
     | '/contributor/dashboard'
     | '/contributor/settings'
+    | '/contributor/teams'
     | '/learner/dashboard'
     | '/learner/settings'
     | '/login/callback'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/admin/user-management'
     | '/contributor/dashboard'
     | '/contributor/settings'
+    | '/contributor/teams'
     | '/learner/dashboard'
     | '/learner/settings'
     | '/login/callback'
@@ -200,6 +212,7 @@ export interface RootRouteChildren {
   AdminUserManagementRoute: typeof AdminUserManagementRoute
   ContributorDashboardRoute: typeof ContributorDashboardRoute
   ContributorSettingsRoute: typeof ContributorSettingsRoute
+  ContributorTeamsRoute: typeof ContributorTeamsRoute
   LearnerDashboardRoute: typeof LearnerDashboardRoute
   LearnerSettingsRoute: typeof LearnerSettingsRoute
   LoginCallbackRoute: typeof LoginCallbackRoute
@@ -255,6 +268,13 @@ declare module '@tanstack/react-router' {
       path: '/learner/dashboard'
       fullPath: '/learner/dashboard'
       preLoaderRoute: typeof LearnerDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contributor/teams': {
+      id: '/contributor/teams'
+      path: '/contributor/teams'
+      fullPath: '/contributor/teams'
+      preLoaderRoute: typeof ContributorTeamsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contributor/settings': {
@@ -331,6 +351,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminUserManagementRoute: AdminUserManagementRoute,
   ContributorDashboardRoute: ContributorDashboardRoute,
   ContributorSettingsRoute: ContributorSettingsRoute,
+  ContributorTeamsRoute: ContributorTeamsRoute,
   LearnerDashboardRoute: LearnerDashboardRoute,
   LearnerSettingsRoute: LearnerSettingsRoute,
   LoginCallbackRoute: LoginCallbackRoute,
