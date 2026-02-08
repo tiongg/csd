@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as LoginCallbackRouteImport } from './routes/login/callback'
 import { Route as LearnerSettingsRouteImport } from './routes/learner/settings'
+import { Route as LearnerMyCoursesRouteImport } from './routes/learner/my-courses'
 import { Route as LearnerDashboardRouteImport } from './routes/learner/dashboard'
 import { Route as LearnerChallengesRouteImport } from './routes/learner/challenges'
 import { Route as ContributorTeamsRouteImport } from './routes/contributor/teams'
@@ -53,6 +54,11 @@ const LoginCallbackRoute = LoginCallbackRouteImport.update({
 const LearnerSettingsRoute = LearnerSettingsRouteImport.update({
   id: '/learner/settings',
   path: '/learner/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnerMyCoursesRoute = LearnerMyCoursesRouteImport.update({
+  id: '/learner/my-courses',
+  path: '/learner/my-courses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/contributor/teams': typeof ContributorTeamsRoute
   '/learner/challenges': typeof LearnerChallengesRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
+  '/learner/my-courses': typeof LearnerMyCoursesRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login': typeof LoginIndexRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByTo {
   '/contributor/teams': typeof ContributorTeamsRoute
   '/learner/challenges': typeof LearnerChallengesRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
+  '/learner/my-courses': typeof LearnerMyCoursesRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login': typeof LoginIndexRoute
@@ -155,6 +163,7 @@ export interface FileRoutesById {
   '/contributor/teams': typeof ContributorTeamsRoute
   '/learner/challenges': typeof LearnerChallengesRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
+  '/learner/my-courses': typeof LearnerMyCoursesRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login/': typeof LoginIndexRoute
@@ -174,6 +183,7 @@ export interface FileRouteTypes {
     | '/contributor/teams'
     | '/learner/challenges'
     | '/learner/dashboard'
+    | '/learner/my-courses'
     | '/learner/settings'
     | '/login/callback'
     | '/login'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/contributor/teams'
     | '/learner/challenges'
     | '/learner/dashboard'
+    | '/learner/my-courses'
     | '/learner/settings'
     | '/login/callback'
     | '/login'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/contributor/teams'
     | '/learner/challenges'
     | '/learner/dashboard'
+    | '/learner/my-courses'
     | '/learner/settings'
     | '/login/callback'
     | '/login/'
@@ -227,6 +239,7 @@ export interface RootRouteChildren {
   ContributorTeamsRoute: typeof ContributorTeamsRoute
   LearnerChallengesRoute: typeof LearnerChallengesRoute
   LearnerDashboardRoute: typeof LearnerDashboardRoute
+  LearnerMyCoursesRoute: typeof LearnerMyCoursesRoute
   LearnerSettingsRoute: typeof LearnerSettingsRoute
   LoginCallbackRoute: typeof LoginCallbackRoute
   LoginIndexRoute: typeof LoginIndexRoute
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/learner/settings'
       fullPath: '/learner/settings'
       preLoaderRoute: typeof LearnerSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learner/my-courses': {
+      id: '/learner/my-courses'
+      path: '/learner/my-courses'
+      fullPath: '/learner/my-courses'
+      preLoaderRoute: typeof LearnerMyCoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learner/dashboard': {
@@ -374,6 +394,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContributorTeamsRoute: ContributorTeamsRoute,
   LearnerChallengesRoute: LearnerChallengesRoute,
   LearnerDashboardRoute: LearnerDashboardRoute,
+  LearnerMyCoursesRoute: LearnerMyCoursesRoute,
   LearnerSettingsRoute: LearnerSettingsRoute,
   LoginCallbackRoute: LoginCallbackRoute,
   LoginIndexRoute: LoginIndexRoute,
