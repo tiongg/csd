@@ -33,7 +33,7 @@ function NavItem({ title, link, icon }: NavItemProps) {
         className="w-full cursor-pointer justify-start rounded-full text-slate-700"
         asChild
       >
-        <Link to={link}>
+        <Link to={link} className='[&.active]:bg-slate-100 hover:bg-slate-50'>
           {icon}
           {title}
         </Link>
