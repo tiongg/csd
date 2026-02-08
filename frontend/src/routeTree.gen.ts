@@ -21,6 +21,7 @@ import { Route as ContributorDashboardRouteImport } from './routes/contributor/d
 import { Route as AdminUserManagementRouteImport } from './routes/admin/user-management'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
+import { Route as AdminCourseModerationRouteImport } from './routes/admin/course-moderation'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 
 const RegisterRoute = RegisterRouteImport.update({
@@ -82,6 +83,11 @@ const AdminDashboardRoute = AdminDashboardRouteImport.update({
   path: '/admin/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCourseModerationRoute = AdminCourseModerationRouteImport.update({
+  id: '/admin/course-moderation',
+  path: '/admin/course-moderation',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/admin/course-moderation': typeof AdminCourseModerationRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/user-management': typeof AdminUserManagementRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
+  '/admin/course-moderation': typeof AdminCourseModerationRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/user-management': typeof AdminUserManagementRoute
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/register': typeof RegisterRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/admin/course-moderation': typeof AdminCourseModerationRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/user-management': typeof AdminUserManagementRoute
@@ -138,6 +147,7 @@ export interface FileRouteTypes {
     | '/'
     | '/register'
     | '/profile'
+    | '/admin/course-moderation'
     | '/admin/dashboard'
     | '/admin/settings'
     | '/admin/user-management'
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/'
     | '/register'
     | '/profile'
+    | '/admin/course-moderation'
     | '/admin/dashboard'
     | '/admin/settings'
     | '/admin/user-management'
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/register'
     | '/_authenticated/profile'
+    | '/admin/course-moderation'
     | '/admin/dashboard'
     | '/admin/settings'
     | '/admin/user-management'
@@ -182,6 +194,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   RegisterRoute: typeof RegisterRoute
+  AdminCourseModerationRoute: typeof AdminCourseModerationRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUserManagementRoute: typeof AdminUserManagementRoute
@@ -279,6 +292,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/course-moderation': {
+      id: '/admin/course-moderation'
+      path: '/admin/course-moderation'
+      fullPath: '/admin/course-moderation'
+      preLoaderRoute: typeof AdminCourseModerationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -305,6 +325,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   RegisterRoute: RegisterRoute,
+  AdminCourseModerationRoute: AdminCourseModerationRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUserManagementRoute: AdminUserManagementRoute,

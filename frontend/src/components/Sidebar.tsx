@@ -57,7 +57,7 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
 
         <NavItem
           title="Course Moderation"
-          link="/"
+          link="/admin/course-moderation"
           icon={<DocumentTextIcon />}
         />
       </>
