@@ -82,7 +82,7 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           link="/learner/dashboard"
           icon={<RectangleGroupIcon />}
         />
-        <NavItem title="Challenges" link="/" icon={<TrophyIcon />} />
+        <NavItem title="Challenges" link="/learner/challenges" icon={<TrophyIcon />} />
         <NavItem title="My Courses" link="/" icon={<PencilSquareIcon />} />
       </>
     ));
@@ -106,7 +106,7 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-3rem)] w-1/6 min-w-50 flex-col justify-between bg-white/50 shadow-lg">
+    <div className="flex h-[calc(100vh-3rem)] w-1/6 min-w-60 flex-col justify-between bg-white/50 shadow-lg">
       <div>
         <div className="px-8 py-4">
           <p className="font-subtitle tracking-wider">MAIN MENU</p>
