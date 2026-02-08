@@ -1,7 +1,7 @@
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
-const headingBase = "font-bold text-sky-950 w-fit font-[Noto_Sans]";
+const headingBase = "font-bold text-slate-950 w-fit font-[Noto_Sans]";
 
 export function Heading1({ className, ...rest }: ComponentProps<"h1">) {
     return <h1 className={cn("text-3xl bg-linear-[to_bottom,transparent_65%,var(--color-sky-200)_65%,var(--color-sky-200)_100%]", headingBase, className)}{...rest} />;
@@ -20,5 +20,5 @@ export function Heading4({ className, ...rest }: ComponentProps<"h4">) {
 }
 
 export function Paragraph({ className, ...rest }: ComponentProps<"p">) {
-    return <p className={cn("text-sky-900", className)}{...rest} />;
+    return <p className={cn("text-slate-900", className)}{...rest} />;
 }
