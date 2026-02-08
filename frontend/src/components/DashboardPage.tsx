@@ -9,23 +9,23 @@ function CardsByRole() {
     return match(dir)
         .with("ADMIN", () => (
             <>
-                <Card title="Pending Approvals" value="4" color="red" />
-                <Card title="Total Learners" value="10,000" color="black" />
-                <Card title="Total Courses" value="1000" color="black" />
+                <InfoCard title="Pending Approvals" value="4" color="red" />
+                <InfoCard title="Total Learners" value="10,000" color="black" />
+                <InfoCard title="Total Courses" value="1000" color="black" />
             </>
         ))
         .with("CONTRIBUTOR", () => (
             <>
-                <Card title="Awaiting Approvals" value="4" color="orange" />
-                <Card title="Total Learners" value="10,000" color="black" />
-                <Card title="Total Courses" value="1000" color="black" />
+                <InfoCard title="Awaiting Approvals" value="4" color="orange" />
+                <InfoCard title="Total Learners" value="10,000" color="black" />
+                <InfoCard title="Total Courses" value="1000" color="black" />
             </>
         ))
         .with("LEARNER", () => (
             <>
-                <Card title="Daily streak" value="4" color="red" />
-                <Card title="Current Rank" value="Top 10%" color="black" />
-                <Card title="Total Courses" value="1000" color="black" />
+                <InfoCard title="Daily streak" value="4" color="red" />
+                <InfoCard title="Current Rank" value="Top 10%" color="black" />
+                <InfoCard title="Total Courses" value="1000" color="black" />
             </>
         ))
         .exhaustive();
@@ -73,13 +73,13 @@ export default function Dashboard() {
     )
 }
 
-type CardProps = {
+type InfoCardProps = {
     title: string;
     value: string;
     color: "red" | "orange" | "black";
 }
 
-function Card({ title, value, color }: CardProps) {
+function InfoCard({ title, value, color }: InfoCardProps) {
     let textColorClassName;
     let borderColorClassName;
     switch (color) {
