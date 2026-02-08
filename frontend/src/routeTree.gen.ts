@@ -16,6 +16,7 @@ import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as LoginCallbackRouteImport } from './routes/login/callback'
 import { Route as LearnerSettingsRouteImport } from './routes/learner/settings'
 import { Route as LearnerDashboardRouteImport } from './routes/learner/dashboard'
+import { Route as LearnerChallengesRouteImport } from './routes/learner/challenges'
 import { Route as ContributorTeamsRouteImport } from './routes/contributor/teams'
 import { Route as ContributorSettingsRouteImport } from './routes/contributor/settings'
 import { Route as ContributorDashboardRouteImport } from './routes/contributor/dashboard'
@@ -57,6 +58,11 @@ const LearnerSettingsRoute = LearnerSettingsRouteImport.update({
 const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
   id: '/learner/dashboard',
   path: '/learner/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnerChallengesRoute = LearnerChallengesRouteImport.update({
+  id: '/learner/challenges',
+  path: '/learner/challenges',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContributorTeamsRoute = ContributorTeamsRouteImport.update({
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/contributor/teams': typeof ContributorTeamsRoute
+  '/learner/challenges': typeof LearnerChallengesRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/contributor/teams': typeof ContributorTeamsRoute
+  '/learner/challenges': typeof LearnerChallengesRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/contributor/teams': typeof ContributorTeamsRoute
+  '/learner/challenges': typeof LearnerChallengesRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/contributor/dashboard'
     | '/contributor/settings'
     | '/contributor/teams'
+    | '/learner/challenges'
     | '/learner/dashboard'
     | '/learner/settings'
     | '/login/callback'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/contributor/dashboard'
     | '/contributor/settings'
     | '/contributor/teams'
+    | '/learner/challenges'
     | '/learner/dashboard'
     | '/learner/settings'
     | '/login/callback'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/contributor/dashboard'
     | '/contributor/settings'
     | '/contributor/teams'
+    | '/learner/challenges'
     | '/learner/dashboard'
     | '/learner/settings'
     | '/login/callback'
@@ -213,6 +225,7 @@ export interface RootRouteChildren {
   ContributorDashboardRoute: typeof ContributorDashboardRoute
   ContributorSettingsRoute: typeof ContributorSettingsRoute
   ContributorTeamsRoute: typeof ContributorTeamsRoute
+  LearnerChallengesRoute: typeof LearnerChallengesRoute
   LearnerDashboardRoute: typeof LearnerDashboardRoute
   LearnerSettingsRoute: typeof LearnerSettingsRoute
   LoginCallbackRoute: typeof LoginCallbackRoute
@@ -268,6 +281,13 @@ declare module '@tanstack/react-router' {
       path: '/learner/dashboard'
       fullPath: '/learner/dashboard'
       preLoaderRoute: typeof LearnerDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learner/challenges': {
+      id: '/learner/challenges'
+      path: '/learner/challenges'
+      fullPath: '/learner/challenges'
+      preLoaderRoute: typeof LearnerChallengesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contributor/teams': {
@@ -352,6 +372,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContributorDashboardRoute: ContributorDashboardRoute,
   ContributorSettingsRoute: ContributorSettingsRoute,
   ContributorTeamsRoute: ContributorTeamsRoute,
+  LearnerChallengesRoute: LearnerChallengesRoute,
   LearnerDashboardRoute: LearnerDashboardRoute,
   LearnerSettingsRoute: LearnerSettingsRoute,
   LoginCallbackRoute: LoginCallbackRoute,
