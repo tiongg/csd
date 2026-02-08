@@ -76,7 +76,7 @@ function TeamCard({ name, size }: TeamCardProps) {
                 <div className="w-8/10">
                     <CardTitle>
                         <div className="relative group">
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max px-2 py-1 text-sm text-white bg-slate-800 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition">
+                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 text-center w-full px-2 py-1 text-sm text-white bg-slate-800 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition">
                                 {name}
                             </div>
                             <Heading3 className="w-full truncate">
