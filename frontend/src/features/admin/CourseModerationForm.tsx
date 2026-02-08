@@ -1,4 +1,4 @@
-import { MagnifyingGlassIcon, PencilIcon } from "@heroicons/react/24/outline";
+import { PencilIcon } from "@heroicons/react/24/outline";
 import { Heading1 } from "@/components/ui/typography"
 import {
     Tabs,
@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
+import SearchBar from "@/components/ui/searchbar";
 
 const pending = [
     {
@@ -101,12 +101,7 @@ function AllAdmins() {
     return (
         <div className="flex flex-col gap-4 py-4">
             <div className="flex gap-x-2 w-full justify-end">
-                <div className="relative">
-                    <Input placeholder="Search for Courses" className="pl-8 placeholder:text-slate-400" />
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <MagnifyingGlassIcon height="1em" className="inline-block text-slate-400" />
-                    </div>
-                </div>
+                <SearchBar placeholder="Search for Courses"/>
             </div>
 
             <Table>
