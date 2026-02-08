@@ -79,8 +79,6 @@ export default function UpdateProfileForm() {
       },
       onSuccess: () => {
         toast.success('Request sent!');
-
-        // TODO: Put toast
       },
     },
   );

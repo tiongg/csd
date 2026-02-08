@@ -9,7 +9,7 @@ import {
   UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link, linkOptions, useNavigate } from '@tanstack/react-router';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
 import type { Account } from '@/context/AuthContext';
@@ -88,12 +88,22 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
     ));
 }
 
+function getRoleUrl(currentActiveRole: Account['role']): LinkOptions['to'] {
+  switch (currentActiveRole) {
+    case 'LEARNER':
+      return '/learner/settings' as const;
+    case 'ADMIN':
+      return '/admin/settings' as const;
+    default:
+      return '/contributor/settings' as const;
+  }
+}
 export default function Sidebar() {
   const currentActiveRole = useActiveRole();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  if (!user) {
+  if (!user || !currentActiveRole) {
     return null;
   }
 
@@ -111,27 +121,12 @@ export default function Sidebar() {
           <p className="font-subtitle tracking-wider">SYSTEM</p>
 
           <div className="flex flex-col gap-y-4 py-4">
-            {currentActiveRole === 'LEARNER' && (
-              <NavItem
-                title="Settings"
-                link="/learner/settings"
-                icon={<Cog6ToothIcon />}
-              />
-            )}
-            {currentActiveRole === 'CONTRIBUTOR' && (
-              <NavItem
-                title="Settings"
-                link="/contributor/settings"
-                icon={<Cog6ToothIcon />}
-              />
-            )}
-            {currentActiveRole === 'ADMIN' && (
-              <NavItem
-                title="Settings"
-                link="/admin/settings"
-                icon={<Cog6ToothIcon />}
-              />
-            )}
+            <NavItem
+              title="Settings"
+              link={getRoleUrl(currentActiveRole)}
+              icon={<Cog6ToothIcon />}
+            />
+
             <NavItem
               title="Help & Support"
               link="/"
