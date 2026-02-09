@@ -67,7 +67,7 @@ function CourseCard({ name, date, status }: CourseCardProps) {
     return (
         <div className="relative">
             {
-                status && <div className={cn("absolute right-0 px-2 py-1 m-4 rounded-full w-26 text-center text-white", BADGE_STYLES[status])}>{capitalizeFirst(status)}</div>
+                status && <div className={cn("absolute top-4 right-4 px-2 py-1 rounded-full w-26 text-center text-white", BADGE_STYLES[status])}>{capitalizeFirst(status)}</div>
             }
             <CardWithDetails title={name} descriptor="Last Edited" data={date} />
         </div>

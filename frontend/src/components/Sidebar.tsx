@@ -56,7 +56,7 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
         />
 
         <NavItem title="User Management" link="/admin/user-management" icon={<UserIcon />}>
-          <div className='absolute right-0 mr-10 px-3 bg-rose-500 text-white rounded-full'>4</div>
+          <div className='absolute right-10 px-3 bg-rose-500 text-white rounded-full'>4</div>
         </NavItem>
 
         <NavItem
