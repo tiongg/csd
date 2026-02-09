@@ -23,7 +23,7 @@ type CoursePreviewProps = {
 function CoursePreview({ title, instructor }: CoursePreviewProps) {
   return (
     <div>
-      <div className="h-[100px] bg-slate-200 lg:h-[300px]">
+      <div className="h-24 bg-slate-200 lg:h-72">
         {/* image goes here */}
       </div>
       <div className="py-2">

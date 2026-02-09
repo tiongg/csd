@@ -81,10 +81,10 @@ function PendingApprovals() {
     return (
         <div className="flex flex-col gap-4 py-4">
             <div className="flex gap-x-2 w-full justify-end">
-                <Button variant="outline" className="cursor-pointer rounded-full w-[100px]">
+                <Button variant="outline" className="cursor-pointer rounded-full w-24">
                     Approve
                 </Button>
-                <Button variant="destructive" className="cursor-pointer rounded-full w-[100px]">
+                <Button variant="destructive" className="cursor-pointer rounded-full w-24">
                     Delete
                 </Button>
             </div>

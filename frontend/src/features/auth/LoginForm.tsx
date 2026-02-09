@@ -53,7 +53,7 @@ export default function LoginForm() {
     <div className="flex h-full w-full flex-row-reverse">
       <div className="h-full w-1/2 bg-slate-200">{/* image here */}</div>
       <div className="flex h-full w-1/2 justify-center">
-        <div className="flex w-8/10 min-w-[500px] flex-col justify-between p-18">
+        <div className="flex w-8/10 min-w-120 flex-col justify-between p-18">
           <div>
             <div className="flex justify-center">
               <Heading1>Login</Heading1>

@@ -92,7 +92,7 @@ export default function RegistrationForm() {
         {/* image here */}
       </div>
       <div className='h-full w-1/2 flex justify-center'>
-        <div className='p-18 w-8/10 min-w-[500px] flex flex-col justify-between'>
+        <div className='p-18 w-8/10 min-w-120 flex flex-col justify-between'>
           <div>
             <div className='flex justify-center'>
               <Heading1>Sign Up</Heading1>
