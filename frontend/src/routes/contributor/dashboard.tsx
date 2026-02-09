@@ -9,9 +9,7 @@ export const Route = createFileRoute('/contributor/dashboard')({
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <div className='h-[calc(100vh-52px)] w-full'>
-        <DashboardPage/>
-      </div>
+      <DashboardPage />
     </PageWithSideBar>
   );
 }

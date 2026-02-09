@@ -9,9 +9,7 @@ export const Route = createFileRoute('/admin/course-moderation')({
 function RouteComponent() {
   return (
     <PageWithSideBar>
-        <div className='h-[calc(100vh-52px)] w-full'>
-            <CourseModerationForm/>
-        </div>
+      <CourseModerationForm />
     </PageWithSideBar>
   )
 }

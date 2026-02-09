@@ -9,9 +9,7 @@ export const Route = createFileRoute('/admin/user-management')({
 function RouteComponent() {
   return (
     <PageWithSideBar>
-        <div className='h-[calc(100vh-52px)] w-full'>
-            <UserManagementForm/>
-        </div>
+      <UserManagementForm />
     </PageWithSideBar>
   )
 }

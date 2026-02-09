@@ -9,9 +9,7 @@ export const Route = createFileRoute('/learner/challenges')({
 function RouteComponent() {
     return (
         <PageWithSideBar>
-            <div className='h-[calc(100vh-52px)] w-full'>
-                <ChallengesPage/>
-            </div>
+            <ChallengesPage/>
         </PageWithSideBar>
     );
 }

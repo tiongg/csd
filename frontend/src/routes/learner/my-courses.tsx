@@ -10,9 +10,7 @@ export const Route = createFileRoute('/learner/my-courses')({
 function RouteComponent() {
     return (
         <PageWithSideBar>
-            <div className='h-[calc(100vh-52px)] w-full'>
-                <MyCoursesPage/>
-            </div>
+            <MyCoursesPage />
         </PageWithSideBar>
     );
 }
