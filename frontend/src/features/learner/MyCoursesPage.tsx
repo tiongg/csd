@@ -31,7 +31,7 @@ export default function MyCoursesPage() {
                     </div>
                     <div className="flex items-center text-rose-500">
                         <div className="text-xl font-bold">4</div>
-                        <FireIcon height="2em" />
+                        <FireIcon className="size-8" />
                     </div>
                 </div>
                 <p className="font-subtitle">Here's what's happening today!</p>

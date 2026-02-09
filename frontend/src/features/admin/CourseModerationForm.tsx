@@ -119,7 +119,7 @@ function AllAdmins() {
                             <TableCell>{course.name}</TableCell>
                             <TableCell>{course.creator}</TableCell>
                             <TableCell>
-                                <PencilIcon className="cursor-pointer" height="1.5em" />
+                                <PencilIcon className="cursor-pointer size-5" />
                             </TableCell>
                         </TableRow>
                     ))}
