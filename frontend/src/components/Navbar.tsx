@@ -17,7 +17,7 @@ export default function Navbar() {
   const dir = useActiveRole() ?? "";
 
   return (
-    <header className="flex w-full items-center justify-between bg-white/50 p-2 px-8 shadow-lg">
+    <header className="flex w-full items-center justify-between bg-white p-2 px-8 shadow-lg sticky top-0">
       {/* Logo placeholder */}
       <Link className="aspect-square size-8 rounded-full bg-sky-600" to="/" />
 
