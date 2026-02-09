@@ -1,4 +1,4 @@
-import { CardWithDetails, CardWithPlusIcon } from "@/components/ui/cards";
+import { CardWithDetails, CardWithPlusIcon } from "@/components/ui/custom-cards";
 import { Heading1 } from "@/components/ui/typography";
 import { capitalizeFirst, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";

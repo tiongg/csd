@@ -1,5 +1,5 @@
 import { Heading1 } from "@/components/ui/typography"
-import { CardWithDetails, CardWithPlusIcon } from "@/components/ui/cards";
+import { CardWithDetails, CardWithPlusIcon } from "@/components/ui/custom-cards";
 
 // placeholders
 const teams = [
