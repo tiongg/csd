@@ -11,7 +11,7 @@ export default function PageWithSideBar({
   return (
     <div className={cn('flex', className)}>
       <Sidebar />
-      <div className='ml-60 w-full'>
+      <div className='ml-70 w-full'>
         {children}
       </div>
     </div>

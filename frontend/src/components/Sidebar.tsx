@@ -106,7 +106,7 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="fixed flex h-[calc(100vh-3rem)] w-60 flex-col justify-between bg-white/50 shadow-lg">
+    <div className="fixed flex h-[calc(100vh-3rem)] w-70 flex-col justify-between bg-white/50 shadow-lg">
       <div>
         <div className="px-8 py-4">
           <p className="font-subtitle tracking-wider">MAIN MENU</p>
