@@ -9,7 +9,7 @@ import {
   UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
-import { Link,useNavigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
 import type { Account } from '@/context/AuthContext';
@@ -89,15 +89,13 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
 }
 
 function getRoleUrl(currentActiveRole: Account['role']): LinkOptions['to'] {
-  switch (currentActiveRole) {
-    case 'LEARNER':
-      return '/learner/settings' as const;
-    case 'ADMIN':
-      return '/admin/settings' as const;
-    default:
-      return '/contributor/settings' as const;
-  }
+  return match(currentActiveRole)
+    .with('LEARNER', () => '/learner/settings' as const)
+    .with('ADMIN', () => '/admin/settings' as const)
+    .with('CONTRIBUTOR', () => '/contributor/settings' as const)
+    .exhaustive();
 }
+
 export default function Sidebar() {
   const currentActiveRole = useActiveRole();
   const { user, logout } = useAuth();
