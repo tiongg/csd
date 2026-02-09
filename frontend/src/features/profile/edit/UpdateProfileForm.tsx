@@ -9,10 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
+import { capitalizeFirst } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 const updateSchema = z.object({
@@ -68,6 +70,19 @@ export default function UpdateProfileForm() {
     },
   );
 
+  const { mutateAsync: applyContributor } = useApiMutation(
+    'post',
+    '/api/contributor/apply',
+    {
+      onError: (error) => {
+        toast.error(error.message);
+      },
+      onSuccess: () => {
+        toast.success('Request sent!');
+      },
+    },
+  );
+
   useEffect(() => {
     if (!user?.email) {
       return;
@@ -84,23 +99,35 @@ export default function UpdateProfileForm() {
   };
 
   return (
-    <div className="w-full max-w-lg space-y-6">
+    <div className="w-full max-w-lg space-y-4">
       {/* Profile Header Card */}
-      <div className="bg-card text-card-foreground rounded-lg border p-6 shadow-sm">
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6">
+      <div className="bg-card text-card-foreground rounded-lg border p-4 shadow-sm">
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-4">
           <div className="relative">
             <img
               src={gravatarUrl}
               alt="Profile avatar"
-              className="border-muted bg-muted h-24 w-24 rounded-full border-2"
+              className="border-muted bg-muted h-20 w-20 rounded-full border-2"
             />
           </div>
           <div className="flex flex-1 flex-col gap-1 text-center sm:text-left">
             <h2 className="text-xl font-semibold">
               {user?.realname || 'No name set'}
             </h2>
-            <p className="text-muted-foreground">@{user?.username}</p>
+            <p className="text-muted-foreground">
+              @{user?.username} ({capitalizeFirst(user?.role)})
+            </p>
             <p className="text-muted-foreground text-sm">{user?.email}</p>
+            {user.role === 'LEARNER' && (
+              <p
+                className="cursor-pointer text-sm underline"
+                onClick={() => {
+                  applyContributor({});
+                }}
+              >
+                Apply to be contributor
+              </p>
+            )}
           </div>
         </div>
 
@@ -117,13 +144,13 @@ export default function UpdateProfileForm() {
       </div>
 
       {/* Edit Profile Form */}
-      <div className="bg-card text-card-foreground rounded-lg border p-6 shadow-sm">
+      <div className="bg-card text-card-foreground rounded-lg border p-4 shadow-sm">
         <h3 className="mb-1 text-lg font-semibold">Edit Profile</h3>
-        <p className="text-muted-foreground mb-6 text-sm">
+        <p className="text-muted-foreground mb-4 text-sm">
           Update your profile information
         </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
           <FieldGroup>
             <Controller
               control={control}

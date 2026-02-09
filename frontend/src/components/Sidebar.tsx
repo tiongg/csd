@@ -21,9 +21,9 @@ import useActiveRole from '@/hooks/useActiveRole';
 
 type NavItemProps = {
   title: string;
-  link: LinkOptions["to"];
+  link: LinkOptions['to'];
   icon?: React.ReactNode;
-}
+};
 
 function NavItem({ title, link, icon }: NavItemProps) {
   return (
@@ -44,7 +44,6 @@ function NavItem({ title, link, icon }: NavItemProps) {
 
 function SidebarByRole({ role }: { role: Account['role'] }) {
   const dir = useActiveRole();
-
   return match([role, dir])
     .with(['ADMIN', 'ADMIN'], () => (
       <>
@@ -89,11 +88,20 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
     ));
 }
 
+function getRoleUrl(currentActiveRole: Account['role']): LinkOptions['to'] {
+  return match(currentActiveRole)
+    .with('LEARNER', () => '/learner/settings' as const)
+    .with('ADMIN', () => '/admin/settings' as const)
+    .with('CONTRIBUTOR', () => '/contributor/settings' as const)
+    .exhaustive();
+}
+
 export default function Sidebar() {
+  const currentActiveRole = useActiveRole();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  if (!user) {
+  if (!user || !currentActiveRole) {
     return null;
   }
 
@@ -102,7 +110,7 @@ export default function Sidebar() {
       <div>
         <div className="px-8 py-4">
           <p className="font-subtitle tracking-wider">MAIN MENU</p>
-          <div className='flex flex-col gap-y-4 py-4'>
+          <div className="flex flex-col gap-y-4 py-4">
             <SidebarByRole role={user.role} />
           </div>
         </div>
@@ -110,15 +118,19 @@ export default function Sidebar() {
         <div className="px-8 py-4">
           <p className="font-subtitle tracking-wider">SYSTEM</p>
 
-          <div className='flex flex-col gap-y-4 py-4'>
-            <NavItem title="Settings" link="/" icon={<Cog6ToothIcon />} />
+          <div className="flex flex-col gap-y-4 py-4">
+            <NavItem
+              title="Settings"
+              link={getRoleUrl(currentActiveRole)}
+              icon={<Cog6ToothIcon />}
+            />
+
             <NavItem
               title="Help & Support"
               link="/"
               icon={<QuestionMarkCircleIcon />}
             />
           </div>
-
 
           <Button
             variant="default"
