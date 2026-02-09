@@ -82,8 +82,8 @@ function PendingApprovals() {
                 </TableHeader>
 
                 <TableBody>
-                    {pending.map(({ name, creator }) => (
-                        <TableRow>
+                    {pending.map(({ name, creator }, i) => (
+                        <TableRow key={i}>
                             <TableCell>
                                 <Checkbox className="border-slate-800" />
                             </TableCell>
@@ -114,8 +114,8 @@ function AllAdmins() {
                 </TableHeader>
 
                 <TableBody>
-                    {courses.map(({ name, creator }) => (
-                        <TableRow>
+                    {courses.map(({ name, creator }, i) => (
+                        <TableRow key={i}>
                             <TableCell>{name}</TableCell>
                             <TableCell>{creator}</TableCell>
                             <TableCell>

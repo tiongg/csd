@@ -100,7 +100,7 @@ function PendingApprovals() {
 
                 <TableBody>
                     {pending.map(({ name, email }) => (
-                        <TableRow>
+                        <TableRow key={email}>
                             <TableCell>
                                 <Checkbox className="border-slate-800" />
                             </TableCell>
@@ -132,7 +132,7 @@ function AllAdmins() {
 
                 <TableBody>
                     {admins.map(({ name, email }) => (
-                        <TableRow>
+                        <TableRow key={email}>
                             <TableCell>{name}</TableCell>
                             <TableCell>{email}</TableCell>
                             <TableCell>
@@ -164,7 +164,7 @@ function AllUsers() {
 
                 <TableBody>
                     {users.map(({ name, email }) => (
-                        <TableRow>
+                        <TableRow key={email}>
                             <TableCell>{name}</TableCell>
                             <TableCell>{email}</TableCell>
                             <TableCell>

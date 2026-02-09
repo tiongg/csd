@@ -41,8 +41,8 @@ export default function CoursesList() {
                 <CardWithPlusIcon title="Add New Team" />
 
                 {
-                    courses.map(({ name, date, status }) => (
-                        <CourseCard name={name} date={date} status={status} />
+                    courses.map(({ name, date, status }, i) => (
+                        <CourseCard name={name} date={date} status={status} key={i} />
                     ))
                 }
             </div>

@@ -71,8 +71,8 @@ function InProgress() {
             <CardWithPlusIcon title="Start New Course" />
 
             {
-                courses.map(({ name, date }) => (
-                    <CourseCard name={name} date={date} status="in-progress" />
+                courses.map(({ name, date }, i) => (
+                    <CourseCard name={name} date={date} status="in-progress" key={i} />
                 ))
             }
         </div>
@@ -83,8 +83,8 @@ function Completed() {
     return (
         <div className="grid grid-cols-3 gap-4 lg:gap-12 justify-start py-4">
             {
-                courses.map(({ name, date }) => (
-                    <CourseCard name={name} date={date} status="completed" />
+                courses.map(({ name, date }, i) => (
+                    <CourseCard name={name} date={date} status="completed" key={i} />
                 ))
             }
         </div>

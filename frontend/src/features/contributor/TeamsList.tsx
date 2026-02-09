@@ -36,8 +36,8 @@ export default function TeamsList() {
                 <CardWithPlusIcon title="Add New Team" />
 
                 {
-                    teams.map(({ name, size }) => (
-                        <TeamCard name={name} size={size} />
+                    teams.map(({ name, size }, i) => (
+                        <TeamCard name={name} size={size} key={i} />
                     ))
                 }
             </div>
