@@ -72,7 +72,7 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
 
         <NavItem title="Teams" link="/contributor/teams" icon={<UsersIcon />} />
 
-        <NavItem title="Courses" link="/" icon={<BookOpenIcon />} />
+        <NavItem title="Courses" link="/contributor/courses" icon={<BookOpenIcon />} />
       </>
     ))
     .otherwise(() => (

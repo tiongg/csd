@@ -21,6 +21,7 @@ import { Route as LearnerChallengesRouteImport } from './routes/learner/challeng
 import { Route as ContributorTeamsRouteImport } from './routes/contributor/teams'
 import { Route as ContributorSettingsRouteImport } from './routes/contributor/settings'
 import { Route as ContributorDashboardRouteImport } from './routes/contributor/dashboard'
+import { Route as ContributorCoursesRouteImport } from './routes/contributor/courses'
 import { Route as AdminUserManagementRouteImport } from './routes/admin/user-management'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
@@ -86,6 +87,11 @@ const ContributorDashboardRoute = ContributorDashboardRouteImport.update({
   path: '/contributor/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContributorCoursesRoute = ContributorCoursesRouteImport.update({
+  id: '/contributor/courses',
+  path: '/contributor/courses',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminUserManagementRoute = AdminUserManagementRouteImport.update({
   id: '/admin/user-management',
   path: '/admin/user-management',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/user-management': typeof AdminUserManagementRoute
+  '/contributor/courses': typeof ContributorCoursesRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/contributor/teams': typeof ContributorTeamsRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/user-management': typeof AdminUserManagementRoute
+  '/contributor/courses': typeof ContributorCoursesRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/contributor/teams': typeof ContributorTeamsRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/user-management': typeof AdminUserManagementRoute
+  '/contributor/courses': typeof ContributorCoursesRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/contributor/teams': typeof ContributorTeamsRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/settings'
     | '/admin/user-management'
+    | '/contributor/courses'
     | '/contributor/dashboard'
     | '/contributor/settings'
     | '/contributor/teams'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/settings'
     | '/admin/user-management'
+    | '/contributor/courses'
     | '/contributor/dashboard'
     | '/contributor/settings'
     | '/contributor/teams'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/admin/dashboard'
     | '/admin/settings'
     | '/admin/user-management'
+    | '/contributor/courses'
     | '/contributor/dashboard'
     | '/contributor/settings'
     | '/contributor/teams'
@@ -234,6 +246,7 @@ export interface RootRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUserManagementRoute: typeof AdminUserManagementRoute
+  ContributorCoursesRoute: typeof ContributorCoursesRoute
   ContributorDashboardRoute: typeof ContributorDashboardRoute
   ContributorSettingsRoute: typeof ContributorSettingsRoute
   ContributorTeamsRoute: typeof ContributorTeamsRoute
@@ -331,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContributorDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contributor/courses': {
+      id: '/contributor/courses'
+      path: '/contributor/courses'
+      fullPath: '/contributor/courses'
+      preLoaderRoute: typeof ContributorCoursesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/user-management': {
       id: '/admin/user-management'
       path: '/admin/user-management'
@@ -389,6 +409,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUserManagementRoute: AdminUserManagementRoute,
+  ContributorCoursesRoute: ContributorCoursesRoute,
   ContributorDashboardRoute: ContributorDashboardRoute,
   ContributorSettingsRoute: ContributorSettingsRoute,
   ContributorTeamsRoute: ContributorTeamsRoute,
