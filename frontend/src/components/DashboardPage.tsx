@@ -9,23 +9,23 @@ function CardsByRole() {
     return match(dir)
         .with("ADMIN", () => (
             <>
-                <InfoCard title="Pending Approvals" value="4" color="red" />
-                <InfoCard title="Total Learners" value="10,000" color="black" />
-                <InfoCard title="Total Courses" value="1000" color="black" />
+                <InfoCard title="Pending Approvals" value="4" variant="danger" />
+                <InfoCard title="Total Learners" value="10,000" variant="default" />
+                <InfoCard title="Total Courses" value="1000" variant="default" />
             </>
         ))
         .with("CONTRIBUTOR", () => (
             <>
-                <InfoCard title="Awaiting Approvals" value="4" color="orange" />
-                <InfoCard title="Total Learners" value="10,000" color="black" />
-                <InfoCard title="Total Courses" value="1000" color="black" />
+                <InfoCard title="Awaiting Approvals" value="4" variant="warning" />
+                <InfoCard title="Total Learners" value="10,000" variant="default" />
+                <InfoCard title="Total Courses" value="1000" variant="default" />
             </>
         ))
         .with("LEARNER", () => (
             <>
-                <InfoCard title="Daily streak" value="4" color="red" />
-                <InfoCard title="Current Rank" value="Top 10%" color="black" />
-                <InfoCard title="Total Courses" value="1000" color="black" />
+                <InfoCard title="Daily streak" value="4" variant="danger" />
+                <InfoCard title="Current Rank" value="Top 10%" variant="default" />
+                <InfoCard title="Total Courses" value="1000" variant="default" />
             </>
         ))
         .exhaustive();
@@ -76,28 +76,17 @@ export default function Dashboard() {
 type InfoCardProps = {
     title: string;
     value: string;
-    color: "red" | "orange" | "black";
+    variant: "danger" | "warning" | "default";
 }
 
-function InfoCard({ title, value, color }: InfoCardProps) {
-    let textColorClassName;
-    let borderColorClassName;
-    switch (color) {
-        case "red":
-            textColorClassName = "text-rose-400";
-            borderColorClassName = "border-rose-400";
-            break;
-        case "orange":
-            textColorClassName = "text-amber-500";
-            borderColorClassName = "border-amber-500";
-            break;
-        case "black":
-            textColorClassName = "text-slate-800";
-            borderColorClassName = "border-slate-400";
-            break;
+function InfoCard({ title, value, variant }: InfoCardProps) {
+    const INFO_CARD_STYLES = {
+        danger: "text-rose-400 border-rose-400",
+        warning: "text-amber-500 border-amber-500",
+        default: "text-slate-800 border-slate-400"
     }
     return (
-        <div className={cn("w-0 grow rounded-lg text-center border-2 p-8 flex flex-col gap-4", textColorClassName, borderColorClassName)}>
+        <div className={cn("w-0 grow rounded-lg text-center border-2 p-8 flex flex-col gap-4", INFO_CARD_STYLES[variant])}>
             <div className="font-bold text-lg">
                 {title}
             </div>

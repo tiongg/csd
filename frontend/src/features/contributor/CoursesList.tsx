@@ -3,23 +3,25 @@ import { Heading1 } from "@/components/ui/typography";
 import { capitalizeFirst, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
+type StatusType = "approved" | "pending";
+
 // placeholder
 const courses = [
     {
         name: "Capital Markets in China",
         date: "9 February 2026",
-        status: "approved"
+        status: "approved" as StatusType
     },
     {
         name: "Enterprise Solution Management",
         date: "8 February 2026",
-        status: "pending"
+        status: "pending" as StatusType
     },
     {
         name: "Enterprise Solution Development",
         date: "5 February 2026",
     }
-]
+];
 
 export default function CoursesList() {
     return (
@@ -53,26 +55,21 @@ export default function CoursesList() {
 type CourseCardProps = {
     name: string;
     date: string;
-    status?: string;
+    status?: "approved" | "pending";
 }
 
 function CourseCard({ name, date, status }: CourseCardProps) {
-    let badgeColor;
-    switch (status) {
-        case "approved":
-            badgeColor = "bg-slate-800";
-            break;
-        case "pending":
-            badgeColor = "bg-amber-500";
-            break;
-    }
+    const BADGE_STYLES = {
+        approved: "bg-slate-800",
+        pending: "bg-amber-500",
+    };
 
     return (
         <div className="relative">
             {
-                status && <div className={cn("absolute right-0 px-2 py-1 m-4 rounded-full w-26 text-center text-white", badgeColor)}>{capitalizeFirst(status)}</div>
+                status && <div className={cn("absolute right-0 px-2 py-1 m-4 rounded-full w-26 text-center text-white", BADGE_STYLES[status])}>{capitalizeFirst(status)}</div>
             }
             <CardWithDetails title={name} descriptor="Last Edited" data={date} />
         </div>
-    )
+    );
 }
