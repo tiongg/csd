@@ -48,7 +48,7 @@ export default function MyCoursesPage() {
                         </div>
 
                         <div>
-                            <SearchBar placeholder="Search for Courses"/>
+                            <SearchBar placeholder="Search for Courses" />
                         </div>
                     </div>
 
@@ -71,8 +71,8 @@ function InProgress() {
             <CardWithPlusIcon title="Start New Course" />
 
             {
-                courses.map((course) => (
-                    <CourseCard name={course.name} date={course.date} status="in-progress" />
+                courses.map(({ name, date }) => (
+                    <CourseCard name={name} date={date} status="in-progress" />
                 ))
             }
         </div>
@@ -83,8 +83,8 @@ function Completed() {
     return (
         <div className="grid grid-cols-3 gap-4 lg:gap-12 justify-start py-4">
             {
-                courses.map((course) => (
-                    <CourseCard name={course.name} date={course.date} status="completed" />
+                courses.map(({ name, date }) => (
+                    <CourseCard name={name} date={date} status="completed" />
                 ))
             }
         </div>
@@ -99,7 +99,7 @@ type CourseCardProps = {
 
 function CourseCard({ name, date, status }: CourseCardProps) {
     const descriptor = status === "in-progress" ? "Last accessed" : "Completed on"
-    return ( 
+    return (
         <CardWithDetails title={name} descriptor={descriptor} data={date} />
     )
 }

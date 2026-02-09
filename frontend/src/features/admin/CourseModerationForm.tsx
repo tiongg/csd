@@ -82,13 +82,13 @@ function PendingApprovals() {
                 </TableHeader>
 
                 <TableBody>
-                    {pending.map((course) => (
+                    {pending.map(({ name, creator }) => (
                         <TableRow>
                             <TableCell>
                                 <Checkbox className="border-slate-800" />
                             </TableCell>
-                            <TableCell>{course.name}</TableCell>
-                            <TableCell>{course.creator}</TableCell>
+                            <TableCell>{name}</TableCell>
+                            <TableCell>{creator}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -101,7 +101,7 @@ function AllAdmins() {
     return (
         <div className="flex flex-col gap-4 py-4">
             <div className="flex gap-x-2 w-full justify-end">
-                <SearchBar placeholder="Search for Courses"/>
+                <SearchBar placeholder="Search for Courses" />
             </div>
 
             <Table>
@@ -114,10 +114,10 @@ function AllAdmins() {
                 </TableHeader>
 
                 <TableBody>
-                    {courses.map((course) => (
+                    {courses.map(({ name, creator }) => (
                         <TableRow>
-                            <TableCell>{course.name}</TableCell>
-                            <TableCell>{course.creator}</TableCell>
+                            <TableCell>{name}</TableCell>
+                            <TableCell>{creator}</TableCell>
                             <TableCell>
                                 <PencilIcon className="cursor-pointer size-5" />
                             </TableCell>

@@ -99,13 +99,13 @@ function PendingApprovals() {
                 </TableHeader>
 
                 <TableBody>
-                    {pending.map((user) => (
+                    {pending.map(({ name, email }) => (
                         <TableRow>
                             <TableCell>
                                 <Checkbox className="border-slate-800" />
                             </TableCell>
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{name}</TableCell>
+                            <TableCell>{email}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>
@@ -118,7 +118,7 @@ function AllAdmins() {
     return (
         <div className="flex flex-col gap-4 py-4">
             <div className="flex gap-x-2 w-full justify-end">
-                <SearchBar placeholder="Search for Admins"/>
+                <SearchBar placeholder="Search for Admins" />
             </div>
 
             <Table>
@@ -131,10 +131,10 @@ function AllAdmins() {
                 </TableHeader>
 
                 <TableBody>
-                    {admins.map((user) => (
+                    {admins.map(({ name, email }) => (
                         <TableRow>
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{name}</TableCell>
+                            <TableCell>{email}</TableCell>
                             <TableCell>
                                 <XMarkIcon className="cursor-pointer size-5" color="red" />
                             </TableCell>
@@ -150,7 +150,7 @@ function AllUsers() {
     return (
         <div className="flex flex-col gap-4 py-4">
             <div className="flex gap-x-2 w-full justify-end">
-                <SearchBar placeholder="Search for Users"/>
+                <SearchBar placeholder="Search for Users" />
             </div>
 
             <Table>
@@ -163,10 +163,10 @@ function AllUsers() {
                 </TableHeader>
 
                 <TableBody>
-                    {users.map((user) => (
+                    {users.map(({ name, email }) => (
                         <TableRow>
-                            <TableCell>{user.name}</TableCell>
-                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{name}</TableCell>
+                            <TableCell>{email}</TableCell>
                             <TableCell>
                                 <PencilIcon className="cursor-pointer size-5" />
                             </TableCell>

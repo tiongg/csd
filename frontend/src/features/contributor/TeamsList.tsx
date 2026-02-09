@@ -33,11 +33,11 @@ export default function TeamsList() {
                 <p className="font-subtitle">Here's what's happening today!</p>
             </div>
             <div className="grid grid-cols-3 gap-4 lg:gap-12 justify-start py-4">
-                <CardWithPlusIcon title="Add New Team"/>
+                <CardWithPlusIcon title="Add New Team" />
 
                 {
-                    teams.map((team) => (
-                        <TeamCard name={team.name} size={team.size} />
+                    teams.map(({ name, size }) => (
+                        <TeamCard name={name} size={size} />
                     ))
                 }
             </div>
@@ -52,6 +52,6 @@ type TeamCardProps = {
 
 function TeamCard({ name, size }: TeamCardProps) {
     return (
-        <CardWithDetails title={name} descriptor="Collaborators" data={size.toString()}/>
+        <CardWithDetails title={name} descriptor="Collaborators" data={size.toString()} />
     )
 }
