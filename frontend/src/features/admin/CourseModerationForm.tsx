@@ -75,9 +75,9 @@ function PendingApprovals() {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-1/5"></TableHead>
-                        <TableHead className="w-2/5">Course Name</TableHead>
-                        <TableHead className="w-2/5">Creator</TableHead>
+                        <TableHead className="w-1/6"></TableHead>
+                        <TableHead className="w-3/6">Course Name</TableHead>
+                        <TableHead className="w-2/6">Creator</TableHead>
                     </TableRow>
                 </TableHeader>
 
@@ -107,9 +107,9 @@ function AllAdmins() {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-2/5">Course Name</TableHead>
-                        <TableHead className="w-2/5">Creator</TableHead>
-                        <TableHead className="w-1/5"></TableHead>
+                        <TableHead className="w-3/6">Course Name</TableHead>
+                        <TableHead className="w-2/6">Creator</TableHead>
+                        <TableHead className="w-1/6"></TableHead>
                     </TableRow>
                 </TableHeader>
 
