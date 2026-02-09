@@ -23,7 +23,7 @@ const courses = [
 
 export default function MyCoursesPage() {
     return (
-        <div className="p-16 w-full h-full flex flex-col gap-8">
+        <div className="p-16 w-full h-full flex flex-col gap-4">
             <div>
                 <div className="flex items-center gap-6">
                     <div>
@@ -67,7 +67,7 @@ export default function MyCoursesPage() {
 
 function InProgress() {
     return (
-        <div className="grid grid-cols-3 gap-4 lg:gap-12 justify-start py-4">
+        <div className="grid grid-cols-3 gap-4 justify-start py-4">
             <CardWithPlusIcon title="Start New Course" />
 
             {
@@ -81,7 +81,7 @@ function InProgress() {
 
 function Completed() {
     return (
-        <div className="grid grid-cols-3 gap-4 lg:gap-12 justify-start py-4">
+        <div className="grid grid-cols-3 gap-4 justify-start py-4">
             {
                 courses.map(({ name, date }, i) => (
                     <CourseCard name={name} date={date} status="completed" key={i} />

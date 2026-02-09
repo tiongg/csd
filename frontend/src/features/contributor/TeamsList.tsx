@@ -32,7 +32,7 @@ export default function TeamsList() {
                 <Heading1>Your Teams</Heading1>
                 <p className="font-subtitle">Here's what's happening today!</p>
             </div>
-            <div className="grid grid-cols-3 gap-4 lg:gap-12 justify-start py-4">
+            <div className="grid grid-cols-3 gap-4 justify-start py-4">
                 <CardWithPlusIcon title="Add New Team" />
 
                 {

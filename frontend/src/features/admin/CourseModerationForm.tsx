@@ -34,7 +34,7 @@ const courses = [
 
 export default function CourseModerationForm() {
     return (
-        <div className="p-16 w-full h-full flex flex-col gap-8">
+        <div className="p-16 w-full h-full flex flex-col gap-4">
             <div>
                 <Heading1>Course Moderation</Heading1>
                 <p className="font-subtitle">Here's what's happening today!</p>

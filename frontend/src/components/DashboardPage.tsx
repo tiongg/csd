@@ -55,13 +55,13 @@ function ContentByRole() {
 
 export default function Dashboard() {
     return (
-        <div className="p-16 w-full h-full flex flex-col gap-8">
+        <div className="p-16 w-full h-full flex flex-col gap-4">
             <div>
                 <Heading1>Dashboard Overview</Heading1>
                 <p className="font-subtitle">Here's what's happening today!</p>
             </div>
 
-            <div className="flex gap-4 lg:gap-12 justify-between">
+            <div className="flex gap-4 justify-between">
                 <CardsByRole />
             </div>
 

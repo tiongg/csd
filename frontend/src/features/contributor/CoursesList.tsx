@@ -39,7 +39,7 @@ export default function CoursesList() {
             <div>
                 <Button variant="destructive" className="rounded-full cursor-pointer">Delete Team</Button>
             </div>
-            <div className="grid grid-cols-3 gap-4 lg:gap-12 justify-start py-4">
+            <div className="grid grid-cols-3 gap-4 justify-start py-4">
                 <CardWithPlusIcon title="Add New Team" />
 
                 {
