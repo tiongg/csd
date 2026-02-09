@@ -12,6 +12,7 @@ import {
 import { Link, useNavigate } from '@tanstack/react-router';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
+import type { PropsWithChildren } from 'react';
 import type { Account } from '@/context/AuthContext';
 import type React from 'react';
 import type { LinkOptions } from '@tanstack/react-router';
@@ -19,12 +20,11 @@ import { useAuth } from '@/context/AuthContext';
 import { capitalizeFirst } from '@/lib/utils';
 import useActiveRole from '@/hooks/useActiveRole';
 
-type NavItemProps = {
+type NavItemProps = PropsWithChildren<{
   title: string;
   link: LinkOptions['to'];
   icon?: React.ReactNode;
-  children?: React.ReactNode;
-};
+}>;
 
 function NavItem({ title, link, icon, children }: NavItemProps) {
   return (
