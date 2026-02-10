@@ -69,6 +69,20 @@ services:
         condition: service_healthy
     entrypoint: ['flyway']
 
+  y-websocket:
+    build:
+      context: ./external-services
+      dockerfile: yWsDockerfile
+    container_name: y-websocket
+    ports:
+      - '8081:8081'
+    environment:
+      PORT: 8081
+      HOST: y-websocket
+      YPERSISTENCE: /persistence
+    volumes:
+      - yws-data:/persistence
+
   backend:
     build:
       context: ./backend
@@ -105,6 +119,7 @@ services:
     environment:
       NODE_ENV: development
       VITE_BACKEND_URL: http://localhost:8080
+      VITE_WS_URL: ws://localhost:8081
     command: ./dev-start.sh
 
 configs:
@@ -130,3 +145,4 @@ configs:
 volumes:
   maven-repo:
   postgres_data:
+  yws-data:
