@@ -13,6 +13,7 @@ import * as Y from 'yjs';
 
 import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
+import './editor.css';
 
 function CrepeEditorInternal() {
   const { get: getEditor } = useEditor((root) => {

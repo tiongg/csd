@@ -11,6 +11,7 @@ import {
 import { yXmlFragmentToProseMirrorRootNode } from 'y-prosemirror';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
+import { useAuth } from './AuthContext';
 
 export type SectionType = Y.Map<any>;
 
@@ -34,10 +35,24 @@ type ContentEditorProviderProps = PropsWithChildren<{
   roomName: string;
 }>;
 
+function generateColorFromString(str: string) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const color =
+    '#' +
+    ((hash >> 24) & 0xff).toString(16).padStart(2, '0') +
+    ((hash >> 16) & 0xff).toString(16).padStart(2, '0') +
+    ((hash >> 8) & 0xff).toString(16).padStart(2, '0');
+  return color;
+}
+
 export function ContentEditorProvider({
   children,
   roomName,
 }: ContentEditorProviderProps) {
+  const { user } = useAuth();
   const [doc] = useState(new Y.Doc());
   const [provider] = useState(
     new WebsocketProvider(import.meta.env.VITE_WS_URL!, roomName, doc, {
@@ -49,8 +64,8 @@ export function ContentEditorProvider({
 
   useEffect(() => {
     provider.awareness.setLocalStateField('user', {
-      name: 'Anonymous',
-      color: '#ffa500',
+      name: user?.username ?? 'Anonymous',
+      color: generateColorFromString(user?.username ?? 'Anonymous'),
     });
     provider.connect();
 
