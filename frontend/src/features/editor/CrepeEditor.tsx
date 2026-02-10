@@ -1,11 +1,16 @@
 import { Button } from '@/components/ui/button';
-import { useContentEditor } from '@/context/ContentEditorContext';
+import {
+  useContentEditor,
+  type SectionType,
+} from '@/context/ContentEditorContext';
 import { Crepe } from '@milkdown/crepe';
 import { collab, collabServiceCtx } from '@milkdown/plugin-collab';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
 import { useEffect } from 'react';
 import { useY } from 'react-yjs';
+import * as Y from 'yjs';
 
+import useYArrayLength from '@/hooks/useYArrayLength';
 import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
 
@@ -13,7 +18,7 @@ function CrepeEditorInternal() {
   const { get: getEditor } = useEditor((root) => {
     return new Crepe({ root }).editor.use(collab);
   });
-  const { doc, provider } = useContentEditor();
+  const { doc, provider, currentSection } = useContentEditor();
 
   useEffect(() => {
     const editorInstance = getEditor();
@@ -22,12 +27,22 @@ function CrepeEditorInternal() {
     editorInstance.action((ctx) => {
       try {
         const collabService = ctx.get(collabServiceCtx);
-        collabService.bindDoc(doc).setAwareness(provider.awareness).connect();
+        collabService?.disconnect();
+
+        const xmlFragment = doc
+          .getArray<SectionType>('root')
+          .get(currentSection)!
+          .get('content') as Y.XmlFragment;
+
+        collabService
+          .bindXmlFragment(xmlFragment)
+          .setAwareness(provider.awareness)
+          .connect();
       } catch {
         // collabServiceCtx not ready yet, will retry on next render
       }
     });
-  }, [getEditor, doc, provider]);
+  }, [getEditor, doc, provider, currentSection]);
 
   return <Milkdown />;
 }
@@ -62,12 +77,45 @@ function Counter() {
 }
 
 export default function CrepeEditor() {
-  const { doc, provider } = useContentEditor();
+  const {
+    setCurrentSection,
+    currentSection,
+    getDocAsJson,
+    doc,
+    addSection,
+    deleteSection,
+  } = useContentEditor();
+
+  const sectionCount = useYArrayLength(doc.getArray<SectionType>('root'));
 
   return (
     <>
-      <Counter />
-      {doc && provider && (
+      {/* <Counter /> */}
+      <Button onClick={() => console.log(getDocAsJson())}>
+        Log Doc as JSON
+      </Button>
+
+      <div>
+        <Button onClick={addSection}>Add Section</Button>
+        {Array.from({ length: sectionCount }, (_, i) => i).map((i) => (
+          <Button
+            key={i}
+            variant={i === currentSection ? 'default' : 'outline'}
+            onClick={() => setCurrentSection(i)}
+          >
+            Section {i}
+          </Button>
+        ))}
+        <Button
+          variant="destructive"
+          onClick={() => deleteSection(currentSection)}
+        >
+          Delete Current Section
+        </Button>
+      </div>
+      {sectionCount === 0 ? (
+        <p>No sections yet. Click "Add Section" to create one.</p>
+      ) : (
         <MilkdownProvider>
           <CrepeEditorInternal />
         </MilkdownProvider>

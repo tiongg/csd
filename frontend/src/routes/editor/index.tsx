@@ -10,7 +10,7 @@ export const Route = createFileRoute('/editor/')({
 
 function RouteComponent() {
   return (
-    <ContentEditorProvider roomName="12345">
+    <ContentEditorProvider roomName="1234">
       <CrepeEditor />
     </ContentEditorProvider>
   );
