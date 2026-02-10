@@ -1,8 +1,8 @@
 import { useContentEditor } from '@/context/ContentEditorContext';
 import { cn } from '@/lib/utils';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
 import { useY } from 'react-yjs';
+import { useBoolean } from 'usehooks-ts';
 import * as Y from 'yjs';
 
 type SectionSelectProps = {
@@ -12,24 +12,25 @@ type SectionSelectProps = {
 export default function SectionSelect({ index }: SectionSelectProps) {
   const { setCurrentSection, currentSection, deleteSection, doc } =
     useContentEditor();
-  const [isEditing, setIsEditing] = useState(false);
   const title = useY(doc.getArray('root').get(index)!.get('title')!);
-  const [editedTitle, setEditedTitle] = useState(title);
+  const {
+    value: isEditing,
+    setTrue: startEditing,
+    setFalse: stopEditing,
+  } = useBoolean(false);
 
-  const handleSaveTitle = () => {
-    if (editedTitle.trim()) {
-      doc.transact(() => {
-        const sections = doc.getArray('root');
-        const section = sections.get(index);
-        if (section) {
-          const titleText = section.get('title') as Y.Text;
-          titleText.delete(0, titleText.length);
-          titleText.insert(0, editedTitle);
-        }
-      });
-    }
-    setIsEditing(false);
-  };
+  function handleSaveTitle(newTitle: string) {
+    if (!newTitle) return;
+    doc.transact(() => {
+      const sections = doc.getArray('root');
+      const section = sections.get(index);
+      if (section) {
+        const titleText = section.get('title') as Y.Text;
+        titleText.delete(0, titleText.length);
+        titleText.insert(0, newTitle);
+      }
+    });
+  }
 
   return (
     // Opting to use default input compoents for greater control over styling and behavior
@@ -45,15 +46,13 @@ export default function SectionSelect({ index }: SectionSelectProps) {
       {isEditing ? (
         <input
           type="text"
-          value={editedTitle}
-          onChange={(e) => setEditedTitle(e.target.value)}
-          onBlur={handleSaveTitle}
+          value={title}
+          onChange={(e) => handleSaveTitle(e.target.value)}
+          onBlur={stopEditing}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleSaveTitle();
-            } else if (e.key === 'Escape') {
-              setEditedTitle(title);
-              setIsEditing(false);
+            if (['Enter', 'Escape'].includes(e.key)) {
+              e.preventDefault();
+              stopEditing();
             }
           }}
           onClick={(e) => e.stopPropagation()}
@@ -64,7 +63,7 @@ export default function SectionSelect({ index }: SectionSelectProps) {
         <span
           onDoubleClick={(e) => {
             e.stopPropagation();
-            setIsEditing(true);
+            startEditing();
           }}
           className="cursor-pointer px-1"
         >
