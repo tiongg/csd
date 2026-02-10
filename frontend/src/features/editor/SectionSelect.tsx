@@ -1,7 +1,4 @@
-import {
-  useContentEditor,
-  type SectionType,
-} from '@/context/ContentEditorContext';
+import { useContentEditor } from '@/context/ContentEditorContext';
 import { cn } from '@/lib/utils';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
@@ -16,15 +13,13 @@ export default function SectionSelect({ index }: SectionSelectProps) {
   const { setCurrentSection, currentSection, deleteSection, doc } =
     useContentEditor();
   const [isEditing, setIsEditing] = useState(false);
-  const title = useY(
-    doc.getArray<SectionType>('root').get(index)!.get('title') as Y.Text,
-  );
+  const title = useY(doc.getArray('root').get(index)!.get('title')!);
   const [editedTitle, setEditedTitle] = useState(title);
 
   const handleSaveTitle = () => {
     if (editedTitle.trim()) {
       doc.transact(() => {
-        const sections = doc.getArray<SectionType>('root');
+        const sections = doc.getArray('root');
         const section = sections.get(index);
         if (section) {
           const titleText = section.get('title') as Y.Text;

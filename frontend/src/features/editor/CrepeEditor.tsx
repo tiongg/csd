@@ -1,14 +1,10 @@
 import { Button } from '@/components/ui/button';
-import {
-  useContentEditor,
-  type SectionType,
-} from '@/context/ContentEditorContext';
+import { useContentEditor } from '@/context/ContentEditorContext';
 import useYArrayLength from '@/hooks/useYArrayLength';
 import { Crepe } from '@milkdown/crepe';
 import { collab, collabServiceCtx } from '@milkdown/plugin-collab';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
 import { useEffect } from 'react';
-import * as Y from 'yjs';
 
 import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
@@ -31,10 +27,11 @@ function CrepeEditorInternal() {
         const collabService = ctx.get(collabServiceCtx);
         collabService?.disconnect();
 
+        // Assert doc structure, if null, it will automatically create it
         const xmlFragment = doc
-          .getArray<SectionType>('root')
+          .getArray('root')
           .get(currentSection)!
-          .get('content') as Y.XmlFragment;
+          .get('content')!;
 
         collabService
           .bindXmlFragment(xmlFragment)
@@ -54,10 +51,10 @@ function CrepeEditorInternal() {
 }
 
 export default function CrepeEditor() {
-  const { setCurrentSection, currentSection, doc, addSection, deleteSection } =
+  const { setCurrentSection, currentSection, doc, addSection } =
     useContentEditor();
 
-  const sectionCount = useYArrayLength(doc.getArray<SectionType>('root'));
+  const sectionCount = useYArrayLength(doc.getArray('root'));
 
   return (
     <div className="flex h-full min-h-0 flex-col">

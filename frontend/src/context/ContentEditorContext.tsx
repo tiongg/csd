@@ -12,13 +12,24 @@ import {
 import { yXmlFragmentToProseMirrorRootNode } from 'y-prosemirror';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
+import type { TypedArray, TypedDoc, TypedMap } from 'yjs-types';
 import { useAuth } from './AuthContext';
 
-export type SectionType = Y.Map<unknown>;
 export type ContentType = 'markdown' | 'quiz';
+export type SectionType = TypedMap<{
+  title: Y.Text;
+  content: Y.XmlFragment;
+  type: ContentType;
+}>;
+export type DocType = TypedDoc<
+  any, // For typing maps
+  {
+    root: TypedArray<SectionType>;
+  }
+>;
 
 export type ContentEditorContextType = {
-  doc: Y.Doc;
+  doc: DocType;
   provider: WebsocketProvider;
   currentSection: number;
   setCurrentSection: Dispatch<SetStateAction<number>>;
@@ -40,12 +51,17 @@ export function ContentEditorProvider({
   roomName,
 }: ContentEditorProviderProps) {
   const { user } = useAuth();
-  const [doc] = useState(() => new Y.Doc());
+  const [doc] = useState(() => new Y.Doc() as DocType);
   const [provider] = useState(
     () =>
-      new WebsocketProvider(import.meta.env.VITE_WS_URL!, roomName, doc, {
-        connect: false,
-      }),
+      new WebsocketProvider(
+        import.meta.env.VITE_WS_URL!,
+        roomName,
+        doc as Y.Doc,
+        {
+          connect: false,
+        },
+      ),
   );
 
   const [currentSection, setCurrentSection] = useState(-1);
@@ -63,7 +79,7 @@ export function ContentEditorProvider({
   }, [provider, user]);
 
   function getDocAsJson() {
-    const rootArray = doc.getArray<SectionType>('root');
+    const rootArray = doc.getArray('root');
     let res = '';
 
     for (const node of rootArray) {
@@ -83,7 +99,7 @@ export function ContentEditorProvider({
 
   function deleteSection(index: number) {
     doc.transact(() => {
-      const rootArray = doc.getArray<SectionType>('root');
+      const rootArray = doc.getArray('root');
       rootArray.delete(index, 1);
 
       if (currentSection >= index) {
@@ -94,14 +110,14 @@ export function ContentEditorProvider({
 
   function addSection() {
     doc.transact(() => {
-      const rootArray = doc.getArray<SectionType>('root');
+      const rootArray = doc.getArray('root');
       const title = new Y.Text();
       title.insert(0, `Section ${rootArray.length + 1}`);
 
-      const section = new Y.Map<unknown>();
+      const section = new Y.Map() as SectionType;
       section.set('title', title);
       section.set('content', new Y.XmlFragment());
-      section.set('type', 'markdown' as ContentType);
+      section.set('type', 'markdown');
 
       rootArray.push([section]);
     });
