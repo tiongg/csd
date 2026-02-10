@@ -14,6 +14,7 @@ import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
 import './editor.css';
 import EditorCourseDisplay from './EditorCourseDisplay';
+import SectionSelect from './SectionSelect';
 
 function CrepeEditorInternal() {
   const { get: getEditor } = useEditor((root) => {
@@ -71,29 +72,12 @@ export default function CrepeEditor() {
         <div className="bg-border mx-2 h-6 w-px shrink-0" />
         <div className="flex gap-1">
           {Array.from({ length: sectionCount }, (_, i) => i).map((i) => (
-            <Button
-              key={i}
-              size="sm"
-              variant={i === currentSection ? 'default' : 'ghost'}
-              onClick={() => setCurrentSection(i)}
-            >
-              Section {i + 1}
-            </Button>
+            <SectionSelect key={i} index={i} />
           ))}
           <Button size="sm" variant="ghost" onClick={addSection}>
             + Add
           </Button>
         </div>
-        <div className="flex-1" />
-        {currentSection >= 0 && (
-          <Button
-            size="sm"
-            variant="destructive"
-            onClick={() => deleteSection(currentSection)}
-          >
-            Delete
-          </Button>
-        )}
       </nav>
       <div className="min-h-0 flex-1 overflow-y-auto">
         {currentSection === -1 ? (
