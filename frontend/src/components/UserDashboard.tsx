@@ -53,26 +53,6 @@ function ContentByRole() {
         .exhaustive();
 }
 
-export default function Dashboard() {
-    return (
-        <div className="p-16 w-full h-full flex flex-col gap-4">
-            <div>
-                <Heading1>Dashboard Overview</Heading1>
-                <p className="font-subtitle">Here's what's happening today!</p>
-            </div>
-
-            <div className="flex gap-4 justify-between">
-                <CardsByRole />
-            </div>
-
-            <div className="bg-slate-200 h-full flex justify-center items-center">
-                {/* something goes here depending on role (not designed yet) */}
-                <ContentByRole/>
-            </div>
-        </div>
-    )
-}
-
 type InfoCardProps = {
     title: string;
     value: string;
@@ -92,6 +72,26 @@ function InfoCard({ title, value, variant }: InfoCardProps) {
             </div>
             <div className="font-bold text-2xl">
                 {value}
+            </div>
+        </div>
+    )
+}
+
+export default function UserDashboard() {
+    return (
+        <div className="p-16 w-full h-full flex flex-col gap-4">
+            <div>
+                <Heading1>Dashboard Overview</Heading1>
+                <p className="font-subtitle">Here's what's happening today!</p>
+            </div>
+
+            <div className="flex gap-4 justify-between">
+                <CardsByRole />
+            </div>
+
+            <div className="bg-slate-200 h-full flex justify-center items-center">
+                {/* something goes here depending on role (not designed yet) */}
+                <ContentByRole/>
             </div>
         </div>
     )

@@ -32,34 +32,6 @@ const courses = [
     }
 ]
 
-export default function CourseModerationForm() {
-    return (
-        <div className="p-16 w-full h-full flex flex-col gap-4">
-            <div>
-                <Heading1>Course Moderation</Heading1>
-                <p className="font-subtitle">Here's what's happening today!</p>
-            </div>
-
-            <div className="text-slate-800">
-                <Tabs defaultValue="pending">
-                    <TabsList variant="line">
-                        <TabsTrigger value="pending" className="cursor-pointer">Pending Approvals</TabsTrigger>
-                        <TabsTrigger value="courses" className="cursor-pointer">All Courses</TabsTrigger>
-                    </TabsList>
-
-                    <TabsContent value="pending">
-                        <PendingApprovals />
-                    </TabsContent>
-
-                    <TabsContent value="courses">
-                        <AllAdmins />
-                    </TabsContent>
-                </Tabs>
-            </div>
-        </div>
-    )
-}
-
 function PendingApprovals() {
     return (
         <div className="flex flex-col gap-4 py-4">
@@ -125,6 +97,34 @@ function AllAdmins() {
                     ))}
                 </TableBody>
             </Table>
+        </div>
+    )
+}
+
+export default function CourseModerationForm() {
+    return (
+        <div className="p-16 w-full h-full flex flex-col gap-4">
+            <div>
+                <Heading1>Course Moderation</Heading1>
+                <p className="font-subtitle">Here's what's happening today!</p>
+            </div>
+
+            <div className="text-slate-800">
+                <Tabs defaultValue="pending">
+                    <TabsList variant="line">
+                        <TabsTrigger value="pending" className="cursor-pointer">Pending Approvals</TabsTrigger>
+                        <TabsTrigger value="courses" className="cursor-pointer">All Courses</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="pending">
+                        <PendingApprovals />
+                    </TabsContent>
+
+                    <TabsContent value="courses">
+                        <AllAdmins />
+                    </TabsContent>
+                </Tabs>
+            </div>
         </div>
     )
 }
