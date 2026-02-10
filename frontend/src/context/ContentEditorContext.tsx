@@ -1,3 +1,4 @@
+import { generateColorFromString } from '@/lib/utils';
 import { defaultMarkdownSerializer, schema } from 'prosemirror-markdown';
 import {
   createContext,
@@ -14,6 +15,7 @@ import * as Y from 'yjs';
 import { useAuth } from './AuthContext';
 
 export type SectionType = Y.Map<any>;
+export type ContentType = 'markdown' | 'quiz';
 
 export type ContentEditorContextType = {
   doc: Y.Doc;
@@ -35,19 +37,6 @@ type ContentEditorProviderProps = PropsWithChildren<{
   roomName: string;
 }>;
 
-function generateColorFromString(str: string) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const color =
-    '#' +
-    ((hash >> 24) & 0xff).toString(16).padStart(2, '0') +
-    ((hash >> 16) & 0xff).toString(16).padStart(2, '0') +
-    ((hash >> 8) & 0xff).toString(16).padStart(2, '0');
-  return color;
-}
-
 export function ContentEditorProvider({
   children,
   roomName,
@@ -60,9 +49,10 @@ export function ContentEditorProvider({
     }),
   );
 
-  const [currentSection, setCurrentSection] = useState(0);
+  const [currentSection, setCurrentSection] = useState(-1);
 
   useEffect(() => {
+    // Note: Anon should not exist here, but allow for now
     provider.awareness.setLocalStateField('user', {
       name: user?.username ?? 'Anonymous',
       color: generateColorFromString(user?.username ?? 'Anonymous'),
@@ -78,6 +68,9 @@ export function ContentEditorProvider({
     let res = '';
     const rootArray = doc.getArray<SectionType>('root');
     for (const node of rootArray) {
+      if ((node.get('type') as ContentType) !== 'markdown') {
+        continue;
+      }
       const pmNode = yXmlFragmentToProseMirrorRootNode(
         node.get('content'),
         schema,
@@ -110,6 +103,7 @@ export function ContentEditorProvider({
 
       section.set('title', title);
       section.set('content', new Y.XmlFragment());
+      section.set('type', 'markdown' as ContentType);
 
       rootArray.push([section]);
     });
