@@ -79,8 +79,9 @@ services:
     environment:
       PORT: 8081
       HOST: y-websocket
-      # CALLBACK_URL: backend:8080/docs/collab/callback
-      # CALLBACK_OBJECTS: '{"prosemirror":"XmlFragment"}'
+      YPERSISTENCE: /persistence
+    volumes:
+      - yws-data:/persistence
 
   backend:
     build:
@@ -144,3 +145,4 @@ configs:
 volumes:
   maven-repo:
   postgres_data:
+  yws-data:
