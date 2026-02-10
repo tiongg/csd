@@ -69,6 +69,19 @@ services:
         condition: service_healthy
     entrypoint: ['flyway']
 
+  y-websocket:
+    build:
+      context: ./external-services
+      dockerfile: yWsDockerfile
+    container_name: y-websocket
+    ports:
+      - '8081:8081'
+    environment:
+      PORT: 8081
+      HOST: y-websocket
+      # CALLBACK_URL: backend:8080/docs/collab/callback
+      # CALLBACK_OBJECTS: '{"prosemirror":"XmlFragment"}'
+
   backend:
     build:
       context: ./backend
