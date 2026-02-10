@@ -45,7 +45,11 @@ function CrepeEditorInternal() {
     });
   }, [getEditor, doc, provider, currentSection]);
 
-  return <Milkdown />;
+  return (
+    <div className="px-2">
+      <Milkdown />
+    </div>
+  );
 }
 
 export default function CrepeEditor() {
@@ -55,8 +59,8 @@ export default function CrepeEditor() {
   const sectionCount = useYArrayLength(doc.getArray<SectionType>('root'));
 
   return (
-    <div className="flex h-full flex-col">
-      <nav className="bg-muted/40 flex items-center gap-2 border-b p-2">
+    <div className="flex h-full min-h-0 flex-col">
+      <nav className="bg-muted/40 flex shrink-0 items-center gap-2 overflow-x-auto border-b p-2">
         <Button
           size="sm"
           variant={currentSection === -1 ? 'default' : 'ghost'}
@@ -64,8 +68,8 @@ export default function CrepeEditor() {
         >
           Overview
         </Button>
-        <div className="bg-border mx-2 h-6 w-px" />
-        <div className="flex gap-1 overflow-x-auto">
+        <div className="bg-border mx-2 h-6 w-px shrink-0" />
+        <div className="flex gap-1">
           {Array.from({ length: sectionCount }, (_, i) => i).map((i) => (
             <Button
               key={i}
@@ -91,7 +95,7 @@ export default function CrepeEditor() {
           </Button>
         )}
       </nav>
-      <div className="flex-1 overflow-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto">
         {currentSection === -1 ? (
           <EditorCourseDisplay />
         ) : (

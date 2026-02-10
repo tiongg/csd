@@ -6,7 +6,7 @@ export default function EditorHeader() {
   const [title, setTitle] = useState('Untitled Course');
 
   return (
-    <header className="flex w-full items-center justify-between border-b p-4">
+    <header className="flex w-full shrink-0 items-center justify-between border-b p-4">
       <Input
         className="max-w-md"
         value={title}
