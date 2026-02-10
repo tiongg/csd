@@ -1,5 +1,6 @@
 // Test page for now
 // TODO: Remove this page
+import { ContentEditorProvider } from '@/context/ContentEditorContext';
 import CrepeEditor from '@/features/editor/CrepeEditor';
 import { createFileRoute } from '@tanstack/react-router';
 
@@ -8,5 +9,9 @@ export const Route = createFileRoute('/editor/')({
 });
 
 function RouteComponent() {
-  return <CrepeEditor />;
+  return (
+    <ContentEditorProvider roomName="12345">
+      <CrepeEditor />
+    </ContentEditorProvider>
+  );
 }

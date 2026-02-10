@@ -1,59 +1,77 @@
+import { Button } from '@/components/ui/button';
+import { useContentEditor } from '@/context/ContentEditorContext';
 import { Crepe } from '@milkdown/crepe';
 import { collab, collabServiceCtx } from '@milkdown/plugin-collab';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
 import { useEffect } from 'react';
-import { WebsocketProvider } from 'y-websocket';
-import * as Y from 'yjs';
+import { useY } from 'react-yjs';
 
 import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
 
 function CrepeEditorInternal() {
   const { get: getEditor } = useEditor((root) => {
-    const editor = new Crepe({ root }).editor.use(collab);
-
-    return editor;
+    return new Crepe({ root }).editor.use(collab);
   });
+  const { doc, provider } = useContentEditor();
 
   useEffect(() => {
     const editorInstance = getEditor();
     if (!editorInstance) return;
 
-    const doc = new Y.Doc();
-    const wsProvider = new WebsocketProvider(
-      import.meta.env.VITE_WS_URL!,
-      'roomname',
-      doc,
-    );
-    wsProvider.awareness.setLocalStateField('user', {
-      name: 'Anonymous',
-      color: '#ffa500',
-    });
-
     editorInstance.action((ctx) => {
-      const collabService = ctx.get(collabServiceCtx);
-
-      collabService
-        // bind doc and awareness
-        .bindDoc(doc)
-        .setAwareness(wsProvider.awareness)
-        // connect yjs with milkdown
-        .connect();
+      try {
+        const collabService = ctx.get(collabServiceCtx);
+        collabService.bindDoc(doc).setAwareness(provider.awareness).connect();
+      } catch {
+        // collabServiceCtx not ready yet, will retry on next render
+      }
     });
-
-    return () => {
-      wsProvider.destroy();
-      doc.destroy();
-    };
-  }, [getEditor]);
+  }, [getEditor, doc, provider]);
 
   return <Milkdown />;
 }
 
-export default function CrepeEditor() {
+function Counter() {
+  const { doc } = useContentEditor();
+  const count = useY(doc.getMap<number>('counter'));
+
+  const increment = () => {
+    doc.transact(() => {
+      const counterMap = doc.getMap<number>('counter');
+      const current = counterMap.get('count') ?? 0;
+      counterMap.set('count', current + 1);
+    });
+  };
+
+  const decrement = () => {
+    doc.transact(() => {
+      const counterMap = doc.getMap<number>('counter');
+      const current = counterMap.get('count') ?? 0;
+      counterMap.set('count', current - 1);
+    });
+  };
+
   return (
-    <MilkdownProvider>
-      <CrepeEditorInternal />
-    </MilkdownProvider>
+    <div className="flex items-center gap-4 p-4">
+      <Button onClick={decrement}>-</Button>
+      <span>Count: {count['count']}</span>
+      <Button onClick={increment}>+</Button>
+    </div>
+  );
+}
+
+export default function CrepeEditor() {
+  const { doc, provider } = useContentEditor();
+
+  return (
+    <>
+      <Counter />
+      {doc && provider && (
+        <MilkdownProvider>
+          <CrepeEditorInternal />
+        </MilkdownProvider>
+      )}
+    </>
   );
 }
