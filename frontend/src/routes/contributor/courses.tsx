@@ -4,12 +4,12 @@ import CoursesList from '@/features/contributor/CoursesList';
 
 export const Route = createFileRoute('/contributor/courses')({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   return (
     <PageWithSideBar>
       <CoursesList />
     </PageWithSideBar>
-  )
+  );
 }

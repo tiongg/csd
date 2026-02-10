@@ -9,7 +9,7 @@ export const Route = createFileRoute('/learner/dashboard')({
 function RouteComponent() {
   return (
     <PageWithSideBar>
-        <UserDashboard/>
+      <UserDashboard />
     </PageWithSideBar>
   );
 }

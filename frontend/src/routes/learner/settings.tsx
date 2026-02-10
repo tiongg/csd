@@ -9,7 +9,7 @@ export const Route = createFileRoute('/learner/settings')({
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <div className="mx-auto flex w-full flex-1 items-center">
+      <div className="flex h-full w-full items-center justify-center">
         <UpdateProfileForm />
       </div>
     </PageWithSideBar>

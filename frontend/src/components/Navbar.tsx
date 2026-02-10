@@ -14,10 +14,10 @@ import useActiveRole from '@/hooks/useActiveRole';
 export default function Navbar() {
   const { user } = useAuth();
   const [navClicked, setNavClicked] = useState(false);
-  const dir = useActiveRole() ?? "";
+  const dir = useActiveRole() ?? '';
 
   return (
-    <header className="flex w-full items-center justify-between bg-white p-2 px-8 shadow-lg sticky top-0">
+    <header className="sticky top-0 flex w-full items-center justify-between bg-white p-2 px-8 shadow-lg">
       {/* Logo placeholder */}
       <Link className="aspect-square size-8 rounded-full bg-sky-600" to="/" />
 
@@ -35,9 +35,7 @@ export default function Navbar() {
           <DropdownMenu onOpenChange={setNavClicked}>
             <DropdownMenuTrigger asChild>
               <div className="flex h-7.5 w-40 cursor-pointer items-center justify-between rounded border bg-white px-4 py-1">
-                <span>
-                  {capitalizeFirst(dir)}
-                </span>
+                <span>{capitalizeFirst(dir)}</span>
                 {navClicked ? (
                   <div className="ml-8 inline-block h-0 w-0 border-r-8 border-b-5 border-l-8 border-r-transparent border-b-slate-400 border-l-transparent">
                     <span className="sr-only">Dropdown</span>

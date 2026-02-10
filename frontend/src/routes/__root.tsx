@@ -16,7 +16,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     <main className="flex min-h-dvh w-full flex-col">
       <Navbar />
       <Outlet />
-      <Toaster/>
+      <Toaster />
     </main>
   ),
 });

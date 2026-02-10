@@ -34,7 +34,10 @@ function NavItem({ title, link, icon, children }: NavItemProps) {
         className="w-full cursor-pointer justify-start rounded-full text-slate-700"
         asChild
       >
-        <Link to={link} className='[&.active]:bg-slate-100 hover:bg-slate-50 flex'>
+        <Link
+          to={link}
+          className="flex hover:bg-slate-50 [&.active]:bg-slate-100"
+        >
           {icon}
           {title}
           {children}
@@ -55,8 +58,14 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           icon={<RectangleGroupIcon />}
         />
 
-        <NavItem title="User Management" link="/admin/user-management" icon={<UserIcon />}>
-          <div className='absolute right-10 px-3 bg-rose-500 text-white rounded-full'>4</div>
+        <NavItem
+          title="User Management"
+          link="/admin/user-management"
+          icon={<UserIcon />}
+        >
+          <div className="absolute right-10 rounded-full bg-rose-500 px-3 text-white">
+            4
+          </div>
         </NavItem>
 
         <NavItem
@@ -76,7 +85,11 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
 
         <NavItem title="Teams" link="/contributor/teams" icon={<UsersIcon />} />
 
-        <NavItem title="Courses" link="/contributor/courses" icon={<BookOpenIcon />} />
+        <NavItem
+          title="Courses"
+          link="/contributor/courses"
+          icon={<BookOpenIcon />}
+        />
       </>
     ))
     .otherwise(() => (
@@ -86,8 +99,16 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           link="/learner/dashboard"
           icon={<RectangleGroupIcon />}
         />
-        <NavItem title="Challenges" link="/learner/challenges" icon={<TrophyIcon />} />
-        <NavItem title="My Courses" link="/learner/my-courses" icon={<PencilSquareIcon />} />
+        <NavItem
+          title="Challenges"
+          link="/learner/challenges"
+          icon={<TrophyIcon />}
+        />
+        <NavItem
+          title="My Courses"
+          link="/learner/my-courses"
+          icon={<PencilSquareIcon />}
+        />
       </>
     ));
 }

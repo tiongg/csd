@@ -18,14 +18,12 @@ export const Route = createFileRoute('/')({
 type CoursePreviewProps = {
   title: string;
   instructor: string;
-}
+};
 
 function CoursePreview({ title, instructor }: CoursePreviewProps) {
   return (
     <div>
-      <div className="h-24 bg-slate-200 lg:h-72">
-        {/* image goes here */}
-      </div>
+      <div className="h-24 bg-slate-200 lg:h-72">{/* image goes here */}</div>
       <div className="py-2">
         <Heading2>{title}</Heading2>
         <p className="font-subtitle">{instructor}</p>
@@ -91,14 +89,11 @@ function App() {
 
         <Carousel>
           <CarouselContent>
-            {courses.map(({ title, instructor }, i) =>
+            {courses.map(({ title, instructor }, i) => (
               <CarouselItem className="basis-1/3" key={i}>
-                <CoursePreview
-                  title={title}
-                  instructor={instructor}
-                />
+                <CoursePreview title={title} instructor={instructor} />
               </CarouselItem>
-            )}
+            ))}
           </CarouselContent>
           <CarouselPrevious />
           <CarouselNext />
