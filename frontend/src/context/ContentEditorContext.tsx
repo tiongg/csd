@@ -1,3 +1,4 @@
+import { defaultMarkdownSerializer, schema } from 'prosemirror-markdown';
 import {
   createContext,
   type Dispatch,
@@ -7,6 +8,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { yXmlFragmentToProseMirrorRootNode } from 'y-prosemirror';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 
@@ -58,15 +60,18 @@ export function ContentEditorProvider({
   }, [roomName, doc]);
 
   function getDocAsJson() {
-    for (const key of doc.share.keys()) {
-      const item = doc.get(key);
-      if (item instanceof Y.XmlFragment) {
-        console.log(`Key: ${key} (Array)`);
-        console.log(item.toJSON());
-      }
+    let res = '';
+    const rootArray = doc.getArray<SectionType>('root');
+    for (const node of rootArray) {
+      const pmNode = yXmlFragmentToProseMirrorRootNode(
+        node.get('content'),
+        schema,
+      );
+      const markdownOutput = defaultMarkdownSerializer.serialize(pmNode);
+      res += markdownOutput + '\n\n';
     }
 
-    return doc.toJSON();
+    return res;
   }
 
   function deleteSection(index: number) {
@@ -84,7 +89,7 @@ export function ContentEditorProvider({
     doc.transact(() => {
       const rootArray = doc.getArray<SectionType>('root');
       const title = new Y.Text();
-      title.insert(0, `Section ${currentSection}`);
+      title.insert(0, `Section ${rootArray.length + 1}`);
 
       const section = new Y.Map();
 

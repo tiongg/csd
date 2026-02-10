@@ -3,6 +3,7 @@ import {
   useContentEditor,
   type SectionType,
 } from '@/context/ContentEditorContext';
+import useYArrayLength from '@/hooks/useYArrayLength';
 import { Crepe } from '@milkdown/crepe';
 import { collab, collabServiceCtx } from '@milkdown/plugin-collab';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
@@ -10,7 +11,6 @@ import { useEffect } from 'react';
 import { useY } from 'react-yjs';
 import * as Y from 'yjs';
 
-import useYArrayLength from '@/hooks/useYArrayLength';
 import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
 
@@ -18,7 +18,7 @@ function CrepeEditorInternal() {
   const { get: getEditor } = useEditor((root) => {
     return new Crepe({ root }).editor.use(collab);
   });
-  const { doc, provider, currentSection } = useContentEditor();
+  const { doc, provider, currentSection, getDocAsJson } = useContentEditor();
 
   useEffect(() => {
     const editorInstance = getEditor();
@@ -44,7 +44,19 @@ function CrepeEditorInternal() {
     });
   }, [getEditor, doc, provider, currentSection]);
 
-  return <Milkdown />;
+  return (
+    <>
+      <Button
+        onClick={() => {
+          const markdown = getDocAsJson();
+          console.log(markdown);
+        }}
+      >
+        Get MD
+      </Button>
+      <Milkdown />
+    </>
+  );
 }
 
 function Counter() {
@@ -91,10 +103,6 @@ export default function CrepeEditor() {
   return (
     <>
       {/* <Counter /> */}
-      <Button onClick={() => console.log(getDocAsJson())}>
-        Log Doc as JSON
-      </Button>
-
       <div>
         <Button onClick={addSection}>Add Section</Button>
         {Array.from({ length: sectionCount }, (_, i) => i).map((i) => (
