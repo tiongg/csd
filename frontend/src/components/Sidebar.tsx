@@ -12,6 +12,7 @@ import {
 import { Link, useNavigate } from '@tanstack/react-router';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
+import type { PropsWithChildren } from 'react';
 import type { Account } from '@/context/AuthContext';
 import type React from 'react';
 import type { LinkOptions } from '@tanstack/react-router';
@@ -19,13 +20,13 @@ import { useAuth } from '@/context/AuthContext';
 import { capitalizeFirst } from '@/lib/utils';
 import useActiveRole from '@/hooks/useActiveRole';
 
-type NavItemProps = {
+type NavItemProps = PropsWithChildren<{
   title: string;
   link: LinkOptions['to'];
   icon?: React.ReactNode;
-};
+}>;
 
-function NavItem({ title, link, icon }: NavItemProps) {
+function NavItem({ title, link, icon, children }: NavItemProps) {
   return (
     <div className="w-full">
       <Button
@@ -33,9 +34,13 @@ function NavItem({ title, link, icon }: NavItemProps) {
         className="w-full cursor-pointer justify-start rounded-full text-slate-700"
         asChild
       >
-        <Link to={link}>
+        <Link
+          to={link}
+          className="flex hover:bg-slate-50 [&.active]:bg-slate-100"
+        >
           {icon}
           {title}
+          {children}
         </Link>
       </Button>
     </div>
@@ -53,11 +58,19 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           icon={<RectangleGroupIcon />}
         />
 
-        <NavItem title="User Moderation" link="/" icon={<UserIcon />} />
+        <NavItem
+          title="User Management"
+          link="/admin/user-management"
+          icon={<UserIcon />}
+        >
+          <div className="absolute right-10 rounded-full bg-rose-500 px-3 text-white">
+            4
+          </div>
+        </NavItem>
 
         <NavItem
           title="Course Moderation"
-          link="/"
+          link="/admin/course-moderation"
           icon={<DocumentTextIcon />}
         />
       </>
@@ -70,9 +83,13 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           icon={<RectangleGroupIcon />}
         />
 
-        <NavItem title="Teams" link="/" icon={<UsersIcon />} />
+        <NavItem title="Teams" link="/contributor/teams" icon={<UsersIcon />} />
 
-        <NavItem title="Courses" link="/" icon={<BookOpenIcon />} />
+        <NavItem
+          title="Courses"
+          link="/contributor/courses"
+          icon={<BookOpenIcon />}
+        />
       </>
     ))
     .otherwise(() => (
@@ -82,8 +99,16 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           link="/learner/dashboard"
           icon={<RectangleGroupIcon />}
         />
-        <NavItem title="Challenges" link="/" icon={<TrophyIcon />} />
-        <NavItem title="My Courses" link="/" icon={<PencilSquareIcon />} />
+        <NavItem
+          title="Challenges"
+          link="/learner/challenges"
+          icon={<TrophyIcon />}
+        />
+        <NavItem
+          title="My Courses"
+          link="/learner/my-courses"
+          icon={<PencilSquareIcon />}
+        />
       </>
     ));
 }
@@ -106,7 +131,7 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-3rem)] w-1/6 min-w-50 flex-col justify-between bg-white/50 shadow-lg">
+    <div className="fixed flex h-[calc(100vh-3rem)] w-70 flex-col justify-between bg-white/50 shadow-lg">
       <div>
         <div className="px-8 py-4">
           <p className="font-subtitle tracking-wider">MAIN MENU</p>

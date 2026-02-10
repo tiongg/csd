@@ -1,15 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
-import UserDashboard from '@/components/UserDashboard';
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import CourseModerationForm from '@/features/admin/CourseModerationForm';
 
-export const Route = createFileRoute('/learner/dashboard')({
+export const Route = createFileRoute('/admin/course-moderation')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <UserDashboard />
+      <CourseModerationForm />
     </PageWithSideBar>
   );
 }

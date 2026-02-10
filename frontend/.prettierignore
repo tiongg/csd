@@ -1,3 +1,7 @@
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+# Ignore shadcn files
+src/components/ui/**/*.tsx
+src/routeTree.gen.ts
+api.d.ts

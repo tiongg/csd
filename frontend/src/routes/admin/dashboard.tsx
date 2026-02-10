@@ -1,5 +1,6 @@
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { createFileRoute } from '@tanstack/react-router';
+import UserDashboard from '@/components/UserDashboard';
+import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 
 export const Route = createFileRoute('/admin/dashboard')({
   component: RouteComponent,
@@ -8,7 +9,7 @@ export const Route = createFileRoute('/admin/dashboard')({
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <div>Hello "/admin/dashboard"!</div>
+      <UserDashboard />
     </PageWithSideBar>
   );
 }

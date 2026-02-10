@@ -7,7 +7,7 @@ export const Route = createFileRoute('/register')({
 
 function RegisterPage() {
   return (
-    <div className="h-[calc(100vh-52px)] flex justify-center">
+    <div className="flex h-[calc(100vh-52px)] justify-center">
       <RegistrationForm />
     </div>
   );
