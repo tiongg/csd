@@ -1,5 +1,3 @@
-// Test page for now
-// TODO: Remove this page
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { ContentEditorProvider } from '@/context/ContentEditorContext';
 import CrepeEditor from '@/features/editor/CrepeEditor';
@@ -13,12 +11,12 @@ export const Route = createFileRoute('/editor/')({
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <div className="relative flex h-full w-full flex-col">
-        <ContentEditorProvider roomName="1234">
+      <ContentEditorProvider roomName="1234">
+        <div className="flex h-full w-full flex-col">
           <EditorHeader />
           <CrepeEditor />
-        </ContentEditorProvider>
-      </div>
+        </div>
+      </ContentEditorProvider>
     </PageWithSideBar>
   );
 }

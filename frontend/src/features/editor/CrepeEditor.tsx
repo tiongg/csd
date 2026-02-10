@@ -55,33 +55,51 @@ export default function CrepeEditor() {
   const sectionCount = useYArrayLength(doc.getArray<SectionType>('root'));
 
   return (
-    <>
-      <div>
-        <Button onClick={addSection}>Add Section</Button>
-        <Button onClick={() => setCurrentSection(-1)}>Home page</Button>
-        {Array.from({ length: sectionCount }, (_, i) => i).map((i) => (
-          <Button
-            key={i}
-            variant={i === currentSection ? 'default' : 'outline'}
-            onClick={() => setCurrentSection(i)}
-          >
-            Section {i}
-          </Button>
-        ))}
+    <div className="flex h-full flex-col">
+      <nav className="bg-muted/40 flex items-center gap-2 border-b p-2">
         <Button
-          variant="destructive"
-          onClick={() => deleteSection(currentSection)}
+          size="sm"
+          variant={currentSection === -1 ? 'default' : 'ghost'}
+          onClick={() => setCurrentSection(-1)}
         >
-          Delete Current Section
+          Overview
         </Button>
+        <div className="bg-border mx-2 h-6 w-px" />
+        <div className="flex gap-1 overflow-x-auto">
+          {Array.from({ length: sectionCount }, (_, i) => i).map((i) => (
+            <Button
+              key={i}
+              size="sm"
+              variant={i === currentSection ? 'default' : 'ghost'}
+              onClick={() => setCurrentSection(i)}
+            >
+              Section {i + 1}
+            </Button>
+          ))}
+          <Button size="sm" variant="ghost" onClick={addSection}>
+            + Add
+          </Button>
+        </div>
+        <div className="flex-1" />
+        {currentSection >= 0 && (
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => deleteSection(currentSection)}
+          >
+            Delete
+          </Button>
+        )}
+      </nav>
+      <div className="flex-1 overflow-auto">
+        {currentSection === -1 ? (
+          <EditorCourseDisplay />
+        ) : (
+          <MilkdownProvider>
+            <CrepeEditorInternal />
+          </MilkdownProvider>
+        )}
       </div>
-      {currentSection === -1 ? (
-        <EditorCourseDisplay />
-      ) : (
-        <MilkdownProvider>
-          <CrepeEditorInternal />
-        </MilkdownProvider>
-      )}
-    </>
+    </div>
   );
 }

@@ -14,17 +14,15 @@ import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 import { useAuth } from './AuthContext';
 
-export type SectionType = Y.Map<any>;
+export type SectionType = Y.Map<unknown>;
 export type ContentType = 'markdown' | 'quiz';
 
 export type ContentEditorContextType = {
   doc: Y.Doc;
   provider: WebsocketProvider;
-
   currentSection: number;
   setCurrentSection: Dispatch<SetStateAction<number>>;
-
-  getDocAsJson: () => any;
+  getDocAsJson: () => string;
   deleteSection: (index: number) => void;
   addSection: () => void;
 };
@@ -42,17 +40,17 @@ export function ContentEditorProvider({
   roomName,
 }: ContentEditorProviderProps) {
   const { user } = useAuth();
-  const [doc] = useState(new Y.Doc());
+  const [doc] = useState(() => new Y.Doc());
   const [provider] = useState(
-    new WebsocketProvider(import.meta.env.VITE_WS_URL!, roomName, doc, {
-      connect: false,
-    }),
+    () =>
+      new WebsocketProvider(import.meta.env.VITE_WS_URL!, roomName, doc, {
+        connect: false,
+      }),
   );
 
   const [currentSection, setCurrentSection] = useState(-1);
 
   useEffect(() => {
-    // Note: Anon should not exist here, but allow for now
     provider.awareness.setLocalStateField('user', {
       name: user?.username ?? 'Anonymous',
       color: generateColorFromString(user?.username ?? 'Anonymous'),
@@ -62,17 +60,18 @@ export function ContentEditorProvider({
     return () => {
       provider.disconnect();
     };
-  }, [roomName, doc]);
+  }, [provider, user]);
 
   function getDocAsJson() {
-    let res = '';
     const rootArray = doc.getArray<SectionType>('root');
+    let res = '';
+
     for (const node of rootArray) {
       if ((node.get('type') as ContentType) !== 'markdown') {
         continue;
       }
       const pmNode = yXmlFragmentToProseMirrorRootNode(
-        node.get('content'),
+        node.get('content') as Y.XmlFragment,
         schema,
       );
       const markdownOutput = defaultMarkdownSerializer.serialize(pmNode);
@@ -84,10 +83,10 @@ export function ContentEditorProvider({
 
   function deleteSection(index: number) {
     doc.transact(() => {
-      const rootArray = doc.getArray<any>('root');
+      const rootArray = doc.getArray<SectionType>('root');
       rootArray.delete(index, 1);
-      // Adjust currentSection if necessary
-      if (currentSection >= index && currentSection > 0) {
+
+      if (currentSection >= index) {
         setCurrentSection(currentSection - 1);
       }
     });
@@ -99,8 +98,7 @@ export function ContentEditorProvider({
       const title = new Y.Text();
       title.insert(0, `Section ${rootArray.length + 1}`);
 
-      const section = new Y.Map();
-
+      const section = new Y.Map<unknown>();
       section.set('title', title);
       section.set('content', new Y.XmlFragment());
       section.set('type', 'markdown' as ContentType);
@@ -114,10 +112,8 @@ export function ContentEditorProvider({
       value={{
         doc,
         provider,
-
         currentSection,
         setCurrentSection,
-
         getDocAsJson,
         deleteSection,
         addSection,
@@ -128,7 +124,7 @@ export function ContentEditorProvider({
   );
 }
 
-export function useContentEditor() {
+export function useContentEditor(): ContentEditorContextType {
   const context = useContext(ContentEditorContext);
   if (!context) {
     throw new Error('ContentEditor context missing!');
