@@ -9,10 +9,10 @@ import org.jooq.TableField;
 import org.jooq.UpdatableRecord;
 
 /**
- * Base repository class providing common CRUD operations for JOQ-based
+ * Base repository class providing common CRUD operations for JOOQ-based
  * repositories.
  *
- * @param <TBaseTable> - the JOQ table type this repository operates on
+ * @param <TRecord> the type of the JOOQ record
  */
 public abstract class BaseRepository<TRecord extends UpdatableRecord<TRecord>> {
   protected final DSLContext dsl;
