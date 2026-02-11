@@ -13,7 +13,7 @@ import { useApiQuery } from '@/lib/fetch-client';
 function PendingApplicationRows() {
   const { data: applications, isLoading: isLoadingApplications } = useApiQuery(
     'get',
-    '/api/admin/contributor-applications',
+    '/api/admins/contributor-applications',
   );
 
   if (isLoadingApplications) {
