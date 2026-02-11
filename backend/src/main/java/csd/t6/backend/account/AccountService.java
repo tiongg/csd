@@ -42,7 +42,7 @@ public class AccountService {
 
   public OauthConnectionRecord createWithOAuthLogin(String email, String realname, OauthProvider provider,
       String providerId) {
-    AccountRecord account = this.accountRepository.findBy(ACCOUNT.EMAIL, email).orElseGet(() -> {
+    AccountRecord account = this.accountRepository.findOneBy(ACCOUNT.EMAIL, email).orElseGet(() -> {
       String usernameBase = email.split("@")[0];
       String username = usernameBase;
       int suffix = 1;
@@ -58,7 +58,7 @@ public class AccountService {
   }
 
   public AccountRecord updateAccount(UUID id, AccountUpdateRequest updateDTO) {
-    AccountRecord existingAccount = this.accountRepository.findBy(ACCOUNT.ID, id)
+    AccountRecord existingAccount = this.accountRepository.findOneBy(ACCOUNT.ID, id)
         .orElseThrow(() -> new BadRequestException("Account does not exist"));
 
     if (updateDTO.username() != null && !existingAccount.getUsername().equals(updateDTO.username())
@@ -73,13 +73,13 @@ public class AccountService {
       existingAccount.setRealName(updateDTO.realName());
     }
 
-    return this.accountRepository.update(existingAccount);
+    return this.accountRepository.save(existingAccount);
   }
 
   public void deleteAccount(UUID id) {
-    if (!this.accountRepository.exists(ACCOUNT.ID, id)) {
-      throw new BadRequestException("Account does not exist");
+    int deleted = this.accountRepository.delete(ACCOUNT.ID, id);
+    if (deleted == 0) {
+      throw new BadRequestException("Account does not exist!");
     }
-    this.accountRepository.delete(id);
   }
 }

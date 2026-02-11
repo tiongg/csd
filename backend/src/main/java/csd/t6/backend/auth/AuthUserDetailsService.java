@@ -19,8 +19,8 @@ public class AuthUserDetailsService implements UserDetailsService {
 
   @Override
   public AuthUserDetails loadUserByUsername(String usernameOrEmail) {
-    AccountRecord accountRecord = this.accountRepository.findBy(ACCOUNT.USERNAME, usernameOrEmail)
-        .or(() -> this.accountRepository.findBy(ACCOUNT.EMAIL, usernameOrEmail))
+    AccountRecord accountRecord = this.accountRepository.findOneBy(ACCOUNT.USERNAME, usernameOrEmail)
+        .or(() -> this.accountRepository.findOneBy(ACCOUNT.EMAIL, usernameOrEmail))
         .orElseThrow(() -> new BadRequestException("Invalid credentials"));
 
     return new AuthUserDetails(accountRecord);

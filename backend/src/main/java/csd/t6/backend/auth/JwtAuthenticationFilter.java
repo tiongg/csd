@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
   }
 
   private void setAuthentication(UUID accountId, HttpServletRequest request) {
-    Optional<AccountRecord> accountRecord = accountRepository.findBy(ACCOUNT.ID, accountId);
+    Optional<AccountRecord> accountRecord = accountRepository.findOneBy(ACCOUNT.ID, accountId);
     if (accountRecord.isPresent()) {
       AuthUserDetails userDetails = new AuthUserDetails(accountRecord.get());
       UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null,
