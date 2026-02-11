@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.AccountCreateRequest;
-import csd.t6.backend.account.dto.AccountResponseDTO;
+import csd.t6.backend.account.dto.AccountResponseDto;
 import csd.t6.backend.account.dto.AccountUpdateRequest;
 import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.decorators.auth.PublicDecorator;
@@ -37,17 +37,17 @@ public class AccountController {
   }
 
   @GetMapping("/")
-  public List<AccountResponseDTO> getAll() {
-    return accountService.getAllAccounts().stream().map(record -> new AccountResponseDTO(record)).toList();
+  public List<AccountResponseDto> getAll() {
+    return accountService.getAllAccounts().stream().map(record -> new AccountResponseDto(record)).toList();
   }
 
   @PostMapping("/")
   @PublicDecorator()
   @CreatedResponse()
   @BadRequestResponse()
-  public AccountResponseDTO createAccount(@RequestBody @Valid AccountCreateRequest createDTO) {
+  public AccountResponseDto createAccount(@RequestBody @Valid AccountCreateRequest createDTO) {
     String hashedPassword = passwordEncoder.encode(createDTO.password());
-    return new AccountResponseDTO(
+    return new AccountResponseDto(
         accountService.createNewAccount(createDTO.username(), createDTO.email(), hashedPassword));
   }
 
@@ -61,8 +61,8 @@ public class AccountController {
   @PatchMapping("/")
   @BadRequestResponse()
   @OkResponse()
-  public AccountResponseDTO updateAccount(@AuthenticationPrincipal AuthUserDetails user,
+  public AccountResponseDto updateAccount(@AuthenticationPrincipal AuthUserDetails user,
       @RequestBody @Valid AccountUpdateRequest updateDTO) {
-    return new AccountResponseDTO(accountService.updateAccount(user.getAccount().getId(), updateDTO));
+    return new AccountResponseDto(accountService.updateAccount(user.getAccount().getId(), updateDTO));
   }
 }
