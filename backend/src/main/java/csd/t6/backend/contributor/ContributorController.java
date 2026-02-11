@@ -11,7 +11,6 @@ import csd.t6.backend.decorators.responses.NoContentResponse;
 
 @RestController
 @RequestMapping("/api/contributor")
-
 public class ContributorController {
   private final ContributorService contributorService;
 
@@ -25,5 +24,4 @@ public class ContributorController {
   public void applyContributor(@AuthenticationPrincipal AuthUserDetails user) {
     this.contributorService.insertPendingContributor(user.getAccount().getId());
   }
-
 }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import csd.t6.backend.account.dto.AccountResponseDTO;
+import csd.t6.backend.account.dto.AccountResponseDto;
 import csd.t6.backend.auth.dto.ExchangeCodeDto;
 import csd.t6.backend.auth.dto.LoginDto;
 import csd.t6.backend.auth.dto.LoginResponseDto;
@@ -58,7 +58,7 @@ public class AuthController {
     TokenData tokenData = this.authService.generateTokenData(accountId);
     response.addCookie(tokenData.refreshCookie());
 
-    return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDTO(userDetails.getAccount()));
+    return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDto(userDetails.getAccount()));
   }
 
   @PostMapping("/logout")
@@ -81,17 +81,17 @@ public class AuthController {
     UUID accountId = jwtService.extractAccountId(refreshTokenCookie);
     TokenData tokenData = this.authService.generateTokenData(accountId);
     response.addCookie(tokenData.refreshCookie());
-    return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDTO(tokenData.account()));
+    return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDto(tokenData.account()));
   }
 
   @GetMapping("/me")
   @BadRequestResponse()
   @OkResponse()
-  public AccountResponseDTO getSelf(@AuthenticationPrincipal AuthUserDetails user) {
+  public AccountResponseDto getSelf(@AuthenticationPrincipal AuthUserDetails user) {
     if (user == null) {
       throw new BadRequestException("User is not authenticated");
     }
-    return new AccountResponseDTO(user.getAccount());
+    return new AccountResponseDto(user.getAccount());
   }
 
   @PostMapping("/exchange")
@@ -103,6 +103,6 @@ public class AuthController {
     UUID accountId = oauthCodeService.consumeCode(exchangeCodeDto.code());
     TokenData tokenData = authService.generateTokenData(accountId);
     response.addCookie(tokenData.refreshCookie());
-    return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDTO(tokenData.account()));
+    return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDto(tokenData.account()));
   }
 }
