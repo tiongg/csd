@@ -28,7 +28,7 @@ public class AuthService {
     Cookie refreshCookie = this.createRefreshTokenCookie(refreshToken);
     refreshCookie.setMaxAge((int) jwtService.getRefreshTokenExpirationHours() * 3600);
 
-    AccountRecord account = this.accountRepository.findBy(ACCOUNT.ID, accountId).orElse(null);
+    AccountRecord account = this.accountRepository.findOneBy(ACCOUNT.ID, accountId).orElse(null);
     return new TokenData(accessToken, account, refreshCookie);
   }
 
