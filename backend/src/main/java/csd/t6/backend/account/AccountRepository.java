@@ -2,6 +2,7 @@ package csd.t6.backend.account;
 
 import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
@@ -31,5 +32,9 @@ public class AccountRepository extends BaseRepository<AccountRecord> {
     record.setRealName(realname);
 
     return this.save(record);
+  }
+
+  public int updateAccountsRole(List<UUID> accountIds, Roles role) {
+    return dsl.update(ACCOUNT).set(ACCOUNT.USER_ROLE, role).where(ACCOUNT.ID.in(accountIds)).execute();
   }
 }

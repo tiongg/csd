@@ -29,4 +29,8 @@ public class PendingContributorRepository extends BaseRepository<PendingContribu
     return dsl.select().from(PENDING_CONTRIBUTORS).join(ACCOUNT).on(PENDING_CONTRIBUTORS.LEARNER_ID.eq(ACCOUNT.ID))
         .limit(limit).offset(offset).fetchInto(ACCOUNT);
   }
+
+  public int deletePendingContributors(List<UUID> learnerUuids) {
+    return dsl.deleteFrom(PENDING_CONTRIBUTORS).where(PENDING_CONTRIBUTORS.LEARNER_ID.in(learnerUuids)).execute();
+  }
 }
