@@ -173,9 +173,9 @@ export default function Sidebar() {
       <div className="flex items-center justify-around border-t-2 border-t-slate-300 px-4 py-1">
         <div className="aspect-square size-10 rounded-full bg-sky-600"></div>
 
-        <div className="flex flex-col p-4">
+        <div className="flex flex-col p-4 text-center">
           <div className="text-sm font-bold text-slate-700">
-            {user.realname}
+            @{user.username}
           </div>
           <div className="text-xs text-slate-500">
             {capitalizeFirst(user.role)}
