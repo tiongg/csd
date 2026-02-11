@@ -21,8 +21,16 @@ public class AdminService {
     this.accountRepository = accountRepository;
   }
 
-  public List<AccountRecord> getAllPendingContributors() {
-    return this.pendingContributorRepository.getPendingContributorAccounts(100, 0);
+  public List<AccountRecord> getAllPendingContributors(int limit, int offset) {
+    return this.pendingContributorRepository.getPendingContributorAccounts(limit, offset);
+  }
+
+  public List<AccountRecord> getAllAdmins(int limit, int offset) {
+    return this.accountRepository.getAllAdmins(limit, offset);
+  }
+
+  public List<AccountRecord> getAdminsExcluding(UUID excludeAdminUuid, int limit, int offset) {
+    return this.accountRepository.getNonAdmins(limit, offset);
   }
 
   @Transactional

@@ -37,4 +37,13 @@ public class AccountRepository extends BaseRepository<AccountRecord> {
   public int updateAccountsRole(List<UUID> accountIds, Roles role) {
     return dsl.update(ACCOUNT).set(ACCOUNT.USER_ROLE, role).where(ACCOUNT.ID.in(accountIds)).execute();
   }
+
+  public List<AccountRecord> getAllAdmins(int limit, int offset) {
+    return this.findBy(ACCOUNT.USER_ROLE, Roles.ADMIN, limit, offset);
+  }
+
+  public List<AccountRecord> getNonAdmins(int limit, int offset) {
+    return dsl.select().from(ACCOUNT).where(ACCOUNT.USER_ROLE.ne(Roles.ADMIN)).limit(limit).offset(offset)
+        .fetchInto(ACCOUNT);
+  }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.jooq.DSLContext;
+import org.jooq.SelectConditionStep;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UpdatableRecord;
@@ -54,7 +55,20 @@ public abstract class BaseRepository<TRecord extends UpdatableRecord<TRecord>> {
    * @return a list of records matching the criteria
    */
   public <T> List<TRecord> findBy(TableField<TRecord, T> field, T value) {
-    return this.dsl.selectFrom(this.table).where(field.eq(value)).fetch();
+    return this.baseFind(field, value).fetch();
+  }
+
+  /**
+   * Generic method to find many records by a specified field.
+   * 
+   * @param field  - the field to find by
+   * @param value  - the value to look for
+   * @param limit  - the maximum number of records to return
+   * @param offset - the number of records to skip
+   * @return a list of records matching the criteria
+   */
+  public <T> List<TRecord> findBy(TableField<TRecord, T> field, T value, int limit, int offset) {
+    return this.baseFind(field, value).limit(limit).offset(offset).fetch();
   }
 
   /**
@@ -77,8 +91,25 @@ public abstract class BaseRepository<TRecord extends UpdatableRecord<TRecord>> {
     return this.dsl.deleteFrom(this.table).where(field.eq(value)).execute();
   }
 
+  /**
+   * Generic method to save a record to the database.
+   * 
+   * @param record - the record to save
+   * @return the saved record
+   */
   public TRecord save(TRecord record) {
     record.store();
     return record;
+  }
+
+  /**
+   * Base method to create a SelectConditionStep for finding records by a field.
+   * 
+   * @param field - the field to find by
+   * @param value - the value to look for
+   * @return SelectConditionStep for further query customization
+   */
+  private <T> SelectConditionStep<TRecord> baseFind(TableField<TRecord, T> field, T value) {
+    return this.dsl.selectFrom(this.table).where(field.eq(value));
   }
 }

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.AccountResponseDto;
@@ -22,9 +23,16 @@ public class AdminController {
     this.adminService = adminService;
   }
 
+  @GetMapping("/")
+  public List<AccountResponseDto> getAllAdmins(@RequestParam(defaultValue = "100") int limit,
+      @RequestParam(defaultValue = "0") int offset) {
+    return this.adminService.getAllAdmins(limit, offset).stream().map(AccountResponseDto::new).toList();
+  }
+
   @GetMapping("/contributor-applications")
-  public List<AccountResponseDto> getAllPendingApplications() {
-    return this.adminService.getAllPendingContributors().stream().map(AccountResponseDto::new).toList();
+  public List<AccountResponseDto> getAllPendingApplications(@RequestParam(defaultValue = "100") int limit,
+      @RequestParam(defaultValue = "0") int offset) {
+    return this.adminService.getAllPendingContributors(limit, offset).stream().map(AccountResponseDto::new).toList();
   }
 
   @PostMapping("/contributor-applications/approve")
