@@ -109,7 +109,7 @@ export interface paths {
         };
         /**
          * Check if user is team member
-         * @description Returns user's role in team or null if not a member
+         * @description Returns user's role in team
          */
         get: operations["checkMembership"];
         put?: never;
@@ -227,13 +227,14 @@ export interface components {
             accountId: string;
             username: string;
             email: string;
-            teamRole: string;
+            /** @enum {string} */
+            teamRole: "OWNER" | "ADMIN" | "MEMBER";
             /** Format: date-time */
             joinedAt: string;
         };
         UpdateMemberRoleRequest: {
             /** @enum {string} */
-            role: "OWNER" | "ADMIN" | "CONTRIBUTOR";
+            role: "OWNER" | "ADMIN" | "MEMBER";
         };
         CourseUpdateRequest: {
             title?: string;
@@ -250,27 +251,28 @@ export interface components {
             /** Format: uuid */
             creatorId: string;
             /** Format: uuid */
-            teamId?: string;
+            teamId: string;
             isPublished: boolean;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
         };
-        TeamCreateRequest: {
-            name: string;
-            description?: string;
-        };
         AddMemberRequest: {
             /** Format: uuid */
             accountId: string;
-            teamRole: string;
+            /** @enum {string} */
+            teamRole: "OWNER" | "ADMIN" | "MEMBER";
+        };
+        TeamCreateRequest: {
+            name: string;
+            description?: string;
         };
         CourseCreateRequest: {
             title: string;
             description?: string;
             /** Format: uuid */
-            teamId?: string;
+            teamId: string;
         };
         Account: {
             /** Format: uuid */
@@ -300,6 +302,10 @@ export interface components {
         AccountUpdateRequest: {
             username?: string;
             realName?: string;
+        };
+        CheckMembershipResponse: {
+            isMember: boolean;
+            role: string;
         };
     };
     responses: never;
@@ -555,9 +561,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": {
-                        [key: string]: Record<string, never>;
-                    };
+                    "*/*": components["schemas"]["CheckMembershipResponse"];
                 };
             };
         };

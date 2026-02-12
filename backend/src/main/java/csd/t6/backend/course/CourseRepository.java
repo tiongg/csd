@@ -1,6 +1,6 @@
 package csd.t6.backend.course;
 
-import static csd.t6.jooq.tables.Course.COURSE;
+import static csd.t6.jooq.public_.tables.Course.COURSE;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
-import csd.t6.jooq.tables.records.CourseRecord;
+import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Repository
 public class CourseRepository {
@@ -20,25 +20,17 @@ public class CourseRepository {
   }
 
   public CourseRecord create(String title, String description, UUID creatorId, UUID teamId) {
-    return dsl.insertInto(COURSE)
-        .set(COURSE.TITLE, title)
-        .set(COURSE.DESCRIPTION, description)
-        .set(COURSE.CREATOR_ID, creatorId)
-        .set(COURSE.TEAM_ID, teamId)
-        .set(COURSE.IS_PUBLISHED, false)
-        .returning()
+    return dsl.insertInto(COURSE).set(COURSE.TITLE, title).set(COURSE.DESCRIPTION, description)
+        .set(COURSE.CREATOR_ID, creatorId).set(COURSE.TEAM_ID, teamId).set(COURSE.IS_PUBLISHED, false).returning()
         .fetchOne();
   }
 
   public Optional<CourseRecord> findById(UUID id) {
-    return dsl.selectFrom(COURSE)
-        .where(COURSE.ID.eq(id))
-        .fetchOptional();
+    return dsl.selectFrom(COURSE).where(COURSE.ID.eq(id)).fetchOptional();
   }
 
   public List<CourseRecord> findAll() {
-    return dsl.selectFrom(COURSE)
-        .fetch();
+    return dsl.selectFrom(COURSE).fetch();
   }
 
   public CourseRecord update(UUID id, String title, String description, UUID teamId, Boolean isPublished) {
@@ -62,8 +54,6 @@ public class CourseRepository {
   }
 
   public void delete(UUID id) {
-    dsl.deleteFrom(COURSE)
-        .where(COURSE.ID.eq(id))
-        .execute();
+    dsl.deleteFrom(COURSE).where(COURSE.ID.eq(id)).execute();
   }
 }

@@ -25,7 +25,7 @@ import csd.t6.backend.team.dto.TeamMemberResponseDTO;
 import csd.t6.backend.team.dto.TeamResponseDTO;
 import csd.t6.backend.team.dto.TeamUpdateRequest;
 import csd.t6.backend.team.dto.UpdateMemberRoleRequest;
-import csd.t6.jooq.enums.TeamRole;
+import csd.t6.jooq.public_.enums.TeamRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;

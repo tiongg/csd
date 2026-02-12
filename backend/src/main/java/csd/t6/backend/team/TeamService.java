@@ -17,9 +17,9 @@ import csd.t6.backend.team.dto.TeamMemberResponseDTO;
 import csd.t6.backend.team.dto.TeamResponseDTO;
 import csd.t6.backend.team.dto.TeamUpdateRequest;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
-import csd.t6.jooq.enums.TeamRole;
-import csd.t6.jooq.tables.records.TeamMemberRecord;
-import csd.t6.jooq.tables.records.TeamRecord;
+import csd.t6.jooq.public_.enums.TeamRole;
+import csd.t6.jooq.public_.tables.records.TeamMemberRecord;
+import csd.t6.jooq.public_.tables.records.TeamRecord;
 
 @Service
 public class TeamService {
@@ -59,13 +59,11 @@ public class TeamService {
   public List<TeamResponseDTO> getUserTeams(UUID userId) {
     List<TeamMemberRecord> userMemberships = teamMemberRepository.findByAccountId(userId);
 
-    return userMemberships.stream()
-        .map(membership -> {
-          TeamRecord team = teamRepository.findById(membership.getTeamId()).orElseThrow();
-          List<TeamMemberResponseDTO> members = getTeamMembers(team.getId());
-          return new TeamResponseDTO(team, members);
-        })
-        .collect(Collectors.toList());
+    return userMemberships.stream().map(membership -> {
+      TeamRecord team = teamRepository.findById(membership.getTeamId()).orElseThrow();
+      List<TeamMemberResponseDTO> members = getTeamMembers(team.getId());
+      return new TeamResponseDTO(team, members);
+    }).collect(Collectors.toList());
   }
 
   @Transactional
@@ -103,8 +101,7 @@ public class TeamService {
 
   @Transactional
   public TeamMemberResponseDTO addMember(UUID teamId, AddMemberRequest request, UUID requesterId) {
-    teamRepository.findById(teamId)
-        .orElseThrow(() -> new BadRequestException("Team not found"));
+    teamRepository.findById(teamId).orElseThrow(() -> new BadRequestException("Team not found"));
 
     TeamMemberRecord requesterMember = teamMemberRepository.findByTeamAndAccount(teamId, requesterId)
         .orElseThrow(() -> new BadRequestException("You are not a member of this team"));
@@ -150,13 +147,11 @@ public class TeamService {
   public List<TeamMemberResponseDTO> getTeamMembers(UUID teamId) {
     List<TeamMemberRecord> memberRecords = teamMemberRepository.findByTeamId(teamId);
 
-    return memberRecords.stream()
-        .map(record -> {
-          AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, record.getAccountId())
-              .orElseThrow(() -> new BadRequestException("Account not found"));
-          return new TeamMemberResponseDTO(record, accountRecord.getUsername(), accountRecord.getEmail());
-        })
-        .collect(Collectors.toList());
+    return memberRecords.stream().map(record -> {
+      AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, record.getAccountId())
+          .orElseThrow(() -> new BadRequestException("Account not found"));
+      return new TeamMemberResponseDTO(record, accountRecord.getUsername(), accountRecord.getEmail());
+    }).collect(Collectors.toList());
   }
 
   public boolean isTeamMember(UUID teamId, UUID accountId) {
@@ -164,15 +159,12 @@ public class TeamService {
   }
 
   public TeamRole getTeamMemberRole(UUID teamId, UUID accountId) {
-    return teamMemberRepository.findByTeamAndAccount(teamId, accountId)
-        .map(TeamMemberRecord::getTeamRole)
-        .orElse(null);
+    return teamMemberRepository.findByTeamAndAccount(teamId, accountId).map(TeamMemberRecord::getTeamRole).orElse(null);
   }
 
   @Transactional
   public TeamMemberResponseDTO updateMemberRole(UUID teamId, UUID accountId, TeamRole newRole, UUID requesterId) {
-    teamRepository.findById(teamId)
-        .orElseThrow(() -> new BadRequestException("Team not found"));
+    teamRepository.findById(teamId).orElseThrow(() -> new BadRequestException("Team not found"));
 
     TeamMemberRecord requesterMember = teamMemberRepository.findByTeamAndAccount(teamId, requesterId)
         .orElseThrow(() -> new BadRequestException("You are not a member of this team"));

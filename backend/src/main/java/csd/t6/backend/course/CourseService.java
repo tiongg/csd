@@ -12,7 +12,7 @@ import csd.t6.backend.course.dto.CourseResponseDTO;
 import csd.t6.backend.course.dto.CourseUpdateRequest;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.team.TeamService;
-import csd.t6.jooq.tables.records.CourseRecord;
+import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Service
 public class CourseService {
@@ -35,15 +35,12 @@ public class CourseService {
   }
 
   public CourseResponseDTO getCourseById(UUID id) {
-    CourseRecord course = courseRepository.findById(id)
-        .orElseThrow(() -> new BadRequestException("Course not found"));
+    CourseRecord course = courseRepository.findById(id).orElseThrow(() -> new BadRequestException("Course not found"));
     return new CourseResponseDTO(course);
   }
 
   public List<CourseResponseDTO> getAllCourses() {
-    return courseRepository.findAll().stream()
-        .map(CourseResponseDTO::new)
-        .collect(Collectors.toList());
+    return courseRepository.findAll().stream().map(CourseResponseDTO::new).collect(Collectors.toList());
   }
 
   @Transactional
@@ -71,8 +68,7 @@ public class CourseService {
 
   @Transactional
   public void deleteCourse(UUID id, UUID requesterId) {
-    CourseRecord course = courseRepository.findById(id)
-        .orElseThrow(() -> new BadRequestException("Course not found"));
+    CourseRecord course = courseRepository.findById(id).orElseThrow(() -> new BadRequestException("Course not found"));
 
     if (!course.getCreatorId().equals(requesterId)) {
       throw new BadRequestException("Only course creator can delete the course");
