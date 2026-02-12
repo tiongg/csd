@@ -37,7 +37,7 @@ public class CourseController {
     this.courseService = courseService;
   }
 
-  @PostMapping
+  @PostMapping("/")
   @CreatedResponse
   @BadRequestResponse
   @Operation(summary = "Create a new course", description = "Creates a new course with the authenticated user as creator")
@@ -54,7 +54,7 @@ public class CourseController {
     return courseService.getCourseById(id);
   }
 
-  @GetMapping
+  @GetMapping("/")
   @OkResponse
   @Operation(summary = "Get all courses", description = "Retrieves all courses")
   public List<CourseResponseDTO> getAllCourses() {
@@ -64,7 +64,7 @@ public class CourseController {
   @PutMapping("/{id}")
   @OkResponse
   @BadRequestResponse
-  @Operation(summary = "Update course", description = "Updates course details. Only creator can update.")
+  @Operation(summary = "Update course", description = "Updates course details. Only creator or team members can update.")
   public CourseResponseDTO updateCourse(@PathVariable UUID id, @Valid @RequestBody CourseUpdateRequest request,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
     return courseService.updateCourse(id, request, userDetails.getId());

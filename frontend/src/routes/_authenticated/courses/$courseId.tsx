@@ -6,6 +6,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/AuthContext';
 import { useApiMutation, useApiQuery } from '@/lib/fetch-client';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,7 +23,7 @@ export const Route = createFileRoute('/_authenticated/courses/$courseId')({
 const courseSchema = z.object({
   title: z.string().min(3, 'Course title must be at least 3 characters'),
   description: z.string().optional(),
-  teamId: z.string().optional(),
+  teamId: z.string().min(1, 'Team is required'),
   isPublished: z.boolean(),
 });
 
@@ -41,12 +42,7 @@ function CourseDetailPage() {
     }
   );
 
-  const { data: teams } = useApiQuery('get', '/api/teams', {});
-
-  // Filter teams to only show those where user is a member
-  const userTeams = teams?.filter((team) =>
-    team.members?.some((member) => member.accountId === user?.id)
-  );
+  const { data: teams } = useApiQuery('get', '/api/teams/', {});
 
   const {
     handleSubmit,
@@ -64,13 +60,12 @@ function CourseDetailPage() {
     },
   });
 
-  // Update form when course data loads
   useEffect(() => {
     if (course) {
       reset({
         title: course.title,
         description: course.description || '',
-        teamId: course.teamId || '',
+        teamId: course.teamId,
         isPublished: course.isPublished,
       });
     }
@@ -105,7 +100,7 @@ function CourseDetailPage() {
         body: {
           title: data.title,
           description: data.description,
-          teamId: data.teamId || undefined,
+          teamId: data.teamId,
           isPublished: data.isPublished,
         },
       });
@@ -137,8 +132,6 @@ function CourseDetailPage() {
   }
 
   const isCreator = course.creatorId === user?.id;
-  
-  // Check if user is a team member (can edit)
   const courseTeam = teams?.find((team) => team.id === course.teamId);
   const isTeamMember = courseTeam?.members?.some(
     (member) => member.accountId === user?.id
@@ -147,14 +140,13 @@ function CourseDetailPage() {
 
   return (
     <div className="container mx-auto p-8 max-w-2xl">
-      {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold">{course.title}</h1>
           <p className="text-muted-foreground mt-1">
             {canEdit ? 'Edit your course' : 'View course details'}
           </p>
-          {course.teamId && courseTeam && (
+          {courseTeam && (
             <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
               <Users className="h-4 w-4" />
               <span>Team: {courseTeam.name}</span>
@@ -169,7 +161,6 @@ function CourseDetailPage() {
         )}
       </div>
 
-      {/* Edit Form (only for creator or team members) */}
       {canEdit ? (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <FieldGroup>
@@ -183,7 +174,6 @@ function CourseDetailPage() {
                     {...field}
                     id="title"
                     aria-invalid={fieldState.invalid}
-                    placeholder="e.g., Introduction to Gen-Alpha Culture"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -200,12 +190,7 @@ function CourseDetailPage() {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="description">Description</FieldLabel>
-                  <textarea
-                    {...field}
-                    id="description"
-                    className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
-                    placeholder="What will students learn in this course?"
-                  />
+                  <Textarea {...field} id="description" />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -224,18 +209,14 @@ function CourseDetailPage() {
                   <select
                     {...field}
                     id="teamId"
-                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                    className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors"
                   >
-                    <option value="">No team (Personal course)</option>
-                    {userTeams?.map((team) => (
+                    {teams?.map((team) => (
                       <option key={team.id} value={team.id}>
                         {team.name}
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    You can only assign teams you are a member of
-                  </p>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -256,10 +237,10 @@ function CourseDetailPage() {
                       id="isPublished"
                       checked={field.value}
                       onChange={field.onChange}
-                      className="h-4 w-4 rounded border-gray-300"
+                      className="h-4 w-4 rounded"
                     />
                     <FieldLabel htmlFor="isPublished" className="mb-0">
-                      Publish course (make it visible to others)
+                      Publish course
                     </FieldLabel>
                   </div>
                 </Field>
@@ -287,7 +268,6 @@ function CourseDetailPage() {
           </div>
         </form>
       ) : (
-        // Read-only view for non-members
         <div className="space-y-6">
           <div>
             <h3 className="font-semibold mb-2">Description</h3>
@@ -309,7 +289,7 @@ function CourseDetailPage() {
           </div>
           <div className="p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">
-              You don't have permission to edit this course. Only the creator or team members can edit.
+              You don't have permission to edit this course.
             </p>
           </div>
           <Button onClick={() => navigate({ to: '/courses' })}>

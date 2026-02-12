@@ -232,7 +232,8 @@ export interface components {
             joinedAt: string;
         };
         UpdateMemberRoleRequest: {
-            role: string;
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN" | "CONTRIBUTOR";
         };
         CourseUpdateRequest: {
             title?: string;

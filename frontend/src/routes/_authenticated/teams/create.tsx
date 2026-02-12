@@ -6,6 +6,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useApiMutation } from '@/lib/fetch-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
@@ -39,7 +40,7 @@ function CreateTeamPage() {
     },
   });
 
-  const { mutateAsync: createTeam } = useApiMutation('post', '/api/teams', {
+  const { mutateAsync: createTeam } = useApiMutation('post', '/api/teams/', {
     onSuccess: (data) => {
       navigate({ to: '/teams/$teamId', params: { teamId: data.id } });
     },
@@ -101,10 +102,9 @@ function CreateTeamPage() {
                 <FieldLabel htmlFor="description">
                   Description (Optional)
                 </FieldLabel>
-                <textarea
+                <Textarea
                   {...field}
                   id="description"
-                  className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                   placeholder="What is this team about?"
                 />
                 {fieldState.invalid && (

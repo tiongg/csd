@@ -21,7 +21,7 @@ export const Route = createFileRoute('/_authenticated/teams/$teamId')({
 
 const addMemberSchema = z.object({
   email: z.string().email('Invalid email address'),
-  role: z.enum(['OWNER', 'ADMIN', 'CONTRIBUTOR']),
+  role: z.enum(['OWNER', 'ADMIN', 'MEMBER']),
 });
 
 type AddMemberFormValues = z.infer<typeof addMemberSchema>;
@@ -43,14 +43,6 @@ function TeamDetailPage() {
   );
 
   const { data: allAccounts } = useApiQuery('get', '/api/account/', {});
-
-  const { mutateAsync: updateTeam } = useApiMutation(
-    'put',
-    '/api/teams/{teamId}',
-    {
-      onSuccess: () => refetch(),
-    }
-  );
 
   const { mutateAsync: deleteTeam } = useApiMutation(
     'delete',
@@ -101,7 +93,7 @@ function TeamDetailPage() {
     resolver: zodResolver(addMemberSchema),
     defaultValues: {
       email: '',
-      role: 'CONTRIBUTOR',
+      role: 'MEMBER',
     },
   });
 
@@ -191,7 +183,6 @@ function TeamDetailPage() {
 
   return (
     <div className="container mx-auto p-8 max-w-4xl">
-      {/* Header */}
       <div className="mb-8">
         <div className="flex items-start justify-between">
           <div>
@@ -201,11 +192,7 @@ function TeamDetailPage() {
             </p>
           </div>
           {isOwner && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDeleteTeam}
-            >
+            <Button variant="destructive" size="sm" onClick={handleDeleteTeam}>
               <Trash2 className="mr-2 h-4 w-4" />
               Delete Team
             </Button>
@@ -213,7 +200,6 @@ function TeamDetailPage() {
         </div>
       </div>
 
-      {/* Members Section */}
       <div className="border rounded-lg p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -223,17 +209,13 @@ function TeamDetailPage() {
             </h2>
           </div>
           {canManage && (
-            <Button
-              size="sm"
-              onClick={() => setShowAddMember(!showAddMember)}
-            >
+            <Button size="sm" onClick={() => setShowAddMember(!showAddMember)}>
               <UserPlus className="mr-2 h-4 w-4" />
               Add Member
             </Button>
           )}
         </div>
 
-        {/* Add Member Form */}
         {showAddMember && (
           <form
             onSubmit={handleSubmit(onAddMember)}
@@ -273,7 +255,7 @@ function TeamDetailPage() {
                       id="role"
                       className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                     >
-                      <option value="CONTRIBUTOR">Contributor</option>
+                      <option value="MEMBER">Member</option>
                       <option value="ADMIN">Admin</option>
                       <option value="OWNER">Owner</option>
                     </select>
@@ -310,7 +292,6 @@ function TeamDetailPage() {
           </form>
         )}
 
-        {/* Members List */}
         <div className="space-y-3">
           {team.members?.map((member) => {
             const isTeamOwner = member.accountId === team.ownerId;
@@ -341,7 +322,6 @@ function TeamDetailPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  {/* Role Editor */}
                   {isEditingThis ? (
                     <div className="flex items-center gap-2">
                       <select
@@ -350,7 +330,7 @@ function TeamDetailPage() {
                         className="text-sm px-2 py-1 border rounded"
                         disabled={isAdmin && isTeamOwner}
                       >
-                        <option value="CONTRIBUTOR">CONTRIBUTOR</option>
+                        <option value="MEMBER">MEMBER</option>
                         <option value="ADMIN">ADMIN</option>
                         <option value="OWNER">OWNER</option>
                       </select>

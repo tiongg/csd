@@ -1,7 +1,6 @@
 package csd.t6.backend.team;
 
 import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
-import static csd.t6.jooq.teams.tables.Team.TEAM;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,9 +17,9 @@ import csd.t6.backend.team.dto.TeamMemberResponseDTO;
 import csd.t6.backend.team.dto.TeamResponseDTO;
 import csd.t6.backend.team.dto.TeamUpdateRequest;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
-import csd.t6.jooq.teams.enums.TeamRole;
-import csd.t6.jooq.teams.tables.records.TeamMemberRecord;
-import csd.t6.jooq.teams.tables.records.TeamRecord;
+import csd.t6.jooq.enums.TeamRole;
+import csd.t6.jooq.tables.records.TeamMemberRecord;
+import csd.t6.jooq.tables.records.TeamRecord;
 
 @Service
 public class TeamService {
@@ -35,6 +34,11 @@ public class TeamService {
     this.accountRepository = accountRepository;
   }
 
+  // Helper function for permission checks
+  private boolean isOwnerOrAdmin(TeamMemberRecord member) {
+    return member.getTeamRole() == TeamRole.OWNER || member.getTeamRole() == TeamRole.ADMIN;
+  }
+
   @Transactional
   public TeamResponseDTO createTeam(TeamCreateRequest request, UUID ownerId) {
     TeamRecord teamRecord = teamRepository.create(request.name(), request.description(), ownerId);
@@ -44,7 +48,6 @@ public class TeamService {
     return new TeamResponseDTO(teamRecord, members);
   }
 
-  @Transactional(readOnly = true)
   public TeamResponseDTO getTeamById(UUID teamId) {
     TeamRecord teamRecord = teamRepository.findById(teamId)
         .orElseThrow(() -> new BadRequestException("Team not found"));
@@ -53,12 +56,14 @@ public class TeamService {
     return new TeamResponseDTO(teamRecord, members);
   }
 
-  @Transactional(readOnly = true)
-  public List<TeamResponseDTO> getAllTeams() {
-    return teamRepository.findAll().stream()
-        .map(record -> {
-          List<TeamMemberResponseDTO> members = getTeamMembers(record.getId());
-          return new TeamResponseDTO(record, members);
+  public List<TeamResponseDTO> getUserTeams(UUID userId) {
+    List<TeamMemberRecord> userMemberships = teamMemberRepository.findByAccountId(userId);
+
+    return userMemberships.stream()
+        .map(membership -> {
+          TeamRecord team = teamRepository.findById(membership.getTeamId()).orElseThrow();
+          List<TeamMemberResponseDTO> members = getTeamMembers(team.getId());
+          return new TeamResponseDTO(team, members);
         })
         .collect(Collectors.toList());
   }
@@ -71,7 +76,7 @@ public class TeamService {
     TeamMemberRecord memberRecord = teamMemberRepository.findByTeamAndAccount(teamId, requesterId)
         .orElseThrow(() -> new BadRequestException("You are not a member of this team"));
 
-    if (memberRecord.getTeamRole() != TeamRole.OWNER && memberRecord.getTeamRole() != TeamRole.ADMIN) {
+    if (!isOwnerOrAdmin(memberRecord)) {
       throw new BadRequestException("Only team owner or admin can update team details");
     }
 
@@ -104,7 +109,7 @@ public class TeamService {
     TeamMemberRecord requesterMember = teamMemberRepository.findByTeamAndAccount(teamId, requesterId)
         .orElseThrow(() -> new BadRequestException("You are not a member of this team"));
 
-    if (requesterMember.getTeamRole() != TeamRole.OWNER && requesterMember.getTeamRole() != TeamRole.ADMIN) {
+    if (!isOwnerOrAdmin(requesterMember)) {
       throw new BadRequestException("Only team owner or admin can add members");
     }
 
@@ -115,8 +120,7 @@ public class TeamService {
       throw new BadRequestException("User is already a member of this team");
     }
 
-    TeamMemberRecord memberRecord = teamMemberRepository.addMember(teamId, request.accountId(),
-        TeamRole.valueOf(request.teamRole()));
+    TeamMemberRecord memberRecord = teamMemberRepository.addMember(teamId, request.accountId(), request.teamRole());
 
     return new TeamMemberResponseDTO(memberRecord, accountRecord.getUsername(), accountRecord.getEmail());
   }
@@ -133,7 +137,7 @@ public class TeamService {
     TeamMemberRecord requesterMember = teamMemberRepository.findByTeamAndAccount(teamId, requesterId)
         .orElseThrow(() -> new BadRequestException("You are not a member of this team"));
 
-    if (requesterMember.getTeamRole() != TeamRole.OWNER && requesterMember.getTeamRole() != TeamRole.ADMIN) {
+    if (!isOwnerOrAdmin(requesterMember)) {
       throw new BadRequestException("Only team owner or admin can remove members");
     }
 
@@ -143,7 +147,6 @@ public class TeamService {
     teamMemberRepository.removeMember(teamId, accountId);
   }
 
-  @Transactional(readOnly = true)
   public List<TeamMemberResponseDTO> getTeamMembers(UUID teamId) {
     List<TeamMemberRecord> memberRecords = teamMemberRepository.findByTeamId(teamId);
 
@@ -156,12 +159,10 @@ public class TeamService {
         .collect(Collectors.toList());
   }
 
-  @Transactional(readOnly = true)
   public boolean isTeamMember(UUID teamId, UUID accountId) {
     return teamMemberRepository.findByTeamAndAccount(teamId, accountId).isPresent();
   }
 
-  @Transactional(readOnly = true)
   public TeamRole getTeamMemberRole(UUID teamId, UUID accountId) {
     return teamMemberRepository.findByTeamAndAccount(teamId, accountId)
         .map(TeamMemberRecord::getTeamRole)
@@ -170,20 +171,19 @@ public class TeamService {
 
   @Transactional
   public TeamMemberResponseDTO updateMemberRole(UUID teamId, UUID accountId, TeamRole newRole, UUID requesterId) {
-    TeamRecord team = teamRepository.findById(teamId)
+    teamRepository.findById(teamId)
         .orElseThrow(() -> new BadRequestException("Team not found"));
 
     TeamMemberRecord requesterMember = teamMemberRepository.findByTeamAndAccount(teamId, requesterId)
         .orElseThrow(() -> new BadRequestException("You are not a member of this team"));
 
-    if (requesterMember.getTeamRole() != TeamRole.OWNER && requesterMember.getTeamRole() != TeamRole.ADMIN) {
+    if (!isOwnerOrAdmin(requesterMember)) {
       throw new BadRequestException("Only team owner or admin can update member roles");
     }
 
     TeamMemberRecord targetMember = teamMemberRepository.findByTeamAndAccount(teamId, accountId)
         .orElseThrow(() -> new BadRequestException("User is not a member of this team"));
 
-    // SIMPLIFIED CHECK - Owner role should never be changed
     if (targetMember.getTeamRole() == TeamRole.OWNER) {
       throw new BadRequestException("Cannot change owner's role");
     }

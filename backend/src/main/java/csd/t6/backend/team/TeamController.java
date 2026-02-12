@@ -1,10 +1,8 @@
 package csd.t6.backend.team;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.auth.AuthUserDetails;
@@ -22,12 +19,13 @@ import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
 import csd.t6.backend.decorators.responses.OkResponse;
 import csd.t6.backend.team.dto.AddMemberRequest;
+import csd.t6.backend.team.dto.CheckMembershipResponseDTO;
 import csd.t6.backend.team.dto.TeamCreateRequest;
 import csd.t6.backend.team.dto.TeamMemberResponseDTO;
 import csd.t6.backend.team.dto.TeamResponseDTO;
 import csd.t6.backend.team.dto.TeamUpdateRequest;
 import csd.t6.backend.team.dto.UpdateMemberRoleRequest;
-import csd.t6.jooq.teams.enums.TeamRole;
+import csd.t6.jooq.enums.TeamRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -44,7 +42,7 @@ public class TeamController {
     this.teamService = teamService;
   }
 
-  @PostMapping
+  @PostMapping("/")
   @CreatedResponse
   @BadRequestResponse
   @Operation(summary = "Create a new team", description = "Creates a new team with the authenticated user as owner")
@@ -61,11 +59,11 @@ public class TeamController {
     return teamService.getTeamById(teamId);
   }
 
-  @GetMapping
+  @GetMapping("/")
   @OkResponse
-  @Operation(summary = "Get all teams", description = "Retrieves all teams")
-  public List<TeamResponseDTO> getAllTeams() {
-    return teamService.getAllTeams();
+  @Operation(summary = "Get user's teams", description = "Retrieves all teams the authenticated user is a member of")
+  public List<TeamResponseDTO> getUserTeams(@AuthenticationPrincipal AuthUserDetails userDetails) {
+    return teamService.getUserTeams(userDetails.getId());
   }
 
   @PutMapping("/{teamId}")
@@ -78,7 +76,6 @@ public class TeamController {
   }
 
   @DeleteMapping("/{teamId}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   @NoContentResponse
   @BadRequestResponse
   @Operation(summary = "Delete team", description = "Deletes a team. Only owner can delete.")
@@ -96,7 +93,6 @@ public class TeamController {
   }
 
   @DeleteMapping("/{teamId}/members/{accountId}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   @NoContentResponse
   @BadRequestResponse
   @Operation(summary = "Remove team member", description = "Removes a member from the team. Only owner or admin can remove members. Cannot remove owner.")
@@ -115,22 +111,19 @@ public class TeamController {
 
   @GetMapping("/{teamId}/check-membership")
   @OkResponse
-  @Operation(summary = "Check if user is team member", description = "Returns user's role in team or null if not a member")
-  public Map<String, Object> checkMembership(@PathVariable UUID teamId,
+  @Operation(summary = "Check if user is team member", description = "Returns user's role in team")
+  public CheckMembershipResponseDTO checkMembership(@PathVariable UUID teamId,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
     TeamRole role = teamService.getTeamMemberRole(teamId, userDetails.getId());
-    boolean isMember = role != null;
-    return Map.of(
-        "isMember", isMember,
-        "role", role != null ? role.toString() : "NONE");
+    return new CheckMembershipResponseDTO(role != null, role != null ? role.toString() : "NONE");
   }
 
   @PutMapping("/{teamId}/members/{accountId}/role")
   @OkResponse
   @BadRequestResponse
-  @Operation(summary = "Update member role", description = "Updates a team member's role. Only owner and admin can update roles. Cannot change owner role.")
+  @Operation(summary = "Update member role", description = "Updates a team member's role. Only owner and admin can update roles.")
   public TeamMemberResponseDTO updateMemberRole(@PathVariable UUID teamId, @PathVariable UUID accountId,
       @Valid @RequestBody UpdateMemberRoleRequest request, @AuthenticationPrincipal AuthUserDetails userDetails) {
-    return teamService.updateMemberRole(teamId, accountId, TeamRole.valueOf(request.role()), userDetails.getId());
+    return teamService.updateMemberRole(teamId, accountId, request.role(), userDetails.getId());
   }
 }

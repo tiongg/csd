@@ -1,6 +1,6 @@
 package csd.t6.backend.team;
 
-import static csd.t6.jooq.teams.tables.Team.TEAM;
+import static csd.t6.jooq.tables.Team.TEAM;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +10,7 @@ import org.jooq.DSLContext;
 import org.jooq.TableField;
 import org.springframework.stereotype.Repository;
 
-import csd.t6.jooq.teams.tables.records.TeamRecord;
+import csd.t6.jooq.tables.records.TeamRecord;
 
 @Repository
 public class TeamRepository {

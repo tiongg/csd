@@ -1,6 +1,6 @@
 package csd.t6.backend.course;
 
-import static csd.t6.jooq.courses.tables.Course.COURSE;
+import static csd.t6.jooq.tables.Course.COURSE;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +9,7 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
-import csd.t6.jooq.courses.tables.records.CourseRecord;
+import csd.t6.jooq.tables.records.CourseRecord;
 
 @Repository
 public class CourseRepository {

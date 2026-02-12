@@ -6,12 +6,12 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useApiMutation, useApiQuery } from '@/lib/fetch-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useAuth } from '@/context/AuthContext';
 
 export const Route = createFileRoute('/_authenticated/courses/create')({
   component: CreateCoursePage,
@@ -20,21 +20,15 @@ export const Route = createFileRoute('/_authenticated/courses/create')({
 const courseSchema = z.object({
   title: z.string().min(3, 'Course title must be at least 3 characters'),
   description: z.string().optional(),
-  teamId: z.string().optional(),
+  teamId: z.string().min(1, 'Team is required'),
 });
 
 type CourseFormValues = z.infer<typeof courseSchema>;
 
 function CreateCoursePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
-  const { data: teams } = useApiQuery('get', '/api/teams', {});
-
-  // Filter teams to only show those where user is a member
-  const userTeams = teams?.filter((team) =>
-    team.members?.some((member) => member.accountId === user?.id)
-  );
+  const { data: teams } = useApiQuery('get', '/api/teams/', {});
 
   const {
     handleSubmit,
@@ -50,7 +44,7 @@ function CreateCoursePage() {
     },
   });
 
-  const { mutateAsync: createCourse } = useApiMutation('post', '/api/courses', {
+  const { mutateAsync: createCourse } = useApiMutation('post', '/api/courses/', {
     onSuccess: (data) => {
       navigate({ to: '/courses/$courseId', params: { courseId: data.id } });
     },
@@ -68,7 +62,7 @@ function CreateCoursePage() {
         body: {
           title: data.title,
           description: data.description,
-          teamId: data.teamId || undefined,
+          teamId: data.teamId,
         },
       });
     } catch (error: any) {
@@ -81,7 +75,7 @@ function CreateCoursePage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Create New Course</h1>
         <p className="text-muted-foreground mt-1">
-          Share your knowledge with the community
+          Share your knowledge with your team
         </p>
       </div>
 
@@ -116,10 +110,9 @@ function CreateCoursePage() {
                 <FieldLabel htmlFor="description">
                   Description (Optional)
                 </FieldLabel>
-                <textarea
+                <Textarea
                   {...field}
                   id="description"
-                  className="flex min-h-[100px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                   placeholder="What will students learn in this course?"
                 />
                 {fieldState.invalid && (
@@ -136,22 +129,19 @@ function CreateCoursePage() {
             name="teamId"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="teamId">Team (Optional)</FieldLabel>
+                <FieldLabel htmlFor="teamId">Team</FieldLabel>
                 <select
                   {...field}
                   id="teamId"
                   className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                 >
-                  <option value="">No team (Personal course)</option>
-                  {userTeams?.map((team) => (
+                  <option value="">Select a team</option>
+                  {teams?.map((team) => (
                     <option key={team.id} value={team.id}>
                       {team.name}
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Only teams you are a member of are shown
-                </p>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}

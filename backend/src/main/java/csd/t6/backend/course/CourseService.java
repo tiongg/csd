@@ -12,7 +12,7 @@ import csd.t6.backend.course.dto.CourseResponseDTO;
 import csd.t6.backend.course.dto.CourseUpdateRequest;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.team.TeamService;
-import csd.t6.jooq.courses.tables.records.CourseRecord;
+import csd.t6.jooq.tables.records.CourseRecord;
 
 @Service
 public class CourseService {
@@ -26,27 +26,23 @@ public class CourseService {
 
   @Transactional
   public CourseResponseDTO createCourse(CourseCreateRequest request, UUID creatorId) {
-    if (request.teamId() != null) {
-      if (!teamService.isTeamMember(request.teamId(), creatorId)) {
-        throw new BadRequestException("You must be a member of the team to create a course for it");
-      }
+    if (!teamService.isTeamMember(request.teamId(), creatorId)) {
+      throw new BadRequestException("You must be a member of the team to create a course for it");
     }
 
     CourseRecord course = courseRepository.create(request.title(), request.description(), creatorId, request.teamId());
-    return toDTO(course);
+    return new CourseResponseDTO(course);
   }
 
-  @Transactional(readOnly = true)
   public CourseResponseDTO getCourseById(UUID id) {
     CourseRecord course = courseRepository.findById(id)
         .orElseThrow(() -> new BadRequestException("Course not found"));
-    return toDTO(course);
+    return new CourseResponseDTO(course);
   }
 
-  @Transactional(readOnly = true)
   public List<CourseResponseDTO> getAllCourses() {
     return courseRepository.findAll().stream()
-        .map(this::toDTO)
+        .map(CourseResponseDTO::new)
         .collect(Collectors.toList());
   }
 
@@ -55,11 +51,8 @@ public class CourseService {
     CourseRecord existing = courseRepository.findById(id)
         .orElseThrow(() -> new BadRequestException("Course not found"));
 
-    boolean canEdit = existing.getCreatorId().equals(requesterId);
-
-    if (!canEdit && existing.getTeamId() != null) {
-      canEdit = teamService.isTeamMember(existing.getTeamId(), requesterId);
-    }
+    boolean canEdit = existing.getCreatorId().equals(requesterId)
+        || teamService.isTeamMember(existing.getTeamId(), requesterId);
 
     if (!canEdit) {
       throw new BadRequestException("Only the course creator or team members can update the course");
@@ -73,7 +66,7 @@ public class CourseService {
 
     CourseRecord updated = courseRepository.update(id, request.title(), request.description(), request.teamId(),
         request.isPublished());
-    return toDTO(updated);
+    return new CourseResponseDTO(updated);
   }
 
   @Transactional
@@ -86,17 +79,5 @@ public class CourseService {
     }
 
     courseRepository.delete(id);
-  }
-
-  private CourseResponseDTO toDTO(CourseRecord course) {
-    return new CourseResponseDTO(
-        course.getId(),
-        course.getTitle(),
-        course.getDescription(),
-        course.getCreatorId(),
-        course.getTeamId(),
-        course.getIsPublished(),
-        course.getCreatedAt(),
-        course.getUpdatedAt());
   }
 }

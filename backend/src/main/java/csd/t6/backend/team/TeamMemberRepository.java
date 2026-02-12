@@ -1,6 +1,6 @@
 package csd.t6.backend.team;
 
-import static csd.t6.jooq.teams.tables.TeamMember.TEAM_MEMBER;
+import static csd.t6.jooq.tables.TeamMember.TEAM_MEMBER;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,8 +9,8 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
-import csd.t6.jooq.teams.enums.TeamRole;
-import csd.t6.jooq.teams.tables.records.TeamMemberRecord;
+import csd.t6.jooq.enums.TeamRole;
+import csd.t6.jooq.tables.records.TeamMemberRecord;
 
 @Repository
 public class TeamMemberRepository {
