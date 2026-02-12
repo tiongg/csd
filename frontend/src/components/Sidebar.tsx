@@ -114,6 +114,14 @@ function getRoleUrl(currentActiveRole: Account['role']): LinkOptions['to'] {
     .exhaustive();
 }
 
+function getFAQRole(currentActiveRole: Account['role']): LinkOptions['to'] {
+  return match(currentActiveRole)
+    .with('LEARNER', () => '/learner/faq' as const)
+    .with('ADMIN', () => '/admin/faq' as const)
+    .with('CONTRIBUTOR', () => '/contributor/faq' as const)
+    .exhaustive();
+}
+
 export default function Sidebar() {
   const currentActiveRole = useActiveRole();
   const { user, logout } = useAuth();
@@ -145,7 +153,7 @@ export default function Sidebar() {
 
             <NavItem
               title="Help & Support"
-              link="/"
+              link={getFAQRole(currentActiveRole)}
               icon={<QuestionMarkCircleIcon />}
             />
           </div>

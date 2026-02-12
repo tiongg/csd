@@ -16,13 +16,16 @@ import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as LoginCallbackRouteImport } from './routes/login/callback'
 import { Route as LearnerSettingsRouteImport } from './routes/learner/settings'
 import { Route as LearnerMyCoursesRouteImport } from './routes/learner/my-courses'
+import { Route as LearnerFaqRouteImport } from './routes/learner/faq'
 import { Route as LearnerDashboardRouteImport } from './routes/learner/dashboard'
 import { Route as LearnerChallengesRouteImport } from './routes/learner/challenges'
 import { Route as ContributorTeamsRouteImport } from './routes/contributor/teams'
 import { Route as ContributorSettingsRouteImport } from './routes/contributor/settings'
+import { Route as ContributorFaqRouteImport } from './routes/contributor/faq'
 import { Route as ContributorDashboardRouteImport } from './routes/contributor/dashboard'
 import { Route as AdminUserManagementRouteImport } from './routes/admin/user-management'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminFaqRouteImport } from './routes/admin/faq'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminCourseModerationRouteImport } from './routes/admin/course-moderation'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
@@ -63,6 +66,11 @@ const LearnerMyCoursesRoute = LearnerMyCoursesRouteImport.update({
   path: '/learner/my-courses',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearnerFaqRoute = LearnerFaqRouteImport.update({
+  id: '/learner/faq',
+  path: '/learner/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
   id: '/learner/dashboard',
   path: '/learner/dashboard',
@@ -83,6 +91,11 @@ const ContributorSettingsRoute = ContributorSettingsRouteImport.update({
   path: '/contributor/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContributorFaqRoute = ContributorFaqRouteImport.update({
+  id: '/contributor/faq',
+  path: '/contributor/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContributorDashboardRoute = ContributorDashboardRouteImport.update({
   id: '/contributor/dashboard',
   path: '/contributor/dashboard',
@@ -96,6 +109,11 @@ const AdminUserManagementRoute = AdminUserManagementRouteImport.update({
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/admin/settings',
   path: '/admin/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminFaqRoute = AdminFaqRouteImport.update({
+  id: '/admin/faq',
+  path: '/admin/faq',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -132,13 +150,16 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/course-moderation': typeof AdminCourseModerationRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/faq': typeof AdminFaqRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/user-management': typeof AdminUserManagementRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
+  '/contributor/faq': typeof ContributorFaqRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/contributor/teams': typeof ContributorTeamsRoute
   '/learner/challenges': typeof LearnerChallengesRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
+  '/learner/faq': typeof LearnerFaqRoute
   '/learner/my-courses': typeof LearnerMyCoursesRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -152,13 +173,16 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/course-moderation': typeof AdminCourseModerationRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/faq': typeof AdminFaqRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/user-management': typeof AdminUserManagementRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
+  '/contributor/faq': typeof ContributorFaqRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/contributor/teams': typeof ContributorTeamsRoute
   '/learner/challenges': typeof LearnerChallengesRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
+  '/learner/faq': typeof LearnerFaqRoute
   '/learner/my-courses': typeof LearnerMyCoursesRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -174,13 +198,16 @@ export interface FileRoutesById {
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/admin/course-moderation': typeof AdminCourseModerationRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/faq': typeof AdminFaqRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/user-management': typeof AdminUserManagementRoute
   '/contributor/dashboard': typeof ContributorDashboardRoute
+  '/contributor/faq': typeof ContributorFaqRoute
   '/contributor/settings': typeof ContributorSettingsRoute
   '/contributor/teams': typeof ContributorTeamsRoute
   '/learner/challenges': typeof LearnerChallengesRoute
   '/learner/dashboard': typeof LearnerDashboardRoute
+  '/learner/faq': typeof LearnerFaqRoute
   '/learner/my-courses': typeof LearnerMyCoursesRoute
   '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -196,13 +223,16 @@ export interface FileRouteTypes {
     | '/profile'
     | '/admin/course-moderation'
     | '/admin/dashboard'
+    | '/admin/faq'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
+    | '/contributor/faq'
     | '/contributor/settings'
     | '/contributor/teams'
     | '/learner/challenges'
     | '/learner/dashboard'
+    | '/learner/faq'
     | '/learner/my-courses'
     | '/learner/settings'
     | '/login/callback'
@@ -216,13 +246,16 @@ export interface FileRouteTypes {
     | '/profile'
     | '/admin/course-moderation'
     | '/admin/dashboard'
+    | '/admin/faq'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
+    | '/contributor/faq'
     | '/contributor/settings'
     | '/contributor/teams'
     | '/learner/challenges'
     | '/learner/dashboard'
+    | '/learner/faq'
     | '/learner/my-courses'
     | '/learner/settings'
     | '/login/callback'
@@ -237,13 +270,16 @@ export interface FileRouteTypes {
     | '/_authenticated/profile'
     | '/admin/course-moderation'
     | '/admin/dashboard'
+    | '/admin/faq'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
+    | '/contributor/faq'
     | '/contributor/settings'
     | '/contributor/teams'
     | '/learner/challenges'
     | '/learner/dashboard'
+    | '/learner/faq'
     | '/learner/my-courses'
     | '/learner/settings'
     | '/login/callback'
@@ -258,13 +294,16 @@ export interface RootRouteChildren {
   RegisterRoute: typeof RegisterRoute
   AdminCourseModerationRoute: typeof AdminCourseModerationRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminFaqRoute: typeof AdminFaqRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminUserManagementRoute: typeof AdminUserManagementRoute
   ContributorDashboardRoute: typeof ContributorDashboardRoute
+  ContributorFaqRoute: typeof ContributorFaqRoute
   ContributorSettingsRoute: typeof ContributorSettingsRoute
   ContributorTeamsRoute: typeof ContributorTeamsRoute
   LearnerChallengesRoute: typeof LearnerChallengesRoute
   LearnerDashboardRoute: typeof LearnerDashboardRoute
+  LearnerFaqRoute: typeof LearnerFaqRoute
   LearnerMyCoursesRoute: typeof LearnerMyCoursesRoute
   LearnerSettingsRoute: typeof LearnerSettingsRoute
   LoginCallbackRoute: typeof LoginCallbackRoute
@@ -324,6 +363,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnerMyCoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learner/faq': {
+      id: '/learner/faq'
+      path: '/learner/faq'
+      fullPath: '/learner/faq'
+      preLoaderRoute: typeof LearnerFaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/learner/dashboard': {
       id: '/learner/dashboard'
       path: '/learner/dashboard'
@@ -352,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContributorSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contributor/faq': {
+      id: '/contributor/faq'
+      path: '/contributor/faq'
+      fullPath: '/contributor/faq'
+      preLoaderRoute: typeof ContributorFaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contributor/dashboard': {
       id: '/contributor/dashboard'
       path: '/contributor/dashboard'
@@ -371,6 +424,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/faq': {
+      id: '/admin/faq'
+      path: '/admin/faq'
+      fullPath: '/admin/faq'
+      preLoaderRoute: typeof AdminFaqRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/dashboard': {
@@ -429,13 +489,16 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterRoute: RegisterRoute,
   AdminCourseModerationRoute: AdminCourseModerationRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminFaqRoute: AdminFaqRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminUserManagementRoute: AdminUserManagementRoute,
   ContributorDashboardRoute: ContributorDashboardRoute,
+  ContributorFaqRoute: ContributorFaqRoute,
   ContributorSettingsRoute: ContributorSettingsRoute,
   ContributorTeamsRoute: ContributorTeamsRoute,
   LearnerChallengesRoute: LearnerChallengesRoute,
   LearnerDashboardRoute: LearnerDashboardRoute,
+  LearnerFaqRoute: LearnerFaqRoute,
   LearnerMyCoursesRoute: LearnerMyCoursesRoute,
   LearnerSettingsRoute: LearnerSettingsRoute,
   LoginCallbackRoute: LoginCallbackRoute,
