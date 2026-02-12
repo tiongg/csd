@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useApiQuery } from '@/lib/fetch-client';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Plus, Users, Trash2, Edit } from 'lucide-react';
+import { Plus, Users, Edit } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/teams/')({
   component: TeamsPage,
@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_authenticated/teams/')({
 function TeamsPage() {
   const { user } = useAuth();
   
-  const { data: teams, isLoading } = useApiQuery('get', '/api/teams', {});
+  const { data: teams, isLoading } = useApiQuery('get', '/api/teams/', {});
 
   if (isLoading) {
     return (

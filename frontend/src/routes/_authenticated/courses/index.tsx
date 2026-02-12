@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_authenticated/courses/')({
 function CoursesPage() {
   const { user } = useAuth();
   
-  const { data: courses, isLoading } = useApiQuery('get', '/api/courses', {});
+  const { data: courses, isLoading } = useApiQuery('get', '/api/courses/', {});
 
   if (isLoading) {
     return (

@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useApiMutation, useApiQuery } from '@/lib/fetch-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -27,6 +28,7 @@ type CourseFormValues = z.infer<typeof courseSchema>;
 
 function CreateCoursePage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: teams } = useApiQuery('get', '/api/teams/', {});
 
@@ -45,7 +47,9 @@ function CreateCoursePage() {
   });
 
   const { mutateAsync: createCourse } = useApiMutation('post', '/api/courses/', {
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // Invalidate courses list query to refresh the data
+      await queryClient.invalidateQueries({ queryKey: ['get', '/api/courses/'] });
       navigate({ to: '/courses/$courseId', params: { courseId: data.id } });
     },
     onError: (error: any) => {

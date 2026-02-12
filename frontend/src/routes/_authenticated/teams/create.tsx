@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useApiMutation } from '@/lib/fetch-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -26,6 +27,7 @@ type TeamFormValues = z.infer<typeof teamSchema>;
 
 function CreateTeamPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const {
     handleSubmit,
@@ -41,7 +43,9 @@ function CreateTeamPage() {
   });
 
   const { mutateAsync: createTeam } = useApiMutation('post', '/api/teams/', {
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // Invalidate teams list query to refresh the data
+      await queryClient.invalidateQueries({ queryKey: ['get', '/api/teams/'] });
       navigate({ to: '/teams/$teamId', params: { teamId: data.id } });
     },
   });
