@@ -53,6 +53,7 @@ services:
       -url=jdbc:postgresql://db:5432/postgres
       -user=postgres
       -password=password
+      -outOfOrder=true
       migrate
 
   # To run manual flyway commands

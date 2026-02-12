@@ -110,7 +110,7 @@ public class TeamService {
       throw new BadRequestException("Only team owner or admin can add members");
     }
 
-    AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, request.accountId())
+    AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, request.accountId())
         .orElseThrow(() -> new BadRequestException("Account not found"));
 
     if (teamMemberRepository.findByTeamAndAccount(teamId, request.accountId()).isPresent()) {
@@ -148,7 +148,7 @@ public class TeamService {
     List<TeamMemberRecord> memberRecords = teamMemberRepository.findByTeamId(teamId);
 
     return memberRecords.stream().map(record -> {
-      AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, record.getAccountId())
+      AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, record.getAccountId())
           .orElseThrow(() -> new BadRequestException("Account not found"));
       return new TeamMemberResponseDTO(record, accountRecord.getUsername(), accountRecord.getEmail());
     }).collect(Collectors.toList());
@@ -183,7 +183,7 @@ public class TeamService {
     teamMemberRepository.updateRole(teamId, accountId, newRole);
 
     TeamMemberRecord updatedMember = teamMemberRepository.findByTeamAndAccount(teamId, accountId).orElseThrow();
-    AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, accountId).orElseThrow();
+    AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, accountId).orElseThrow();
 
     return new TeamMemberResponseDTO(updatedMember, accountRecord.getUsername(), accountRecord.getEmail());
   }
