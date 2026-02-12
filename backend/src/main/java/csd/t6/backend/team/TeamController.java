@@ -1,6 +1,7 @@
 package csd.t6.backend.team;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
@@ -111,4 +112,31 @@ public class TeamController {
   public List<TeamMemberResponseDTO> getTeamMembers(@PathVariable UUID teamId) {
     return teamService.getTeamMembers(teamId);
   }
+
+  @GetMapping("/{teamId}/check-membership")
+  @OkResponse
+  @Operation(summary = "Check if user is team member", description = "Returns user's role in team or null if not a member")
+  public Map<String, Object> checkMembership(
+      @PathVariable UUID teamId,
+      @AuthenticationPrincipal AuthUserDetails userDetails) {
+    String role = teamService.getTeamMemberRole(teamId, userDetails.getId());
+    boolean isMember = role != null;
+    return Map.of(
+        "isMember", isMember,
+        "role", role != null ? role : "NONE"
+    );
+  }
+
+  @PutMapping("/{teamId}/members/{accountId}/role")
+  @OkResponse
+  @BadRequestResponse
+  @Operation(summary = "Update member role", description = "Updates a team member's role. Only owner and admin can update roles. Admin cannot update owner.")
+  public TeamMemberResponseDTO updateMemberRole(
+      @PathVariable UUID teamId,
+      @PathVariable UUID accountId,
+      @RequestBody Map<String, String> payload,
+      @AuthenticationPrincipal AuthUserDetails userDetails) {
+    return teamService.updateMemberRole(teamId, accountId, payload.get("role"), userDetails.getId());
+  }
+
 }

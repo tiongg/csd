@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useApiMutation, useApiQuery } from '@/lib/fetch-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Users } from 'lucide-react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -42,6 +42,11 @@ function CourseDetailPage() {
   );
 
   const { data: teams } = useApiQuery('get', '/api/teams', {});
+
+  // Filter teams to only show those where user is a member
+  const userTeams = teams?.filter((team) =>
+    team.members?.some((member) => member.accountId === user?.id)
+  );
 
   const {
     handleSubmit,
@@ -76,6 +81,12 @@ function CourseDetailPage() {
     '/api/courses/{id}',
     {
       onSuccess: () => refetch(),
+      onError: (error: any) => {
+        setError('root', {
+          type: 'custom',
+          message: error?.message || 'Failed to update course',
+        });
+      },
     }
   );
 
@@ -99,10 +110,7 @@ function CourseDetailPage() {
         },
       });
     } catch (error) {
-      setError('root', {
-        type: 'custom',
-        message: 'Failed to update course',
-      });
+      // Error handled by onError callback
     }
   }
 
@@ -129,6 +137,13 @@ function CourseDetailPage() {
   }
 
   const isCreator = course.creatorId === user?.id;
+  
+  // Check if user is a team member (can edit)
+  const courseTeam = teams?.find((team) => team.id === course.teamId);
+  const isTeamMember = courseTeam?.members?.some(
+    (member) => member.accountId === user?.id
+  );
+  const canEdit = isCreator || isTeamMember;
 
   return (
     <div className="container mx-auto p-8 max-w-2xl">
@@ -137,8 +152,14 @@ function CourseDetailPage() {
         <div>
           <h1 className="text-3xl font-bold">{course.title}</h1>
           <p className="text-muted-foreground mt-1">
-            {isCreator ? 'Edit your course' : 'View course details'}
+            {canEdit ? 'Edit your course' : 'View course details'}
           </p>
+          {course.teamId && courseTeam && (
+            <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
+              <Users className="h-4 w-4" />
+              <span>Team: {courseTeam.name}</span>
+            </div>
+          )}
         </div>
         {isCreator && (
           <Button variant="destructive" size="sm" onClick={handleDeleteCourse}>
@@ -148,8 +169,8 @@ function CourseDetailPage() {
         )}
       </div>
 
-      {/* Edit Form (only for creator) */}
-      {isCreator ? (
+      {/* Edit Form (only for creator or team members) */}
+      {canEdit ? (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <FieldGroup>
             <Controller
@@ -206,12 +227,15 @@ function CourseDetailPage() {
                     className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                   >
                     <option value="">No team (Personal course)</option>
-                    {teams?.map((team) => (
+                    {userTeams?.map((team) => (
                       <option key={team.id} value={team.id}>
                         {team.name}
                       </option>
                     ))}
                   </select>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    You can only assign teams you are a member of
+                  </p>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
@@ -244,7 +268,7 @@ function CourseDetailPage() {
           </FieldGroup>
 
           {errors.root && (
-            <div className="text-destructive text-sm">
+            <div className="p-3 bg-destructive/10 border border-destructive rounded text-destructive text-sm">
               {errors.root.message}
             </div>
           )}
@@ -263,7 +287,7 @@ function CourseDetailPage() {
           </div>
         </form>
       ) : (
-        // Read-only view for non-creators
+        // Read-only view for non-members
         <div className="space-y-6">
           <div>
             <h3 className="font-semibold mb-2">Description</h3>
@@ -282,6 +306,11 @@ function CourseDetailPage() {
             >
               {course.isPublished ? 'Published' : 'Draft'}
             </span>
+          </div>
+          <div className="p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              You don't have permission to edit this course. Only the creator or team members can edit.
+            </p>
           </div>
           <Button onClick={() => navigate({ to: '/courses' })}>
             Back to Courses

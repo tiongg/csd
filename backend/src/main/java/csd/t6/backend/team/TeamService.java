@@ -169,4 +169,77 @@ public class TeamService {
         })
         .collect(Collectors.toList());
   }
+  
+  /**
+   * Check if a user is a member of a team
+   */
+  @Transactional(readOnly = true)
+  public boolean isTeamMember(UUID teamId, UUID accountId) {
+    return teamMemberRepository.findByTeamAndAccount(teamId, accountId).isPresent();
+  }
+
+  /**
+   * Get the role of a user in a team
+   */
+  @Transactional(readOnly = true)
+  public String getTeamMemberRole(UUID teamId, UUID accountId) {
+    return teamMemberRepository.findByTeamAndAccount(teamId, accountId)
+        .map(TeamMember::getTeamRole)
+        .orElse(null);
+  }
+
+  /**
+   * Check if user can edit team member roles
+   */
+  @Transactional(readOnly = true)
+  public boolean canEditTeamMemberRoles(UUID teamId, UUID accountId) {
+    TeamMember member = teamMemberRepository.findByTeamAndAccount(teamId, accountId).orElse(null);
+    if (member == null) return false;
+    return "OWNER".equals(member.getTeamRole()) || "ADMIN".equals(member.getTeamRole());
+  }
+
+  @Transactional
+  public TeamMemberResponseDTO updateMemberRole(UUID teamId, UUID accountId, String newRole, UUID requesterId) {
+    // Verify team exists
+    Team team = teamRepository.findById(teamId)
+        .orElseThrow(() -> new BadRequestException("Team not found"));
+
+    // Check requester permissions
+    TeamMember requesterMember = teamMemberRepository.findByTeamAndAccount(teamId, requesterId)
+        .orElseThrow(() -> new BadRequestException("You are not a member of this team"));
+
+    // Only OWNER and ADMIN can update roles
+    if (!"OWNER".equals(requesterMember.getTeamRole()) && !"ADMIN".equals(requesterMember.getTeamRole())) {
+      throw new BadRequestException("Only team owner or admin can update member roles");
+    }
+
+    // Get target member
+    TeamMember targetMember = teamMemberRepository.findByTeamAndAccount(teamId, accountId)
+        .orElseThrow(() -> new BadRequestException("User is not a member of this team"));
+
+    // Admin cannot update owner
+    if ("ADMIN".equals(requesterMember.getTeamRole()) && "OWNER".equals(targetMember.getTeamRole())) {
+      throw new BadRequestException("Admin cannot update owner's role");
+    }
+
+    // Cannot change owner role if they are the actual owner
+    if (team.getOwnerId().equals(accountId) && !"OWNER".equals(newRole)) {
+      throw new BadRequestException("Cannot change team owner's role");
+    }
+
+    // Validate new role
+    if (!newRole.matches("OWNER|ADMIN|CONTRIBUTOR")) {
+      throw new BadRequestException("Invalid role. Must be OWNER, ADMIN, or CONTRIBUTOR");
+    }
+
+    // Update role
+    teamMemberRepository.updateRole(teamId, accountId, newRole);
+
+    // Fetch updated member and account info
+    TeamMember updatedMember = teamMemberRepository.findByTeamAndAccount(teamId, accountId).orElseThrow();
+    AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, accountId).orElseThrow();
+
+    return new TeamMemberResponseDTO(updatedMember, accountRecord.getUsername(), accountRecord.getEmail());
+  }
+
 }

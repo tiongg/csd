@@ -100,6 +100,26 @@ export interface paths {
         patch: operations["updateAccount"];
         trace?: never;
     };
+    "/api/teams/{teamId}/check-membership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Check if user is team member
+         * @description Returns user's role in team or null if not a member
+         */
+        get: operations["checkMembership"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -510,6 +530,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    checkMembership: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": {
+                        [key: string]: Record<string, never>;
+                    };
                 };
             };
         };

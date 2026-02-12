@@ -11,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { useAuth } from '@/context/AuthContext';
 
 export const Route = createFileRoute('/_authenticated/courses/create')({
   component: CreateCoursePage,
@@ -26,8 +27,14 @@ type CourseFormValues = z.infer<typeof courseSchema>;
 
 function CreateCoursePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const { data: teams } = useApiQuery('get', '/api/teams', {});
+
+  // Filter teams to only show those where user is a member
+  const userTeams = teams?.filter((team) =>
+    team.members?.some((member) => member.accountId === user?.id)
+  );
 
   const {
     handleSubmit,
@@ -47,6 +54,12 @@ function CreateCoursePage() {
     onSuccess: (data) => {
       navigate({ to: '/courses/$courseId', params: { courseId: data.id } });
     },
+    onError: (error: any) => {
+      setError('root', {
+        type: 'custom',
+        message: error?.message || 'Failed to create course',
+      });
+    },
   });
 
   async function onSubmit(data: CourseFormValues) {
@@ -58,11 +71,8 @@ function CreateCoursePage() {
           teamId: data.teamId || undefined,
         },
       });
-    } catch (error) {
-      setError('root', {
-        type: 'custom',
-        message: 'Failed to create course',
-      });
+    } catch (error: any) {
+      // Error handled by onError callback
     }
   }
 
@@ -126,21 +136,22 @@ function CreateCoursePage() {
             name="teamId"
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="teamId">
-                  Team (Optional)
-                </FieldLabel>
+                <FieldLabel htmlFor="teamId">Team (Optional)</FieldLabel>
                 <select
                   {...field}
                   id="teamId"
                   className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
                 >
                   <option value="">No team (Personal course)</option>
-                  {teams?.map((team) => (
+                  {userTeams?.map((team) => (
                     <option key={team.id} value={team.id}>
                       {team.name}
                     </option>
                   ))}
                 </select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Only teams you are a member of are shown
+                </p>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -150,7 +161,9 @@ function CreateCoursePage() {
         </FieldGroup>
 
         {errors.root && (
-          <div className="text-destructive text-sm">{errors.root.message}</div>
+          <div className="p-3 bg-destructive/10 border border-destructive rounded text-destructive text-sm">
+            {errors.root.message}
+          </div>
         )}
 
         <div className="flex gap-4">

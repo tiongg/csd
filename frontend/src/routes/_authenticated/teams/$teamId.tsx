@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useApiMutation, useApiQuery } from '@/lib/fetch-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { Crown, Mail, Trash2, UserPlus, Users } from 'lucide-react';
+import { Crown, Mail, Trash2, UserPlus, Users, Edit2, Check, X } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -31,6 +31,8 @@ function TeamDetailPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [showAddMember, setShowAddMember] = useState(false);
+  const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
+  const [editingRole, setEditingRole] = useState<string>('');
 
   const { data: team, isLoading, refetch } = useApiQuery(
     'get',
@@ -75,6 +77,17 @@ function TeamDetailPage() {
     '/api/teams/{teamId}/members/{accountId}',
     {
       onSuccess: () => refetch(),
+    }
+  );
+
+  const { mutateAsync: updateMemberRole } = useApiMutation(
+    'put',
+    '/api/teams/{teamId}/members/{accountId}/role',
+    {
+      onSuccess: () => {
+        refetch();
+        setEditingMemberId(null);
+      },
     }
   );
 
@@ -132,6 +145,28 @@ function TeamDetailPage() {
     }
   }
 
+  function startEditingRole(memberId: string, currentRole: string) {
+    setEditingMemberId(memberId);
+    setEditingRole(currentRole);
+  }
+
+  async function saveRoleEdit(accountId: string) {
+    try {
+      await updateMemberRole({
+        params: { path: { teamId, accountId } },
+        body: { role: editingRole },
+      });
+    } catch (error: any) {
+      alert(error?.message || 'Failed to update role');
+      setEditingMemberId(null);
+    }
+  }
+
+  function cancelRoleEdit() {
+    setEditingMemberId(null);
+    setEditingRole('');
+  }
+
   if (isLoading) {
     return (
       <div className="container mx-auto p-8">
@@ -148,9 +183,11 @@ function TeamDetailPage() {
     );
   }
 
+  const currentUserMember = team.members?.find((m) => m.accountId === user?.id);
   const isOwner = team.ownerId === user?.id;
-  const isAdmin = team.members?.find((m) => m.accountId === user?.id)?.teamRole === 'ADMIN';
+  const isAdmin = currentUserMember?.teamRole === 'ADMIN';
   const canManage = isOwner || isAdmin;
+  const canEditRoles = canManage;
 
   return (
     <div className="container mx-auto p-8 max-w-4xl">
@@ -275,44 +312,94 @@ function TeamDetailPage() {
 
         {/* Members List */}
         <div className="space-y-3">
-          {team.members?.map((member) => (
-            <div
-              key={member.id}
-              className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
-            >
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-violet-400 flex items-center justify-center text-white font-semibold">
-                  {member.username.at(0)?.toUpperCase()}
+          {team.members?.map((member) => {
+            const isTeamOwner = member.accountId === team.ownerId;
+            const canEditThisMember = canEditRoles && (!isTeamOwner || isOwner);
+            const canRemoveThisMember = canManage && !isTeamOwner;
+            const isEditingThis = editingMemberId === member.id;
+
+            return (
+              <div
+                key={member.id}
+                className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-violet-400 flex items-center justify-center text-white font-semibold">
+                    {member.username.at(0)?.toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{member.username}</span>
+                      {isTeamOwner && (
+                        <Crown className="h-4 w-4 text-yellow-500" />
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Mail className="h-3 w-3" />
+                      <span>{member.email}</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{member.username}</span>
-                    {member.accountId === team.ownerId && (
-                      <Crown className="h-4 w-4 text-yellow-500" />
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Mail className="h-3 w-3" />
-                    <span>{member.email}</span>
-                  </div>
+                <div className="flex items-center gap-3">
+                  {/* Role Editor */}
+                  {isEditingThis ? (
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={editingRole}
+                        onChange={(e) => setEditingRole(e.target.value)}
+                        className="text-sm px-2 py-1 border rounded"
+                        disabled={isAdmin && isTeamOwner}
+                      >
+                        <option value="CONTRIBUTOR">CONTRIBUTOR</option>
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="OWNER">OWNER</option>
+                      </select>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => saveRoleEdit(member.accountId)}
+                      >
+                        <Check className="h-4 w-4 text-green-600" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={cancelRoleEdit}
+                      >
+                        <X className="h-4 w-4 text-red-600" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="text-sm px-2 py-1 bg-muted rounded">
+                        {member.teamRole}
+                      </span>
+                      {canEditThisMember && (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() =>
+                            startEditingRole(member.id, member.teamRole)
+                          }
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </>
+                  )}
+                  {canRemoveThisMember && !isEditingThis && (
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => handleRemoveMember(member.accountId)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-sm px-2 py-1 bg-muted rounded">
-                  {member.teamRole}
-                </span>
-                {canManage && member.accountId !== team.ownerId && (
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => handleRemoveMember(member.accountId)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
