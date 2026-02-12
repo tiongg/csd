@@ -26,6 +26,8 @@ import csd.t6.backend.team.dto.TeamCreateRequest;
 import csd.t6.backend.team.dto.TeamMemberResponseDTO;
 import csd.t6.backend.team.dto.TeamResponseDTO;
 import csd.t6.backend.team.dto.TeamUpdateRequest;
+import csd.t6.backend.team.dto.UpdateMemberRoleRequest;
+import csd.t6.jooq.teams.enums.TeamRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,7 +45,6 @@ public class TeamController {
   }
 
   @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
   @CreatedResponse
   @BadRequestResponse
   @Operation(summary = "Create a new team", description = "Creates a new team with the authenticated user as owner")
@@ -86,7 +87,6 @@ public class TeamController {
   }
 
   @PostMapping("/{teamId}/members")
-  @ResponseStatus(HttpStatus.CREATED)
   @CreatedResponse
   @BadRequestResponse
   @Operation(summary = "Add team member", description = "Adds a new member to the team. Only owner or admin can add members.")
@@ -116,27 +116,21 @@ public class TeamController {
   @GetMapping("/{teamId}/check-membership")
   @OkResponse
   @Operation(summary = "Check if user is team member", description = "Returns user's role in team or null if not a member")
-  public Map<String, Object> checkMembership(
-      @PathVariable UUID teamId,
+  public Map<String, Object> checkMembership(@PathVariable UUID teamId,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
-    String role = teamService.getTeamMemberRole(teamId, userDetails.getId());
+    TeamRole role = teamService.getTeamMemberRole(teamId, userDetails.getId());
     boolean isMember = role != null;
     return Map.of(
         "isMember", isMember,
-        "role", role != null ? role : "NONE"
-    );
+        "role", role != null ? role.toString() : "NONE");
   }
 
   @PutMapping("/{teamId}/members/{accountId}/role")
   @OkResponse
   @BadRequestResponse
-  @Operation(summary = "Update member role", description = "Updates a team member's role. Only owner and admin can update roles. Admin cannot update owner.")
-  public TeamMemberResponseDTO updateMemberRole(
-      @PathVariable UUID teamId,
-      @PathVariable UUID accountId,
-      @RequestBody Map<String, String> payload,
-      @AuthenticationPrincipal AuthUserDetails userDetails) {
-    return teamService.updateMemberRole(teamId, accountId, payload.get("role"), userDetails.getId());
+  @Operation(summary = "Update member role", description = "Updates a team member's role. Only owner and admin can update roles. Cannot change owner role.")
+  public TeamMemberResponseDTO updateMemberRole(@PathVariable UUID teamId, @PathVariable UUID accountId,
+      @Valid @RequestBody UpdateMemberRoleRequest request, @AuthenticationPrincipal AuthUserDetails userDetails) {
+    return teamService.updateMemberRole(teamId, accountId, TeamRole.valueOf(request.role()), userDetails.getId());
   }
-
 }

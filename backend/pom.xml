@@ -144,17 +144,23 @@
 					</jdbc>
 
 					<generator>
-						<database>
-							<name>org.jooq.meta.postgres.PostgresDatabase</name>
-							<schemata>
-								<schema>
-									<inputSchema>public</inputSchema>
-								</schema>
-								<schema>
-									<inputSchema>accounts</inputSchema>
-								</schema>
-							</schemata>
-						</database>
+					<database>
+						<name>org.jooq.meta.postgres.PostgresDatabase</name>
+						<schemata>
+							<schema>
+								<inputSchema>public</inputSchema>
+							</schema>
+							<schema>
+								<inputSchema>accounts</inputSchema>
+							</schema>
+							<schema>
+								<inputSchema>teams</inputSchema>
+							</schema>
+							<schema>
+								<inputSchema>courses</inputSchema>
+							</schema>
+						</schemata>
+					</database>
 						<generate>
 							<pojos>true</pojos>
 							<daos>true</daos>

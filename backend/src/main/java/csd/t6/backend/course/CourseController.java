@@ -3,7 +3,6 @@ package csd.t6.backend.course;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.auth.AuthUserDetails;
@@ -40,7 +38,6 @@ public class CourseController {
   }
 
   @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
   @CreatedResponse
   @BadRequestResponse
   @Operation(summary = "Create a new course", description = "Creates a new course with the authenticated user as creator")
@@ -74,7 +71,6 @@ public class CourseController {
   }
 
   @DeleteMapping("/{id}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
   @NoContentResponse
   @BadRequestResponse
   @Operation(summary = "Delete course", description = "Deletes a course. Only creator can delete.")

@@ -231,6 +231,9 @@ export interface components {
             /** Format: date-time */
             joinedAt: string;
         };
+        UpdateMemberRoleRequest: {
+            role: string;
+        };
         CourseUpdateRequest: {
             title?: string;
             description?: string;

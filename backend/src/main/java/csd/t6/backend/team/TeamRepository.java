@@ -1,69 +1,69 @@
 package csd.t6.backend.team;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import static csd.t6.jooq.teams.tables.Team.TEAM;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
+import org.jooq.DSLContext;
+import org.jooq.TableField;
 import org.springframework.stereotype.Repository;
+
+import csd.t6.jooq.teams.tables.records.TeamRecord;
 
 @Repository
 public class TeamRepository {
-  private final JdbcTemplate jdbcTemplate;
+  private final DSLContext dsl;
 
-  public TeamRepository(JdbcTemplate jdbcTemplate) {
-    this.jdbcTemplate = jdbcTemplate;
+  public TeamRepository(DSLContext dsl) {
+    this.dsl = dsl;
   }
 
-  private static final RowMapper<Team> TEAM_ROW_MAPPER = (rs, rowNum) -> {
-    Team team = new Team();
-    team.setId(UUID.fromString(rs.getString("id")));
-    team.setName(rs.getString("name"));
-    team.setDescription(rs.getString("description"));
-    team.setOwnerId(UUID.fromString(rs.getString("owner_id")));
-    team.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime().atOffset(java.time.ZoneOffset.UTC));
-    team.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime().atOffset(java.time.ZoneOffset.UTC));
-    return team;
-  };
-
-  public Team create(String name, String description, UUID ownerId) {
-    UUID id = UUID.randomUUID();
-    jdbcTemplate.update(
-        "INSERT INTO teams.team (id, name, description, owner_id) VALUES (?, ?, ?, ?)",
-        id, name, description, ownerId);
-    return findById(id).orElseThrow();
+  public TeamRecord create(String name, String description, UUID ownerId) {
+    return dsl.insertInto(TEAM)
+        .set(TEAM.NAME, name)
+        .set(TEAM.DESCRIPTION, description)
+        .set(TEAM.OWNER_ID, ownerId)
+        .returning()
+        .fetchOne();
   }
 
-  public Optional<Team> findById(UUID id) {
-    List<Team> results = jdbcTemplate.query(
-        "SELECT * FROM teams.team WHERE id = ?",
-        TEAM_ROW_MAPPER,
-        id);
-    return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+  public Optional<TeamRecord> findById(UUID teamId) {
+    return dsl.selectFrom(TEAM)
+        .where(TEAM.ID.eq(teamId))
+        .fetchOptional();
   }
 
-  public List<Team> findAll() {
-    return jdbcTemplate.query("SELECT * FROM teams.team", TEAM_ROW_MAPPER);
+  public <T> Optional<TeamRecord> findBy(TableField<TeamRecord, T> field, T value) {
+    return dsl.selectFrom(TEAM)
+        .where(field.eq(value))
+        .fetchOptional();
   }
 
-  public List<Team> findByOwnerId(UUID ownerId) {
-    return jdbcTemplate.query(
-        "SELECT * FROM teams.team WHERE owner_id = ?",
-        TEAM_ROW_MAPPER,
-        ownerId);
+  public List<TeamRecord> findAll() {
+    return dsl.selectFrom(TEAM)
+        .fetch();
   }
 
-  public Team update(UUID id, String name, String description) {
-    jdbcTemplate.update(
-        "UPDATE teams.team SET name = ?, description = ? WHERE id = ?",
-        name, description, id);
-    return findById(id).orElseThrow();
+  public List<TeamRecord> findByOwnerId(UUID ownerId) {
+    return dsl.selectFrom(TEAM)
+        .where(TEAM.OWNER_ID.eq(ownerId))
+        .fetch();
   }
 
-  public void delete(UUID id) {
-    jdbcTemplate.update("DELETE FROM teams.team WHERE id = ?", id);
+  public TeamRecord update(UUID teamId, String name, String description) {
+    return dsl.update(TEAM)
+        .set(TEAM.NAME, name)
+        .set(TEAM.DESCRIPTION, description)
+        .where(TEAM.ID.eq(teamId))
+        .returning()
+        .fetchOne();
+  }
+
+  public void delete(UUID teamId) {
+    dsl.deleteFrom(TEAM)
+        .where(TEAM.ID.eq(teamId))
+        .execute();
   }
 }

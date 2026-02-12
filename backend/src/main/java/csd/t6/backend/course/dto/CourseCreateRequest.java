@@ -8,9 +8,8 @@ import jakarta.validation.constraints.Size;
 
 @Schema(name = "CourseCreateRequest")
 public record CourseCreateRequest(
-    @NotNull @Size(min = 3, max = 200, message = "Title must be between 3 and 200 characters") String title,
+                @NotNull @Size(min = 3, max = 200, message = "Title must be between 3 and 200 characters") String title,
 
-    @Size(max = 1000, message = "Description must not exceed 1000 characters") String description,
+                @Size(max = 1000, message = "Description must not exceed 1000 characters") String description,
 
-    UUID teamId) {
-}
+                UUID teamId) {}

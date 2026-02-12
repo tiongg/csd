@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import csd.t6.backend.team.Team;
+import csd.t6.jooq.teams.tables.records.TeamRecord;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -18,7 +18,7 @@ public record TeamResponseDTO(
     @NotNull OffsetDateTime updatedAt,
     List<TeamMemberResponseDTO> members) {
 
-  public TeamResponseDTO(Team team, List<TeamMemberResponseDTO> members) {
+  public TeamResponseDTO(TeamRecord team, List<TeamMemberResponseDTO> members) {
     this(team.getId(), team.getName(), team.getDescription(), team.getOwnerId(), team.getCreatedAt(),
         team.getUpdatedAt(), members);
   }

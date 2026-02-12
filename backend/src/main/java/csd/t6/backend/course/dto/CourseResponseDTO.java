@@ -12,7 +12,7 @@ public record CourseResponseDTO(
     @NotNull String title,
     String description,
     @NotNull UUID creatorId,
-    UUID teamId,
+    UUID teamId, // This CAN be null
     @NotNull Boolean isPublished,
     @NotNull OffsetDateTime createdAt,
     @NotNull OffsetDateTime updatedAt) {
