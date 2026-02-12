@@ -132,6 +132,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/teams/{teamId}/members/{accountId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove team member
+         * @description Removes a member from the team. Only owner or admin can remove members. Cannot remove owner.
+         */
+        delete: operations["removeMember"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/account/{accountId}": {
         parameters: {
             query?: never;
@@ -152,6 +172,10 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        TeamUpdateRequest: {
+            name?: string;
+            description?: string;
+        };
         HttpErrorPayload: {
             /** Format: int64 */
             timestamp: number;
@@ -160,6 +184,69 @@ export interface components {
             error: string;
             message: string;
             path: string;
+        };
+        Team: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            description?: string;
+            /** Format: uuid */
+            ownerId: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            members?: components["schemas"]["TeamMember"][];
+        };
+        TeamMember: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            teamId: string;
+            /** Format: uuid */
+            accountId: string;
+            username: string;
+            email: string;
+            teamRole: string;
+            /** Format: date-time */
+            joinedAt: string;
+        };
+        CourseUpdateRequest: {
+            title?: string;
+            description?: string;
+            /** Format: uuid */
+            teamId?: string;
+            isPublished?: boolean;
+        };
+        Course: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            description?: string;
+            /** Format: uuid */
+            creatorId: string;
+            /** Format: uuid */
+            teamId?: string;
+            isPublished: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TeamCreateRequest: {
+            name: string;
+            description?: string;
+        };
+        AddMemberRequest: {
+            /** Format: uuid */
+            accountId: string;
+            teamRole: string;
+        };
+        CourseCreateRequest: {
+            title: string;
+            description?: string;
+            /** Format: uuid */
+            teamId?: string;
         };
         Account: {
             /** Format: uuid */
@@ -472,6 +559,36 @@ export interface operations {
                 };
                 content: {
                     "*/*": string;
+                };
+            };
+        };
+    };
+    removeMember: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+                accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
                 };
             };
         };
