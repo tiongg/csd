@@ -1,15 +1,15 @@
-import { Link, useLocation } from '@tanstack/react-router';
-import { useState } from 'react';
-import { Button } from './ui/button';
-import { useAuth } from '@/context/AuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { capitalizeFirst } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 import useActiveRole from '@/hooks/useActiveRole';
+import { capitalizeFirst } from '@/lib/utils';
+import { Link } from '@tanstack/react-router';
+import { useState } from 'react';
+import { Button } from './ui/button';
 
 export default function Navbar() {
   const { user } = useAuth();
