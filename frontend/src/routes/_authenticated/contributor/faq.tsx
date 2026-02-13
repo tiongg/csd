@@ -4,38 +4,36 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/admin/faq')({
+export const Route = createFileRoute('/_authenticated/contributor/faq')({
   component: RouteComponent,
 });
 
 const items = [
   {
-    value: 'addAdmin',
-    trigger: 'How do i add an admin?',
+    value: 'scope',
+    trigger: 'What is a Contributor allowed to do?',
     content:
-      'Go to User Management -> All Users. Search for the user and assign them with the admin role by tapping on the pencil icon',
+      'Contributors typically create and edit content (lessons, quizzes, resources), but may need Admin approval to publish courses',
   },
   {
-    value: 'deleteAdmin',
-    trigger: 'How do I deactivate or remove an admin?',
+    value: 'drafts',
+    trigger: 'How do drafts and publishing work?',
     content:
-      'Go to User Management -> All Admins. Search for the admin and remove the admin by tapping on the "X" icon',
+      'Work in Draft, submit for Review, then it becomes Published once approved. Published content is what learners see.',
   },
   {
-    value: 'content',
-    trigger: 'How do I approve content?',
-    content:
-      'Go to Course Management, you will be able to see all the courses that contributors wish to publish. Review the course content and select the appropriate actions.',
+    value: 'team',
+    trigger: 'Can i work on the course with my teammates?',
+    content: 'Yes you can. In fact, we support real time collaboration!',
   },
   {
-    value: 'roles',
-    trigger: 'How do I switch between my roles?',
+    value: 'data',
+    trigger: 'How do I see how my content is performing?',
     content:
-      'At the top of your screen, you should see a drop down to switch between your roles. If you wish to be take up some courses, feel free to do so!',
+      'Go to Dashboard to get a quick overview of the courses that were created and the general popularity of your courses.',
   },
 ];
 

@@ -14,23 +14,24 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as LoginCallbackRouteImport } from './routes/login/callback'
-import { Route as LearnerSettingsRouteImport } from './routes/learner/settings'
-import { Route as LearnerMyCoursesRouteImport } from './routes/learner/my-courses'
-import { Route as LearnerFaqRouteImport } from './routes/learner/faq'
-import { Route as LearnerDashboardRouteImport } from './routes/learner/dashboard'
-import { Route as LearnerChallengesRouteImport } from './routes/learner/challenges'
-import { Route as ContributorTeamsRouteImport } from './routes/contributor/teams'
-import { Route as ContributorSettingsRouteImport } from './routes/contributor/settings'
-import { Route as ContributorFaqRouteImport } from './routes/contributor/faq'
-import { Route as ContributorDashboardRouteImport } from './routes/contributor/dashboard'
-import { Route as AdminUserManagementRouteImport } from './routes/admin/user-management'
-import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
-import { Route as AdminFaqRouteImport } from './routes/admin/faq'
-import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
-import { Route as AdminCourseModerationRouteImport } from './routes/admin/course-moderation'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as ContributorEditorCourseIdRouteImport } from './routes/contributor/editor/$courseId'
 import { Route as ContributorTeamIdCoursesRouteImport } from './routes/contributor/$teamId/courses'
+import { Route as AuthenticatedLearnerSettingsRouteImport } from './routes/_authenticated/learner/settings'
+import { Route as AuthenticatedLearnerMyCoursesRouteImport } from './routes/_authenticated/learner/my-courses'
+import { Route as AuthenticatedLearnerFaqRouteImport } from './routes/_authenticated/learner/faq'
+import { Route as AuthenticatedLearnerDashboardRouteImport } from './routes/_authenticated/learner/dashboard'
+import { Route as AuthenticatedLearnerChallengesRouteImport } from './routes/_authenticated/learner/challenges'
+import { Route as AuthenticatedContributorTeamsRouteImport } from './routes/_authenticated/contributor/teams'
+import { Route as AuthenticatedContributorSettingsRouteImport } from './routes/_authenticated/contributor/settings'
+import { Route as AuthenticatedContributorFaqRouteImport } from './routes/_authenticated/contributor/faq'
+import { Route as AuthenticatedContributorDashboardRouteImport } from './routes/_authenticated/contributor/dashboard'
+import { Route as AuthenticatedContributorCoursesRouteImport } from './routes/_authenticated/contributor/courses'
+import { Route as AuthenticatedAdminUserManagementRouteImport } from './routes/_authenticated/admin/user-management'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
+import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
+import { Route as AuthenticatedAdminCourseModerationRouteImport } from './routes/_authenticated/admin/course-moderation'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -56,76 +57,6 @@ const LoginCallbackRoute = LoginCallbackRouteImport.update({
   path: '/login/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LearnerSettingsRoute = LearnerSettingsRouteImport.update({
-  id: '/learner/settings',
-  path: '/learner/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LearnerMyCoursesRoute = LearnerMyCoursesRouteImport.update({
-  id: '/learner/my-courses',
-  path: '/learner/my-courses',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LearnerFaqRoute = LearnerFaqRouteImport.update({
-  id: '/learner/faq',
-  path: '/learner/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LearnerDashboardRoute = LearnerDashboardRouteImport.update({
-  id: '/learner/dashboard',
-  path: '/learner/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LearnerChallengesRoute = LearnerChallengesRouteImport.update({
-  id: '/learner/challenges',
-  path: '/learner/challenges',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContributorTeamsRoute = ContributorTeamsRouteImport.update({
-  id: '/contributor/teams',
-  path: '/contributor/teams',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContributorSettingsRoute = ContributorSettingsRouteImport.update({
-  id: '/contributor/settings',
-  path: '/contributor/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContributorFaqRoute = ContributorFaqRouteImport.update({
-  id: '/contributor/faq',
-  path: '/contributor/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContributorDashboardRoute = ContributorDashboardRouteImport.update({
-  id: '/contributor/dashboard',
-  path: '/contributor/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminUserManagementRoute = AdminUserManagementRouteImport.update({
-  id: '/admin/user-management',
-  path: '/admin/user-management',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminSettingsRoute = AdminSettingsRouteImport.update({
-  id: '/admin/settings',
-  path: '/admin/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminFaqRoute = AdminFaqRouteImport.update({
-  id: '/admin/faq',
-  path: '/admin/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminDashboardRoute = AdminDashboardRouteImport.update({
-  id: '/admin/dashboard',
-  path: '/admin/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminCourseModerationRoute = AdminCourseModerationRouteImport.update({
-  id: '/admin/course-moderation',
-  path: '/admin/course-moderation',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -143,27 +74,116 @@ const ContributorTeamIdCoursesRoute =
     path: '/contributor/$teamId/courses',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedLearnerSettingsRoute =
+  AuthenticatedLearnerSettingsRouteImport.update({
+    id: '/learner/settings',
+    path: '/learner/settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedLearnerMyCoursesRoute =
+  AuthenticatedLearnerMyCoursesRouteImport.update({
+    id: '/learner/my-courses',
+    path: '/learner/my-courses',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedLearnerFaqRoute = AuthenticatedLearnerFaqRouteImport.update({
+  id: '/learner/faq',
+  path: '/learner/faq',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedLearnerDashboardRoute =
+  AuthenticatedLearnerDashboardRouteImport.update({
+    id: '/learner/dashboard',
+    path: '/learner/dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedLearnerChallengesRoute =
+  AuthenticatedLearnerChallengesRouteImport.update({
+    id: '/learner/challenges',
+    path: '/learner/challenges',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedContributorTeamsRoute =
+  AuthenticatedContributorTeamsRouteImport.update({
+    id: '/contributor/teams',
+    path: '/contributor/teams',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedContributorSettingsRoute =
+  AuthenticatedContributorSettingsRouteImport.update({
+    id: '/contributor/settings',
+    path: '/contributor/settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedContributorFaqRoute =
+  AuthenticatedContributorFaqRouteImport.update({
+    id: '/contributor/faq',
+    path: '/contributor/faq',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedContributorDashboardRoute =
+  AuthenticatedContributorDashboardRouteImport.update({
+    id: '/contributor/dashboard',
+    path: '/contributor/dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedContributorCoursesRoute =
+  AuthenticatedContributorCoursesRouteImport.update({
+    id: '/contributor/courses',
+    path: '/contributor/courses',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminUserManagementRoute =
+  AuthenticatedAdminUserManagementRouteImport.update({
+    id: '/admin/user-management',
+    path: '/admin/user-management',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/admin/settings',
+    path: '/admin/settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminFaqRoute = AuthenticatedAdminFaqRouteImport.update({
+  id: '/admin/faq',
+  path: '/admin/faq',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAdminDashboardRoute =
+  AuthenticatedAdminDashboardRouteImport.update({
+    id: '/admin/dashboard',
+    path: '/admin/dashboard',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminCourseModerationRoute =
+  AuthenticatedAdminCourseModerationRouteImport.update({
+    id: '/admin/course-moderation',
+    path: '/admin/course-moderation',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/admin/course-moderation': typeof AdminCourseModerationRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/faq': typeof AdminFaqRoute
-  '/admin/settings': typeof AdminSettingsRoute
-  '/admin/user-management': typeof AdminUserManagementRoute
-  '/contributor/dashboard': typeof ContributorDashboardRoute
-  '/contributor/faq': typeof ContributorFaqRoute
-  '/contributor/settings': typeof ContributorSettingsRoute
-  '/contributor/teams': typeof ContributorTeamsRoute
-  '/learner/challenges': typeof LearnerChallengesRoute
-  '/learner/dashboard': typeof LearnerDashboardRoute
-  '/learner/faq': typeof LearnerFaqRoute
-  '/learner/my-courses': typeof LearnerMyCoursesRoute
-  '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login': typeof LoginIndexRoute
+  '/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/faq': typeof AuthenticatedAdminFaqRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
+  '/contributor/courses': typeof AuthenticatedContributorCoursesRoute
+  '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
+  '/contributor/faq': typeof AuthenticatedContributorFaqRoute
+  '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
+  '/contributor/teams': typeof AuthenticatedContributorTeamsRoute
+  '/learner/challenges': typeof AuthenticatedLearnerChallengesRoute
+  '/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
+  '/learner/faq': typeof AuthenticatedLearnerFaqRoute
+  '/learner/my-courses': typeof AuthenticatedLearnerMyCoursesRoute
+  '/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
 }
@@ -171,22 +191,23 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
-  '/admin/course-moderation': typeof AdminCourseModerationRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/faq': typeof AdminFaqRoute
-  '/admin/settings': typeof AdminSettingsRoute
-  '/admin/user-management': typeof AdminUserManagementRoute
-  '/contributor/dashboard': typeof ContributorDashboardRoute
-  '/contributor/faq': typeof ContributorFaqRoute
-  '/contributor/settings': typeof ContributorSettingsRoute
-  '/contributor/teams': typeof ContributorTeamsRoute
-  '/learner/challenges': typeof LearnerChallengesRoute
-  '/learner/dashboard': typeof LearnerDashboardRoute
-  '/learner/faq': typeof LearnerFaqRoute
-  '/learner/my-courses': typeof LearnerMyCoursesRoute
-  '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login': typeof LoginIndexRoute
+  '/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
+  '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/faq': typeof AuthenticatedAdminFaqRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
+  '/contributor/courses': typeof AuthenticatedContributorCoursesRoute
+  '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
+  '/contributor/faq': typeof AuthenticatedContributorFaqRoute
+  '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
+  '/contributor/teams': typeof AuthenticatedContributorTeamsRoute
+  '/learner/challenges': typeof AuthenticatedLearnerChallengesRoute
+  '/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
+  '/learner/faq': typeof AuthenticatedLearnerFaqRoute
+  '/learner/my-courses': typeof AuthenticatedLearnerMyCoursesRoute
+  '/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
 }
@@ -196,22 +217,23 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/register': typeof RegisterRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/admin/course-moderation': typeof AdminCourseModerationRoute
-  '/admin/dashboard': typeof AdminDashboardRoute
-  '/admin/faq': typeof AdminFaqRoute
-  '/admin/settings': typeof AdminSettingsRoute
-  '/admin/user-management': typeof AdminUserManagementRoute
-  '/contributor/dashboard': typeof ContributorDashboardRoute
-  '/contributor/faq': typeof ContributorFaqRoute
-  '/contributor/settings': typeof ContributorSettingsRoute
-  '/contributor/teams': typeof ContributorTeamsRoute
-  '/learner/challenges': typeof LearnerChallengesRoute
-  '/learner/dashboard': typeof LearnerDashboardRoute
-  '/learner/faq': typeof LearnerFaqRoute
-  '/learner/my-courses': typeof LearnerMyCoursesRoute
-  '/learner/settings': typeof LearnerSettingsRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login/': typeof LoginIndexRoute
+  '/_authenticated/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
+  '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/admin/faq': typeof AuthenticatedAdminFaqRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
+  '/_authenticated/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
+  '/_authenticated/contributor/courses': typeof AuthenticatedContributorCoursesRoute
+  '/_authenticated/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
+  '/_authenticated/contributor/faq': typeof AuthenticatedContributorFaqRoute
+  '/_authenticated/contributor/settings': typeof AuthenticatedContributorSettingsRoute
+  '/_authenticated/contributor/teams': typeof AuthenticatedContributorTeamsRoute
+  '/_authenticated/learner/challenges': typeof AuthenticatedLearnerChallengesRoute
+  '/_authenticated/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
+  '/_authenticated/learner/faq': typeof AuthenticatedLearnerFaqRoute
+  '/_authenticated/learner/my-courses': typeof AuthenticatedLearnerMyCoursesRoute
+  '/_authenticated/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
 }
@@ -221,11 +243,14 @@ export interface FileRouteTypes {
     | '/'
     | '/register'
     | '/profile'
+    | '/login/callback'
+    | '/login'
     | '/admin/course-moderation'
     | '/admin/dashboard'
     | '/admin/faq'
     | '/admin/settings'
     | '/admin/user-management'
+    | '/contributor/courses'
     | '/contributor/dashboard'
     | '/contributor/faq'
     | '/contributor/settings'
@@ -235,8 +260,6 @@ export interface FileRouteTypes {
     | '/learner/faq'
     | '/learner/my-courses'
     | '/learner/settings'
-    | '/login/callback'
-    | '/login'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
   fileRoutesByTo: FileRoutesByTo
@@ -244,11 +267,14 @@ export interface FileRouteTypes {
     | '/'
     | '/register'
     | '/profile'
+    | '/login/callback'
+    | '/login'
     | '/admin/course-moderation'
     | '/admin/dashboard'
     | '/admin/faq'
     | '/admin/settings'
     | '/admin/user-management'
+    | '/contributor/courses'
     | '/contributor/dashboard'
     | '/contributor/faq'
     | '/contributor/settings'
@@ -258,8 +284,6 @@ export interface FileRouteTypes {
     | '/learner/faq'
     | '/learner/my-courses'
     | '/learner/settings'
-    | '/login/callback'
-    | '/login'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
   id:
@@ -268,22 +292,23 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/register'
     | '/_authenticated/profile'
-    | '/admin/course-moderation'
-    | '/admin/dashboard'
-    | '/admin/faq'
-    | '/admin/settings'
-    | '/admin/user-management'
-    | '/contributor/dashboard'
-    | '/contributor/faq'
-    | '/contributor/settings'
-    | '/contributor/teams'
-    | '/learner/challenges'
-    | '/learner/dashboard'
-    | '/learner/faq'
-    | '/learner/my-courses'
-    | '/learner/settings'
     | '/login/callback'
     | '/login/'
+    | '/_authenticated/admin/course-moderation'
+    | '/_authenticated/admin/dashboard'
+    | '/_authenticated/admin/faq'
+    | '/_authenticated/admin/settings'
+    | '/_authenticated/admin/user-management'
+    | '/_authenticated/contributor/courses'
+    | '/_authenticated/contributor/dashboard'
+    | '/_authenticated/contributor/faq'
+    | '/_authenticated/contributor/settings'
+    | '/_authenticated/contributor/teams'
+    | '/_authenticated/learner/challenges'
+    | '/_authenticated/learner/dashboard'
+    | '/_authenticated/learner/faq'
+    | '/_authenticated/learner/my-courses'
+    | '/_authenticated/learner/settings'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
   fileRoutesById: FileRoutesById
@@ -292,20 +317,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   RegisterRoute: typeof RegisterRoute
-  AdminCourseModerationRoute: typeof AdminCourseModerationRoute
-  AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminFaqRoute: typeof AdminFaqRoute
-  AdminSettingsRoute: typeof AdminSettingsRoute
-  AdminUserManagementRoute: typeof AdminUserManagementRoute
-  ContributorDashboardRoute: typeof ContributorDashboardRoute
-  ContributorFaqRoute: typeof ContributorFaqRoute
-  ContributorSettingsRoute: typeof ContributorSettingsRoute
-  ContributorTeamsRoute: typeof ContributorTeamsRoute
-  LearnerChallengesRoute: typeof LearnerChallengesRoute
-  LearnerDashboardRoute: typeof LearnerDashboardRoute
-  LearnerFaqRoute: typeof LearnerFaqRoute
-  LearnerMyCoursesRoute: typeof LearnerMyCoursesRoute
-  LearnerSettingsRoute: typeof LearnerSettingsRoute
   LoginCallbackRoute: typeof LoginCallbackRoute
   LoginIndexRoute: typeof LoginIndexRoute
   ContributorTeamIdCoursesRoute: typeof ContributorTeamIdCoursesRoute
@@ -349,104 +360,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/learner/settings': {
-      id: '/learner/settings'
-      path: '/learner/settings'
-      fullPath: '/learner/settings'
-      preLoaderRoute: typeof LearnerSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/learner/my-courses': {
-      id: '/learner/my-courses'
-      path: '/learner/my-courses'
-      fullPath: '/learner/my-courses'
-      preLoaderRoute: typeof LearnerMyCoursesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/learner/faq': {
-      id: '/learner/faq'
-      path: '/learner/faq'
-      fullPath: '/learner/faq'
-      preLoaderRoute: typeof LearnerFaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/learner/dashboard': {
-      id: '/learner/dashboard'
-      path: '/learner/dashboard'
-      fullPath: '/learner/dashboard'
-      preLoaderRoute: typeof LearnerDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/learner/challenges': {
-      id: '/learner/challenges'
-      path: '/learner/challenges'
-      fullPath: '/learner/challenges'
-      preLoaderRoute: typeof LearnerChallengesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contributor/teams': {
-      id: '/contributor/teams'
-      path: '/contributor/teams'
-      fullPath: '/contributor/teams'
-      preLoaderRoute: typeof ContributorTeamsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contributor/settings': {
-      id: '/contributor/settings'
-      path: '/contributor/settings'
-      fullPath: '/contributor/settings'
-      preLoaderRoute: typeof ContributorSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contributor/faq': {
-      id: '/contributor/faq'
-      path: '/contributor/faq'
-      fullPath: '/contributor/faq'
-      preLoaderRoute: typeof ContributorFaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contributor/dashboard': {
-      id: '/contributor/dashboard'
-      path: '/contributor/dashboard'
-      fullPath: '/contributor/dashboard'
-      preLoaderRoute: typeof ContributorDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/user-management': {
-      id: '/admin/user-management'
-      path: '/admin/user-management'
-      fullPath: '/admin/user-management'
-      preLoaderRoute: typeof AdminUserManagementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/settings': {
-      id: '/admin/settings'
-      path: '/admin/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AdminSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/faq': {
-      id: '/admin/faq'
-      path: '/admin/faq'
-      fullPath: '/admin/faq'
-      preLoaderRoute: typeof AdminFaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/dashboard': {
-      id: '/admin/dashboard'
-      path: '/admin/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/course-moderation': {
-      id: '/admin/course-moderation'
-      path: '/admin/course-moderation'
-      fullPath: '/admin/course-moderation'
-      preLoaderRoute: typeof AdminCourseModerationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/profile': {
       id: '/_authenticated/profile'
       path: '/profile'
@@ -468,15 +381,152 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContributorTeamIdCoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/learner/settings': {
+      id: '/_authenticated/learner/settings'
+      path: '/learner/settings'
+      fullPath: '/learner/settings'
+      preLoaderRoute: typeof AuthenticatedLearnerSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/learner/my-courses': {
+      id: '/_authenticated/learner/my-courses'
+      path: '/learner/my-courses'
+      fullPath: '/learner/my-courses'
+      preLoaderRoute: typeof AuthenticatedLearnerMyCoursesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/learner/faq': {
+      id: '/_authenticated/learner/faq'
+      path: '/learner/faq'
+      fullPath: '/learner/faq'
+      preLoaderRoute: typeof AuthenticatedLearnerFaqRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/learner/dashboard': {
+      id: '/_authenticated/learner/dashboard'
+      path: '/learner/dashboard'
+      fullPath: '/learner/dashboard'
+      preLoaderRoute: typeof AuthenticatedLearnerDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/learner/challenges': {
+      id: '/_authenticated/learner/challenges'
+      path: '/learner/challenges'
+      fullPath: '/learner/challenges'
+      preLoaderRoute: typeof AuthenticatedLearnerChallengesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/contributor/teams': {
+      id: '/_authenticated/contributor/teams'
+      path: '/contributor/teams'
+      fullPath: '/contributor/teams'
+      preLoaderRoute: typeof AuthenticatedContributorTeamsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/contributor/settings': {
+      id: '/_authenticated/contributor/settings'
+      path: '/contributor/settings'
+      fullPath: '/contributor/settings'
+      preLoaderRoute: typeof AuthenticatedContributorSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/contributor/faq': {
+      id: '/_authenticated/contributor/faq'
+      path: '/contributor/faq'
+      fullPath: '/contributor/faq'
+      preLoaderRoute: typeof AuthenticatedContributorFaqRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/contributor/dashboard': {
+      id: '/_authenticated/contributor/dashboard'
+      path: '/contributor/dashboard'
+      fullPath: '/contributor/dashboard'
+      preLoaderRoute: typeof AuthenticatedContributorDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/contributor/courses': {
+      id: '/_authenticated/contributor/courses'
+      path: '/contributor/courses'
+      fullPath: '/contributor/courses'
+      preLoaderRoute: typeof AuthenticatedContributorCoursesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/user-management': {
+      id: '/_authenticated/admin/user-management'
+      path: '/admin/user-management'
+      fullPath: '/admin/user-management'
+      preLoaderRoute: typeof AuthenticatedAdminUserManagementRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/admin/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/faq': {
+      id: '/_authenticated/admin/faq'
+      path: '/admin/faq'
+      fullPath: '/admin/faq'
+      preLoaderRoute: typeof AuthenticatedAdminFaqRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/dashboard': {
+      id: '/_authenticated/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/course-moderation': {
+      id: '/_authenticated/admin/course-moderation'
+      path: '/admin/course-moderation'
+      fullPath: '/admin/course-moderation'
+      preLoaderRoute: typeof AuthenticatedAdminCourseModerationRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedAdminCourseModerationRoute: typeof AuthenticatedAdminCourseModerationRoute
+  AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedAdminFaqRoute: typeof AuthenticatedAdminFaqRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
+  AuthenticatedAdminUserManagementRoute: typeof AuthenticatedAdminUserManagementRoute
+  AuthenticatedContributorCoursesRoute: typeof AuthenticatedContributorCoursesRoute
+  AuthenticatedContributorDashboardRoute: typeof AuthenticatedContributorDashboardRoute
+  AuthenticatedContributorFaqRoute: typeof AuthenticatedContributorFaqRoute
+  AuthenticatedContributorSettingsRoute: typeof AuthenticatedContributorSettingsRoute
+  AuthenticatedContributorTeamsRoute: typeof AuthenticatedContributorTeamsRoute
+  AuthenticatedLearnerChallengesRoute: typeof AuthenticatedLearnerChallengesRoute
+  AuthenticatedLearnerDashboardRoute: typeof AuthenticatedLearnerDashboardRoute
+  AuthenticatedLearnerFaqRoute: typeof AuthenticatedLearnerFaqRoute
+  AuthenticatedLearnerMyCoursesRoute: typeof AuthenticatedLearnerMyCoursesRoute
+  AuthenticatedLearnerSettingsRoute: typeof AuthenticatedLearnerSettingsRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedAdminCourseModerationRoute:
+    AuthenticatedAdminCourseModerationRoute,
+  AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+  AuthenticatedAdminFaqRoute: AuthenticatedAdminFaqRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
+  AuthenticatedAdminUserManagementRoute: AuthenticatedAdminUserManagementRoute,
+  AuthenticatedContributorCoursesRoute: AuthenticatedContributorCoursesRoute,
+  AuthenticatedContributorDashboardRoute:
+    AuthenticatedContributorDashboardRoute,
+  AuthenticatedContributorFaqRoute: AuthenticatedContributorFaqRoute,
+  AuthenticatedContributorSettingsRoute: AuthenticatedContributorSettingsRoute,
+  AuthenticatedContributorTeamsRoute: AuthenticatedContributorTeamsRoute,
+  AuthenticatedLearnerChallengesRoute: AuthenticatedLearnerChallengesRoute,
+  AuthenticatedLearnerDashboardRoute: AuthenticatedLearnerDashboardRoute,
+  AuthenticatedLearnerFaqRoute: AuthenticatedLearnerFaqRoute,
+  AuthenticatedLearnerMyCoursesRoute: AuthenticatedLearnerMyCoursesRoute,
+  AuthenticatedLearnerSettingsRoute: AuthenticatedLearnerSettingsRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -487,20 +537,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   RegisterRoute: RegisterRoute,
-  AdminCourseModerationRoute: AdminCourseModerationRoute,
-  AdminDashboardRoute: AdminDashboardRoute,
-  AdminFaqRoute: AdminFaqRoute,
-  AdminSettingsRoute: AdminSettingsRoute,
-  AdminUserManagementRoute: AdminUserManagementRoute,
-  ContributorDashboardRoute: ContributorDashboardRoute,
-  ContributorFaqRoute: ContributorFaqRoute,
-  ContributorSettingsRoute: ContributorSettingsRoute,
-  ContributorTeamsRoute: ContributorTeamsRoute,
-  LearnerChallengesRoute: LearnerChallengesRoute,
-  LearnerDashboardRoute: LearnerDashboardRoute,
-  LearnerFaqRoute: LearnerFaqRoute,
-  LearnerMyCoursesRoute: LearnerMyCoursesRoute,
-  LearnerSettingsRoute: LearnerSettingsRoute,
   LoginCallbackRoute: LoginCallbackRoute,
   LoginIndexRoute: LoginIndexRoute,
   ContributorTeamIdCoursesRoute: ContributorTeamIdCoursesRoute,

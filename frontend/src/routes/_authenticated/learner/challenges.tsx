@@ -1,17 +1,15 @@
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
-import UpdateProfileForm from '@/features/profile/edit/UpdateProfileForm';
+import ChallengesPage from '@/features/learner/ChallengesPage';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/contributor/settings')({
+export const Route = createFileRoute('/_authenticated/learner/challenges')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <div className="flex h-full w-full items-center justify-center">
-        <UpdateProfileForm />
-      </div>
+      <ChallengesPage />
     </PageWithSideBar>
   );
 }

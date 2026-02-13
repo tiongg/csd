@@ -7,7 +7,7 @@ import {
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/learner/faq')({
+export const Route = createFileRoute('/_authenticated/learner/faq')({
   component: RouteComponent,
 });
 

@@ -1,15 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router';
+import UserDashboard from '@/components/UserDashboard';
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
-import UserManagementForm from '@/features/admin/UserManagementForm';
 
-export const Route = createFileRoute('/admin/user-management')({
+export const Route = createFileRoute('/_authenticated/contributor/dashboard')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
   return (
     <PageWithSideBar>
-      <UserManagementForm />
+      <UserDashboard />
     </PageWithSideBar>
   );
 }
