@@ -110,7 +110,9 @@ public class TeamService {
       throw new BadRequestException("Only team owner or admin can add members");
     }
 
-    AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, request.accountId())
+    AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, request.accountId())
+        .stream()
+        .findFirst()
         .orElseThrow(() -> new BadRequestException("Account not found"));
 
     if (teamMemberRepository.findByTeamAndAccount(teamId, request.accountId()).isPresent()) {
@@ -148,7 +150,9 @@ public class TeamService {
     List<TeamMemberRecord> memberRecords = teamMemberRepository.findByTeamId(teamId);
 
     return memberRecords.stream().map(record -> {
-      AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, record.getAccountId())
+      AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, record.getAccountId())
+          .stream()
+          .findFirst()
           .orElseThrow(() -> new BadRequestException("Account not found"));
       return new TeamMemberResponseDTO(record, accountRecord.getUsername(), accountRecord.getEmail());
     }).collect(Collectors.toList());
@@ -159,7 +163,9 @@ public class TeamService {
   }
 
   public TeamRole getTeamMemberRole(UUID teamId, UUID accountId) {
-    return teamMemberRepository.findByTeamAndAccount(teamId, accountId).map(TeamMemberRecord::getTeamRole).orElse(null);
+    return teamMemberRepository.findByTeamAndAccount(teamId, accountId)
+        .map(TeamMemberRecord::getTeamRole)
+        .orElse(null);
   }
 
   @Transactional
@@ -176,14 +182,35 @@ public class TeamService {
     TeamMemberRecord targetMember = teamMemberRepository.findByTeamAndAccount(teamId, accountId)
         .orElseThrow(() -> new BadRequestException("User is not a member of this team"));
 
-    if (targetMember.getTeamRole() == TeamRole.OWNER) {
-      throw new BadRequestException("Cannot change owner's role");
+    boolean isRequesterOwner = requesterMember.getTeamRole() == TeamRole.OWNER;
+    boolean isTargetOwner = targetMember.getTeamRole() == TeamRole.OWNER;
+    boolean isSelfUpdate = requesterId.equals(accountId);
+
+    if (isSelfUpdate && newRole == TeamRole.OWNER) {
+      throw new BadRequestException("You cannot promote yourself to owner");
+    }
+
+    if (!isRequesterOwner) {
+      if (newRole == TeamRole.OWNER) {
+        throw new BadRequestException("Only the team owner can promote members to owner");
+      }
+      
+      if (isTargetOwner) {
+        throw new BadRequestException("Only the team owner can change another owner's role");
+      }
+    }
+
+    if (isRequesterOwner && isSelfUpdate && isTargetOwner && newRole != TeamRole.OWNER) {
+      throw new BadRequestException("Cannot demote yourself as owner. Transfer ownership to another member first");
     }
 
     teamMemberRepository.updateRole(teamId, accountId, newRole);
 
     TeamMemberRecord updatedMember = teamMemberRepository.findByTeamAndAccount(teamId, accountId).orElseThrow();
-    AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, accountId).orElseThrow();
+    AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, accountId)
+        .stream()
+        .findFirst()
+        .orElseThrow(() -> new BadRequestException("Account not found"));
 
     return new TeamMemberResponseDTO(updatedMember, accountRecord.getUsername(), accountRecord.getEmail());
   }
