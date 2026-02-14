@@ -14,6 +14,7 @@ import type { Team } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
+import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
 type TeamMember = components['schemas']['TeamMember'];
@@ -71,7 +72,14 @@ export default function TeamCollaboratorsDialog({
   const { mutate: onRemoveMember } = useApiMutation(
     'delete',
     '/api/teams/{teamId}/members/{accountId}',
-    { onSuccess: onMutationSuccess },
+    {
+      onSuccess: onMutationSuccess,
+      onError: (err) => {
+        toast.error(
+          err.message || 'An error occurred while removing the member.',
+        );
+      },
+    },
   );
 
   async function handleSubmit(e: FormEvent) {

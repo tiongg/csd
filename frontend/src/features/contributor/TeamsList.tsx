@@ -30,7 +30,7 @@ export default function TeamsList() {
         {isLoading ? (
           <p>Loading...</p>
         ) : (
-          (teams ?? []).map((team, i) => <TeamCard team={team} key={i} />)
+          (teams ?? []).map((team, i) => <TeamCard team={team} key={team.id} />)
         )}
       </div>
 
