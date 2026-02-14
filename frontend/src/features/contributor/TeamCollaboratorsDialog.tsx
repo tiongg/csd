@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { components } from '@/generated/api';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
-import type { Team } from '@/lib/utils';
+import { capitalizeFirst, type Team } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { Trash2 } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
@@ -168,26 +168,27 @@ export default function TeamCollaboratorsDialog({
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant={getRoleBadgeVariant(member.teamRole)}>
-                        {member.teamRole.toLowerCase()}
+                        {capitalizeFirst(member.teamRole)}
                       </Badge>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() =>
-                          onRemoveMember({
-                            params: {
-                              path: {
-                                teamId: team.id,
-                                accountId: member.accountId,
+                      {member.teamRole !== 'OWNER' && (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() =>
+                            onRemoveMember({
+                              params: {
+                                path: {
+                                  teamId: team.id,
+                                  accountId: member.accountId,
+                                },
                               },
-                            },
-                          })
-                        }
-                        className="text-muted-foreground hover:text-destructive"
-                        disabled={member.teamRole === 'OWNER'}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
+                            })
+                          }
+                          className="text-muted-foreground hover:text-destructive"
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 ))
