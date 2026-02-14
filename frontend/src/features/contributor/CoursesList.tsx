@@ -6,7 +6,7 @@ import {
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Heading1 } from '@/components/ui/typography';
 import type { components } from '@/generated/api';
-import { useApiMutation, useApiQuery } from '@/lib/fetch-client';
+import { useApiQuery } from '@/lib/fetch-client';
 import { capitalizeFirst, cn, type Course, type Team } from '@/lib/utils';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
@@ -45,7 +45,7 @@ export default function CoursesList({ team }: CourseListProps) {
   } = useBoolean(false);
 
   return (
-    <div className="flex h-full w-full flex-col gap-y-2 p-8">
+    <div className="flex h-full w-full flex-col p-8">
       <div className="flex justify-between">
         <div>
           <Heading1>{team.name}</Heading1>
