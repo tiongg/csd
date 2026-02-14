@@ -255,7 +255,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get: operations["getMethodName"];
+        get: operations["getTeamCourses"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1103,7 +1103,7 @@ export interface operations {
             };
         };
     };
-    getMethodName: {
+    getTeamCourses: {
         parameters: {
             query?: never;
             header?: never;

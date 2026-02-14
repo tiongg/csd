@@ -132,7 +132,7 @@ public class TeamController {
   }
 
   @GetMapping("/{teamId}/courses")
-  public List<CourseResponseDTO> getMethodName(@PathVariable UUID teamId) {
+  public List<CourseResponseDTO> getTeamCourses(@PathVariable UUID teamId) {
     return this.courseService.getCoursesByTeamId(teamId).stream().map(CourseResponseDTO::new).toList();
   }
 
