@@ -101,8 +101,6 @@ public class TeamService {
 
   @Transactional
   public TeamMemberResponseDTO addMember(UUID teamId, AddMemberRequest request, UUID requesterId) {
-    teamRepository.findById(teamId).orElseThrow(() -> new BadRequestException("Team not found"));
-
     TeamMemberRecord requesterMember = teamMemberRepository.findByTeamAndAccount(teamId, requesterId)
         .orElseThrow(() -> new BadRequestException("You are not a member of this team"));
 
@@ -110,14 +108,14 @@ public class TeamService {
       throw new BadRequestException("Only team owner or admin can add members");
     }
 
-    AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, request.accountId())
-        .orElseThrow(() -> new BadRequestException("Account not found"));
+    AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.USERNAME, request.username())
+        .orElseThrow(() -> new BadRequestException("User not found"));
 
-    if (teamMemberRepository.findByTeamAndAccount(teamId, request.accountId()).isPresent()) {
+    if (teamMemberRepository.findByTeamAndAccount(teamId, accountRecord.getId()).isPresent()) {
       throw new BadRequestException("User is already a member of this team");
     }
 
-    TeamMemberRecord memberRecord = teamMemberRepository.addMember(teamId, request.accountId(), request.teamRole());
+    TeamMemberRecord memberRecord = teamMemberRepository.addMember(teamId, accountRecord.getId(), TeamRole.MEMBER);
 
     return new TeamMemberResponseDTO(memberRecord, accountRecord.getUsername(), accountRecord.getEmail());
   }
@@ -137,7 +135,6 @@ public class TeamService {
     if (!isOwnerOrAdmin(requesterMember)) {
       throw new BadRequestException("Only team owner or admin can remove members");
     }
-
     teamMemberRepository.findByTeamAndAccount(teamId, accountId)
         .orElseThrow(() -> new BadRequestException("User is not a member of this team"));
 

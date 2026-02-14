@@ -423,10 +423,7 @@ export interface components {
             updatedAt: string;
         };
         AddMemberRequest: {
-            /** Format: uuid */
-            accountId: string;
-            /** @enum {string} */
-            teamRole: "OWNER" | "ADMIN" | "MEMBER";
+            username: string;
         };
         TeamCreateRequest: {
             name: string;

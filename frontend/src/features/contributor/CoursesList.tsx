@@ -5,12 +5,17 @@ import {
 } from '@/components/ui/custom-cards';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Heading1 } from '@/components/ui/typography';
-import { useApiQuery } from '@/lib/fetch-client';
+import type { components } from '@/generated/api';
+import { useApiMutation, useApiQuery } from '@/lib/fetch-client';
 import { capitalizeFirst, cn, type Course, type Team } from '@/lib/utils';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
+import { Trash2, Users } from 'lucide-react';
 import { useBoolean } from 'usehooks-ts';
 import CreateCourseDialog from './CreateCourseDialog';
+import TeamCollaboratorsDialog from './TeamCollaboratorsDialog';
+
+type TeamMember = components['schemas']['TeamMember'];
 
 type StatusType = 'approved' | 'pending';
 
@@ -33,6 +38,12 @@ export default function CoursesList({ team }: CourseListProps) {
     setTrue: openCreateCourseDialog,
   } = useBoolean(false);
 
+  const {
+    value: isTeamCollaboratorsDialogOpen,
+    setValue: setIsTeamCollaboratorsDialogOpen,
+    setTrue: openTeamCollaboratorsDialog,
+  } = useBoolean(false);
+
   return (
     <div className="flex h-full w-full flex-col gap-y-2 p-8">
       <div className="flex justify-between">
@@ -41,16 +52,22 @@ export default function CoursesList({ team }: CourseListProps) {
           <p className="font-subtitle">Collaborators: {team.members.length}</p>
         </div>
 
-        <div>
-          <Button size="lg" className="cursor-pointer">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="destructive"
+            className="cursor-pointer gap-2 rounded-full"
+          >
+            <Trash2 className="size-4" />
+            Delete Team
+          </Button>
+          <Button
+            className="cursor-pointer gap-2 rounded-full"
+            onClick={openTeamCollaboratorsDialog}
+          >
+            <Users className="size-4" />
             Collaborators
           </Button>
         </div>
-      </div>
-      <div>
-        <Button variant="destructive" className="cursor-pointer rounded-full">
-          Delete Team
-        </Button>
       </div>
       <div className="grid grid-cols-4 justify-start gap-4 py-4">
         <CardWithPlusIcon
@@ -67,6 +84,12 @@ export default function CoursesList({ team }: CourseListProps) {
         team={team}
         isOpen={isCreateCourseDialogOpen}
         setDialogOpen={setIsCreateCourseDialogOpen}
+      />
+
+      <TeamCollaboratorsDialog
+        team={team}
+        isOpen={isTeamCollaboratorsDialogOpen}
+        setDialogOpen={setIsTeamCollaboratorsDialogOpen}
       />
     </div>
   );
