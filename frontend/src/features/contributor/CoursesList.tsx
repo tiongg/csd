@@ -7,6 +7,7 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Heading1 } from '@/components/ui/typography';
 import { useApiQuery } from '@/lib/fetch-client';
 import { capitalizeFirst, cn, type Course, type Team } from '@/lib/utils';
+import dayjs from 'dayjs';
 import { useBoolean } from 'usehooks-ts';
 import CreateCourseDialog from './CreateCourseDialog';
 
@@ -96,7 +97,7 @@ function CourseCard({ course, status }: CourseCardProps) {
       <CardWithDetails
         title={course.title}
         descriptor="Last Edited"
-        data={course.updatedAt}
+        data={dayjs(course.updatedAt).fromNow()}
       >
         <DropdownMenuItem>Delete</DropdownMenuItem>
       </CardWithDetails>

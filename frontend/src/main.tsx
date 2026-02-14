@@ -10,6 +10,9 @@ import { routeTree } from './routeTree.gen';
 import { AuthProvider, useAuth } from './context/AuthContext.tsx';
 import './styles.css';
 
+// Config
+import './config/dayjs.config.ts';
+
 // Create a new router instance
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext();
