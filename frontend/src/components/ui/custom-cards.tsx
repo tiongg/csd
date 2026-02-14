@@ -1,68 +1,92 @@
+import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { EllipsisVerticalIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
-import type { ComponentProps } from "react";
-import { Separator } from "./separator";
-import { Heading3 } from "./typography";
+  EllipsisVerticalIcon,
+  PlusCircleIcon,
+} from '@heroicons/react/24/outline';
+import type { ComponentProps } from 'react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from './dropdown-menu';
+import { Separator } from './separator';
+import { Heading3 } from './typography';
 
-export function CardWithPlusIcon({ title }: { title: string }) {
-    return (
-        <Card className="col-span-1 border-2 cursor-pointer transition hover:border-slate-500 hover:shadow-lg">
-            <CardContent className="flex justify-center items-center flex-col h-full gap-y-8">
-                <PlusCircleIcon className="size-28" />
-                <Heading3>{title}</Heading3>
-            </CardContent>
-        </Card>
-    )
+export function CardWithPlusIcon({
+  title,
+  className,
+  ...rest
+}: { title: string } & ComponentProps<'div'>) {
+  return (
+    <Card
+      className={cn(
+        'col-span-1 cursor-pointer border-2 transition hover:border-slate-500 hover:shadow-lg',
+        className,
+      )}
+      {...rest}
+    >
+      <CardContent className="flex h-full flex-col items-center justify-center gap-y-8">
+        <PlusCircleIcon className="size-28" />
+        <Heading3>{title}</Heading3>
+      </CardContent>
+    </Card>
+  );
 }
 
 type CardWithDetailsProps = {
-    title: string;
-    descriptor: string;
-    data: string;
+  title: string;
+  descriptor: string;
+  data: string;
 } & ComponentProps<'div'>;
 
-export function CardWithDetails({ title, descriptor, data, className, ...rest }: CardWithDetailsProps) {
-    return (
-        <Card className={cn(
-            "flex flex-col justify-between col-span-1 overflow-hidden pt-0 border-2 cursor-pointer transition hover:border-slate-500 hover:shadow-lg",
-            className
-        )} {...rest}>
-            <div className="h-50 bg-sky-200 flex flex-col justify-between">
-                <CardContent>
-                    {/* image (if any) goes here, otherwise just do solid colour bg */}
-                </CardContent>
-                <Separator />
+export function CardWithDetails({
+  title,
+  descriptor,
+  data,
+  children,
+  className,
+  ...rest
+}: CardWithDetailsProps) {
+  return (
+    <div
+      className={cn(
+        'flex cursor-pointer flex-col overflow-hidden rounded-2xl border transition-all hover:border-slate-300 hover:shadow-lg',
+        className,
+      )}
+      {...rest}
+    >
+      <div className="h-40 bg-sky-200" />
+      <Separator />
+      <div className="flex items-end justify-between p-4">
+        <div className="flex flex-col gap-1">
+          <div className="group relative">
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-lg bg-slate-800 px-2 py-1 text-sm whitespace-nowrap text-white opacity-0 shadow-md transition group-hover:opacity-100">
+              {title}
             </div>
-            <CardHeader className="flex justify-between items-end">
-                <div className="w-8/10">
-                    <CardTitle>
-                        <div className="relative group">
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 text-center w-full px-2 py-1 text-sm text-white bg-slate-800 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition">
-                                {title}
-                            </div>
-                            <Heading3 className="w-full truncate">
-                                {title}
-                            </Heading3>
-                        </div>
-                    </CardTitle>
-                    <CardDescription>
-                        <p className="text-slate-600">
-                            {descriptor}: {data}
-                        </p>
-                    </CardDescription>
-                </div>
-
-                <div className="w-1/10">
-                    <EllipsisVerticalIcon className="size-10 text-slate-600" />
-                </div>
-            </CardHeader>
-        </Card>
-    )
+            <Heading3 className="max-w-full truncate">{title}</Heading3>
+          </div>
+          <p className="text-sm text-slate-600">
+            {descriptor}: {data}
+          </p>
+        </div>
+        {children ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="cursor-pointer text-slate-600 hover:text-slate-800 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <EllipsisVerticalIcon className="size-6" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {children}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
+      </div>
+    </div>
+  );
 }

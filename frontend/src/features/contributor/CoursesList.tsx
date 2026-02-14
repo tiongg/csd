@@ -3,9 +3,12 @@ import {
   CardWithDetails,
   CardWithPlusIcon,
 } from '@/components/ui/custom-cards';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Heading1 } from '@/components/ui/typography';
 import { useApiQuery } from '@/lib/fetch-client';
 import { capitalizeFirst, cn, type Course, type Team } from '@/lib/utils';
+import { useBoolean } from 'usehooks-ts';
+import CreateCourseDialog from './CreateCourseDialog';
 
 type StatusType = 'approved' | 'pending';
 
@@ -22,8 +25,14 @@ export default function CoursesList({ team }: CourseListProps) {
     },
   });
 
+  const {
+    value: isCreateCourseDialogOpen,
+    setValue: setIsCreateCourseDialogOpen,
+    setTrue: openCreateCourseDialog,
+  } = useBoolean(false);
+
   return (
-    <div className="flex h-full w-full flex-col gap-y-2 p-16">
+    <div className="flex h-full w-full flex-col gap-y-2 p-8">
       <div className="flex justify-between">
         <div>
           <Heading1>{team.name}</Heading1>
@@ -41,13 +50,22 @@ export default function CoursesList({ team }: CourseListProps) {
           Delete Team
         </Button>
       </div>
-      <div className="grid grid-cols-3 justify-start gap-4 py-4">
-        <CardWithPlusIcon title="Create New Course" />
+      <div className="grid grid-cols-4 justify-start gap-4 py-4">
+        <CardWithPlusIcon
+          title="Create New Course"
+          onClick={openCreateCourseDialog}
+        />
 
         {(courses ?? []).map((course, i) => (
           <CourseCard course={course} key={i} />
         ))}
       </div>
+
+      <CreateCourseDialog
+        team={team}
+        isOpen={isCreateCourseDialogOpen}
+        setDialogOpen={setIsCreateCourseDialogOpen}
+      />
     </div>
   );
 }
@@ -79,7 +97,9 @@ function CourseCard({ course, status }: CourseCardProps) {
         title={course.title}
         descriptor="Last Edited"
         data={course.updatedAt}
-      />
+      >
+        <DropdownMenuItem>Delete</DropdownMenuItem>
+      </CardWithDetails>
     </div>
   );
 }
