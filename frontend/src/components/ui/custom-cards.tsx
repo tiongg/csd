@@ -1,6 +1,3 @@
-import { EllipsisVerticalIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
-import { Heading3 } from "./typography";
-import { Separator } from "./separator";
 import {
     Card,
     CardContent,
@@ -8,6 +5,11 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { EllipsisVerticalIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
+import type { ComponentProps } from "react";
+import { Separator } from "./separator";
+import { Heading3 } from "./typography";
 
 export function CardWithPlusIcon({ title }: { title: string }) {
     return (
@@ -24,11 +26,14 @@ type CardWithDetailsProps = {
     title: string;
     descriptor: string;
     data: string;
-}
+} & ComponentProps<'div'>;
 
-export function CardWithDetails({ title, descriptor, data }: CardWithDetailsProps) {
+export function CardWithDetails({ title, descriptor, data, className, ...rest }: CardWithDetailsProps) {
     return (
-        <Card className="flex flex-col justify-between col-span-1 overflow-hidden pt-0 border-2 cursor-pointer transition hover:border-slate-500 hover:shadow-lg">
+        <Card className={cn(
+            "flex flex-col justify-between col-span-1 overflow-hidden pt-0 border-2 cursor-pointer transition hover:border-slate-500 hover:shadow-lg",
+            className
+        )} {...rest}>
             <div className="h-50 bg-sky-200 flex flex-col justify-between">
                 <CardContent>
                     {/* image (if any) goes here, otherwise just do solid colour bg */}

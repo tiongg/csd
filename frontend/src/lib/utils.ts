@@ -1,3 +1,4 @@
+import type { components } from '@/generated/api';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -21,3 +22,6 @@ export function generateColorFromString(str: string) {
     ((hash >> 8) & 0xff).toString(16).padStart(2, '0');
   return color;
 }
+
+export type Team = components['schemas']['Team'];
+export type Course = components['schemas']['Course'];

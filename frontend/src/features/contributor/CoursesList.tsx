@@ -1,38 +1,33 @@
+import { Button } from '@/components/ui/button';
 import {
   CardWithDetails,
   CardWithPlusIcon,
 } from '@/components/ui/custom-cards';
 import { Heading1 } from '@/components/ui/typography';
-import { capitalizeFirst, cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { useApiQuery } from '@/lib/fetch-client';
+import { capitalizeFirst, cn, type Course, type Team } from '@/lib/utils';
 
 type StatusType = 'approved' | 'pending';
 
-// placeholder
-const courses = [
-  {
-    name: 'Capital Markets in China',
-    date: '9 February 2026',
-    status: 'approved' as StatusType,
-  },
-  {
-    name: 'Enterprise Solution Management',
-    date: '8 February 2026',
-    status: 'pending' as StatusType,
-  },
-  {
-    name: 'Enterprise Solution Development',
-    date: '5 February 2026',
-  },
-];
+type CourseListProps = {
+  team: Team;
+};
 
-export default function CoursesList() {
+export default function CoursesList({ team }: CourseListProps) {
+  const { data: courses } = useApiQuery('get', '/api/teams/{teamId}/courses', {
+    params: {
+      path: {
+        teamId: team.id,
+      },
+    },
+  });
+
   return (
     <div className="flex h-full w-full flex-col gap-y-2 p-16">
       <div className="flex justify-between">
         <div>
-          <Heading1>Team Name</Heading1>
-          <p className="font-subtitle">Collaborators: 3</p>
+          <Heading1>{team.name}</Heading1>
+          <p className="font-subtitle">Collaborators: {team.members.length}</p>
         </div>
 
         <div>
@@ -47,10 +42,10 @@ export default function CoursesList() {
         </Button>
       </div>
       <div className="grid grid-cols-3 justify-start gap-4 py-4">
-        <CardWithPlusIcon title="Add New Team" />
+        <CardWithPlusIcon title="Create New Course" />
 
-        {courses.map(({ name, date, status }, i) => (
-          <CourseCard name={name} date={date} status={status} key={i} />
+        {(courses ?? []).map((course, i) => (
+          <CourseCard course={course} key={i} />
         ))}
       </div>
     </div>
@@ -58,17 +53,16 @@ export default function CoursesList() {
 }
 
 type CourseCardProps = {
-  name: string;
-  date: string;
-  status?: 'approved' | 'pending';
+  course: Course;
+  status?: StatusType;
 };
 
-function CourseCard({ name, date, status }: CourseCardProps) {
-  const BADGE_STYLES = {
-    approved: 'bg-slate-800',
-    pending: 'bg-amber-500',
-  };
+const BADGE_STYLES = {
+  approved: 'bg-slate-800',
+  pending: 'bg-amber-500',
+} satisfies Record<StatusType, string>;
 
+function CourseCard({ course, status }: CourseCardProps) {
   return (
     <div className="relative">
       {status && (
@@ -81,7 +75,11 @@ function CourseCard({ name, date, status }: CourseCardProps) {
           {capitalizeFirst(status)}
         </div>
       )}
-      <CardWithDetails title={name} descriptor="Last Edited" data={date} />
+      <CardWithDetails
+        title={course.title}
+        descriptor="Last Edited"
+        data={course.updatedAt}
+      />
     </div>
   );
 }
