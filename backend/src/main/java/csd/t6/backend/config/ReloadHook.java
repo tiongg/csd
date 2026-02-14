@@ -21,10 +21,7 @@ public class ReloadHook {
 
   private void runCliCommand() {
     try {
-      ProcessBuilder pb = new ProcessBuilder(
-          "docker", "exec", "-t",
-          "frontend",
-          "npm", "run", "generate-api");
+      ProcessBuilder pb = new ProcessBuilder("docker", "exec", "-t", "frontend", "npm", "run", "generate-api");
 
       pb.inheritIO();
 
@@ -36,7 +33,6 @@ public class ReloadHook {
       } else {
         log.warn("npm run generate-api finished with non-zero exit code: {}", exitCode);
       }
-
     } catch (Exception e) {
       log.error("Failed to run npm generate-api script", e);
     }

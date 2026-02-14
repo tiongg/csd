@@ -10,7 +10,8 @@
     "lint": "eslint",
     "format": "prettier",
     "check": "prettier --write . && eslint --fix",
-    "generate-api": "npx openapi-typescript http://backend:8080/v3/api-docs.yaml -o ./src/generated/api.d.ts"
+    "generate-api": "npx openapi-typescript http://backend:8080/v3/api-docs.yaml -o ./src/generated/api.d.ts",
+    "generate-api-manual": "npx openapi-typescript http://localhost:8080/v3/api-docs.yaml -o ./src/generated/api.d.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
