@@ -110,9 +110,7 @@ public class TeamService {
       throw new BadRequestException("Only team owner or admin can add members");
     }
 
-    AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, request.accountId())
-        .stream()
-        .findFirst()
+    AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, request.accountId())
         .orElseThrow(() -> new BadRequestException("Account not found"));
 
     if (teamMemberRepository.findByTeamAndAccount(teamId, request.accountId()).isPresent()) {
@@ -150,9 +148,7 @@ public class TeamService {
     List<TeamMemberRecord> memberRecords = teamMemberRepository.findByTeamId(teamId);
 
     return memberRecords.stream().map(record -> {
-      AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, record.getAccountId())
-          .stream()
-          .findFirst()
+      AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, record.getAccountId())
           .orElseThrow(() -> new BadRequestException("Account not found"));
       return new TeamMemberResponseDTO(record, accountRecord.getUsername(), accountRecord.getEmail());
     }).collect(Collectors.toList());
@@ -163,9 +159,7 @@ public class TeamService {
   }
 
   public TeamRole getTeamMemberRole(UUID teamId, UUID accountId) {
-    return teamMemberRepository.findByTeamAndAccount(teamId, accountId)
-        .map(TeamMemberRecord::getTeamRole)
-        .orElse(null);
+    return teamMemberRepository.findByTeamAndAccount(teamId, accountId).map(TeamMemberRecord::getTeamRole).orElse(null);
   }
 
   @Transactional
@@ -194,7 +188,7 @@ public class TeamService {
       if (newRole == TeamRole.OWNER) {
         throw new BadRequestException("Only the team owner can promote members to owner");
       }
-      
+
       if (isTargetOwner) {
         throw new BadRequestException("Only the team owner can change another owner's role");
       }
@@ -207,9 +201,7 @@ public class TeamService {
     teamMemberRepository.updateRole(teamId, accountId, newRole);
 
     TeamMemberRecord updatedMember = teamMemberRepository.findByTeamAndAccount(teamId, accountId).orElseThrow();
-    AccountRecord accountRecord = accountRepository.findBy(ACCOUNT.ID, accountId)
-        .stream()
-        .findFirst()
+    AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, accountId)
         .orElseThrow(() -> new BadRequestException("Account not found"));
 
     return new TeamMemberResponseDTO(updatedMember, accountRecord.getUsername(), accountRecord.getEmail());
