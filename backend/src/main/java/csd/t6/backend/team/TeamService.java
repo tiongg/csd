@@ -186,7 +186,7 @@ public class TeamService {
     boolean isTargetOwner = targetMember.getTeamRole() == TeamRole.OWNER;
     boolean isSelfUpdate = requesterId.equals(accountId);
 
-    if (isSelfUpdate && newRole == TeamRole.OWNER) {
+    if (isSelfUpdate && newRole == TeamRole.OWNER && !isRequesterOwner) {
       throw new BadRequestException("You cannot promote yourself to owner");
     }
 
