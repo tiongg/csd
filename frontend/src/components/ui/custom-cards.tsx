@@ -38,6 +38,7 @@ type CardWithDetailsProps = {
   title: string;
   descriptor: string;
   data: string;
+  enableTooltip?: boolean;
 } & ComponentProps<'div'>;
 
 export function CardWithDetails({
@@ -45,6 +46,7 @@ export function CardWithDetails({
   descriptor,
   data,
   children,
+  enableTooltip = false,
   className,
   ...rest
 }: CardWithDetailsProps) {
@@ -61,9 +63,9 @@ export function CardWithDetails({
       <div className="flex items-end justify-between p-4">
         <div className="flex flex-col gap-1">
           <div className="group relative">
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-lg bg-slate-800 px-2 py-1 text-sm whitespace-nowrap text-white opacity-0 shadow-md transition group-hover:opacity-100">
+           {enableTooltip && <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-lg bg-slate-800 px-2 py-1 text-sm whitespace-nowrap text-white opacity-0 shadow-md transition group-hover:opacity-100">
               {title}
-            </div>
+            </div>}
             <Heading3 className="max-w-full truncate">{title}</Heading3>
           </div>
           <p className="text-sm text-slate-600">
