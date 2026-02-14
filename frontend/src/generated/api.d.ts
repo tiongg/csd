@@ -255,6 +255,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Gets all team courses
+         * @description Retrieves all courses associated with the team
+         */
         get: operations["getTeamCourses"];
         put?: never;
         post?: never;
@@ -1121,6 +1125,15 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["Course"][];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
                 };
             };
         };

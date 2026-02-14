@@ -13,7 +13,7 @@ import csd.t6.backend.utils.BaseRepository;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Repository
-public class CourseRepository extends BaseRepository {
+public class CourseRepository extends BaseRepository<CourseRecord> {
   public CourseRepository(DSLContext dsl) {
     super(dsl, COURSE);
   }

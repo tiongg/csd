@@ -132,8 +132,13 @@ public class TeamController {
   }
 
   @GetMapping("/{teamId}/courses")
-  public List<CourseResponseDTO> getTeamCourses(@PathVariable UUID teamId) {
-    return this.courseService.getCoursesByTeamId(teamId).stream().map(CourseResponseDTO::new).toList();
+  @OkResponse
+  @BadRequestResponse
+  @Operation(summary = "Gets all team courses", description = "Retrieves all courses associated with the team")
+  public List<CourseResponseDTO> getTeamCourses(@PathVariable UUID teamId,
+      @AuthenticationPrincipal AuthUserDetails userDetails) {
+    return this.courseService.getCoursesByTeamId(teamId, userDetails.getId()).stream().map(CourseResponseDTO::new)
+        .toList();
   }
 
 }

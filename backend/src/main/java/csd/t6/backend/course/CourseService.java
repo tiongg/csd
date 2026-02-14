@@ -45,7 +45,11 @@ public class CourseService {
     return courseRepository.findAll().stream().map(CourseResponseDTO::new).collect(Collectors.toList());
   }
 
-  public List<CourseRecord> getCoursesByTeamId(UUID teamId) {
+  public List<CourseRecord> getCoursesByTeamId(UUID teamId, UUID requesterId) {
+    if (!teamService.isTeamMember(teamId, requesterId)) {
+      throw new BadRequestException("You must be a member of the team to view its courses");
+    }
+
     return this.courseRepository.findBy(COURSE.TEAM_ID, teamId);
   }
 
