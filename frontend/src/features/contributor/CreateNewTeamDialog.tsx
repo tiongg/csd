@@ -122,6 +122,7 @@ export default function CreateNewTeamDialog({
                     {...field}
                     id="description"
                     placeholder="What is this team about?"
+                    className="resize-none"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
