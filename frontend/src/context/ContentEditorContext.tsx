@@ -1,13 +1,13 @@
-import { generateColorFromString } from '@/lib/utils';
+import { generateColorFromString, type Course } from '@/lib/utils';
 import { defaultMarkdownSerializer, schema } from 'prosemirror-markdown';
 import {
   createContext,
-  type Dispatch,
-  type PropsWithChildren,
-  type SetStateAction,
   useContext,
   useEffect,
   useState,
+  type Dispatch,
+  type PropsWithChildren,
+  type SetStateAction,
 } from 'react';
 import { yXmlFragmentToProseMirrorRootNode } from 'y-prosemirror';
 import { WebsocketProvider } from 'y-websocket';
@@ -29,6 +29,8 @@ export type DocType = TypedDoc<
 >;
 
 export type ContentEditorContextType = {
+  course: Course;
+
   doc: DocType;
   provider: WebsocketProvider;
   currentSection: number;
@@ -44,11 +46,13 @@ const ContentEditorContext = createContext<ContentEditorContextType | null>(
 
 type ContentEditorProviderProps = PropsWithChildren<{
   roomName: string;
+  course: Course;
 }>;
 
 export function ContentEditorProvider({
   children,
   roomName,
+  course,
 }: ContentEditorProviderProps) {
   const { user } = useAuth();
   const [doc] = useState(() => new Y.Doc() as DocType);
@@ -126,6 +130,7 @@ export function ContentEditorProvider({
   return (
     <ContentEditorContext.Provider
       value={{
+        course,
         doc,
         provider,
         currentSection,

@@ -1,5 +1,8 @@
+import type { Account } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
+import useActiveRole from '@/hooks/useActiveRole';
+import { capitalizeFirst } from '@/lib/utils';
 import {
-  BookOpenIcon,
   Cog6ToothIcon,
   DocumentTextIcon,
   PencilSquareIcon,
@@ -9,16 +12,12 @@ import {
   UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
+import type { LinkOptions } from '@tanstack/react-router';
 import { Link, useNavigate } from '@tanstack/react-router';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
-import type { PropsWithChildren } from 'react';
-import type { Account } from '@/context/AuthContext';
-import type React from 'react';
-import type { LinkOptions } from '@tanstack/react-router';
-import { useAuth } from '@/context/AuthContext';
-import { capitalizeFirst } from '@/lib/utils';
-import useActiveRole from '@/hooks/useActiveRole';
 
 type NavItemProps = PropsWithChildren<{
   title: string;
@@ -84,12 +83,6 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
         />
 
         <NavItem title="Teams" link="/contributor/teams" icon={<UsersIcon />} />
-
-        <NavItem
-          title="Courses"
-          link="/contributor/courses"
-          icon={<BookOpenIcon />}
-        />
       </>
     ))
     .otherwise(() => (

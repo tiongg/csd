@@ -248,6 +248,26 @@ export interface paths {
         patch: operations["updateAccount"];
         trace?: never;
     };
+    "/api/teams/{teamId}/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Gets all team courses
+         * @description Retrieves all courses associated with the team
+         */
+        get: operations["getTeamCourses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/teams/{teamId}/check-membership": {
         parameters: {
             query?: never;
@@ -364,7 +384,7 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
-            members?: components["schemas"]["TeamMember"][];
+            members: components["schemas"]["TeamMember"][];
         };
         TeamMember: {
             /** Format: uuid */
@@ -407,10 +427,7 @@ export interface components {
             updatedAt: string;
         };
         AddMemberRequest: {
-            /** Format: uuid */
-            accountId: string;
-            /** @enum {string} */
-            teamRole: "OWNER" | "ADMIN" | "MEMBER";
+            username: string;
         };
         TeamCreateRequest: {
             name: string;
@@ -1077,6 +1094,37 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["Account"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    getTeamCourses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                teamId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Course"][];
                 };
             };
             /** @description Bad request */

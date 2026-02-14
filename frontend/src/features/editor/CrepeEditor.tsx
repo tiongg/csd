@@ -51,7 +51,7 @@ function CrepeEditorInternal() {
 }
 
 export default function CrepeEditor() {
-  const { setCurrentSection, currentSection, doc, addSection } =
+  const { setCurrentSection, currentSection, doc, addSection, course } =
     useContentEditor();
 
   const sectionCount = useYArrayLength(doc.getArray('root'));
@@ -78,7 +78,7 @@ export default function CrepeEditor() {
       </nav>
       <div className="min-h-0 flex-1 overflow-y-auto">
         {currentSection === -1 ? (
-          <EditorCourseDisplay />
+          <EditorCourseDisplay course={course} />
         ) : (
           <MilkdownProvider>
             <CrepeEditorInternal />

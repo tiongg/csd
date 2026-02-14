@@ -1,5 +1,7 @@
 package csd.t6.backend.course;
 
+import static csd.t6.jooq.public_.tables.Course.COURSE;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,6 +43,14 @@ public class CourseService {
 
   public List<CourseResponseDTO> getAllCourses() {
     return courseRepository.findAll().stream().map(CourseResponseDTO::new).collect(Collectors.toList());
+  }
+
+  public List<CourseRecord> getCoursesByTeamId(UUID teamId, UUID requesterId) {
+    if (!teamService.isTeamMember(teamId, requesterId)) {
+      throw new BadRequestException("You must be a member of the team to view its courses");
+    }
+
+    return this.courseRepository.findBy(COURSE.TEAM_ID, teamId);
   }
 
   @Transactional

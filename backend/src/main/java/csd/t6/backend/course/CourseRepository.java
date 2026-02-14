@@ -9,14 +9,13 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
+import csd.t6.backend.utils.BaseRepository;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Repository
-public class CourseRepository {
-  private final DSLContext dsl;
-
+public class CourseRepository extends BaseRepository<CourseRecord> {
   public CourseRepository(DSLContext dsl) {
-    this.dsl = dsl;
+    super(dsl, COURSE);
   }
 
   public CourseRecord create(String title, String description, UUID creatorId, UUID teamId) {

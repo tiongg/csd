@@ -1,62 +1,65 @@
-import { Heading1 } from '@/components/ui/typography';
 import {
   CardWithDetails,
   CardWithPlusIcon,
 } from '@/components/ui/custom-cards';
-
-// placeholders
-const teams = [
-  {
-    name: 'School of Computing and Information Systems',
-    size: 4,
-  },
-  {
-    name: 'School of Business',
-    size: 3,
-  },
-  {
-    name: 'School of Law',
-    size: 1,
-  },
-  {
-    name: 'School of Accountancy',
-    size: 6,
-  },
-  {
-    name: 'School of Economics',
-    size: 2,
-  },
-];
+import { Heading1 } from '@/components/ui/typography';
+import { useApiQuery } from '@/lib/fetch-client';
+import type { Team } from '@/lib/utils';
+import { useNavigate } from '@tanstack/react-router';
+import { useBoolean } from 'usehooks-ts';
+import CreateNewTeamDialog from './CreateNewTeamDialog';
 
 export default function TeamsList() {
+  const { data: teams, isLoading } = useApiQuery('get', '/api/teams/');
+
+  const {
+    value: isCreateTeamDialogOpen,
+    setTrue: openCreateTeamDialog,
+    setValue: setCreateTeamDialogOpen,
+  } = useBoolean(false);
+
   return (
-    <div className="flex h-full w-full flex-col p-16">
+    <div className="flex h-full w-full flex-col p-8">
       <div>
         <Heading1>Your Teams</Heading1>
         <p className="font-subtitle">Here's what's happening today!</p>
       </div>
-      <div className="grid grid-cols-3 justify-start gap-4 py-4">
-        <CardWithPlusIcon title="Add New Team" />
+      <div className="grid grid-cols-4 justify-start gap-4 py-4">
+        <CardWithPlusIcon title="Add New Team" onClick={openCreateTeamDialog} />
 
-        {teams.map(({ name, size }, i) => (
-          <TeamCard name={name} size={size} key={i} />
-        ))}
+        {isLoading ? (
+          <p>Loading...</p>
+        ) : (
+          (teams ?? []).map((team, i) => <TeamCard team={team} key={team.id} />)
+        )}
       </div>
+
+      <CreateNewTeamDialog
+        isOpen={isCreateTeamDialogOpen}
+        setDialogOpen={setCreateTeamDialogOpen}
+      />
     </div>
   );
 }
 
 type TeamCardProps = {
-  name: string;
-  size: number;
+  team: Team;
 };
 
-function TeamCard({ name, size }: TeamCardProps) {
+function TeamCard({ team: { name, members, id } }: TeamCardProps) {
+  const navigate = useNavigate();
+
   return (
     <CardWithDetails
       title={name}
       descriptor="Collaborators"
-      data={size.toString()}
+      data={members.length.toString()}
+      onClick={() => {
+        navigate({
+          to: '/contributor/$teamId/courses',
+          params: { teamId: id },
+        });
+      }}
     />
   );
 }

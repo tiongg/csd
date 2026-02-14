@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.auth.AuthUserDetails;
+import csd.t6.backend.course.CourseService;
+import csd.t6.backend.course.dto.CourseResponseDTO;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -37,9 +39,11 @@ import jakarta.validation.Valid;
 @SecurityRequirement(name = "bearerAuth")
 public class TeamController {
   private final TeamService teamService;
+  private final CourseService courseService;
 
-  public TeamController(TeamService teamService) {
+  public TeamController(TeamService teamService, CourseService courseService) {
     this.teamService = teamService;
+    this.courseService = courseService;
   }
 
   @PostMapping("/")
@@ -126,4 +130,15 @@ public class TeamController {
       @Valid @RequestBody UpdateMemberRoleRequest request, @AuthenticationPrincipal AuthUserDetails userDetails) {
     return teamService.updateMemberRole(teamId, accountId, request.role(), userDetails.getId());
   }
+
+  @GetMapping("/{teamId}/courses")
+  @OkResponse
+  @BadRequestResponse
+  @Operation(summary = "Gets all team courses", description = "Retrieves all courses associated with the team")
+  public List<CourseResponseDTO> getTeamCourses(@PathVariable UUID teamId,
+      @AuthenticationPrincipal AuthUserDetails userDetails) {
+    return this.courseService.getCoursesByTeamId(teamId, userDetails.getId()).stream().map(CourseResponseDTO::new)
+        .toList();
+  }
+
 }
