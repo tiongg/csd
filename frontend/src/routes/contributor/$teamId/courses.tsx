@@ -9,9 +9,14 @@ export const Route = createFileRoute('/contributor/$teamId/courses')({
 
 function RouteComponent() {
   const { teamId } = Route.useParams();
-  const { data: team } = useApiQuery('get', '/api/teams/{teamId}', {
+  const { data: team, isLoading } = useApiQuery('get', '/api/teams/{teamId}', {
     params: { path: { teamId: teamId } },
   });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   if (!team) {
     return <div>Team not found</div>;
   }
