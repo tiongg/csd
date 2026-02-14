@@ -9,11 +9,7 @@ import {
 } from '@/components/ui/card';
 import { useContentEditor } from '@/context/ContentEditorContext';
 import type { Course } from '@/lib/utils';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { BookOpen, FileText, HelpCircle, Plus } from 'lucide-react';
-
-dayjs.extend(relativeTime);
 
 type EditorCourseDisplayProps = {
   course: Course;
