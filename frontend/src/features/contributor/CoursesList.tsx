@@ -7,6 +7,7 @@ import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Heading1 } from '@/components/ui/typography';
 import { useApiQuery } from '@/lib/fetch-client';
 import { capitalizeFirst, cn, type Course, type Team } from '@/lib/utils';
+import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import { useBoolean } from 'usehooks-ts';
 import CreateCourseDialog from './CreateCourseDialog';
@@ -82,6 +83,8 @@ const BADGE_STYLES = {
 } satisfies Record<StatusType, string>;
 
 function CourseCard({ course, status }: CourseCardProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="relative">
       {status && (
@@ -98,6 +101,12 @@ function CourseCard({ course, status }: CourseCardProps) {
         title={course.title}
         descriptor="Last Edited"
         data={dayjs(course.updatedAt).fromNow()}
+        onClick={() =>
+          navigate({
+            to: '/contributor/editor/$courseId',
+            params: { courseId: course.id },
+          })
+        }
       >
         <DropdownMenuItem>Delete</DropdownMenuItem>
       </CardWithDetails>

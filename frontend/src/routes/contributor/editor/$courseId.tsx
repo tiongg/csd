@@ -2,10 +2,27 @@ import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { ContentEditorProvider } from '@/context/ContentEditorContext';
 import CrepeEditor from '@/features/editor/CrepeEditor';
 import EditorHeader from '@/features/editor/EditorHeader';
-import { createFileRoute } from '@tanstack/react-router';
+import { fetchClient } from '@/lib/fetch-client';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/editor/$courseId')({
+export const Route = createFileRoute('/contributor/editor/$courseId')({
   component: RouteComponent,
+  loader: async ({ params: { courseId } }) => {
+    const { data } = await fetchClient.GET('/api/courses/{id}', {
+      params: {
+        path: {
+          id: courseId,
+        },
+      },
+    });
+    if (!data) {
+      throw redirect({
+        to: '/contributor/dashboard',
+      });
+    }
+
+    return { courseId, data };
+  },
 });
 
 function RouteComponent() {
