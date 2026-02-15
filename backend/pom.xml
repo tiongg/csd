@@ -34,6 +34,19 @@
 		<jooq.jdbc.user>postgres</jooq.jdbc.user>
 		<jooq.jdbc.password>password</jooq.jdbc.password>
 	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>1.19.8</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -112,6 +125,18 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Testcontainers for integration tests -->
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -136,6 +161,7 @@
 				</executions>
 
 				<configuration>
+					<skip>${jooq.codegen.skip}</skip>
 					<jdbc>
 						<driver>org.postgresql.Driver</driver>
 						<url>${jooq.jdbc.url}</url>
