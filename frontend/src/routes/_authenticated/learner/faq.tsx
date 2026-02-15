@@ -39,11 +39,11 @@ const items = [
 
 function RouteComponent() {
   return (
-    <PageWithSideBar className="flex min-h-screen w-full">
-      <div className="m-auto w-full">
+    <PageWithSideBar className="h-[calc(100vh-4rem)] overflow-hidden">
+      <div className="flex h-full w-full flex-col items-center justify-center gap-8">
         <Accordion
           type="multiple"
-          className="mx-auto max-w-xl p-8"
+          className="w-full max-w-xl"
           defaultValue={['notifications']}
         >
           {items.map((item) => (
