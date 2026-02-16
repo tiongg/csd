@@ -106,11 +106,15 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
     ));
 }
 
-function getRoleUrl(currentActiveRole: Account['role']): LinkOptions['to'] {
+type PathType = 'settings' | 'faq';
+function getRoleUrl(
+  currentActiveRole: Account['role'],
+  path: PathType,
+): LinkOptions['to'] {
   return match(currentActiveRole)
-    .with('LEARNER', () => '/learner/settings' as const)
-    .with('ADMIN', () => '/admin/settings' as const)
-    .with('CONTRIBUTOR', () => '/contributor/settings' as const)
+    .with('LEARNER', () => `/learner/${path}` as const)
+    .with('ADMIN', () => `/admin/${path}` as const)
+    .with('CONTRIBUTOR', () => `/contributor/${path}` as const)
     .exhaustive();
 }
 
@@ -139,13 +143,13 @@ export default function Sidebar() {
           <div className="flex flex-col gap-y-4 py-4">
             <NavItem
               title="Settings"
-              link={getRoleUrl(currentActiveRole)}
+              link={getRoleUrl(currentActiveRole,'settings')}
               icon={<Cog6ToothIcon />}
             />
 
             <NavItem
               title="Help & Support"
-              link="/"
+              link={getRoleUrl(currentActiveRole,'faq')}
               icon={<QuestionMarkCircleIcon />}
             />
           </div>

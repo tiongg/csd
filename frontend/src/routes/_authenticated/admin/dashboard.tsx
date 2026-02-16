@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import UserDashboard from '@/components/UserDashboard';
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 
-export const Route = createFileRoute('/learner/dashboard')({
+export const Route = createFileRoute('/_authenticated/admin/dashboard')({
   component: RouteComponent,
 });
 
