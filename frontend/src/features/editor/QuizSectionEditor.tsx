@@ -3,11 +3,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/AuthContext';
-import {
-  useContentEditor,
-  type QuizContentMap,
-} from '@/context/ContentEditorContext';
+import { useContentEditor } from '@/context/ContentEditorContext';
 import { useYArrayTextBindings } from '@/hooks/useYArrayTextBindings';
+import type { EditableQuizContent, QuizContent } from '@/lib/content.type';
 import { generateColorFromString, hexToRgb } from '@/lib/utils';
 import { TextAreaBinding, type TextAreaBindingOptions } from '@/lib/y-textarea';
 import { XIcon } from 'lucide-react';
@@ -16,15 +14,7 @@ import { useY } from 'react-yjs';
 import * as Y from 'yjs';
 
 type QuizSectionEditorProps = {
-  quizContent: QuizContentMap;
-};
-
-// Same as QuizContentMap but with plain JS types
-// useY Hook converts into json types for us
-type QuizContent = {
-  question: string;
-  options: string[];
-  answer: number; // Bit flags for correct options
+  quizContent: EditableQuizContent;
 };
 
 function isOptionCorrect(answer: number, index: number): boolean {

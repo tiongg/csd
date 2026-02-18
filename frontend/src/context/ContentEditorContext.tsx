@@ -1,3 +1,10 @@
+import type {
+  ContentType,
+  DocType,
+  EditableQuizContent,
+  EditableSectionType,
+  SectionType,
+} from '@/lib/content.type';
 import { generateColorFromString, type Course } from '@/lib/utils';
 import { defaultMarkdownSerializer, schema } from 'prosemirror-markdown';
 import {
@@ -12,37 +19,7 @@ import {
 import { yXmlFragmentToProseMirrorRootNode } from 'y-prosemirror';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
-import type { TypedArray, TypedDoc, TypedMap } from 'yjs-types';
 import { useAuth } from './AuthContext';
-
-export type QuizContentMap = TypedMap<{
-  question: Y.Text;
-  options: Y.Array<Y.Text>;
-  // Bit flags for correct options
-  // For example, if options 0 and 2 are correct, answer would be 0b101 = 5
-  answer: number;
-}>;
-export type ContentType = 'markdown' | 'quiz';
-export type SectionType = TypedMap<
-  {
-    title: Y.Text;
-  } & (
-    | {
-        content: Y.XmlFragment;
-        type: 'markdown';
-      }
-    | {
-        content: QuizContentMap;
-        type: 'quiz';
-      }
-  )
->;
-export type DocType = TypedDoc<
-  any, // For typing maps
-  {
-    root: TypedArray<SectionType>;
-  }
->;
 
 export type ContentEditorContextType = {
   course: Course;
@@ -51,7 +28,7 @@ export type ContentEditorContextType = {
   provider: WebsocketProvider;
   currentSection: number;
   setCurrentSection: Dispatch<SetStateAction<number>>;
-  getDocAsJson: () => string;
+  getDocAsJson: () => SectionType[];
   deleteSection: (index: number) => void;
   addSection: (type: ContentType) => void;
 };
@@ -65,12 +42,15 @@ type ContentEditorProviderProps = PropsWithChildren<{
   course: Course;
 }>;
 
-function countBySectionType(sections: SectionType[], type: ContentType) {
+function countBySectionType(
+  sections: EditableSectionType[],
+  type: ContentType,
+) {
   return sections.filter((section) => section.get('type') === type).length;
 }
 
 function getDefaultQuizContent() {
-  const content = new Y.Map() as QuizContentMap;
+  const content = new Y.Map() as EditableQuizContent;
   const question = new Y.Text();
   question.insert(0, 'New Question');
   content.set('question', question);
@@ -113,19 +93,40 @@ export function ContentEditorProvider({
   }, [provider, user]);
 
   function getDocAsJson() {
-    const rootArray = doc.getArray('root');
-    let res = '';
+    const rootArray = Array.from<EditableSectionType>(doc.getArray('root'));
+    const res = new Array<SectionType>();
 
     for (const node of rootArray) {
-      if ((node.get('type') as ContentType) !== 'markdown') {
-        continue;
+      const type = node.get('type');
+      const title = node.get('title')!.toString();
+
+      if (type == 'markdown') {
+        const pmNode = yXmlFragmentToProseMirrorRootNode(
+          node.get('content') as Y.XmlFragment,
+          schema,
+        );
+        const markdownOutput = defaultMarkdownSerializer.serialize(pmNode);
+        res.push({
+          title,
+          type,
+          content: markdownOutput,
+        });
       }
-      const pmNode = yXmlFragmentToProseMirrorRootNode(
-        node.get('content') as Y.XmlFragment,
-        schema,
-      );
-      const markdownOutput = defaultMarkdownSerializer.serialize(pmNode);
-      res += markdownOutput + '\n\n';
+
+      if (type === 'quiz') {
+        const content = node.get('content') as EditableQuizContent;
+        res.push({
+          title,
+          type,
+          content: {
+            question: content.get('question')!.toString(),
+            options: Array.from(content.get('options')!).map((option) =>
+              option.toString(),
+            ),
+            answer: content.get('answer')!,
+          },
+        });
+      }
     }
 
     return res;
@@ -146,7 +147,7 @@ export function ContentEditorProvider({
     doc.transact(() => {
       const rootArray = doc.getArray('root');
       const title = new Y.Text();
-      const sections = Array.from(rootArray) as SectionType[];
+      const sections = Array.from(rootArray) as EditableSectionType[];
       if (type === 'markdown') {
         title.insert(
           0,
@@ -156,7 +157,7 @@ export function ContentEditorProvider({
         title.insert(0, `Quiz ${countBySectionType(sections, 'quiz') + 1}`);
       }
 
-      const section = new Y.Map() as SectionType;
+      const section = new Y.Map() as EditableSectionType;
       section.set('title', title);
 
       if (type === 'markdown') {
