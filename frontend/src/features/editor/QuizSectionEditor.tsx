@@ -40,9 +40,10 @@ function toggleOptionCorrect(answer: number, index: number): number {
 export default function QuizSectionEditor({
   quizContent,
 }: QuizSectionEditorProps) {
-  const { provider, currentSection } = useContentEditor();
+  const { provider, currentSection, doc } = useContentEditor();
   const { user } = useAuth();
   const questionAreaRef = useRef<HTMLTextAreaElement>(null);
+  const quizOptions = useMemo(() => quizContent.get('options')!, [quizContent]);
 
   // useY returns a Y.Map converted to plain JS object, but the types don't reflect that, so we need to cast it
   const content = useY(quizContent) as unknown as QuizContent;
@@ -74,17 +75,21 @@ export default function QuizSectionEditor({
   }, [quizContent, bindingConfig]);
 
   const { getRef: getOptionRef } = useYArrayTextBindings(
-    quizContent.get('options')!,
+    quizOptions,
     bindingConfig,
   );
 
-  const addOption = () => {
-    quizContent.get('options')!.push([new Y.Text()]);
-  };
+  function addOption() {
+    doc.transact(() => {
+      quizOptions.push([new Y.Text()]);
+    });
+  }
 
-  const deleteOption = (index: number) => {
-    quizContent.get('options')!.delete(index, 1);
-  };
+  function deleteOption(index: number) {
+    doc.transact(() => {
+      quizOptions.delete(index, 1);
+    });
+  }
 
   const currentAnswer = content['answer'] ?? 0;
 

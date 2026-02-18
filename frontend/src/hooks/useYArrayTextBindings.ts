@@ -1,5 +1,6 @@
 import { TextAreaBinding, type TextAreaBindingOptions } from '@/lib/y-textarea';
 import { useCallback, useEffect, useRef } from 'react';
+import { useY } from 'react-yjs';
 import type * as Y from 'yjs';
 
 /**
@@ -17,6 +18,7 @@ export function useYArrayTextBindings(
 ) {
   const bindingsRef = useRef<Map<number, TextAreaBinding>>(new Map());
   const refsMap = useRef<Map<number, HTMLTextAreaElement>>(new Map());
+  const stateUpdater = useY(yArray); // Used to trigger re-renders when yArray changes
 
   const getRef = useCallback((index: number) => {
     return (element: HTMLTextAreaElement | null) => {
@@ -60,7 +62,7 @@ export function useYArrayTextBindings(
       }
       currentBindings.clear();
     };
-  }, [yArray, bindingConfig]);
+  }, [yArray, bindingConfig, stateUpdater]);
 
   return { getRef };
 }
