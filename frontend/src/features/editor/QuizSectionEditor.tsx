@@ -1,4 +1,6 @@
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -6,9 +8,9 @@ import {
   type QuizContentMap,
 } from '@/context/ContentEditorContext';
 import { useYArrayTextBindings } from '@/hooks/useYArrayTextBindings';
-import useYArrayObserver from '@/hooks/useYObserver';
 import { generateColorFromString, hexToRgb } from '@/lib/utils';
 import { TextAreaBinding, type TextAreaBindingOptions } from '@/lib/y-textarea';
+import { XIcon } from 'lucide-react';
 import { useEffect, useMemo, useRef } from 'react';
 import { useY } from 'react-yjs';
 import * as Y from 'yjs';
@@ -25,6 +27,16 @@ type QuizContent = {
   answer: number; // Bit flags for correct options
 };
 
+function isOptionCorrect(answer: number, index: number): boolean {
+  return (answer & (1 << index)) !== 0;
+}
+
+function toggleOptionCorrect(answer: number, index: number): number {
+  return isOptionCorrect(answer, index)
+    ? answer & ~(1 << index)
+    : answer | (1 << index);
+}
+
 export default function QuizSectionEditor({
   quizContent,
 }: QuizSectionEditorProps) {
@@ -34,10 +46,6 @@ export default function QuizSectionEditor({
 
   // useY returns a Y.Map converted to plain JS object, but the types don't reflect that, so we need to cast it
   const content = useY(quizContent) as unknown as QuizContent;
-  const options = useYArrayObserver(
-    quizContent.get('options')!,
-    (option) => option,
-  );
 
   // Binding config for question and option textareas
   const bindingConfig = useMemo<TextAreaBindingOptions>(
@@ -65,57 +73,90 @@ export default function QuizSectionEditor({
     };
   }, [quizContent, bindingConfig]);
 
-  // Options bindings using custom hook
   const { getRef: getOptionRef } = useYArrayTextBindings(
     quizContent.get('options')!,
     bindingConfig,
   );
 
-  return (
-    <div>
-      <p>Quiz editor</p>
-      <Textarea ref={questionAreaRef} id={`${currentSection}-question`} />
-      <p>Options</p>
-      <Button
-        onClick={() => {
-          const options = quizContent.get('options')!;
-          options.push([new Y.Text()]);
-        }}
-      >
-        + Add option
-      </Button>
-      {options.map((_option, index: number) => {
-        const currentAnswer = content['answer'] ?? 0;
-        const isCorrect = (currentAnswer & (1 << index)) !== 0;
+  const addOption = () => {
+    quizContent.get('options')!.push([new Y.Text()]);
+  };
 
-        return (
-          <div key={index} className="flex items-start gap-2">
-            <input
-              type="checkbox"
-              checked={isCorrect}
-              className="mt-2"
-              onChange={() => {
-                const newAnswer = isCorrect
-                  ? currentAnswer & ~(1 << index)
-                  : currentAnswer | (1 << index);
-                quizContent.set('answer', newAnswer);
-              }}
-            />
-            <Textarea
-              ref={getOptionRef(index)}
-              id={`${currentSection}-option-${index}`}
-            />
-            <Button
-              variant="destructive"
-              onClick={() => {
-                quizContent.get('options')!.delete(index, 1);
-              }}
-            >
-              Delete
-            </Button>
-          </div>
-        );
-      })}
+  const deleteOption = (index: number) => {
+    quizContent.get('options')!.delete(index, 1);
+  };
+
+  const currentAnswer = content['answer'] ?? 0;
+
+  return (
+    <div className="space-y-4 p-4">
+      <div className="space-y-2">
+        <Label
+          htmlFor={`${currentSection}-question`}
+          className="text-base font-semibold"
+        >
+          Question
+        </Label>
+        <Textarea
+          ref={questionAreaRef}
+          id={`${currentSection}-question`}
+          placeholder="Enter your question..."
+          className="min-h-20 resize-none"
+        />
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label className="text-base font-semibold">Options</Label>
+          <Button onClick={addOption} size="sm" variant="outline">
+            + Add option
+          </Button>
+        </div>
+
+        <div className="space-y-3">
+          {content.options.length === 0 ? (
+            <div className="text-muted-foreground flex items-center justify-center rounded-lg border border-dashed py-8 text-sm">
+              No options yet.
+            </div>
+          ) : (
+            content.options.map((_option, index) => (
+              <div
+                key={index}
+                className="group hover:bg-muted/50 flex items-start gap-3 rounded-lg border p-3 transition-colors"
+              >
+                <Checkbox
+                  id={`${currentSection}-option-${index}-correct`}
+                  checked={isOptionCorrect(currentAnswer, index)}
+                  onCheckedChange={() => {
+                    const newAnswer = toggleOptionCorrect(currentAnswer, index);
+                    quizContent.set('answer', newAnswer);
+                  }}
+                />
+                <div className="flex-1 space-y-1">
+                  <Label
+                    htmlFor={`${currentSection}-option-${index}-correct`}
+                    className="text-muted-foreground text-xs"
+                  >
+                    Correct answer
+                  </Label>
+                  <Textarea
+                    ref={getOptionRef(index)}
+                    id={`${currentSection}-option-${index}`}
+                    className="min-h-15 resize-none"
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => deleteOption(index)}
+                >
+                  <XIcon />
+                </Button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }
