@@ -6,22 +6,25 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useContentEditor } from '@/context/ContentEditorContext';
+import {
+  useContentEditor,
+  type QuizContentMap,
+} from '@/context/ContentEditorContext';
 import useYArrayLength from '@/hooks/useYArrayLength';
 import { Crepe } from '@milkdown/crepe';
 import { collab, collabServiceCtx } from '@milkdown/plugin-collab';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
+import _ from 'lodash';
 import { useEffect } from 'react';
+import { match } from 'ts-pattern';
 import * as Y from 'yjs';
-
 import EditorCourseDisplay from './EditorCourseDisplay';
+import QuizSectionEditor from './QuizSectionEditor';
 import SectionSelect from './SectionSelect';
 
 import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
-import { match } from 'ts-pattern';
 import './editor.css';
-import QuizSectionEditor from './QuizSectionEditor';
 
 function MarkdownEditor() {
   const { get: getEditor } = useEditor((root) => {
@@ -80,7 +83,7 @@ export default function CrepeEditor() {
         </Button>
         <div className="bg-border mx-2 h-6 w-px shrink-0" />
         <div className="flex gap-1">
-          {Array.from({ length: sectionCount }, (_, i) => i).map((i) => (
+          {_.range(sectionCount).map((i) => (
             <SectionSelect key={i} index={i} />
           ))}
           <DropdownMenu>
@@ -112,7 +115,11 @@ export default function CrepeEditor() {
                 <MarkdownEditor />
               </MilkdownProvider>
             ))
-            .with('quiz', () => <QuizSectionEditor />)
+            .with('quiz', () => (
+              <QuizSectionEditor
+                quizContent={section.get('content') as QuizContentMap}
+              />
+            ))
             .exhaustive()
         )}
       </div>

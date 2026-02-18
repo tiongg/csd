@@ -15,6 +15,13 @@ import * as Y from 'yjs';
 import type { TypedArray, TypedDoc, TypedMap } from 'yjs-types';
 import { useAuth } from './AuthContext';
 
+export type QuizContentMap = TypedMap<{
+  question: Y.Text;
+  options: Y.Array<Y.Text>;
+  // Bit flags for correct options
+  // For example, if options 0 and 2 are correct, answer would be 0b101 = 5
+  answer: number;
+}>;
 export type ContentType = 'markdown' | 'quiz';
 export type SectionType = TypedMap<
   {
@@ -25,7 +32,7 @@ export type SectionType = TypedMap<
         type: 'markdown';
       }
     | {
-        content: Y.Map<any>;
+        content: QuizContentMap;
         type: 'quiz';
       }
   )
@@ -60,6 +67,16 @@ type ContentEditorProviderProps = PropsWithChildren<{
 
 function countBySectionType(sections: SectionType[], type: ContentType) {
   return sections.filter((section) => section.get('type') === type).length;
+}
+
+function getDefaultQuizContent() {
+  const content = new Y.Map() as QuizContentMap;
+  const question = new Y.Text();
+  question.insert(0, 'New Question');
+  content.set('question', question);
+  content.set('options', new Y.Array<Y.Text>());
+  content.set('answer', 0);
+  return content;
 }
 
 export function ContentEditorProvider({
@@ -147,7 +164,7 @@ export function ContentEditorProvider({
         section.set('content', new Y.XmlFragment());
       } else {
         section.set('type', 'quiz');
-        section.set('content', new Y.Map());
+        section.set('content', getDefaultQuizContent());
       }
       rootArray.push([section]);
     });
