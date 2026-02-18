@@ -1,13 +1,11 @@
 import * as awarenessProtocol from 'y-protocols/awareness.js';
 
-export interface color {
-  r: number;
-  g: number;
-  b: number;
-}
-
-export interface options {
+export type TextAreaBindingOptions = {
   awareness: awarenessProtocol.Awareness;
   clientName?: string;
-  color?: color;
-}
+  color?: {
+    r: number;
+    g: number;
+    b: number;
+  };
+};

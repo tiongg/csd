@@ -1,5 +1,5 @@
 import { TextAreaCursors } from './y-textarea-cursors';
-import type { options } from './y-textarea-options';
+import type { TextAreaBindingOptions } from './y-textarea-options';
 
 import diff from 'fast-diff';
 import * as Y from 'yjs';
@@ -11,7 +11,7 @@ export class TextAreaBinding {
   constructor(
     yText: Y.Text,
     textField: HTMLTextAreaElement | HTMLInputElement,
-    options?: options,
+    options?: TextAreaBindingOptions,
   ) {
     let doc = yText.doc as Y.Doc;
     if (doc === null) {

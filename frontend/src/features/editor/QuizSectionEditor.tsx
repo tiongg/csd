@@ -5,10 +5,11 @@ import {
   useContentEditor,
   type QuizContentMap,
 } from '@/context/ContentEditorContext';
+import { useYArrayTextBindings } from '@/hooks/useYArrayTextBindings';
 import useYArrayObserver from '@/hooks/useYObserver';
 import { generateColorFromString, hexToRgb } from '@/lib/utils';
-import { TextAreaBinding } from '@/lib/y-textarea';
-import { useCallback, useEffect, useRef } from 'react';
+import { TextAreaBinding, type TextAreaBindingOptions } from '@/lib/y-textarea';
+import { useEffect, useMemo, useRef } from 'react';
 import { useY } from 'react-yjs';
 import * as Y from 'yjs';
 
@@ -38,19 +39,15 @@ export default function QuizSectionEditor({
     (option) => option,
   );
 
-  // Use a Map to store refs and their corresponding bindings
-  const optionRefsMap = useRef<Map<number, HTMLTextAreaElement>>(new Map());
-  const bindingsRef = useRef<Map<number, TextAreaBinding>>(new Map());
-
-  const getOptionRef = useCallback((index: number) => {
-    return (element: HTMLTextAreaElement | null) => {
-      if (element) {
-        optionRefsMap.current.set(index, element);
-      } else {
-        optionRefsMap.current.delete(index);
-      }
-    };
-  }, []);
+  // Binding config for question and option textareas
+  const bindingConfig = useMemo<TextAreaBindingOptions>(
+    () => ({
+      awareness: provider.awareness,
+      clientName: user?.username ?? 'Anonymous',
+      color: hexToRgb(generateColorFromString(user?.username ?? 'Anonymous')),
+    }),
+    [provider, user],
+  );
 
   // Question area binding
   useEffect(() => {
@@ -60,58 +57,19 @@ export default function QuizSectionEditor({
     const questionAreaBinding = new TextAreaBinding(
       quizContent.get('question')!,
       textArea,
-      {
-        awareness: provider.awareness,
-        clientName: user?.username ?? 'Anonymous',
-        color: hexToRgb(generateColorFromString(user?.username ?? 'Anonymous')),
-      },
+      bindingConfig,
     );
 
     return () => {
       questionAreaBinding.destroy();
     };
-  }, [provider, quizContent]);
+  }, [quizContent, bindingConfig]);
 
-  // Options bindings - watch for changes in options array
-  useEffect(() => {
-    const optionsArray = quizContent.get('options')!;
-    const currentBindings = bindingsRef.current;
-    const currentRefs = optionRefsMap.current;
-
-    // Create bindings for any options that don't have one yet
-    for (let i = 0; i < optionsArray.length; i++) {
-      const optionText = optionsArray.get(i) as Y.Text;
-      const ref = currentRefs.get(i);
-
-      if (ref && !currentBindings.has(i)) {
-        const binding = new TextAreaBinding(optionText, ref, {
-          awareness: provider.awareness,
-          clientName: user?.username ?? 'Anonymous',
-          color: hexToRgb(
-            generateColorFromString(user?.username ?? 'Anonymous'),
-          ),
-        });
-        currentBindings.set(i, binding);
-      }
-    }
-
-    // Clean up bindings for removed options
-    const existingIndices = Array.from(currentBindings.keys());
-    for (const index of existingIndices) {
-      if (index >= optionsArray.length) {
-        currentBindings.get(index)?.destroy();
-        currentBindings.delete(index);
-      }
-    }
-
-    // Clean up all bindings on unmount
-    return () => {
-      for (const binding of currentBindings.values()) {
-        binding.destroy();
-      }
-      currentBindings.clear();
-    };
-  }, [provider, options]);
+  // Options bindings using custom hook
+  const { getRef: getOptionRef } = useYArrayTextBindings(
+    quizContent.get('options')!,
+    bindingConfig,
+  );
 
   return (
     <div>
@@ -126,7 +84,7 @@ export default function QuizSectionEditor({
       >
         + Add option
       </Button>
-      {options.map((_option, index) => {
+      {options.map((_option, index: number) => {
         const currentAnswer = content['answer'] ?? 0;
         const isCorrect = (currentAnswer & (1 << index)) !== 0;
 
