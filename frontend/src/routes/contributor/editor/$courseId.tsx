@@ -30,7 +30,7 @@ function RouteComponent() {
   const { course } = Route.useLoaderData();
 
   return (
-    <PageWithSideBar className="h-[calc(100vh-4rem)] overflow-hidden">
+    <PageWithSideBar>
       <ContentEditorProvider roomName={courseId} course={course}>
         <div className="flex h-full w-full min-w-0 flex-1 flex-col">
           <EditorHeader />
