@@ -16,11 +16,20 @@ import type { TypedArray, TypedDoc, TypedMap } from 'yjs-types';
 import { useAuth } from './AuthContext';
 
 export type ContentType = 'markdown' | 'quiz';
-export type SectionType = TypedMap<{
-  title: Y.Text;
-  content: Y.XmlFragment;
-  type: ContentType;
-}>;
+export type SectionType = TypedMap<
+  {
+    title: Y.Text;
+  } & (
+    | {
+        content: Y.XmlFragment;
+        type: 'markdown';
+      }
+    | {
+        content: Y.Map<any>;
+        type: 'quiz';
+      }
+  )
+>;
 export type DocType = TypedDoc<
   any, // For typing maps
   {
@@ -37,7 +46,7 @@ export type ContentEditorContextType = {
   setCurrentSection: Dispatch<SetStateAction<number>>;
   getDocAsJson: () => string;
   deleteSection: (index: number) => void;
-  addSection: () => void;
+  addSection: (type: ContentType) => void;
 };
 
 const ContentEditorContext = createContext<ContentEditorContextType | null>(
@@ -48,6 +57,10 @@ type ContentEditorProviderProps = PropsWithChildren<{
   roomName: string;
   course: Course;
 }>;
+
+function countBySectionType(sections: SectionType[], type: ContentType) {
+  return sections.filter((section) => section.get('type') === type).length;
+}
 
 export function ContentEditorProvider({
   children,
@@ -112,17 +125,30 @@ export function ContentEditorProvider({
     });
   }
 
-  function addSection() {
+  function addSection(type: ContentType) {
     doc.transact(() => {
       const rootArray = doc.getArray('root');
       const title = new Y.Text();
-      title.insert(0, `Section ${rootArray.length + 1}`);
+      const sections = Array.from(rootArray) as SectionType[];
+      if (type === 'markdown') {
+        title.insert(
+          0,
+          `Section ${countBySectionType(sections, 'markdown') + 1}`,
+        );
+      } else {
+        title.insert(0, `Quiz ${countBySectionType(sections, 'quiz') + 1}`);
+      }
 
       const section = new Y.Map() as SectionType;
       section.set('title', title);
-      section.set('content', new Y.XmlFragment());
-      section.set('type', 'markdown');
 
+      if (type === 'markdown') {
+        section.set('type', 'markdown');
+        section.set('content', new Y.XmlFragment());
+      } else {
+        section.set('type', 'quiz');
+        section.set('content', new Y.Map());
+      }
       rootArray.push([section]);
     });
   }
