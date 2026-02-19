@@ -10,8 +10,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import csd.t6.backend.account.AccountService;
-import csd.t6.backend.auth.OAuth2ProviderRepository;
-import csd.t6.backend.auth.OAuthCodeService;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.jooq.accounts.enums.OauthProvider;
 import csd.t6.jooq.accounts.tables.records.OauthConnectionRecord;

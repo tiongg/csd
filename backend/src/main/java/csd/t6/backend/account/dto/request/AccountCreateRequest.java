@@ -1,4 +1,4 @@
-package csd.t6.backend.account.dto;
+package csd.t6.backend.account.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;

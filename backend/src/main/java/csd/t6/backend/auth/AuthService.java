@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import csd.t6.backend.account.AccountRepository;
-import csd.t6.backend.auth.dto.TokenData;
+import csd.t6.backend.auth.dto.responses.TokenDataResponse;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import jakarta.servlet.http.Cookie;
 
@@ -21,7 +21,7 @@ public class AuthService {
     this.jwtService = jwtService;
   }
 
-  public TokenData generateTokenData(UUID accountId) {
+  public TokenDataResponse generateTokenData(UUID accountId) {
     String accessToken = jwtService.generateAccessToken(accountId);
     String refreshToken = jwtService.generateRefreshToken(accountId);
 
@@ -29,7 +29,7 @@ public class AuthService {
     refreshCookie.setMaxAge((int) jwtService.getRefreshTokenExpirationHours() * 3600);
 
     AccountRecord account = this.accountRepository.findOneBy(ACCOUNT.ID, accountId).orElse(null);
-    return new TokenData(accessToken, account, refreshCookie);
+    return new TokenDataResponse(accessToken, account, refreshCookie);
   }
 
   public Cookie getLogoutCookie() {
