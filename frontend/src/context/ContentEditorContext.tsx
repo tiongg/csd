@@ -1,3 +1,10 @@
+import type {
+  ContentType,
+  DocType,
+  EditableQuizContent,
+  EditableSectionType,
+  SectionType,
+} from '@/lib/content.type';
 import { generateColorFromString, type Course } from '@/lib/utils';
 import { defaultMarkdownSerializer, schema } from 'prosemirror-markdown';
 import {
@@ -12,21 +19,7 @@ import {
 import { yXmlFragmentToProseMirrorRootNode } from 'y-prosemirror';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
-import type { TypedArray, TypedDoc, TypedMap } from 'yjs-types';
 import { useAuth } from './AuthContext';
-
-export type ContentType = 'markdown' | 'quiz';
-export type SectionType = TypedMap<{
-  title: Y.Text;
-  content: Y.XmlFragment;
-  type: ContentType;
-}>;
-export type DocType = TypedDoc<
-  any, // For typing maps
-  {
-    root: TypedArray<SectionType>;
-  }
->;
 
 export type ContentEditorContextType = {
   course: Course;
@@ -35,9 +28,9 @@ export type ContentEditorContextType = {
   provider: WebsocketProvider;
   currentSection: number;
   setCurrentSection: Dispatch<SetStateAction<number>>;
-  getDocAsJson: () => string;
+  getDocAsJson: () => SectionType[];
   deleteSection: (index: number) => void;
-  addSection: () => void;
+  addSection: (type: ContentType) => void;
 };
 
 const ContentEditorContext = createContext<ContentEditorContextType | null>(
@@ -48,6 +41,23 @@ type ContentEditorProviderProps = PropsWithChildren<{
   roomName: string;
   course: Course;
 }>;
+
+function countBySectionType(
+  sections: EditableSectionType[],
+  type: ContentType,
+) {
+  return sections.filter((section) => section.get('type') === type).length;
+}
+
+function getDefaultQuizContent() {
+  const content = new Y.Map() as EditableQuizContent;
+  const question = new Y.Text();
+  question.insert(0, 'New Question');
+  content.set('question', question);
+  content.set('options', new Y.Array<Y.Text>());
+  content.set('answer', 0);
+  return content;
+}
 
 export function ContentEditorProvider({
   children,
@@ -83,19 +93,40 @@ export function ContentEditorProvider({
   }, [provider, user]);
 
   function getDocAsJson() {
-    const rootArray = doc.getArray('root');
-    let res = '';
+    const rootArray = Array.from<EditableSectionType>(doc.getArray('root'));
+    const res = new Array<SectionType>();
 
     for (const node of rootArray) {
-      if ((node.get('type') as ContentType) !== 'markdown') {
-        continue;
+      const type = node.get('type');
+      const title = node.get('title')!.toString();
+
+      if (type == 'markdown') {
+        const pmNode = yXmlFragmentToProseMirrorRootNode(
+          node.get('content') as Y.XmlFragment,
+          schema,
+        );
+        const markdownOutput = defaultMarkdownSerializer.serialize(pmNode);
+        res.push({
+          title,
+          type,
+          content: markdownOutput,
+        });
       }
-      const pmNode = yXmlFragmentToProseMirrorRootNode(
-        node.get('content') as Y.XmlFragment,
-        schema,
-      );
-      const markdownOutput = defaultMarkdownSerializer.serialize(pmNode);
-      res += markdownOutput + '\n\n';
+
+      if (type === 'quiz') {
+        const content = node.get('content') as EditableQuizContent;
+        res.push({
+          title,
+          type,
+          content: {
+            question: content.get('question')!.toString(),
+            options: Array.from(content.get('options')!).map((option) =>
+              option.toString(),
+            ),
+            answer: content.get('answer')!,
+          },
+        });
+      }
     }
 
     return res;
@@ -112,17 +143,30 @@ export function ContentEditorProvider({
     });
   }
 
-  function addSection() {
+  function addSection(type: ContentType) {
     doc.transact(() => {
       const rootArray = doc.getArray('root');
       const title = new Y.Text();
-      title.insert(0, `Section ${rootArray.length + 1}`);
+      const sections = Array.from(rootArray) as EditableSectionType[];
+      if (type === 'markdown') {
+        title.insert(
+          0,
+          `Section ${countBySectionType(sections, 'markdown') + 1}`,
+        );
+      } else {
+        title.insert(0, `Quiz ${countBySectionType(sections, 'quiz') + 1}`);
+      }
 
-      const section = new Y.Map() as SectionType;
+      const section = new Y.Map() as EditableSectionType;
       section.set('title', title);
-      section.set('content', new Y.XmlFragment());
-      section.set('type', 'markdown');
 
+      if (type === 'markdown') {
+        section.set('type', 'markdown');
+        section.set('content', new Y.XmlFragment());
+      } else {
+        section.set('type', 'quiz');
+        section.set('content', getDefaultQuizContent());
+      }
       rootArray.push([section]);
     });
   }

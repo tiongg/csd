@@ -1,6 +1,6 @@
-import Sidebar from '../Sidebar';
-import type { PropsWithChildren } from 'react';
 import { cn } from '@/lib/utils';
+import type { PropsWithChildren } from 'react';
+import Sidebar from '../Sidebar';
 
 export default function PageWithSideBar({
   children,
@@ -11,7 +11,9 @@ export default function PageWithSideBar({
   return (
     <div className={cn('flex', className)}>
       <Sidebar />
-      <div className="ml-70 h-[calc(100vh-52px)] w-full">{children}</div>
+      <div className="h-[calc(100vh-52px)] w-full overflow-hidden pl-70">
+        {children}
+      </div>
     </div>
   );
 }

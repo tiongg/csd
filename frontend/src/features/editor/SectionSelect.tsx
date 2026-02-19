@@ -36,7 +36,7 @@ export default function SectionSelect({ index }: SectionSelectProps) {
     // Opting to use default input compoents for greater control over styling and behavior
     <div
       className={cn(
-        'group relative flex items-center gap-1 rounded-md px-2 py-1 text-sm transition-colors',
+        'group relative flex items-center gap-1 rounded-md px-2 py-1 text-sm text-nowrap transition-colors',
         index === currentSection
           ? 'bg-primary text-primary-foreground'
           : 'hover:bg-muted',

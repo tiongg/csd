@@ -13,7 +13,7 @@ export default function useYArrayObserver<T, K>(
   yArray: Y.Array<T>,
   map: (item: T) => K,
 ) {
-  const [items, setItems] = useState<K[]>([]);
+  const [items, setItems] = useState<K[]>(() => yArray.map(map));
 
   useEffect(() => {
     const observer = () => setItems(yArray.map(map));
