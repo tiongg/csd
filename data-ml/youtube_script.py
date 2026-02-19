@@ -2,22 +2,12 @@ import csv
 import os
 from datetime import datetime, timedelta, UTC
 from pathlib import Path
+from dotenv import load_dotenv
 
 import requests
 
-def load_env_file() -> None:
-    env_path = Path(__file__).resolve().parents[1] / ".env"
-    if not env_path.exists():
-        return
-    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        os.environ.setdefault(key.strip(), value.strip())
+load_dotenv()
 
-
-load_env_file()
 API_KEY = os.getenv("YOUTUBE_API_KEY")
 COUNTRIES = ["US", "SG", "GB", "AU", "CA"]
 BASE_URL = "https://www.googleapis.com/youtube/v3/videos"
