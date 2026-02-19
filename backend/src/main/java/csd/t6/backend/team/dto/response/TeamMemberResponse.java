@@ -1,4 +1,4 @@
-package csd.t6.backend.team.dto;
+package csd.t6.backend.team.dto.response;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -9,10 +9,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(name = "TeamMember")
-public record TeamMemberResponseDTO(@NotNull UUID id, @NotNull UUID teamId, @NotNull UUID accountId,
+public record TeamMemberResponse(@NotNull UUID id, @NotNull UUID teamId, @NotNull UUID accountId,
     @NotNull String username, @NotNull String email, @NotNull TeamRole teamRole, @NotNull OffsetDateTime joinedAt) {
 
-  public TeamMemberResponseDTO(TeamMemberRecord member, String username, String email) {
+  public TeamMemberResponse(TeamMemberRecord member, String username, String email) {
     this(member.getId(), member.getTeamId(), member.getAccountId(), username, email, member.getTeamRole(),
         member.getJoinedAt());
   }

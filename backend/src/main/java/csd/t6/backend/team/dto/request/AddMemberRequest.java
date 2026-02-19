@@ -1,4 +1,4 @@
-package csd.t6.backend.team.dto;
+package csd.t6.backend.team.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
