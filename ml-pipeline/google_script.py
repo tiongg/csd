@@ -4,8 +4,9 @@ from datetime import datetime
 
 HOURS = 168
 COUNTRIES = ["US", "SG", "GB", "AU", "CA"]
-OUT_DIR = Path.cwd() / "google_trends_by_country"
-OUT_DIR.mkdir(exist_ok=True)
+BASE_DIR = Path(__file__).resolve().parent
+RAW_DIR = BASE_DIR / "data" / "raw"
+RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
@@ -37,8 +38,8 @@ with sync_playwright() as p:
             page.get_by_role("menuitem", name="Download CSV").first.click()
 
         download = download_info.value
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        out = OUT_DIR / f"trending_{REGION}_{HOURS}h_{timestamp}.csv"
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+        out = RAW_DIR / f"{timestamp}_google_{REGION}.csv"
         download.save_as(str(out))
         print(f"Saved: {out}")
 

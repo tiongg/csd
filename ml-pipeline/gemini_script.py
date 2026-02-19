@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 
 import requests
@@ -9,6 +10,9 @@ load_dotenv()
 API_KEY = os.getenv("GEMINI_API_KEY")
 PROMPT = "Hello, Gemini!"
 MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+BASE_DIR = Path(__file__).resolve().parent
+ANALYSIS_DIR = BASE_DIR / "data" / "analysis"
+ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)
 
 if not API_KEY:
     raise ValueError("Missing GEMINI_API_KEY in environment variables.")
@@ -46,3 +50,8 @@ else:
     print(PROMPT)
     print("\nGemini response:")
     print(text)
+
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H%M%S")
+    output_path = ANALYSIS_DIR / f"{timestamp}_gemini_response.txt"
+    output_path.write_text(text, encoding="utf-8")
+    print(f"\nSaved analysis output: {output_path}")
