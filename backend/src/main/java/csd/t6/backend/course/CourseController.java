@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.auth.AuthUserDetails;
-import csd.t6.backend.course.dto.CourseCreateRequest;
-import csd.t6.backend.course.dto.CourseResponseDTO;
-import csd.t6.backend.course.dto.CourseUpdateRequest;
+import csd.t6.backend.course.dto.request.CourseCreateRequest;
+import csd.t6.backend.course.dto.request.CourseUpdateRequest;
+import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -41,7 +41,7 @@ public class CourseController {
   @CreatedResponse
   @BadRequestResponse
   @Operation(summary = "Create a new course", description = "Creates a new course with the authenticated user as creator")
-  public CourseResponseDTO createCourse(@Valid @RequestBody CourseCreateRequest request,
+  public CourseResponse createCourse(@Valid @RequestBody CourseCreateRequest request,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
     return courseService.createCourse(request, userDetails.getId());
   }
@@ -50,14 +50,14 @@ public class CourseController {
   @OkResponse
   @BadRequestResponse
   @Operation(summary = "Get course by ID", description = "Retrieves course details")
-  public CourseResponseDTO getCourse(@PathVariable UUID id) {
+  public CourseResponse getCourse(@PathVariable UUID id) {
     return courseService.getCourseById(id);
   }
 
   @GetMapping("/")
   @OkResponse
   @Operation(summary = "Get all courses", description = "Retrieves all courses")
-  public List<CourseResponseDTO> getAllCourses() {
+  public List<CourseResponse> getAllCourses() {
     return courseService.getAllCourses();
   }
 
@@ -65,7 +65,7 @@ public class CourseController {
   @OkResponse
   @BadRequestResponse
   @Operation(summary = "Update course", description = "Updates course details. Only creator or team members can update.")
-  public CourseResponseDTO updateCourse(@PathVariable UUID id, @Valid @RequestBody CourseUpdateRequest request,
+  public CourseResponse updateCourse(@PathVariable UUID id, @Valid @RequestBody CourseUpdateRequest request,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
     return courseService.updateCourse(id, request, userDetails.getId());
   }

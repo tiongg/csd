@@ -1,4 +1,4 @@
-package csd.t6.backend.auth.dto.responses;
+package csd.t6.backend.auth.dto.response;
 
 import csd.t6.backend.account.dto.response.AccountResponse;
 import jakarta.validation.constraints.NotNull;

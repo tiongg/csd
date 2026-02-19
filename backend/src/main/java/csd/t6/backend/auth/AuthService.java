@@ -7,7 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import csd.t6.backend.account.AccountRepository;
-import csd.t6.backend.auth.dto.responses.TokenDataResponse;
+import csd.t6.backend.auth.dto.response.TokenDataResponse;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import jakarta.servlet.http.Cookie;
 

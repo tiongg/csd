@@ -1,4 +1,4 @@
-package csd.t6.backend.course.dto;
+package csd.t6.backend.course.dto.response;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -8,11 +8,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(name = "Course")
-public record CourseResponseDTO(@NotNull UUID id, @NotNull String title, String description, @NotNull UUID creatorId,
+public record CourseResponse(@NotNull UUID id, @NotNull String title, String description, @NotNull UUID creatorId,
     @NotNull UUID teamId, @NotNull Boolean isPublished, @NotNull OffsetDateTime createdAt,
     @NotNull OffsetDateTime updatedAt) {
 
-  public CourseResponseDTO(CourseRecord course) {
+  public CourseResponse(CourseRecord course) {
     this(course.getId(), course.getTitle(), course.getDescription(), course.getCreatorId(), course.getTeamId(),
         course.getIsPublished(), course.getCreatedAt(), course.getUpdatedAt());
   }

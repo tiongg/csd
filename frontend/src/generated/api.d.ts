@@ -407,8 +407,6 @@ export interface components {
         CourseUpdateRequest: {
             title?: string;
             description?: string;
-            /** Format: uuid */
-            teamId?: string;
             isPublished?: boolean;
         };
         Course: {

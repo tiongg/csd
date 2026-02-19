@@ -1,4 +1,4 @@
-package csd.t6.backend.auth.dto.requests;
+package csd.t6.backend.auth.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 

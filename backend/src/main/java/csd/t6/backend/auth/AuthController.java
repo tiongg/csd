@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.response.AccountResponse;
-import csd.t6.backend.auth.dto.requests.LoginRequest;
-import csd.t6.backend.auth.dto.responses.ExchangeCodeResponse;
-import csd.t6.backend.auth.dto.responses.LoginResponse;
-import csd.t6.backend.auth.dto.responses.TokenDataResponse;
+import csd.t6.backend.auth.dto.request.LoginRequest;
+import csd.t6.backend.auth.dto.response.ExchangeCodeResponse;
+import csd.t6.backend.auth.dto.response.LoginResponse;
+import csd.t6.backend.auth.dto.response.TokenDataResponse;
 import csd.t6.backend.auth.oauth.OAuthCodeService;
 import csd.t6.backend.decorators.auth.PublicDecorator;
 import csd.t6.backend.decorators.responses.BadRequestResponse;

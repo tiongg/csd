@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.course.CourseService;
-import csd.t6.backend.course.dto.CourseResponseDTO;
+import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -135,9 +135,9 @@ public class TeamController {
   @OkResponse
   @BadRequestResponse
   @Operation(summary = "Gets all team courses", description = "Retrieves all courses associated with the team")
-  public List<CourseResponseDTO> getTeamCourses(@PathVariable UUID teamId,
+  public List<CourseResponse> getTeamCourses(@PathVariable UUID teamId,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
-    return this.courseService.getCoursesByTeamId(teamId, userDetails.getId()).stream().map(CourseResponseDTO::new)
+    return this.courseService.getCoursesByTeamId(teamId, userDetails.getId()).stream().map(CourseResponse::new)
         .toList();
   }
 
