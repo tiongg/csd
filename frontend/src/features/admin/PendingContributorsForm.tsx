@@ -55,7 +55,7 @@ function PendingApplicationRows({
   }
 
   return applications.map(({ username, email, id }) => (
-    <TableRow key={email}>
+    <TableRow key={id}>
       <TableCell>
         <Checkbox
           className="border-slate-800"

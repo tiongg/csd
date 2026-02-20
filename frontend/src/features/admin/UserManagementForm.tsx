@@ -9,9 +9,9 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heading1 } from '@/components/ui/typography';
-import { PencilIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { PencilIcon } from '@heroicons/react/24/outline';
 import PendingContributorsForm from './PendingContributorsForm';
-import { useApiQuery } from '@/lib/fetch-client';
+import AllAdminsList from './AllAdminsList';
 
 // placeholders
 
@@ -49,7 +49,7 @@ export default function UserManagementForm() {
           </TabsContent>
 
           <TabsContent value="admins">
-            <AllAdmins />
+            <AllAdminsList />
           </TabsContent>
 
           <TabsContent value="users">
@@ -61,69 +61,6 @@ export default function UserManagementForm() {
   );
 }
 
-function AllAdmins() {
-  const { data: applications, isLoading: isLoadingApplications } = useApiQuery(
-    'get',
-    '/api/admins/',
-  );
-  if (isLoadingApplications) {
-    return (
-      <Table>
-        <TableBody>
-          <TableRow>
-            <TableCell colSpan={3} className="text-center">
-              Loading...
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    );
-  }
-
-  if (!applications || applications.length === 0) {
-    return (
-      <Table>
-        <TableBody>
-          <TableRow>
-            <TableCell colSpan={3} className="text-center">
-              No Admins.
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-4 py-4">
-      <div className="flex w-full justify-end gap-x-2">
-        <SearchBar placeholder="Search for Admins" />
-      </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-2/6">Name</TableHead>
-            <TableHead className="w-3/6">Email</TableHead>
-            <TableHead className="w-1/6"></TableHead>
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>
-          {applications.map(({ username, email }) => (
-            <TableRow key={email}>
-              <TableCell>{username}</TableCell>
-              <TableCell>{email}</TableCell>
-              <TableCell>
-                <XMarkIcon className="size-5 cursor-pointer" color="red" />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
 
 function AllUsers() {
   return (
