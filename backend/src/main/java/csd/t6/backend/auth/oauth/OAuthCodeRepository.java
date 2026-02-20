@@ -1,4 +1,4 @@
-package csd.t6.backend.auth;
+package csd.t6.backend.auth.oauth;
 
 import static csd.t6.jooq.accounts.tables.OauthCode.OAUTH_CODE;
 

@@ -7,8 +7,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import csd.t6.backend.account.dto.AccountUpdateRequest;
-import csd.t6.backend.auth.OAuth2ProviderRepository;
+import csd.t6.backend.account.dto.request.AccountUpdateRequest;
+import csd.t6.backend.auth.oauth.OAuth2ProviderRepository;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.jooq.accounts.enums.OauthProvider;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;

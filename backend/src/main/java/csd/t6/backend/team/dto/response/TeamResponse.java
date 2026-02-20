@@ -1,4 +1,4 @@
-package csd.t6.backend.team.dto;
+package csd.t6.backend.team.dto.response;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -9,11 +9,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(name = "Team")
-public record TeamResponseDTO(@NotNull UUID id, @NotNull String name, String description, @NotNull UUID ownerId,
-    @NotNull OffsetDateTime createdAt, @NotNull OffsetDateTime updatedAt,
-    @NotNull List<TeamMemberResponseDTO> members) {
+public record TeamResponse(@NotNull UUID id, @NotNull String name, String description, @NotNull UUID ownerId,
+    @NotNull OffsetDateTime createdAt, @NotNull OffsetDateTime updatedAt, @NotNull List<TeamMemberResponse> members) {
 
-  public TeamResponseDTO(TeamRecord team, List<TeamMemberResponseDTO> members) {
+  public TeamResponse(TeamRecord team, List<TeamMemberResponse> members) {
     this(team.getId(), team.getName(), team.getDescription(), team.getOwnerId(), team.getCreatedAt(),
         team.getUpdatedAt(), members);
   }

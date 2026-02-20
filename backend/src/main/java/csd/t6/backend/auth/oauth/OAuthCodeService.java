@@ -1,4 +1,4 @@
-package csd.t6.backend.auth;
+package csd.t6.backend.auth.oauth;
 
 import java.security.SecureRandom;
 import java.time.OffsetDateTime;

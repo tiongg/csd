@@ -1,4 +1,4 @@
-package csd.t6.backend.account.dto;
+package csd.t6.backend.account.dto.request;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

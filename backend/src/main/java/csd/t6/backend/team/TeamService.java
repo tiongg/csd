@@ -11,11 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import csd.t6.backend.account.AccountRepository;
 import csd.t6.backend.exceptions.BadRequestException;
-import csd.t6.backend.team.dto.AddMemberRequest;
-import csd.t6.backend.team.dto.TeamCreateRequest;
-import csd.t6.backend.team.dto.TeamMemberResponseDTO;
-import csd.t6.backend.team.dto.TeamResponseDTO;
-import csd.t6.backend.team.dto.TeamUpdateRequest;
+import csd.t6.backend.team.dto.request.AddMemberRequest;
+import csd.t6.backend.team.dto.request.TeamCreateRequest;
+import csd.t6.backend.team.dto.request.TeamUpdateRequest;
+import csd.t6.backend.team.dto.response.TeamMemberResponse;
+import csd.t6.backend.team.dto.response.TeamResponse;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.public_.enums.TeamRole;
 import csd.t6.jooq.public_.tables.records.TeamMemberRecord;
@@ -40,34 +40,34 @@ public class TeamService {
   }
 
   @Transactional
-  public TeamResponseDTO createTeam(TeamCreateRequest request, UUID ownerId) {
+  public TeamResponse createTeam(TeamCreateRequest request, UUID ownerId) {
     TeamRecord teamRecord = teamRepository.create(request.name(), request.description(), ownerId);
     teamMemberRepository.addMember(teamRecord.getId(), ownerId, TeamRole.OWNER);
 
-    List<TeamMemberResponseDTO> members = getTeamMembers(teamRecord.getId());
-    return new TeamResponseDTO(teamRecord, members);
+    List<TeamMemberResponse> members = getTeamMembers(teamRecord.getId());
+    return new TeamResponse(teamRecord, members);
   }
 
-  public TeamResponseDTO getTeamById(UUID teamId) {
+  public TeamResponse getTeamById(UUID teamId) {
     TeamRecord teamRecord = teamRepository.findById(teamId)
         .orElseThrow(() -> new BadRequestException("Team not found"));
 
-    List<TeamMemberResponseDTO> members = getTeamMembers(teamId);
-    return new TeamResponseDTO(teamRecord, members);
+    List<TeamMemberResponse> members = getTeamMembers(teamId);
+    return new TeamResponse(teamRecord, members);
   }
 
-  public List<TeamResponseDTO> getUserTeams(UUID userId) {
+  public List<TeamResponse> getUserTeams(UUID userId) {
     List<TeamMemberRecord> userMemberships = teamMemberRepository.findByAccountId(userId);
 
     return userMemberships.stream().map(membership -> {
       TeamRecord team = teamRepository.findById(membership.getTeamId()).orElseThrow();
-      List<TeamMemberResponseDTO> members = getTeamMembers(team.getId());
-      return new TeamResponseDTO(team, members);
+      List<TeamMemberResponse> members = getTeamMembers(team.getId());
+      return new TeamResponse(team, members);
     }).collect(Collectors.toList());
   }
 
   @Transactional
-  public TeamResponseDTO updateTeam(UUID teamId, TeamUpdateRequest request, UUID requesterId) {
+  public TeamResponse updateTeam(UUID teamId, TeamUpdateRequest request, UUID requesterId) {
     TeamRecord teamRecord = teamRepository.findById(teamId)
         .orElseThrow(() -> new BadRequestException("Team not found"));
 
@@ -82,9 +82,9 @@ public class TeamService {
     String newDescription = request.description() != null ? request.description() : teamRecord.getDescription();
 
     TeamRecord updatedRecord = teamRepository.update(teamId, newName, newDescription);
-    List<TeamMemberResponseDTO> members = getTeamMembers(teamId);
+    List<TeamMemberResponse> members = getTeamMembers(teamId);
 
-    return new TeamResponseDTO(updatedRecord, members);
+    return new TeamResponse(updatedRecord, members);
   }
 
   @Transactional
@@ -100,7 +100,7 @@ public class TeamService {
   }
 
   @Transactional
-  public TeamMemberResponseDTO addMember(UUID teamId, AddMemberRequest request, UUID requesterId) {
+  public TeamMemberResponse addMember(UUID teamId, AddMemberRequest request, UUID requesterId) {
     TeamMemberRecord requesterMember = teamMemberRepository.findByTeamAndAccount(teamId, requesterId)
         .orElseThrow(() -> new BadRequestException("You are not a member of this team"));
 
@@ -117,7 +117,7 @@ public class TeamService {
 
     TeamMemberRecord memberRecord = teamMemberRepository.addMember(teamId, accountRecord.getId(), TeamRole.MEMBER);
 
-    return new TeamMemberResponseDTO(memberRecord, accountRecord.getUsername(), accountRecord.getEmail());
+    return new TeamMemberResponse(memberRecord, accountRecord.getUsername(), accountRecord.getEmail());
   }
 
   @Transactional
@@ -141,13 +141,13 @@ public class TeamService {
     teamMemberRepository.removeMember(teamId, accountId);
   }
 
-  public List<TeamMemberResponseDTO> getTeamMembers(UUID teamId) {
+  public List<TeamMemberResponse> getTeamMembers(UUID teamId) {
     List<TeamMemberRecord> memberRecords = teamMemberRepository.findByTeamId(teamId);
 
     return memberRecords.stream().map(record -> {
       AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, record.getAccountId())
           .orElseThrow(() -> new BadRequestException("Account not found"));
-      return new TeamMemberResponseDTO(record, accountRecord.getUsername(), accountRecord.getEmail());
+      return new TeamMemberResponse(record, accountRecord.getUsername(), accountRecord.getEmail());
     }).collect(Collectors.toList());
   }
 
@@ -160,7 +160,7 @@ public class TeamService {
   }
 
   @Transactional
-  public TeamMemberResponseDTO updateMemberRole(UUID teamId, UUID accountId, TeamRole newRole, UUID requesterId) {
+  public TeamMemberResponse updateMemberRole(UUID teamId, UUID accountId, TeamRole newRole, UUID requesterId) {
     teamRepository.findById(teamId).orElseThrow(() -> new BadRequestException("Team not found"));
 
     TeamMemberRecord requesterMember = teamMemberRepository.findByTeamAndAccount(teamId, requesterId)
@@ -201,6 +201,6 @@ public class TeamService {
     AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.ID, accountId)
         .orElseThrow(() -> new BadRequestException("Account not found"));
 
-    return new TeamMemberResponseDTO(updatedMember, accountRecord.getUsername(), accountRecord.getEmail());
+    return new TeamMemberResponse(updatedMember, accountRecord.getUsername(), accountRecord.getEmail());
   }
 }

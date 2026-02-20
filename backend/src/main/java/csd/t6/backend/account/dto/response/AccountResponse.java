@@ -1,4 +1,4 @@
-package csd.t6.backend.account.dto;
+package csd.t6.backend.account.dto.response;
 
 import java.util.UUID;
 
@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(name = "Account")
-public record AccountResponseDTO(@NotNull UUID id, @NotNull String email, @NotNull String username, String realname,
+public record AccountResponse(@NotNull UUID id, @NotNull String email, @NotNull String username, String realname,
     @NotNull Roles role) {
-  public AccountResponseDTO(AccountRecord account) {
+  public AccountResponse(AccountRecord account) {
     this(account.getId(), account.getEmail(), account.getUsername(), account.getRealName(), account.getUserRole());
   }
 }

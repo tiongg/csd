@@ -407,8 +407,6 @@ export interface components {
         CourseUpdateRequest: {
             title?: string;
             description?: string;
-            /** Format: uuid */
-            teamId?: string;
             isPublished?: boolean;
         };
         Course: {
@@ -448,15 +446,15 @@ export interface components {
             /** @enum {string} */
             role: "LEARNER" | "CONTRIBUTOR" | "ADMIN";
         };
-        LoginResponseDto: {
+        LoginResponse: {
             accessToken: string;
             account: components["schemas"]["Account"];
         };
-        LoginDto: {
+        LoginRequest: {
             usernameOrEmail: string;
             password: string;
         };
-        ExchangeCodeDto: {
+        ExchangeCodeResponse: {
             code: string;
         };
         AccountCreateRequest: {
@@ -923,7 +921,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["LoginResponseDto"];
+                    "*/*": components["schemas"]["LoginResponse"];
                 };
             };
             /** @description Bad request */
@@ -964,7 +962,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LoginDto"];
+                "application/json": components["schemas"]["LoginRequest"];
             };
         };
         responses: {
@@ -974,7 +972,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["LoginResponseDto"];
+                    "*/*": components["schemas"]["LoginResponse"];
                 };
             };
             /** @description Bad request */
@@ -997,7 +995,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ExchangeCodeDto"];
+                "application/json": components["schemas"]["ExchangeCodeResponse"];
             };
         };
         responses: {
@@ -1007,7 +1005,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["LoginResponseDto"];
+                    "*/*": components["schemas"]["LoginResponse"];
                 };
             };
             /** @description Bad request */
