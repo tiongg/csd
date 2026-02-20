@@ -85,6 +85,16 @@ export default function PendingContributorsForm() {
       body: { learnerUuids },
     });
   }
+
+  async function rejectContributors() {
+    const learnerUuids = Array.from(selectedUuids);
+    if (learnerUuids.length == 0) return;
+    console.log(learnerUuids);
+    await rejectContributorsAsync({
+      body: { learnerUuids },
+    });
+  }
+
   const queryClient = useQueryClient();
   const { mutateAsync: approveContributorsAsync } = useApiMutation(
     'post',
@@ -106,6 +116,26 @@ export default function PendingContributorsForm() {
     },
   );
 
+  const { mutateAsync: rejectContributorsAsync } = useApiMutation(
+    'post',
+    '/api/admins/contributor-applications/reject',
+    {
+      onSuccess: async () => {
+        toast.success('Rejected contributor');
+        setSelectedUuids(new Set());
+        await queryClient.invalidateQueries({
+          queryKey: apiQueryOptions(
+            'get',
+            '/api/admins/contributor-applications',
+          ).queryKey,
+        });
+      },
+      onError: () => {
+        toast.error('Failed to reject contributor');
+      },
+    },
+  );
+
   return (
     <div className="flex flex-col gap-4 py-4">
       <div className="flex w-full justify-end gap-x-2">
@@ -119,6 +149,7 @@ export default function PendingContributorsForm() {
         <Button
           variant="destructive"
           className="w-24 cursor-pointer rounded-full"
+          onClick={rejectContributors}
         >
           Delete
         </Button>
