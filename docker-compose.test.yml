@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:18
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  flyway:
+    image: flyway/flyway:10
+    volumes:
+      - ./backend/src/main/resources/db/migration:/flyway/sql
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      -X
+      -url=jdbc:postgresql://db:5432/postgres
+      -user=postgres
+      -password=password
+      -outOfOrder=true
+      migrate
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+    depends_on:
+      - db
+      - flyway
+    container_name: backend-test
+    ports:
+      - '8080:8080'
+      - '5005:5005' # Debug port
+    volumes:
+      - ./backend:/usr/src/maven
+      - maven-repo:/root/.m2
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      MAVEN_OPTS: >
+        -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      FRONTEND_URL: http://localhost:3000
+
+
+volumes:
+  maven-repo:
+  postgres_data:
