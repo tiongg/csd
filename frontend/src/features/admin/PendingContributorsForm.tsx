@@ -8,13 +8,27 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useApiQuery } from '@/lib/fetch-client';
+import {
+  apiQueryOptions,
+  useApiMutation,
+  useApiQuery,
+} from '@/lib/fetch-client';
+import { useQueryClient } from '@tanstack/react-query';
+import React from 'react';
+import { toast } from 'sonner';
 
-function PendingApplicationRows() {
+function PendingApplicationRows({
+  isSelectedUuid,
+  setSelected,
+}: {
+  isSelectedUuid: (uuid: string) => boolean;
+  setSelected: (uuid: string, checked: boolean) => void;
+}) {
   const { data: applications, isLoading: isLoadingApplications } = useApiQuery(
     'get',
     '/api/admins/contributor-applications',
   );
+  console.log(applications);
 
   if (isLoadingApplications) {
     return (
@@ -36,10 +50,14 @@ function PendingApplicationRows() {
     );
   }
 
-  return applications.map(({ username, email }) => (
+  return applications.map(({ username, email, id }) => (
     <TableRow key={email}>
       <TableCell>
-        <Checkbox className="border-slate-800" />
+        <Checkbox
+          className="border-slate-800"
+          checked={isSelectedUuid(id)}
+          onCheckedChange={(value) => setSelected(id, value === true)}
+        />
       </TableCell>
       <TableCell>{username}</TableCell>
       <TableCell>{email}</TableCell>
@@ -48,10 +66,54 @@ function PendingApplicationRows() {
 }
 
 export default function PendingContributorsForm() {
+  const [selectedUuids, setSelectedUuids] = React.useState<Set<string>>(
+    () => new Set(),
+  );
+  const isSelectedUuid = (uuid: string) => selectedUuids.has(uuid);
+  const setSelected = (uuid: string, checked: boolean) => {
+    setSelectedUuids((prev) =>
+      checked
+        ? new Set([...prev, uuid])
+        : new Set([...prev].filter((x) => x !== uuid)),
+    );
+  };
+  async function approveContributors() {
+    const learnerUuids = Array.from(selectedUuids);
+    if (learnerUuids.length == 0) return;
+    console.log(learnerUuids);
+    await approveContributorsAsync({
+      body: { learnerUuids },
+    });
+  }
+  const queryClient = useQueryClient();
+  const { mutateAsync: approveContributorsAsync } = useApiMutation(
+    'post',
+    '/api/admins/contributor-applications/approve',
+    {
+      onSuccess: async () => {
+        toast.success('Approved contributor');
+        setSelectedUuids(new Set());
+        await queryClient.invalidateQueries({
+          queryKey: apiQueryOptions(
+            'get',
+            '/api/admins/contributor-applications',
+          ).queryKey,
+        });
+      },
+      onError: () => {
+        toast.error('Failed to approve contributor');
+      },
+    },
+  );
+
   return (
     <div className="flex flex-col gap-4 py-4">
       <div className="flex w-full justify-end gap-x-2">
-        <Button variant="outline" className="w-24 cursor-pointer rounded-full">
+        <Button
+          variant="outline"
+          className="w-24 cursor-pointer rounded-full"
+          onClick={approveContributors}
+        >
           Approve
         </Button>
         <Button
@@ -72,7 +134,10 @@ export default function PendingContributorsForm() {
         </TableHeader>
 
         <TableBody>
-          <PendingApplicationRows />
+          <PendingApplicationRows
+            isSelectedUuid={isSelectedUuid}
+            setSelected={setSelected}
+          />
         </TableBody>
       </Table>
     </div>
