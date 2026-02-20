@@ -14,21 +14,25 @@ import {
   useApiQuery,
 } from '@/lib/fetch-client';
 import { useQueryClient } from '@tanstack/react-query';
-import React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 function PendingApplicationRows({
-  isSelectedUuid,
+  selectedUuids,
   setSelected,
 }: {
-  isSelectedUuid: (uuid: string) => boolean;
+  selectedUuids: Set<string>;
   setSelected: (uuid: string, checked: boolean) => void;
 }) {
   const { data: applications, isLoading: isLoadingApplications } = useApiQuery(
     'get',
     '/api/admins/contributor-applications',
+    {
+      params: {
+        query: {},
+      },
+    },
   );
-  //console.log(applications);
 
   if (isLoadingApplications) {
     return (
@@ -55,8 +59,8 @@ function PendingApplicationRows({
       <TableCell>
         <Checkbox
           className="border-slate-800"
-          checked={isSelectedUuid(id)}
-          onCheckedChange={(value) => setSelected(id, value === true)}
+          checked={selectedUuids.has(id)}
+          onCheckedChange={(value) => setSelected(id, !!value)}
         />
       </TableCell>
       <TableCell>{username}</TableCell>
@@ -66,34 +70,7 @@ function PendingApplicationRows({
 }
 
 export default function PendingContributorsForm() {
-  const [selectedUuids, setSelectedUuids] = React.useState<Set<string>>(
-    () => new Set(),
-  );
-  const isSelectedUuid = (uuid: string) => selectedUuids.has(uuid);
-  const setSelected = (uuid: string, checked: boolean) => {
-    setSelectedUuids((prev) =>
-      checked
-        ? new Set([...prev, uuid])
-        : new Set([...prev].filter((x) => x !== uuid)),
-    );
-  };
-  async function approveContributors() {
-    const learnerUuids = Array.from(selectedUuids);
-    if (learnerUuids.length == 0) return;
-    //console.log(learnerUuids);
-    await approveContributorsAsync({
-      body: { learnerUuids },
-    });
-  }
-
-  async function rejectContributors() {
-    const learnerUuids = Array.from(selectedUuids);
-    if (learnerUuids.length == 0) return;
-    //console.log(learnerUuids);
-    await rejectContributorsAsync({
-      body: { learnerUuids },
-    });
-  }
+  const [selectedUuids, setSelectedUuids] = useState(new Set<string>());
 
   const queryClient = useQueryClient();
   const { mutateAsync: approveContributorsAsync } = useApiMutation(
@@ -136,6 +113,30 @@ export default function PendingContributorsForm() {
     },
   );
 
+  function setSelected(uuid: string, checked: boolean) {
+    setSelectedUuids((prev) =>
+      checked
+        ? new Set([...prev, uuid])
+        : new Set([...prev].filter((x) => x !== uuid)),
+    );
+  }
+
+  async function approveContributors() {
+    const learnerUuids = [...selectedUuids];
+    if (learnerUuids.length === 0) return;
+    await approveContributorsAsync({
+      body: { learnerUuids },
+    });
+  }
+
+  async function rejectContributors() {
+    const learnerUuids = [...selectedUuids];
+    if (learnerUuids.length === 0) return;
+    await rejectContributorsAsync({
+      body: { learnerUuids },
+    });
+  }
+
   return (
     <div className="flex flex-col gap-4 py-4">
       <div className="flex w-full justify-end gap-x-2">
@@ -166,7 +167,7 @@ export default function PendingContributorsForm() {
 
         <TableBody>
           <PendingApplicationRows
-            isSelectedUuid={isSelectedUuid}
+            selectedUuids={selectedUuids}
             setSelected={setSelected}
           />
         </TableBody>
