@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.response.AccountResponse;
-import csd.t6.backend.admin.dto.BatchUpdateApplicationDto;
+import csd.t6.backend.admin.dto.request.BatchUpdateApplicationRequest;
 import csd.t6.backend.decorators.responses.NoContentResponse;
 import jakarta.validation.Valid;
 
@@ -37,13 +37,13 @@ public class AdminController {
 
   @PostMapping("/contributor-applications/approve")
   @NoContentResponse
-  public void batchApproveContributors(@RequestBody @Valid BatchUpdateApplicationDto batchUpdateDto) {
+  public void batchApproveContributors(@RequestBody @Valid BatchUpdateApplicationRequest batchUpdateDto) {
     this.adminService.approveContributors(batchUpdateDto.learnerUuids());
   }
 
   @PostMapping("/contributor-applications/reject")
   @NoContentResponse
-  public void batchRejectContributors(@RequestBody @Valid BatchUpdateApplicationDto batchUpdateDto) {
+  public void batchRejectContributors(@RequestBody @Valid BatchUpdateApplicationRequest batchUpdateDto) {
     this.adminService.rejectContributors(batchUpdateDto.learnerUuids());
   }
 }

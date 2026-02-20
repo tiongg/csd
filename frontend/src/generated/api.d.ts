@@ -521,7 +521,7 @@ export interface components {
         ExchangeCodeResponse: {
             code: string;
         };
-        BatchUpdateApplicationDto: {
+        BatchUpdateApplicationRequest: {
             learnerUuids: string[];
         };
         AccountCreateRequest: {
@@ -1095,7 +1095,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BatchUpdateApplicationDto"];
+                "application/json": components["schemas"]["BatchUpdateApplicationRequest"];
             };
         };
         responses: {
@@ -1117,7 +1117,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["BatchUpdateApplicationDto"];
+                "application/json": components["schemas"]["BatchUpdateApplicationRequest"];
             };
         };
         responses: {
