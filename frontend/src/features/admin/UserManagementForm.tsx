@@ -68,21 +68,29 @@ function AllAdmins() {
   );
   if (isLoadingApplications) {
     return (
-      <TableRow>
-        <TableCell colSpan={3} className="text-center">
-          Loading...
-        </TableCell>
-      </TableRow>
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCell colSpan={3} className="text-center">
+              Loading...
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     );
   }
 
   if (!applications || applications.length === 0) {
     return (
-      <TableRow>
-        <TableCell colSpan={3} className="text-center">
-          No Admins.
-        </TableCell>
-      </TableRow>
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCell colSpan={3} className="text-center">
+              No Admins.
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
     );
   }
 
