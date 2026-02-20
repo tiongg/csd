@@ -11,14 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heading1 } from '@/components/ui/typography';
 import { PencilIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import PendingContributorsForm from './PendingContributorsForm';
+import { useApiQuery } from '@/lib/fetch-client';
 
 // placeholders
-const admins = [
-  {
-    name: 'Tiong Guan',
-    email: 'tiong@email.com',
-  },
-];
 
 const users = [
   {
@@ -67,6 +62,30 @@ export default function UserManagementForm() {
 }
 
 function AllAdmins() {
+  const { data: applications, isLoading: isLoadingApplications } = useApiQuery(
+    'get',
+    '/api/admins/',
+  );
+  if (isLoadingApplications) {
+    return (
+      <TableRow>
+        <TableCell colSpan={3} className="text-center">
+          Loading...
+        </TableCell>
+      </TableRow>
+    );
+  }
+
+  if (!applications || applications.length === 0) {
+    return (
+      <TableRow>
+        <TableCell colSpan={3} className="text-center">
+          No Admins.
+        </TableCell>
+      </TableRow>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4 py-4">
       <div className="flex w-full justify-end gap-x-2">
@@ -83,9 +102,9 @@ function AllAdmins() {
         </TableHeader>
 
         <TableBody>
-          {admins.map(({ name, email }) => (
+          {applications.map(({ username, email }) => (
             <TableRow key={email}>
-              <TableCell>{name}</TableCell>
+              <TableCell>{username}</TableCell>
               <TableCell>{email}</TableCell>
               <TableCell>
                 <XMarkIcon className="size-5 cursor-pointer" color="red" />

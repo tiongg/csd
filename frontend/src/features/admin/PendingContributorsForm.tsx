@@ -28,7 +28,7 @@ function PendingApplicationRows({
     'get',
     '/api/admins/contributor-applications',
   );
-  console.log(applications);
+  //console.log(applications);
 
   if (isLoadingApplications) {
     return (
@@ -80,7 +80,7 @@ export default function PendingContributorsForm() {
   async function approveContributors() {
     const learnerUuids = Array.from(selectedUuids);
     if (learnerUuids.length == 0) return;
-    console.log(learnerUuids);
+    //console.log(learnerUuids);
     await approveContributorsAsync({
       body: { learnerUuids },
     });
@@ -89,7 +89,7 @@ export default function PendingContributorsForm() {
   async function rejectContributors() {
     const learnerUuids = Array.from(selectedUuids);
     if (learnerUuids.length == 0) return;
-    console.log(learnerUuids);
+    //console.log(learnerUuids);
     await rejectContributorsAsync({
       body: { learnerUuids },
     });
