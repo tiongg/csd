@@ -232,7 +232,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/admin/contributor-applications/reject": {
+    "/api/admins/contributor-applications/reject": {
         parameters: {
             query?: never;
             header?: never;
@@ -248,7 +248,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/admin/contributor-applications/approve": {
+    "/api/admins/contributor-applications/approve": {
         parameters: {
             query?: never;
             header?: never;
@@ -336,7 +336,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/admin/contributor-applications": {
+    "/api/admins/contributor-applications": {
         parameters: {
             query?: never;
             header?: never;

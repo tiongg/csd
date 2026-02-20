@@ -14,7 +14,7 @@ import csd.t6.backend.decorators.responses.NoContentResponse;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admins")
 public class AdminController {
   private final AdminService adminService;
 
