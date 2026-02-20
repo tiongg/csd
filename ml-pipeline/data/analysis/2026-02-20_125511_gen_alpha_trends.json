@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "generated_at_utc": "2026-02-20T04:55:11.642487+00:00",
+    "date_queried_utc": "2026-02-20",
+    "model": "gpt-4.1",
+    "trend_count": 10,
+    "response_id": "resp_0b40635d0ae8266b006997e92503fc819a8fb4d0676d9a1c11"
+  },
+  "trends": [
+    {
+      "rank": 1,
+      "name": "wrizz",
+      "trend_type": "slang mutation",
+      "metric": "15× increase in TikTok videos within one month (Dec 2025 to Jan 2026)",
+      "source": "analysis by SlangWatch of TikTok usage"
+    },
+    {
+      "rank": 2,
+      "name": "6‑7 Weekend",
+      "trend_type": "phrase/spoken trend",
+      "metric": "viral TikTok sound circulating since late 2025 as Gen Alpha weekend motto",
+      "source": "PulseScope trend breakdown"
+    },
+    {
+      "rank": 3,
+      "name": "Great Meme Reset of 2026",
+      "trend_type": "meme movement",
+      "metric": "TikTok movement since Jan 1, 2026 reviving old memes in Gen Alpha spaces",
+      "source": "Wikipedia overview of meme movement"
+    },
+    {
+      "rank": 4,
+      "name": "2026 is the new 2016",
+      "trend_type": "nostalgia trend",
+      "metric": "widely used TikTok montages & recreations since Dec 2025 / Jan 2026",
+      "source": "Wikipedia entry describing resurgence across TikTok"
+    },
+    {
+      "rank": 5,
+      "name": "choppleganger",
+      "trend_type": "slang coinage",
+      "metric": "TikTok video by @mr_lindsay_sped with 370K+ views in past month",
+      "source": "People exclusive report"
+    },
+    {
+      "rank": 6,
+      "name": "Techno Duck / chicken banana",
+      "trend_type": "audio/phrase meme",
+      "metric": "‘chicken banana’ phrase viral on TikTok and spreading among children; 'Techno Duck' released last week",
+      "source": "Vox trend coverage"
+    },
+    {
+      "rank": 7,
+      "name": "skibidi (new wave)",
+      "trend_type": "meme‑slang",
+      "metric": "Remixes and Roblox games still active; TikTok usage latest as absurd Gen Alpha meme language",
+      "source": "Wikipedia and AOL youth commentary"
+    },
+    {
+      "rank": 8,
+      "name": "Ohio (meaning 'chaos')",
+      "trend_type": "slang repurposing",
+      "metric": "Contextual shorthand for chaotic content widely used in TikTok captions by Jan 2026",
+      "source": "SlangWatch analysis of TikTok terms"
+    },
+    {
+      "rank": 9,
+      "name": "Flip the Camera",
+      "trend_type": "video format meme",
+      "metric": "TikTok meta‑humor trend noted late 2025, still appearing in short videos",
+      "source": "PulseScope trend breakdown"
+    },
+    {
+      "rank": 10,
+      "name": "Wa Wa Wa Wa",
+      "trend_type": "audio trend",
+      "metric": "Mentioned in Reddit thread last week by teens complaining about its overuse",
+      "source": "Reddit teen discussion (r/teenagers)"
+    }
+  ]
+}

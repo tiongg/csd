@@ -1,4 +1,4 @@
 .env
 /**/.env
-/data/
-/ml-pipeline/data/
+*.csv
+
