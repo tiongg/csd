@@ -1,5 +1,13 @@
-FROM maven:3.9.9-eclipse-temurin-21 AS develop
+# FROM maven:3.9.9-eclipse-temurin-21 AS develop
+
+# WORKDIR /usr/src/maven
+
+# CMD ["mvn", "test"]
+FROM maven:3.9-eclipse-temurin-21
 
 WORKDIR /usr/src/maven
 
-CMD ["mvn", "test"]
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+CMD ["mvn", "test", "-Dspring.profiles.active=test"]

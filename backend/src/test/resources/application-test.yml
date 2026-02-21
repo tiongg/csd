@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:testdb}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jooq:
+    sql-dialect: POSTGRES
+
+jwt:
+  secret: test-secret-key-that-is-at-least-256-bits-long-for-testing-purposes-only
+  access-token:
+    expiration: 1
+  refresh-token:
+    expiration: 720
+
+oauth:
+  code:
+    expiration-minutes: 5
+
+FRONTEND_URL: http://localhost:3000
+
+logging:
+  level:
+    org.jooq: WARN
+    org.springframework.security: WARN
