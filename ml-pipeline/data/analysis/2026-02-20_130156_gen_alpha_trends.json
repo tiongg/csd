@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "generated_at_utc": "2026-02-20T05:01:56.661515+00:00",
+    "date_queried_utc": "2026-02-20",
+    "model": "gpt-4.1",
+    "trend_count": 10,
+    "response_id": "resp_05f5dac2e06ad40d006997eabd247c819a8e48fc449610e97e"
+  },
+  "trends": [
+    {
+      "rank": 1,
+      "name": "Chicken Banana",
+      "trend_type": "audio‑meme sound trend / absurdist meme",
+      "metric": "recent viral TikTok dance appearances among kids and classrooms; presence in youth conversations",
+      "source": "TikTok or social videos using 'chicken banana' sound (e.g., Vox article describing kids using it naturally)"
+    },
+    {
+      "rank": 2,
+      "name": "Choppleganger",
+      "trend_type": "slang term",
+      "metric": "TikTok video by Mr. Lindsay with 370k+ views, followed by users sharing own choppleganger stories",
+      "source": "Mr. Lindsay TikTok video showing usage and engagement"
+    },
+    {
+      "rank": 3,
+      "name": "Great Meme Reset of 2026",
+      "trend_type": "meta‑meme movement / nostalgia meme revival",
+      "metric": "TikTok posts calling memes back to early‑2010s; trending discussion in Reddit Gen Alpha communities",
+      "source": "TikTok posts referencing reset and Reddit threads discussing attempt"
+    },
+    {
+      "rank": 4,
+      "name": "6‑7",
+      "trend_type": "nonsensical meme phrase",
+      "metric": "ongoing classroom usage, Dictionary.com Word of the Year 2025 still echoed by Gen Alpha; referenced in recent interviews",
+      "source": "Zoe Saldaña interview plus school anecdotes"
+    },
+    {
+      "rank": 5,
+      "name": "“2026 is the new 2016”",
+      "trend_type": "nostalgia phrasing / meme label",
+      "metric": "TikTok videos comparing 2026 to 2016, hashtag usage rising in Jan‑Feb 2026",
+      "source": "TikTok montage references and trend context"
+    },
+    {
+      "rank": 6,
+      "name": "Skibidi (as usage, not original meme)",
+      "trend_type": "slang extracted from platform meme",
+      "metric": "spotted in TikTok/Reddit Gen Alpha identity discussions and parental confusion threads",
+      "source": "AOL describing Gen Alpha usage 'skibidi' uttered randomly"
+    },
+    {
+      "rank": 7,
+      "name": "Ohio (chaos slang)",
+      "trend_type": "slang repurposing of place name",
+      "metric": "TikTok tagging of weird content as 'that's so Ohio' used increasingly in 2026",
+      "source": "SlangWatch tracking Jan‑Feb 2026 TikTok usage"
+    },
+    {
+      "rank": 8,
+      "name": "Sigma energy",
+      "trend_type": "slang repurpose",
+      "metric": "68% of Gen Z/Alpha use it devoid of 'alpha male' origin, tracked in thousands of TikTok posts in 2026",
+      "source": "SlangWatch analysis with usage data"
+    },
+    {
+      "rank": 9,
+      "name": "Flip the Camera",
+      "trend_type": "visual‑format trend",
+      "metric": "late‑2025 TikTok trend continuing into 2026, numerous reaction videos showing mid‑video camera switch",
+      "source": "Pulse‑scope mention of continuation trend usage"
+    },
+    {
+      "rank": 10,
+      "name": "Aura farming (revived as critique)",
+      "trend_type": "slang‑meme hybrid",
+      "metric": "Gen Alpha using 'aura farming' sarcastically, seen on Reddit Gen Alpha threads criticizing meme authenticity",
+      "source": "Parents blog plus Gen Alpha Reddit commentary"
+    }
+  ]
+}
