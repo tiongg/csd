@@ -22,7 +22,7 @@ function TrendCard({ rank, change, trend }: TrendCardProps) {
     }
 
     return (
-        <div className="border-slate-200 border-2 rounded-xl w-full flex justify-between px-2 sm:px-4 grow py-1 gap-x-2">
+        <div className="border-slate-300 border-2 rounded-xl w-full flex justify-between px-2 sm:px-4 grow py-1 gap-x-2">
             <div className="flex gap-x-2 items-center">
                 <div className="flex items-center">
                     {changeIcon[change]}
@@ -60,7 +60,7 @@ export default function TrendsPage() {
     }, []);
 
     return (
-        <div className="border-slate-300 border-2 rounded-xl w-full h-full p-4 xl:px-8 flex flex-col">
+        <div className="border-slate-400 border-2 rounded-xl w-full h-full p-4 xl:px-8 flex flex-col">
             <div>
                 <Heading3>Top Trends</Heading3>
                 <p className="font-subtitle">Keep up with the latest trends</p>
