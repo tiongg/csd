@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
+      db:
         image: postgres:18-alpine
         env:
           POSTGRES_USER: postgres
@@ -42,12 +42,12 @@ jobs:
       - name: Run Flyway migrations
         run: |
           flyway migrate \
-            -url="jdbc:postgresql://localhost:5432/postgres" \
+            -url="jdbc:postgresql://db:5432/postgres" \
             -user=postgres \
             -password=password \
             -locations="filesystem:./backend/src/main/resources/db/migration" \
             -outOfOrder=true
 
       - name: Run tests
-        run: mvn verify -Djooq.jdbc.url=jdbc:postgresql://localhost:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
+        run: mvn verify -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
         working-directory: ./backend
