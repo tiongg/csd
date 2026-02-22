@@ -11,6 +11,10 @@ spring:
   jooq:
     sql-dialect: POSTGRES
 
+  devtools:
+    restart:
+      enabled: false
+
 jwt:
   secret: shikanokonokonokokoshitantanshikanokonokonokokoshitantanshikanokonokonokokoshitantan
   # In hours
