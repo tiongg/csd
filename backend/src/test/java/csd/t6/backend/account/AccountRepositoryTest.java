@@ -1,19 +1,22 @@
 package csd.t6.backend.account;
 
-import csd.t6.jooq.accounts.enums.Roles;
-import csd.t6.jooq.accounts.tables.records.AccountRecord;
-import org.jooq.DSLContext;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import org.jooq.DSLContext;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+import csd.t6.jooq.accounts.enums.Roles;
+import csd.t6.jooq.accounts.tables.records.AccountRecord;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -57,8 +60,8 @@ class AccountRepositoryTest {
     void shouldFindByUsername() {
         accountRepository.insert(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD_HASH);
 
-        Optional<AccountRecord> found = accountRepository.findOneBy(
-            csd.t6.jooq.accounts.tables.Account.ACCOUNT.USERNAME, TEST_USERNAME);
+        Optional<AccountRecord> found = accountRepository
+                .findOneBy(csd.t6.jooq.accounts.tables.Account.ACCOUNT.USERNAME, TEST_USERNAME);
 
         assertThat(found).isPresent();
         assertThat(found.get().getUsername()).isEqualTo(TEST_USERNAME);
@@ -69,8 +72,7 @@ class AccountRepositoryTest {
     void shouldFindByEmail() {
         accountRepository.insert(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD_HASH);
 
-        Optional<AccountRecord> found = accountRepository.findOneBy(
-            csd.t6.jooq.accounts.tables.Account.ACCOUNT.EMAIL, TEST_EMAIL);
+        Optional<AccountRecord> found = accountRepository.findOneBy(ACCOUNT.EMAIL, TEST_EMAIL);
 
         assertThat(found).isPresent();
         assertThat(found.get().getEmail()).isEqualTo(TEST_EMAIL);
@@ -81,8 +83,7 @@ class AccountRepositoryTest {
     void shouldFindById() {
         AccountRecord inserted = accountRepository.insert(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD_HASH);
 
-        Optional<AccountRecord> found = accountRepository.findOneBy(
-            csd.t6.jooq.accounts.tables.Account.ACCOUNT.ID, inserted.getId());
+        Optional<AccountRecord> found = accountRepository.findOneBy(ACCOUNT.ID, inserted.getId());
 
         assertThat(found).isPresent();
         assertThat(found.get().getId()).isEqualTo(inserted.getId());
@@ -91,8 +92,7 @@ class AccountRepositoryTest {
     @Test
     @DisplayName("Should return empty Optional when account not found")
     void shouldReturnEmptyWhenNotFound() {
-        Optional<AccountRecord> found = accountRepository.findOneBy(
-            csd.t6.jooq.accounts.tables.Account.ACCOUNT.ID, UUID.randomUUID());
+        Optional<AccountRecord> found = accountRepository.findOneBy(ACCOUNT.ID, UUID.randomUUID());
 
         assertThat(found).isEmpty();
     }
@@ -102,10 +102,8 @@ class AccountRepositoryTest {
     void shouldCheckExistenceByUsername() {
         accountRepository.insert(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD_HASH);
 
-        boolean exists = accountRepository.exists(
-            csd.t6.jooq.accounts.tables.Account.ACCOUNT.USERNAME, TEST_USERNAME);
-        boolean notExists = accountRepository.exists(
-            csd.t6.jooq.accounts.tables.Account.ACCOUNT.USERNAME, "nonexistent");
+        boolean exists = accountRepository.exists(ACCOUNT.USERNAME, TEST_USERNAME);
+        boolean notExists = accountRepository.exists(ACCOUNT.USERNAME, "nonexistent");
 
         assertThat(exists).isTrue();
         assertThat(notExists).isFalse();
@@ -128,12 +126,10 @@ class AccountRepositoryTest {
         AccountRecord record = accountRepository.insert(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD_HASH);
         UUID id = record.getId();
 
-        int deleted = accountRepository.delete(
-            csd.t6.jooq.accounts.tables.Account.ACCOUNT.ID, id);
+        int deleted = accountRepository.delete(ACCOUNT.ID, id);
 
         assertThat(deleted).isEqualTo(1);
-        assertThat(accountRepository.findOneBy(
-            csd.t6.jooq.accounts.tables.Account.ACCOUNT.ID, id)).isEmpty();
+        assertThat(accountRepository.findOneBy(ACCOUNT.ID, id)).isEmpty();
     }
 
     @Test
