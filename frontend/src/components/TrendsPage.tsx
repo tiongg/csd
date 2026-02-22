@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Heading3, Paragraph } from "./ui/typography"
 
 type TrendCardProps = {
@@ -21,8 +22,8 @@ function TrendCard({ rank, change, trend }: TrendCardProps) {
     }
 
     return (
-        <div className="border-slate-200 border-2 rounded-xl w-full flex justify-between px-2 sm:px-4 grow py-1">
-            <div className="flex gap-x-6 items-center">
+        <div className="border-slate-200 border-2 rounded-xl w-full flex justify-between px-2 sm:px-4 grow py-1 gap-x-2">
+            <div className="flex gap-x-2 items-center">
                 <div className="flex items-center">
                     {changeIcon[change]}
                 </div>
@@ -34,7 +35,7 @@ function TrendCard({ rank, change, trend }: TrendCardProps) {
             </div>
 
             <div className="flex items-center">
-                <Paragraph>
+                <Paragraph className="text-end text-sm xl:text-base">
                     {trend}
                 </Paragraph>
             </div>
@@ -43,6 +44,21 @@ function TrendCard({ rank, change, trend }: TrendCardProps) {
 }
 
 export default function TrendsPage() {
+    const [trendsData, setTrendsData] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    async function getTrendsData() {
+        const response = await fetch("/2026-02-20_130221_gen_alpha_trends.json");
+        const data = await response.json();
+        return data;
+    }
+    useEffect(() => {
+        getTrendsData().then(data => {
+            setTrendsData(data.trends);
+            setLoading(false);
+        });
+    }, []);
+
     return (
         <div className="border-slate-300 border-2 rounded-xl w-full h-full p-4 xl:px-8 flex flex-col">
             <div>
@@ -50,38 +66,48 @@ export default function TrendsPage() {
                 <p className="font-subtitle">Keep up with the latest trends</p>
             </div>
 
-            {/* loader */}
-            {/* <div className="h-full flex flex-col justify-center items-center gap-y-2">
-                <span className="size-10 border-4 border-slate-300 border-b-sky-600 rounded-full inline-block box-border animate-spin"></span>
-                <p className="text-slate-600 italic animate-pulse">
-                    Fetching the latest trends for you...
-                </p>
-            </div> */}
-
-            {/* error UI */}
-            <div className="h-full flex justify-center items-center">
-                <p>
-                    We couldn't find any trends right now :( Check back later!
-                </p>
-            </div>
-
-            {/* trends */}
-            {/* <div className="grid md:grid-cols-2 gap-x-4 lg:gap-x-8 h-full gap-y-4 py-2">
-                <div className="flex flex-col justify-between gap-y-4">
-                    <TrendCard rank={1} change="up" trend="six seven" />
-                    <TrendCard rank={2} change="up" trend="six seven" />
-                    <TrendCard rank={3} change="up" trend="six seven" />
-                    <TrendCard rank={4} change="up" trend="six seven" />
-                    <TrendCard rank={5} change="up" trend="six seven" />
+            {
+                loading &&
+                <div className="h-full flex flex-col justify-center items-center gap-y-2">
+                    <span className="size-10 border-4 border-slate-300 border-b-sky-600 rounded-full inline-block box-border animate-spin"></span>
+                    <p className="text-slate-600 italic animate-pulse">
+                        Fetching the latest trends for you...
+                    </p>
                 </div>
-                <div className="flex flex-col justify-between gap-y-4">
-                    <TrendCard rank={6} change="up" trend="skibidi" />
-                    <TrendCard rank={7} change="up" trend="skibidi" />
-                    <TrendCard rank={8} change="up" trend="skibidi" />
-                    <TrendCard rank={9} change="up" trend="skibidi" />
-                    <TrendCard rank={10} change="up" trend="skibidi" />
+            }
+
+            {
+                !loading && trendsData.length === 0 &&
+                <div className="h-full flex justify-center items-center">
+                    <p>
+                        We couldn't find any trends right now :( Check back later!
+                    </p>
                 </div>
-            </div> */}
+            
+            }
+            
+            {!loading && trendsData.length > 0 &&
+                <div className="grid lg:grid-cols-2 gap-x-4 lg:gap-x-8 h-full gap-y-4 py-2">
+                    <div className="flex flex-col justify-between gap-y-4">
+                        {
+                            trendsData.map((trend, key) => (
+                                key < 5 ?
+                                <TrendCard rank={trend.rank} change="up" trend={trend.name} key={key}/>
+                                : null
+                            ))
+                        }
+                    </div>
+                    <div className="flex flex-col justify-between gap-y-4">
+                        {
+                            trendsData.map((trend, key) => (
+                                key > 4 ?
+                                <TrendCard rank={trend.rank} change="down" trend={trend.name} key={key} />
+                                : null
+                            ))
+                        }
+                    </div>
+                </div>
+            }
         </div>
     )
 }
