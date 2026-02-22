@@ -1,0 +1,45 @@
+name: Test Backend
+
+on:
+  pull_request:
+    branches: [dev]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container: maven:3.9.9-eclipse-temurin-21
+
+    services:
+      db:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Flyway
+        uses: red-gate/setup-flyway@v1
+        with:
+          architecture: 'java'
+
+      - name: Run Flyway migrations
+        run: |
+          flyway migrate \
+            -url="jdbc:postgresql://db:5432/postgres" \
+            -user=postgres \
+            -password=password \
+            -locations="filesystem:./backend/src/main/resources/db/migration" \
+            -outOfOrder=true
+
+      - name: Run tests
+        run: mvn verify -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
+        working-directory: ./backend
