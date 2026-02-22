@@ -91,7 +91,7 @@ export default function TrendsPage() {
                     <div className="flex flex-col justify-between gap-y-4">
                         {
                             trendsData.map((trend, key) => (
-                                key < 5 ?
+                                key < Math.floor(trendsData.length / 2) ?
                                 <TrendCard rank={trend.rank} change="up" trend={trend.name} key={key}/>
                                 : null
                             ))
@@ -100,7 +100,7 @@ export default function TrendsPage() {
                     <div className="flex flex-col justify-between gap-y-4">
                         {
                             trendsData.map((trend, key) => (
-                                key > 4 ?
+                                key > Math.floor(trendsData.length / 2) - 1 ?
                                 <TrendCard rank={trend.rank} change="down" trend={trend.name} key={key} />
                                 : null
                             ))
