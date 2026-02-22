@@ -11,7 +11,7 @@ export default function PageWithSideBar({
   return (
     <div className={cn('flex', className)}>
       <Sidebar />
-      <div className="h-[calc(100vh-52px)] w-full overflow-hidden pl-70">
+      <div className="min-h-[calc(100vh-52px)] w-full overflow-hidden pl-70">
         {children}
       </div>
     </div>
