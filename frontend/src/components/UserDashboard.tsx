@@ -37,7 +37,7 @@ function ContentByRole() {
 
   return match(dir)
     .with('ADMIN', () => <>admin placeholder</>)
-    .with('CONTRIBUTOR', () => <>contributor placeholder</>)
+    .with('CONTRIBUTOR', () => <TrendsPage/>)
     .with('LEARNER', () => <TrendsPage/>)
     .exhaustive();
 }
@@ -80,7 +80,6 @@ export default function UserDashboard() {
       </div>
 
       <div className="flex h-full">
-        {/* something goes here depending on role (not designed yet) */}
         <ContentByRole />
       </div>
     </div>
