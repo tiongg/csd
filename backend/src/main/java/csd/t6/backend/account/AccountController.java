@@ -15,9 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.request.AccountCreateRequest;
+import csd.t6.backend.account.dto.request.AccountRoleUpdateRequest;
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.account.dto.response.AccountResponse;
 import csd.t6.backend.auth.AuthUserDetails;
+import csd.t6.backend.decorators.auth.AdminOnly;
 import csd.t6.backend.decorators.auth.PublicDecorator;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
@@ -37,6 +39,7 @@ public class AccountController {
   }
 
   @GetMapping("/")
+  @AdminOnly()
   public List<AccountResponse> getAll() {
     return accountService.getAllAccounts().stream().map(record -> new AccountResponse(record)).toList();
   }
@@ -58,6 +61,15 @@ public class AccountController {
     accountService.deleteAccount(UUID.fromString(accountId));
   }
 
+  @PatchMapping("/{accountId}/role")
+  @BadRequestResponse()
+  @OkResponse()
+  @AdminOnly()
+  public AccountResponse updateAccountRole(@PathVariable UUID accountId,
+      @RequestBody @Valid AccountRoleUpdateRequest updateDto) {
+    return new AccountResponse(accountService.updateAccountRole(accountId, updateDto.newRole()));
+  }
+
   @PatchMapping("/")
   @BadRequestResponse()
   @OkResponse()
@@ -65,4 +77,5 @@ public class AccountController {
       @RequestBody @Valid AccountUpdateRequest updateDTO) {
     return new AccountResponse(accountService.updateAccount(user.getAccount().getId(), updateDTO));
   }
+
 }

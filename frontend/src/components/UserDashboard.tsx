@@ -1,7 +1,7 @@
-import { match } from 'ts-pattern';
-import { Heading1 } from './ui/typography';
 import useActiveRole from '@/hooks/useActiveRole';
 import { cn } from '@/lib/utils';
+import { match } from 'ts-pattern';
+import { Heading1 } from './ui/typography';
 
 function CardsByRole() {
   const dir = useActiveRole() ?? 'LEARNER';
