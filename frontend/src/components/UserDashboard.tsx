@@ -1,5 +1,6 @@
 import { match } from 'ts-pattern';
 import { Heading1 } from './ui/typography';
+import TrendsPage from './TrendsPage';
 import useActiveRole from '@/hooks/useActiveRole';
 import { cn } from '@/lib/utils';
 
@@ -37,7 +38,7 @@ function ContentByRole() {
   return match(dir)
     .with('ADMIN', () => <>admin placeholder</>)
     .with('CONTRIBUTOR', () => <>contributor placeholder</>)
-    .with('LEARNER', () => <>learner placeholder</>)
+    .with('LEARNER', () => <TrendsPage/>)
     .exhaustive();
 }
 
@@ -78,7 +79,7 @@ export default function UserDashboard() {
         <CardsByRole />
       </div>
 
-      <div className="flex h-full items-center justify-center bg-slate-200">
+      <div className="flex h-full">
         {/* something goes here depending on role (not designed yet) */}
         <ContentByRole />
       </div>
