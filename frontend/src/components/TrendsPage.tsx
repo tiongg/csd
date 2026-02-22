@@ -50,7 +50,14 @@ export default function TrendsPage() {
                 <p className="font-subtitle">Keep up with the latest trends</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-x-4 lg:gap-x-8 h-full gap-y-4 py-2">
+            <div className="h-full flex flex-col justify-center items-center gap-y-2">
+                <span className="size-10 border-4 border-slate-300 border-b-sky-600 rounded-full inline-block box-border animate-spin"></span>
+                <p className="text-slate-600 italic animate-pulse">
+                    Fetching the latest trends for you...
+                </p>
+            </div>
+
+            {/* <div className="grid md:grid-cols-2 gap-x-4 lg:gap-x-8 h-full gap-y-4 py-2">
                 <div className="flex flex-col justify-between gap-y-4">
                     <TrendCard rank={1} change="up" trend="six seven" />
                     <TrendCard rank={2} change="up" trend="six seven" />
@@ -65,7 +72,7 @@ export default function TrendsPage() {
                     <TrendCard rank={9} change="up" trend="skibidi" />
                     <TrendCard rank={10} change="up" trend="skibidi" />
                 </div>
-            </div>
+            </div> */}
         </div>
     )
 }
