@@ -37,13 +37,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
+			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 
 		<!-- Login stuff -->
@@ -113,9 +107,20 @@
 			<version>2.8.5</version>
 		</dependency>
 
+		<!-- Tests -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -155,23 +160,23 @@
 					</jdbc>
 
 					<generator>
-					<database>
-						<name>org.jooq.meta.postgres.PostgresDatabase</name>
-						<schemata>
-							<schema>
-								<inputSchema>public</inputSchema>
-							</schema>
-							<schema>
-								<inputSchema>accounts</inputSchema>
-							</schema>
-							<schema>
-								<inputSchema>teams</inputSchema>
-							</schema>
-							<schema>
-								<inputSchema>courses</inputSchema>
-							</schema>
-						</schemata>
-					</database>
+						<database>
+							<name>org.jooq.meta.postgres.PostgresDatabase</name>
+							<schemata>
+								<schema>
+									<inputSchema>public</inputSchema>
+								</schema>
+								<schema>
+									<inputSchema>accounts</inputSchema>
+								</schema>
+								<schema>
+									<inputSchema>teams</inputSchema>
+								</schema>
+								<schema>
+									<inputSchema>courses</inputSchema>
+								</schema>
+							</schemata>
+						</database>
 						<generate>
 							<pojos>true</pojos>
 							<daos>true</daos>
