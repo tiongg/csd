@@ -48,13 +48,22 @@ export default function TrendsPage() {
     const [loading, setLoading] = useState(true);
 
     async function getTrendsData() {
-        const response = await fetch("/2026-02-20_130221_gen_alpha_trends.json");
-        const data = await response.json();
-        return data;
+        try {
+            const response = await fetch("/2026-02-20_130221_gen_alpha_trends.json");
+            const data = await response.json();
+            return data;
+        } catch (e) {
+            setLoading(false);
+            return null;
+        }
     }
     useEffect(() => {
         getTrendsData().then(data => {
-            setTrendsData(data.trends);
+            if (!data) {
+                setTrendsData([]);
+            } else {
+                setTrendsData(data.trends);
+            }
             setLoading(false);
         });
     }, []);
