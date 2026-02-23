@@ -32,6 +32,6 @@ public class TeamRepository extends BaseRepository<TeamRecord> {
   }
 
   public void delete(UUID teamId) {
-    this.delete(TEAM.ID, teamId);
+    super.delete(TEAM.ID, teamId);
   }
 }
