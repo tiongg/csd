@@ -2,6 +2,7 @@ package csd.t6.backend.team;
 
 import static csd.t6.jooq.public_.tables.Team.TEAM;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -33,5 +34,9 @@ public class TeamRepository extends BaseRepository<TeamRecord> {
 
   public void delete(UUID teamId) {
     super.delete(TEAM.ID, teamId);
+  }
+
+  public List<TeamRecord> findByOwnerId(UUID id) {
+    return this.findBy(TEAM.OWNER_ID, id);
   }
 }
