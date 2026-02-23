@@ -2,22 +2,19 @@ package csd.t6.backend.team;
 
 import static csd.t6.jooq.public_.tables.Team.TEAM;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
-import org.jooq.TableField;
 import org.springframework.stereotype.Repository;
 
+import csd.t6.backend.utils.BaseRepository;
 import csd.t6.jooq.public_.tables.records.TeamRecord;
 
 @Repository
-public class TeamRepository {
-  private final DSLContext dsl;
-
+public class TeamRepository extends BaseRepository<TeamRecord> {
   public TeamRepository(DSLContext dsl) {
-    this.dsl = dsl;
+    super(dsl, TEAM);
   }
 
   public TeamRecord create(String name, String description, UUID ownerId) {
@@ -26,19 +23,7 @@ public class TeamRepository {
   }
 
   public Optional<TeamRecord> findById(UUID teamId) {
-    return dsl.selectFrom(TEAM).where(TEAM.ID.eq(teamId)).fetchOptional();
-  }
-
-  public <T> Optional<TeamRecord> findBy(TableField<TeamRecord, T> field, T value) {
-    return dsl.selectFrom(TEAM).where(field.eq(value)).fetchOptional();
-  }
-
-  public List<TeamRecord> findAll() {
-    return dsl.selectFrom(TEAM).fetch();
-  }
-
-  public List<TeamRecord> findByOwnerId(UUID ownerId) {
-    return dsl.selectFrom(TEAM).where(TEAM.OWNER_ID.eq(ownerId)).fetch();
+    return this.findOneBy(TEAM.ID, teamId);
   }
 
   public TeamRecord update(UUID teamId, String name, String description) {
@@ -47,6 +32,6 @@ public class TeamRepository {
   }
 
   public void delete(UUID teamId) {
-    dsl.deleteFrom(TEAM).where(TEAM.ID.eq(teamId)).execute();
+    this.delete(TEAM.ID, teamId);
   }
 }
