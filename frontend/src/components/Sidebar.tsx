@@ -1,7 +1,3 @@
-import type { Account } from '@/context/AuthContext';
-import { useAuth } from '@/context/AuthContext';
-import useActiveRole from '@/hooks/useActiveRole';
-import { capitalizeFirst } from '@/lib/utils';
 import {
   Cog6ToothIcon,
   DocumentTextIcon,
@@ -12,12 +8,16 @@ import {
   UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
-import type { LinkOptions } from '@tanstack/react-router';
 import { Link, useNavigate } from '@tanstack/react-router';
-import type React from 'react';
-import type { PropsWithChildren } from 'react';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
+import type { LinkOptions } from '@tanstack/react-router';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
+import type { Account } from '@/context/AuthContext';
+import useActiveRole from '@/hooks/useActiveRole';
+import { capitalizeFirst } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 type NavItemProps = PropsWithChildren<{
   title: string;
