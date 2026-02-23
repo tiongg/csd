@@ -61,37 +61,31 @@ function TrendsError() {
 }
 
 function TrendsColumns({ trendsData }: { trendsData: Array<{ rank: number, name: string }> }) {
+    const rows = Math.ceil(trendsData.length / 2);
     return (
-        <div className="grid lg:grid-cols-2 gap-x-4 lg:gap-x-8 h-full gap-y-4 py-2">
-            <div className="flex flex-col justify-between gap-y-4">
-                {
-                    trendsData.map((trend, key) => (
-                        key < Math.floor(trendsData.length / 2) ?
-                            <TrendCard rank={trend.rank} change="up" trend={trend.name} key={key} />
-                            : null
-                    ))
-                }
-            </div>
-            <div className="flex flex-col justify-between gap-y-4">
-                {
-                    trendsData.map((trend, key) => (
-                        key > Math.floor(trendsData.length / 2) - 1 ?
-                            <TrendCard rank={trend.rank} change="down" trend={trend.name} key={key} />
-                            : null
-                    ))
-                }
-            </div>
+        <div
+            className="grid grid-flow-col grid-rows-5 gap-4 h-full"
+            style={{ gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}
+        >
+            {trendsData.map((trend, key) => (
+                <TrendCard
+                    rank={trend.rank}
+                    change="down"
+                    trend={trend.name}
+                    key={key}
+                />
+            ))}
         </div>
-    )
+    );
 }
 
 function TrendsDisplay(
-    { trendsData, loading }: { trendsData: Array<{ rank: number, name: string }> , loading: boolean }
+    { trendsData, loading }: { trendsData: Array<{ rank: number, name: string }>, loading: boolean }
 ) {
     return match([loading, trendsData])
-        .with([true, P.any], () => <TrendsLoading/>)
-        .with([false, P.not(undefined)], () => <TrendsColumns trendsData={trendsData}/>)
-        .otherwise(() => <TrendsError/>)
+        .with([true, P.any], () => <TrendsLoading />)
+        .with([false, P.not(undefined)], () => <TrendsColumns trendsData={trendsData} />)
+        .otherwise(() => <TrendsError />)
 }
 
 export default function TrendsPage() {
@@ -113,7 +107,7 @@ export default function TrendsPage() {
                 <p className="font-subtitle">Keep up with the latest trends</p>
             </div>
 
-            <TrendsDisplay trendsData={trendsData} loading={loading}/>
+            <TrendsDisplay trendsData={trendsData} loading={loading} />
         </div>
     )
 }
