@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon, MinusIcon } from "@heroicons/react/24/outline";
-import { Heading3, Paragraph } from "./ui/typography"
 import { useQuery } from "@tanstack/react-query";
+import { P, match } from 'ts-pattern';
+import { Heading3, Paragraph } from "./ui/typography"
 
 const CHANGE_ICON = {
     up: <ChevronUpIcon className="text-emerald-400 size-5" aria-label="Up Arrow" />,
     down: <ChevronDownIcon className="text-rose-500 size-5" aria-label="Down Arrow" />,
     none: <MinusIcon className="text-slate-600 size-5" aria-label="No Change" />
-    
+
 } as const;
 
 type TrendCardProps = {
@@ -39,6 +39,61 @@ function TrendCard({ rank, change, trend }: TrendCardProps) {
     )
 }
 
+function TrendsLoading() {
+    return (
+        <div className="h-full flex flex-col justify-center items-center gap-y-2">
+            <span className="size-10 border-4 border-slate-300 border-b-sky-600 rounded-full inline-block box-border animate-spin"></span>
+            <p className="text-slate-600 italic animate-pulse">
+                Fetching the latest trends for you...
+            </p>
+        </div>
+    )
+}
+
+function TrendsError() {
+    return (
+        <div className="h-full flex justify-center items-center">
+            <p>
+                We couldn't find any trends right now :( Check back later!
+            </p>
+        </div>
+    )
+}
+
+function TrendsColumns({ trendsData }: { trendsData: Array<{ rank: number, name: string }> }) {
+    return (
+        <div className="grid lg:grid-cols-2 gap-x-4 lg:gap-x-8 h-full gap-y-4 py-2">
+            <div className="flex flex-col justify-between gap-y-4">
+                {
+                    trendsData.map((trend, key) => (
+                        key < Math.floor(trendsData.length / 2) ?
+                            <TrendCard rank={trend.rank} change="up" trend={trend.name} key={key} />
+                            : null
+                    ))
+                }
+            </div>
+            <div className="flex flex-col justify-between gap-y-4">
+                {
+                    trendsData.map((trend, key) => (
+                        key > Math.floor(trendsData.length / 2) - 1 ?
+                            <TrendCard rank={trend.rank} change="down" trend={trend.name} key={key} />
+                            : null
+                    ))
+                }
+            </div>
+        </div>
+    )
+}
+
+function TrendsDisplay(
+    { trendsData, loading }: { trendsData: Array<{ rank: number, name: string }> , loading: boolean }
+) {
+    return match([loading, trendsData])
+        .with([true, P.any], () => <TrendsLoading/>)
+        .with([false, P.not(undefined)], () => <TrendsColumns trendsData={trendsData}/>)
+        .otherwise(() => <TrendsError/>)
+}
+
 export default function TrendsPage() {
     async function getTrendsData() {
         const response = await fetch("/2026-02-20_130221_gen_alpha_trends.json");
@@ -58,48 +113,7 @@ export default function TrendsPage() {
                 <p className="font-subtitle">Keep up with the latest trends</p>
             </div>
 
-            {
-                loading &&
-                <div className="h-full flex flex-col justify-center items-center gap-y-2">
-                    <span className="size-10 border-4 border-slate-300 border-b-sky-600 rounded-full inline-block box-border animate-spin"></span>
-                    <p className="text-slate-600 italic animate-pulse">
-                        Fetching the latest trends for you...
-                    </p>
-                </div>
-            }
-
-            {
-                !loading && trendsData.length === 0 &&
-                <div className="h-full flex justify-center items-center">
-                    <p>
-                        We couldn't find any trends right now :( Check back later!
-                    </p>
-                </div>
-            
-            }
-            
-            {!loading && trendsData.length > 0 &&
-                <div className="grid lg:grid-cols-2 gap-x-4 lg:gap-x-8 h-full gap-y-4 py-2">
-                    <div className="flex flex-col justify-between gap-y-4">
-                        {
-                            trendsData.map((trend, key) => (
-                                key < Math.floor(trendsData.length / 2) ?
-                                <TrendCard rank={trend.rank} change="up" trend={trend.name} key={key}/>
-                                : null
-                            ))
-                        }
-                    </div>
-                    <div className="flex flex-col justify-between gap-y-4">
-                        {
-                            trendsData.map((trend, key) => (
-                                key > Math.floor(trendsData.length / 2) - 1 ?
-                                <TrendCard rank={trend.rank} change="down" trend={trend.name} key={key} />
-                                : null
-                            ))
-                        }
-                    </div>
-                </div>
-            }
+            <TrendsDisplay trendsData={trendsData} loading={loading}/>
         </div>
     )
 }
