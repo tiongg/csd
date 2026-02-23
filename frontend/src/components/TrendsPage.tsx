@@ -1,31 +1,26 @@
 import { useEffect, useState } from "react";
+import { ChevronDownIcon, ChevronUpIcon, MinusIcon } from "@heroicons/react/24/outline";
 import { Heading3, Paragraph } from "./ui/typography"
+
+const CHANGE_ICON = {
+    up: <ChevronUpIcon className="text-emerald-400 size-5" aria-label="Up Arrow" />,
+    down: <ChevronDownIcon className="text-rose-500 size-5" aria-label="Down Arrow" />,
+    none: <MinusIcon className="text-slate-600 size-5" aria-label="No Change" />
+    
+} as const;
 
 type TrendCardProps = {
     rank: number;
-    change: "up" | "down" | "none";
+    change: keyof typeof CHANGE_ICON;
     trend: string;
 }
 
 function TrendCard({ rank, change, trend }: TrendCardProps) {
-    const changeIcon = {
-        up: <div className="inline-block h-0 w-0 border-r-8 border-b-5 border-l-8 border-r-transparent border-b-emerald-400 border-l-transparent">
-            <span className="sr-only">Up Arrow</span>
-        </div>,
-        down: <div className="inline-block h-0 w-0 border-r-8 border-t-5 border-l-8 border-r-transparent border-t-rose-500 border-l-transparent">
-            <span className="sr-only">Down Arrow</span>
-        </div>,
-        none: <div className="inline-block text-slate-600 font-bold">
-            <span>—</span>
-            <span className="sr-only">No Change</span>
-        </div>
-    }
-
     return (
         <div className="border-slate-300 border-2 rounded-xl w-full flex justify-between px-2 sm:px-4 grow py-1 gap-x-2">
             <div className="flex gap-x-2 items-center">
                 <div className="flex items-center">
-                    {changeIcon[change]}
+                    {CHANGE_ICON[change]}
                 </div>
                 <div>
                     <Paragraph>
