@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronDownIcon, ChevronUpIcon, MinusIcon } from "@heroicons/react/24/outline";
 import { Heading3, Paragraph } from "./ui/typography"
+import { useQuery } from "@tanstack/react-query";
 
 const CHANGE_ICON = {
     up: <ChevronUpIcon className="text-emerald-400 size-5" aria-label="Up Arrow" />,
@@ -39,29 +40,16 @@ function TrendCard({ rank, change, trend }: TrendCardProps) {
 }
 
 export default function TrendsPage() {
-    const [trendsData, setTrendsData] = useState([]);
-    const [loading, setLoading] = useState(true);
-
     async function getTrendsData() {
-        try {
-            const response = await fetch("/2026-02-20_130221_gen_alpha_trends.json");
-            const data = await response.json();
-            return data;
-        } catch (e) {
-            setLoading(false);
-            return null;
-        }
+        const response = await fetch("/2026-02-20_130221_gen_alpha_trends.json");
+        const data = await response.json();
+        return data.trends;
     }
-    useEffect(() => {
-        getTrendsData().then(data => {
-            if (!data) {
-                setTrendsData([]);
-            } else {
-                setTrendsData(data.trends);
-            }
-            setLoading(false);
-        });
-    }, []);
+
+    const { data: trendsData, isLoading: loading } = useQuery({
+        queryKey: ["trendsData"],
+        queryFn: getTrendsData,
+    });
 
     return (
         <div className="border-slate-400 border-2 rounded-xl w-full h-full p-4 xl:px-8 flex flex-col">
