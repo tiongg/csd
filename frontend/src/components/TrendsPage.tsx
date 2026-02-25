@@ -84,7 +84,10 @@ function TrendsDisplay(
 ) {
     return match([loading, trendsData])
         .with([true, P.any], () => <TrendsLoading />)
-        .with([false, P.not(undefined)], () => <TrendsColumns trendsData={trendsData} />)
+        .with(
+            [false, P.intersection(P.not([]), P.not(undefined))],
+            () => <TrendsColumns trendsData={trendsData} />
+        )
         .otherwise(() => <TrendsError />)
 }
 
