@@ -25,7 +25,7 @@ public class CourseRepository extends BaseRepository<CourseRecord> {
   }
 
   public Optional<CourseRecord> findById(UUID id) {
-    return dsl.selectFrom(COURSE).where(COURSE.ID.eq(id)).fetchOptional();
+    return this.findOneBy(COURSE.ID, id);
   }
 
   public List<CourseRecord> findAll() {
