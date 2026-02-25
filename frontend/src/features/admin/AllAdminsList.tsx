@@ -11,11 +11,11 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { useApiQuery } from '@/lib/fetch-client';
 
 function AllAdminRows() {
-  const { data: applications, isLoading: isLoadingApplications } = useApiQuery(
+  const { data: admins, isLoading: isLoadingAdmins } = useApiQuery(
     'get',
     '/api/admins/',
   );
-  if (isLoadingApplications) {
+  if (isLoadingAdmins) {
     return (
       <TableRow>
         <TableCell colSpan={3} className="text-center">
@@ -25,7 +25,7 @@ function AllAdminRows() {
     );
   }
 
-  if (!applications || applications.length === 0) {
+  if (!admins || admins.length === 0) {
     return (
       <TableRow>
         <TableCell colSpan={3} className="text-center">
@@ -35,7 +35,7 @@ function AllAdminRows() {
     );
   }
 
-  return applications.map(({ username, email, id }) => (
+  return admins.map(({ username, email, id }) => (
     <TableRow key={id}>
       <TableCell>{username}</TableCell>
       <TableCell>{email}</TableCell>
