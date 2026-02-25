@@ -60,7 +60,7 @@ function PendingApplicationRows({
         <Checkbox
           className="border-slate-800"
           checked={selectedUuids.has(id)}
-          onCheckedChange={(value) => setSelected(id, !!value)}
+          onCheckedChange={(value) => setSelected(id, value === true)}
         />
       </TableCell>
       <TableCell>{username}</TableCell>
@@ -78,7 +78,7 @@ export default function PendingContributorsForm() {
     '/api/admins/contributor-applications/approve',
     {
       onSuccess: async () => {
-        toast.success('Approved contributor');
+        toast.success('Approved contributor(s)');
         setSelectedUuids(new Set());
         await queryClient.invalidateQueries({
           queryKey: apiQueryOptions(
@@ -88,7 +88,7 @@ export default function PendingContributorsForm() {
         });
       },
       onError: () => {
-        toast.error('Failed to approve contributor');
+        toast.error('Failed to approve contributor(s)');
       },
     },
   );
@@ -98,7 +98,7 @@ export default function PendingContributorsForm() {
     '/api/admins/contributor-applications/reject',
     {
       onSuccess: async () => {
-        toast.success('Rejected contributor');
+        toast.success('Rejected contributor(s)');
         setSelectedUuids(new Set());
         await queryClient.invalidateQueries({
           queryKey: apiQueryOptions(
@@ -108,7 +108,7 @@ export default function PendingContributorsForm() {
         });
       },
       onError: () => {
-        toast.error('Failed to reject contributor');
+        toast.error('Failed to reject contributor(s)');
       },
     },
   );
@@ -152,7 +152,7 @@ export default function PendingContributorsForm() {
           className="w-24 cursor-pointer rounded-full"
           onClick={rejectContributors}
         >
-          Delete
+          Reject
         </Button>
       </div>
 
