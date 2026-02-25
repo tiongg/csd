@@ -26,8 +26,8 @@ public class PendingContributorRepository extends BaseRepository<PendingContribu
   }
 
   public List<AccountRecord> getPendingContributorAccounts(int limit, int offset) {
-    return dsl.select().from(PENDING_CONTRIBUTORS).join(ACCOUNT).on(PENDING_CONTRIBUTORS.LEARNER_ID.eq(ACCOUNT.ID))
-        .limit(limit).offset(offset).fetchInto(ACCOUNT);
+    return dsl.select(ACCOUNT.fields()).from(PENDING_CONTRIBUTORS).join(ACCOUNT)
+        .on(PENDING_CONTRIBUTORS.LEARNER_ID.eq(ACCOUNT.ID)).limit(limit).offset(offset).fetchInto(ACCOUNT);
   }
 
   public int deletePendingContributors(List<UUID> learnerUuids) {

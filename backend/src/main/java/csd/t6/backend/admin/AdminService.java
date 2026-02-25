@@ -29,10 +29,6 @@ public class AdminService {
     return this.accountRepository.getAllAdmins(limit, offset);
   }
 
-  public List<AccountRecord> getAdminsExcluding(UUID excludeAdminUuid, int limit, int offset) {
-    return this.accountRepository.getNonAdmins(limit, offset);
-  }
-
   @Transactional
   public int approveContributors(List<UUID> learnerUuids) {
     this.accountRepository.updateAccountsRole(learnerUuids, Roles.CONTRIBUTOR);
