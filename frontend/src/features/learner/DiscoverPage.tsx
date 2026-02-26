@@ -21,7 +21,7 @@ function ReelOverlay({ course, description, children }: ReelOverlayProps) {
   const { user } = useAuth();
 
   return (
-    <div className="h-[calc(100vh-16rem)] w-full relative">
+    <div className="h-[calc(100vh-16rem)] w-full relative border-2 border-slate-300">
       <div className="h-full w-full absolute z-1">
         <div className="flex items-center py-4 flex-col">
           <Button className="mb-4 cursor-pointer">View Course</Button>
