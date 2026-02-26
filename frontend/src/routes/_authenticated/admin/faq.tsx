@@ -50,7 +50,7 @@ function RouteComponent() {
         >
           {items.map((item) => (
             <AccordionItem key={item.value} value={item.value}>
-              <AccordionTrigger>{item.trigger}</AccordionTrigger>
+              <AccordionTrigger className='cursor-pointer'>{item.trigger}</AccordionTrigger>
               <AccordionContent>{item.content}</AccordionContent>
             </AccordionItem>
           ))}
