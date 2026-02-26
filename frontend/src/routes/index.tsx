@@ -38,28 +38,28 @@ function CoursePreview({ name, creator, imageSrc }: CoursePreviewProps) {
 function App() {
   // placeholder courses
   const courses = [
-  {
-    name: 'How to say Six Seven',
-    creator: 'Christoph Treude',
-    imageSrc: '/assets/landing_page/six_seven.jpg'
-  },
-  {
-    name: 'Hawk Tuah for Chinese New Year',
-    creator: 'Pius Lee',
-    imageSrc: '/assets/landing_page/hawk_tuah.png'
-    
-  },
-  {
-    name: 'What NOT to say at festive gatherings',
-    creator: 'Wang Jiwei',
-    imageSrc: '/assets/landing_page/festive_gatherings.jpg'
-  },
-  {
-    name: 'Know the latest trends',
-    creator: 'Zhang Zhiyuan',
-    imageSrc: '/assets/landing_page/latest_trends.jpg'
-  }
-];
+    {
+      name: 'How to say Six Seven',
+      creator: 'Christoph Treude',
+      imageSrc: '/assets/landing_page/six_seven.jpg'
+    },
+    {
+      name: 'Hawk Tuah for Chinese New Year',
+      creator: 'Pius Lee',
+      imageSrc: '/assets/landing_page/hawk_tuah.png'
+
+    },
+    {
+      name: 'What NOT to say at festive gatherings',
+      creator: 'Wang Jiwei',
+      imageSrc: '/assets/landing_page/festive_gatherings.jpg'
+    },
+    {
+      name: 'Know the latest trends',
+      creator: 'Zhang Zhiyuan',
+      imageSrc: '/assets/landing_page/latest_trends.jpg'
+    }
+  ];
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -81,10 +81,11 @@ function App() {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center pt-16">
-      <div className="m-5 flex h-50 w-9/10 items-end justify-center bg-slate-200 text-center lg:h-125">
-        <div className="mb-8">
+      <div className="m-5 relative h-50 w-9/10 justify-center text-center lg:h-125">
+        <div className="bottom-8 absolute z-10 px-10 py-6 rounded-md bg-white left-0 right-0 mx-auto w-fit">
           <Heading1>Get Started</Heading1>
         </div>
+        <img src="/assets/landing_page/get_started.jpg" alt="Adult learners in a classroom" className='w-full h-full object-cover rounded-md' />
       </div>
 
       <Separator />
