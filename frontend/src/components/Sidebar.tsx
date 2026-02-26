@@ -1,10 +1,10 @@
 import {
   Cog6ToothIcon,
   DocumentTextIcon,
+  LightBulbIcon,
   PencilSquareIcon,
   QuestionMarkCircleIcon,
   RectangleGroupIcon,
-  TrophyIcon,
   UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
@@ -93,9 +93,9 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           icon={<RectangleGroupIcon />}
         />
         <NavItem
-          title="Challenges"
-          link="/learner/challenges"
-          icon={<TrophyIcon />}
+          title="Discover"
+          link="/learner/discover"
+          icon={<LightBulbIcon />}
         />
         <NavItem
           title="My Courses"
@@ -143,13 +143,13 @@ export default function Sidebar() {
           <div className="flex flex-col gap-y-4 py-4">
             <NavItem
               title="Settings"
-              link={getRoleUrl(currentActiveRole,'settings')}
+              link={getRoleUrl(currentActiveRole, 'settings')}
               icon={<Cog6ToothIcon />}
             />
 
             <NavItem
               title="Help & Support"
-              link={getRoleUrl(currentActiveRole,'faq')}
+              link={getRoleUrl(currentActiveRole, 'faq')}
               icon={<QuestionMarkCircleIcon />}
             />
           </div>

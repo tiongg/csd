@@ -61,7 +61,6 @@ export default function UserManagementForm() {
   );
 }
 
-
 function AllUsers() {
   return (
     <div className="flex flex-col gap-4 py-4">
