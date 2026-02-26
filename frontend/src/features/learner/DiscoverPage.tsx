@@ -1,6 +1,6 @@
 import Autoplay from "embla-carousel-autoplay";
 import { useInView } from "react-intersection-observer";
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { PropsWithChildren } from "react";
 import { Heading1, Heading3 } from '@/components/ui/typography';
 import {
@@ -43,9 +43,10 @@ function ReelOverlay({ course, description, children }: ReelOverlayProps) {
   )
 }
 
-function ReelPlayer({src}: {src: string}) {
+function ReelPlayer({ src }: { src: string }) {
   const { ref, inView } = useInView();
   const vidRef = useRef<HTMLVideoElement>(null);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     if (!vidRef.current) {
@@ -60,9 +61,21 @@ function ReelPlayer({src}: {src: string}) {
 
   return (
     <div className="h-full w-full flex justify-center items-center" ref={ref}>
-      <video loop muted className="max-w-full max-h-full" aria-label="Course preview video" ref={vidRef}>
-        <source src={src} type="video/mp4"/>
-      </video>
+      {
+        !hasError ?
+          <video loop muted className="max-w-full max-h-full" aria-label="Course preview video" ref={vidRef} onError={() => { setHasError(true) }}>
+            <source src={src} type="video/mp4" />
+          </video> :
+          <ReelError />
+      }
+    </div>
+  )
+}
+
+function ReelError() {
+  return (
+    <div className="italic text-slate-500">
+      Reel could not be played. Please check your connection.
     </div>
   )
 }
@@ -89,13 +102,13 @@ export default function DiscoverPage() {
         <CarouselContent>
           <CarouselItem>
             <ReelOverlay course="skibidi" description="skibidi toilet">
-              <ReelPlayer src="/skibidi_toilet.mp4"/>
+              <ReelPlayer src="/skibidi_toilet.mp4" />
             </ReelOverlay>
           </CarouselItem>
 
           <CarouselItem>
             <ReelOverlay course="skibidi" description="skibidi toilet">
-              <ReelPlayer src="/skibidi_toilet.mp4"/>
+              <ReelPlayer src="/skibidi_toilet.mp4" />
             </ReelOverlay>
           </CarouselItem>
         </CarouselContent>
