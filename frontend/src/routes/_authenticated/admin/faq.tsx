@@ -18,13 +18,13 @@ const items = [
     value: 'addAdmin',
     trigger: 'How do i add an admin?',
     content:
-      'Go to User Management -> All Users. Search for the user and assign them with the admin role by tapping on the pencil icon',
+      'Go to User Management -> All Users. Search for the user and assign them with the admin role by clicking on the pencil icon',
   },
   {
     value: 'deleteAdmin',
     trigger: 'How do I deactivate or remove an admin?',
     content:
-      'Go to User Management -> All Admins. Search for the admin and remove the admin by tapping on the "X" icon',
+      'Go to User Management -> All Admins. Search for the admin and remove the admin by clicking on the "X" icon',
   },
   {
     value: 'content',
@@ -36,7 +36,7 @@ const items = [
     value: 'roles',
     trigger: 'How do I switch between my roles?',
     content:
-      'At the top of your screen, you should see a drop down to switch between your roles. If you wish to be take up some courses, feel free to do so!',
+      'At the top of your screen, you should see a drop down to switch between your roles. If you wish to take up some courses, feel free to do so!',
   },
 ];
 

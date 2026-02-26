@@ -17,7 +17,7 @@ const items = [
     value: 'scope',
     trigger: 'What is a Contributor allowed to do?',
     content:
-      'Contributors typically create and edit content (lessons, quizzes, resources), but may need Admin approval to publish courses',
+      'Contributors typically create and edit content (lessons, quizzes, resources), but may need Admin approval to publish courses.',
   },
   {
     value: 'drafts',
@@ -27,7 +27,7 @@ const items = [
   },
   {
     value: 'team',
-    trigger: 'Can i work on the course with my teammates?',
+    trigger: 'Can I work on the course with my teammates?',
     content: 'Yes you can. In fact, we support real time collaboration!',
   },
   {
