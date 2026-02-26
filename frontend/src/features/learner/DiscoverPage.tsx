@@ -1,7 +1,5 @@
-import * as React from "react"
 import type { PropsWithChildren } from 'react';
 import { Heading1, Heading3 } from '@/components/ui/typography';
-import { Card, CardContent } from "@/components/ui/card"
 import {
   Carousel,
   CarouselContent,
