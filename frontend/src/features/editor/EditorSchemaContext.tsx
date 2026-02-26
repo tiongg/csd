@@ -27,7 +27,7 @@ const EditorSchemaContext = createContext<EditorSchemaContextType | null>(null);
 function SchemaExtractor({
   onReady,
 }: {
-  onReady: (schema: any, serializer: Serializer) => void;
+  onReady: (schema: Schema, serializer: Serializer) => void;
 }) {
   const { get: getEditor } = useCrepeEditor();
 
