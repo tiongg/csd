@@ -1,6 +1,6 @@
 import Autoplay from "embla-carousel-autoplay";
 import { useInView } from "react-intersection-observer";
-import type { PropsWithChildren } from 'react';
+import { useEffect, useRef, type PropsWithChildren } from 'react';
 import { Heading1, Heading3 } from '@/components/ui/typography';
 import {
   Carousel,
@@ -44,10 +44,22 @@ function ReelOverlay({ course, description, children }: ReelOverlayProps) {
 
 function ReelPlayer({src}: {src: string}) {
   const { ref, inView } = useInView();
+  const vidRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (!vidRef.current) {
+      return;
+    }
+    if (inView) {
+      vidRef.current.play();
+    } else {
+      vidRef.current.pause();
+    }
+  }, [inView, vidRef])
 
   return (
     <div className="h-full w-full flex justify-center items-center" ref={ref}>
-      <video loop autoPlay={inView} muted className="max-w-full max-h-full" aria-label="Course preview video">
+      <video loop muted className="max-w-full max-h-full" aria-label="Course preview video" ref={vidRef}>
         <source src={src} type="video/mp4"/>
       </video>
     </div>
