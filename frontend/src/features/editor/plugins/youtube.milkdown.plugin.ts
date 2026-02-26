@@ -48,7 +48,11 @@ const iframeNode = $node('iframe', () => ({
   ],
   toDOM: (node: Node) => [
     'iframe',
-    { ...node.attrs, contenteditable: false }, // Prevent editing iframe content
+    {
+      ...node.attrs,
+      contenteditable: false, // Prevent editing iframe content
+      class: 'aspect-video h-98',
+    },
     0,
   ],
   parseMarkdown: {
