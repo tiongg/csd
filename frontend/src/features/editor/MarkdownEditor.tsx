@@ -1,5 +1,5 @@
 import { useContentEditor } from '@/context/ContentEditorContext';
-import { Crepe } from '@milkdown/crepe';
+import { Crepe, CrepeFeature } from '@milkdown/crepe';
 import { collab, collabServiceCtx } from '@milkdown/plugin-collab';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
 import { useEffect } from 'react';
@@ -11,7 +11,28 @@ import './editor.css';
 
 function MarkdownEditorInternal() {
   const { get: getEditor } = useEditor((root) => {
-    return new Crepe({ root }).editor.use(collab);
+    const crepe = new Crepe({
+      root,
+      features: {
+        [CrepeFeature.ImageBlock]: true,
+      },
+      featureConfigs: {
+        [CrepeFeature.ImageBlock]: {
+          onUpload: async (file: File) => {
+            return new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                resolve(reader.result as string);
+              };
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            });
+          },
+        },
+      },
+    });
+
+    return crepe.editor.use(collab);
   });
   const { doc, provider, currentSection } = useContentEditor();
 
