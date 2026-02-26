@@ -1,6 +1,57 @@
-import { Heading1 } from '@/components/ui/typography';
+import * as React from "react"
+import type { PropsWithChildren } from 'react';
+import { Heading1, Heading3 } from '@/components/ui/typography';
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
+
+type ReelOverlayProps = PropsWithChildren<{
+  course: string;
+  description?: string;
+}>
+
+function ReelOverlay({ course, description, children }: ReelOverlayProps) {
+  const { user } = useAuth();
+
+  return (
+    <div className="min-h-100 w-full relative">
+      <div className="h-full w-full absolute z-1">
+        <div className="flex items-center py-4 flex-col">
+          <Button className="mb-4 cursor-pointer">View Course</Button>
+          <Heading3>{course}</Heading3>
+          <p className="font-subtitle">{description}</p>
+        </div>
+
+        <div className="bottom-4 right-4 absolute text-slate-300">
+          @{user?.username}
+        </div>
+      </div>
+
+      <div className="h-full w-full absolute">
+        {children}
+      </div>
+
+    </div>
+  )
+}
+
+function ReelPlayer() {
+  return (
+    <div className="h-full w-full">
+      reel video here
+    </div>
+  )
+}
 
 export default function DiscoverPage() {
+
   return (
     <div className="flex h-full w-full flex-col gap-4 p-16">
       <div>
@@ -8,9 +59,25 @@ export default function DiscoverPage() {
         <p className="font-subtitle">Take a look at what our courses offer!</p>
       </div>
 
-      <div className="flex h-full items-center justify-center bg-slate-200">
-        placeholder
-      </div>
+
+      <Carousel className="w-full h-full">
+        <CarouselContent>
+          <CarouselItem>
+            <ReelOverlay course="skibidi" description="aaa">
+              <ReelPlayer />
+            </ReelOverlay>
+          </CarouselItem>
+
+          <CarouselItem>
+            <ReelOverlay course="skibidi" description="aaa">
+              <ReelPlayer />
+            </ReelOverlay>
+          </CarouselItem>
+        </CarouselContent>
+
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
     </div>
   );
 }
