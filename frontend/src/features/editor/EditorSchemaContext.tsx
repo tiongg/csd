@@ -1,3 +1,4 @@
+import useCrepeEditor from '@/hooks/useCrepeEditor';
 import { schemaCtx, serializerCtx } from '@milkdown/kit/core';
 import { type Schema } from '@milkdown/prose/model';
 import { Milkdown, MilkdownProvider } from '@milkdown/react';
@@ -10,7 +11,6 @@ import {
   type PropsWithChildren,
   type RefObject,
 } from 'react';
-import { useCrepeEditor } from './MarkdownEditor';
 
 export type EditorSchemaContextType = {
   schema: RefObject<Schema | null>;
