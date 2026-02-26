@@ -25,7 +25,7 @@ type CoursePreviewProps = {
 function CoursePreview({ name, creator, imageSrc }: CoursePreviewProps) {
   return (
     <div>
-      <div className="h-24 bg-slate-200 lg:h-72">
+      <div className="h-48 bg-slate-200 lg:h-72">
         <img src={imageSrc} alt={name} className='h-full w-full object-cover' />
       </div>
       <div className="py-2">
@@ -83,7 +83,7 @@ function App() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center pt-16">
       <div className="m-5 relative h-50 w-9/10 justify-center text-center lg:h-125">
-        <div className="bottom-8 absolute z-10 px-10 py-6 rounded-md bg-white left-0 right-0 mx-auto w-fit">
+        <div className="bottom-8 absolute z-10 p-4 sm:px-10 sm:py-6 rounded-md bg-white left-0 right-0 mx-auto w-fit">
           <Heading1>Get Started</Heading1>
         </div>
         <img src="/assets/landing_page/get_started.jpg" alt="Adult learners in a classroom" className='w-full h-full object-cover rounded-md absolute -z-10' />
@@ -91,23 +91,25 @@ function App() {
 
       <Separator />
 
-      <div className="w-9/10 p-5">
-        <div className="py-4">
+      <div className="w-9/10 p-5 flex flex-col items-center">
+        <div className="py-4 w-full">
           <Heading1>Trending now</Heading1>
           <p className="font-subtitle text-lg">Most popular courses</p>
         </div>
 
-        <Carousel>
-          <CarouselContent>
-            {courses.map(({ name, creator, imageSrc }, i) => (
-              <CarouselItem className="basis-1/3" key={i}>
-                <CoursePreview name={name} creator={creator} imageSrc={imageSrc} />
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
+        <div className='w-9/10'>
+          <Carousel>
+            <CarouselContent>
+              {courses.map(({ name, creator, imageSrc }, i) => (
+                <CarouselItem className="sm:basis-1/2 md:basis-1/3" key={i}>
+                  <CoursePreview name={name} creator={creator} imageSrc={imageSrc} />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
       </div>
 
       <Separator />
