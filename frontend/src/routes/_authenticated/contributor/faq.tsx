@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/accordion';
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { createFileRoute } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
 
 export const Route = createFileRoute('/_authenticated/contributor/faq')({
   component: RouteComponent,
@@ -55,13 +56,14 @@ function RouteComponent() {
         </Accordion>
 
         <div className="flex flex-col space-y-4">
-          <p className="text-center">If there are any other questions</p>
-          <a
-            href="mailto:tg.tan.2024@computing.smu.edu.sg"
-            className="m-auto max-w-lg rounded-md bg-black px-4 py-2 text-sm font-medium text-white"
-          >
-            Contact Us
-          </a>
+          <p className="text-center">If you have any other questions</p>
+          <Button asChild>
+            <a
+              href="mailto:tg.tan.2024@computing.smu.edu.sg"
+            >
+              Contact Us
+            </a>
+          </Button>
         </div>
       </div>
     </PageWithSideBar>
