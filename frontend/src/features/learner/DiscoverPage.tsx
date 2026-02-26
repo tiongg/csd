@@ -1,3 +1,4 @@
+import Autoplay from "embla-carousel-autoplay";
 import type { PropsWithChildren } from 'react';
 import { Heading1, Heading3 } from '@/components/ui/typography';
 import {
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/carousel"
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+
 
 type ReelOverlayProps = PropsWithChildren<{
   course: string;
@@ -58,7 +60,13 @@ export default function DiscoverPage() {
       </div>
 
 
-      <Carousel className="w-full h-full">
+      <Carousel className="w-full h-full"
+        plugins={[
+          Autoplay({
+            delay: 4000, stopOnInteraction: true
+          })
+        ]}
+      >
         <CarouselContent>
           <CarouselItem>
             <ReelOverlay course="skibidi" description="aaa">
