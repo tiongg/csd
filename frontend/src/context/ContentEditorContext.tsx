@@ -1,3 +1,4 @@
+import { useEditorSchema } from '@/features/editor/EditorSchemaContext';
 import type {
   ContentType,
   DocType,
@@ -6,7 +7,6 @@ import type {
   SectionType,
 } from '@/lib/content.type';
 import { generateColorFromString, type Course } from '@/lib/utils';
-import { defaultMarkdownSerializer, schema } from 'prosemirror-markdown';
 import {
   createContext,
   useContext,
@@ -28,7 +28,7 @@ export type ContentEditorContextType = {
   provider: WebsocketProvider;
   currentSection: number;
   setCurrentSection: Dispatch<SetStateAction<number>>;
-  getDocAsJson: () => SectionType[];
+  getDocAsJson: () => Promise<SectionType[]>;
   deleteSection: (index: number) => void;
   addSection: (type: ContentType) => void;
 };
@@ -77,7 +77,7 @@ export function ContentEditorProvider({
         },
       ),
   );
-
+  const { schema, serializer } = useEditorSchema();
   const [currentSection, setCurrentSection] = useState(-1);
 
   useEffect(() => {
@@ -92,9 +92,13 @@ export function ContentEditorProvider({
     };
   }, [provider, user]);
 
-  function getDocAsJson() {
+  async function getDocAsJson() {
     const rootArray = Array.from<EditableSectionType>(doc.getArray('root'));
     const res = new Array<SectionType>();
+
+    if (!schema.current || !serializer.current) {
+      throw new Error('Editor schema or serializer not ready');
+    }
 
     for (const node of rootArray) {
       const type = node.get('type');
@@ -103,9 +107,9 @@ export function ContentEditorProvider({
       if (type == 'markdown') {
         const pmNode = yXmlFragmentToProseMirrorRootNode(
           node.get('content') as Y.XmlFragment,
-          schema,
+          schema.current,
         );
-        const markdownOutput = defaultMarkdownSerializer.serialize(pmNode);
+        const markdownOutput = serializer.current(pmNode);
         res.push({
           title,
           type,

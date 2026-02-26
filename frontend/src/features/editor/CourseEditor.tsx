@@ -6,11 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-  useContentEditor,
-  type QuizContentMap,
-} from '@/context/ContentEditorContext';
+import { useContentEditor } from '@/context/ContentEditorContext';
 import useYArrayLength from '@/hooks/useYArrayLength';
+import type { EditableQuizContent } from '@/lib/content.type';
 import _ from 'lodash';
 import { match } from 'ts-pattern';
 import EditorCourseDisplay from './EditorCourseDisplay';
@@ -67,7 +65,7 @@ export default function CourseEditor() {
             .with('markdown', () => <MarkdownEditor />)
             .with('quiz', () => (
               <QuizSectionEditor
-                quizContent={section.get('content') as QuizContentMap}
+                quizContent={section.get('content') as EditableQuizContent}
               />
             ))
             .exhaustive()

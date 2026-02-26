@@ -10,8 +10,8 @@ import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
 import './editor.css';
 
-function MarkdownEditorInternal() {
-  const { get: getEditor } = useEditor((root) => {
+export function useCrepeEditor() {
+  return useEditor((root) => {
     const crepe = new Crepe({
       root,
       features: {
@@ -35,6 +35,10 @@ function MarkdownEditorInternal() {
 
     return crepe.editor.use(collab).use(youtubeIframePlugin);
   });
+}
+
+function MarkdownEditorInternal() {
+  const { get: getEditor } = useCrepeEditor();
   const { doc, provider, currentSection } = useContentEditor();
 
   useEffect(() => {
