@@ -24,6 +24,10 @@ export const Route = createFileRoute('/contributor/editor/$courseId')({
 
     return { course };
   },
+  validateSearch: (search) => ({
+    section:
+      search?.section !== undefined ? Number(search?.section) : undefined,
+  }),
 });
 
 function RouteComponent() {

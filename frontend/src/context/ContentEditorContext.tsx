@@ -7,14 +7,13 @@ import type {
   SectionType,
 } from '@/lib/content.type';
 import { generateColorFromString, type Course } from '@/lib/utils';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import {
   createContext,
   useContext,
   useEffect,
   useState,
-  type Dispatch,
   type PropsWithChildren,
-  type SetStateAction,
 } from 'react';
 import { yXmlFragmentToProseMirrorRootNode } from 'y-prosemirror';
 import { WebsocketProvider } from 'y-websocket';
@@ -27,7 +26,7 @@ export type ContentEditorContextType = {
   doc: DocType;
   provider: WebsocketProvider;
   currentSection: number;
-  setCurrentSection: Dispatch<SetStateAction<number>>;
+  setCurrentSection: (section: number) => void;
   getDocAsJson: () => Promise<SectionType[]>;
   deleteSection: (index: number) => void;
   addSection: (type: ContentType) => void;
@@ -78,7 +77,22 @@ export function ContentEditorProvider({
       ),
   );
   const { schema, serializer } = useEditorSchema();
-  const [currentSection, setCurrentSection] = useState(-1);
+  const navigate = useNavigate({
+    from: '/contributor/editor/$courseId',
+  });
+  const currentSection = useSearch({
+    from: '/contributor/editor/$courseId',
+    select: (search) => search.section ?? -1,
+  });
+  function setCurrentSection(section: number) {
+    console.log('Setting current section to', section);
+    navigate({
+      search: (prev) => ({
+        ...prev,
+        section: section === -1 ? undefined : section,
+      }),
+    });
+  }
 
   useEffect(() => {
     provider.awareness.setLocalStateField('user', {
