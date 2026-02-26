@@ -67,7 +67,7 @@ export default function DiscoverPage() {
       <Carousel className="w-full h-full"
         plugins={[
           Autoplay({
-            delay: 2000,
+            delay: 8000,
             stopOnInteraction: false,
             stopOnMouseEnter: true
           })
