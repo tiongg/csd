@@ -38,7 +38,7 @@ function PendingApprovals() {
           variant="destructive"
           className="w-24 cursor-pointer rounded-full"
         >
-          Delete
+          Reject
         </Button>
       </div>
 
