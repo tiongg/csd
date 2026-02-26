@@ -1,6 +1,7 @@
 import Autoplay from "embla-carousel-autoplay";
 import { useInView } from "react-intersection-observer";
-import { useEffect, useRef, type PropsWithChildren } from 'react';
+import { useEffect, useRef } from 'react';
+import type { PropsWithChildren } from "react";
 import { Heading1, Heading3 } from '@/components/ui/typography';
 import {
   Carousel,
