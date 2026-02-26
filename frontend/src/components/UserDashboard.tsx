@@ -36,10 +36,21 @@ function ContentByRole() {
   const dir = useActiveRole() ?? 'LEARNER';
 
   return match(dir)
-    .with('ADMIN', () => <>admin placeholder</>)
+    .with('ADMIN', () => <AdminPlaceholder/>)
     .with('CONTRIBUTOR', () => <TrendsPage/>)
     .with('LEARNER', () => <TrendsPage/>)
     .exhaustive();
+}
+
+function AdminPlaceholder() {
+  return (
+    <div className='border-slate-400 border-2 rounded-xl w-full h-120 p-4 xl:px-8 flex flex-col items-center justify-center'>
+      <img src="/assets/admin.jpeg" className='h-full rounded-md' alt='placeholder admin image'/>
+      <div className='italic text-slate-500 animate-pulse pt-4'>
+        More coming soon...
+      </div>
+    </div>
+  )
 }
 
 type InfoCardProps = {

@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/accordion';
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { createFileRoute } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
 
 export const Route = createFileRoute('/_authenticated/learner/faq')({
   component: RouteComponent,
@@ -15,19 +16,19 @@ const items = [
   {
     value: 'courses',
     trigger: 'How do I enroll in a course?',
-    content: 'Go to Courses, select a course, click Enroll/Join',
+    content: 'Go to Courses, select a course, click Enroll/Join.',
   },
   {
     value: 'loading',
     trigger: 'Videos/resources won’t load, how do I fix it?',
     content:
-      'Try: refresh page, switch browser (Chrome/Edge), disable extensions/ad-blockers, clear cache, check Wi-Fi, and re-login. If still failing, report the error message + screenshot',
+      'Try: refresh page, switch browser (Chrome/Edge), disable extensions/ad-blockers, clear cache, check Wi-Fi, and re-login. If they still do not load, contact us with the error message and screenshot.',
   },
   {
     value: 'privacy',
     trigger: 'How is my data used?',
     content:
-      'Typically: your activity (progress, scores, completion) is tracked for learning purposes. Only authorized roles (Admin) can see detailed reports.',
+      'Typically, your activity (progress, scores, completion) is tracked for learning purposes. Only authorized roles (Admin) can see detailed reports.',
   },
   {
     value: 'progress',
@@ -48,20 +49,21 @@ function RouteComponent() {
         >
           {items.map((item) => (
             <AccordionItem key={item.value} value={item.value}>
-              <AccordionTrigger>{item.trigger}</AccordionTrigger>
+              <AccordionTrigger className='cursor-pointer'>{item.trigger}</AccordionTrigger>
               <AccordionContent>{item.content}</AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
 
         <div className="flex flex-col space-y-4">
-          <p className="text-center">If there are any other questions</p>
-          <a
-            href="mailto:tg.tan.2024@computing.smu.edu.sg"
-            className="m-auto max-w-lg rounded-md bg-black px-4 py-2 text-sm font-medium text-white"
-          >
-            Contact Us
-          </a>
+          <p className="text-center">If you have any other questions</p>
+          <Button asChild>
+            <a
+              href="mailto:tg.tan.2024@computing.smu.edu.sg"
+            >
+              Contact Us
+            </a>
+          </Button>
         </div>
       </div>
     </PageWithSideBar>
