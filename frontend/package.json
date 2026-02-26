@@ -75,7 +75,7 @@
     "@types/textarea-caret": "^3.0.4",
     "@vitejs/plugin-react": "^5.0.4",
     "jsdom": "^27.0.0",
-    "openapi-typescript": "^7.10.1",
+    "openapi-typescript": "^7.13.0",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "shadcn": "^3.7.0",
