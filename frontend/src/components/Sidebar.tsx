@@ -143,13 +143,13 @@ export default function Sidebar() {
           <div className="flex flex-col gap-y-4 py-4">
             <NavItem
               title="Settings"
-              link={getRoleUrl(currentActiveRole,'settings')}
+              link={getRoleUrl(currentActiveRole, 'settings')}
               icon={<Cog6ToothIcon />}
             />
 
             <NavItem
               title="Help & Support"
-              link={getRoleUrl(currentActiveRole,'faq')}
+              link={getRoleUrl(currentActiveRole, 'faq')}
               icon={<QuestionMarkCircleIcon />}
             />
           </div>

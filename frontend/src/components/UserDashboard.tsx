@@ -1,8 +1,8 @@
-import { match } from 'ts-pattern';
-import { Heading1 } from './ui/typography';
-import TrendsPage from './TrendsPage';
 import useActiveRole from '@/hooks/useActiveRole';
 import { cn } from '@/lib/utils';
+import { match } from 'ts-pattern';
+import TrendsPage from './TrendsPage';
+import { Heading1 } from './ui/typography';
 
 function CardsByRole() {
   const dir = useActiveRole() ?? 'LEARNER';
@@ -36,21 +36,25 @@ function ContentByRole() {
   const dir = useActiveRole() ?? 'LEARNER';
 
   return match(dir)
-    .with('ADMIN', () => <AdminPlaceholder/>)
-    .with('CONTRIBUTOR', () => <TrendsPage/>)
-    .with('LEARNER', () => <TrendsPage/>)
+    .with('ADMIN', () => <AdminPlaceholder />)
+    .with('CONTRIBUTOR', () => <TrendsPage />)
+    .with('LEARNER', () => <TrendsPage />)
     .exhaustive();
 }
 
 function AdminPlaceholder() {
   return (
-    <div className='border-slate-400 border-2 rounded-xl w-full h-120 p-4 xl:px-8 flex flex-col items-center justify-center'>
-      <img src="/assets/admin.jpeg" className='h-full rounded-md' alt='placeholder admin image'/>
-      <div className='italic text-slate-500 animate-pulse pt-4'>
+    <div className="flex h-120 w-full flex-col items-center justify-center rounded-xl border-2 border-slate-400 p-4 xl:px-8">
+      <img
+        src="/assets/admin.jpeg"
+        className="h-full rounded-md"
+        alt="placeholder admin image"
+      />
+      <div className="animate-pulse pt-4 text-slate-500 italic">
         More coming soon...
       </div>
     </div>
-  )
+  );
 }
 
 type InfoCardProps = {

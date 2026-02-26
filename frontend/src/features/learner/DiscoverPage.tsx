@@ -1,7 +1,7 @@
-import Autoplay from "embla-carousel-autoplay";
-import { useInView } from "react-intersection-observer";
+import Autoplay from 'embla-carousel-autoplay';
+import { useInView } from 'react-intersection-observer';
 import { useEffect, useRef, useState } from 'react';
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren } from 'react';
 import { Heading1, Heading3 } from '@/components/ui/typography';
 import {
   Carousel,
@@ -9,38 +9,37 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/components/ui/carousel"
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/context/AuthContext";
+} from '@/components/ui/carousel';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/context/AuthContext';
 
 type ReelOverlayProps = PropsWithChildren<{
   course: string;
   description?: string;
-}>
+}>;
 
 function ReelOverlay({ course, description, children }: ReelOverlayProps) {
   const { user } = useAuth();
 
   return (
-    <div className="h-[calc(100vh-16rem)] w-full relative border-2 border-slate-300">
-      <div className="h-full w-full absolute z-10">
-        <div className="flex items-center py-4 flex-col bg-linear-to-b from-slate-500 to-transparent">
-          <Button className="mb-4" size="lg">View Course</Button>
+    <div className="relative h-[calc(100vh-16rem)] w-full border-2 border-slate-300">
+      <div className="absolute z-10 h-full w-full">
+        <div className="flex flex-col items-center bg-linear-to-b from-slate-500 to-transparent py-4">
+          <Button className="mb-4" size="lg">
+            View Course
+          </Button>
           <Heading3>{course}</Heading3>
           <p className="font-subtitle">{description}</p>
         </div>
 
-        <div className="bottom-4 right-4 absolute text-slate-300">
+        <div className="absolute right-4 bottom-4 text-slate-300">
           @{user?.username}
         </div>
       </div>
 
-      <div className="h-full w-full absolute">
-        {children}
-      </div>
-
+      <div className="absolute h-full w-full">{children}</div>
     </div>
-  )
+  );
 }
 
 function ReelPlayer({ src }: { src: string }) {
@@ -57,31 +56,39 @@ function ReelPlayer({ src }: { src: string }) {
     } else {
       vidRef.current.pause();
     }
-  }, [inView, vidRef])
+  }, [inView, vidRef]);
 
   return (
-    <div className="h-full w-full flex justify-center items-center" ref={ref}>
-      {
-        !hasError ?
-          <video loop muted className="max-w-full max-h-full" aria-label="Course preview video" ref={vidRef} onError={() => { setHasError(true) }}>
-            <source src={src} type="video/mp4" />
-          </video> :
-          <ReelError />
-      }
+    <div className="flex h-full w-full items-center justify-center" ref={ref}>
+      {!hasError ? (
+        <video
+          loop
+          muted
+          className="max-h-full max-w-full"
+          aria-label="Course preview video"
+          ref={vidRef}
+          onError={() => {
+            setHasError(true);
+          }}
+        >
+          <source src={src} type="video/mp4" />
+        </video>
+      ) : (
+        <ReelError />
+      )}
     </div>
-  )
+  );
 }
 
 function ReelError() {
   return (
-    <div className="italic text-slate-500">
+    <div className="text-slate-500 italic">
       Reel could not be played. Please check your connection.
     </div>
-  )
+  );
 }
 
 export default function DiscoverPage() {
-
   return (
     <div className="flex h-full w-full flex-col gap-4 p-16">
       <div>
@@ -89,14 +96,14 @@ export default function DiscoverPage() {
         <p className="font-subtitle">Take a look at what our courses offer!</p>
       </div>
 
-
-      <Carousel className="w-full h-full"
+      <Carousel
+        className="h-full w-full"
         plugins={[
           Autoplay({
             delay: 8000,
             stopOnInteraction: false,
-            stopOnMouseEnter: true
-          })
+            stopOnMouseEnter: true,
+          }),
         ]}
       >
         <CarouselContent>
