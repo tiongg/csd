@@ -40,7 +40,9 @@ function SchemaExtractor({
         const schema = ctx.get(schemaCtx);
         const serializer = ctx.get(serializerCtx);
         onReady(schema, serializer);
-      } catch {}
+      } catch (error: any) {
+        console.error('Failed to extract schema/serializer:', error);
+      }
     });
   }, [getEditor, onReady]);
 
