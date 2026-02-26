@@ -18,7 +18,7 @@ const iframeInputRule = $inputRule(
         const { tr } = state;
         if (full) {
           tr.replaceWith(
-            start - full.length + id.length + 2,
+            start - 1,
             end,
             iframeNode
               .type(ctx)
