@@ -16,17 +16,20 @@ export const Route = createFileRoute('/')({
 });
 
 type CoursePreviewProps = {
-  title: string;
-  instructor: string;
+  name: string;
+  creator: string;
+  imageSrc: string;
 };
 
-function CoursePreview({ title, instructor }: CoursePreviewProps) {
+function CoursePreview({ name, creator, imageSrc }: CoursePreviewProps) {
   return (
     <div>
-      <div className="h-24 bg-slate-200 lg:h-72">{/* image goes here */}</div>
+      <div className="h-24 bg-slate-200 lg:h-72">
+        <img src={imageSrc} alt={name} className='h-full w-full object-cover' />
+      </div>
       <div className="py-2">
-        <Heading2>{title}</Heading2>
-        <p className="font-subtitle">{instructor}</p>
+        <Heading2>{name}</Heading2>
+        <p className="font-subtitle">{creator}</p>
       </div>
     </div>
   );
@@ -35,23 +38,28 @@ function CoursePreview({ title, instructor }: CoursePreviewProps) {
 function App() {
   // placeholder courses
   const courses = [
-    {
-      title: 'How to Muh Hee Ow - The Basics',
-      instructor: 'Cotton Cat',
-    },
-    {
-      title: 'Muh Hee Ow - Advanced',
-      instructor: 'Cotton Cat',
-    },
-    {
-      title: 'Muh Hee Ow (Extreme)',
-      instructor: 'Cotton Cat',
-    },
-    {
-      title: 'Collaborative Software Development',
-      instructor: 'Christoph Treude',
-    },
-  ];
+  {
+    name: 'How to say Six Seven',
+    creator: 'Christoph Treude',
+    imageSrc: '/assets/landing_page/six_seven.jpg'
+  },
+  {
+    name: 'Hawk Tuah for Chinese New Year',
+    creator: 'Pius Lee',
+    imageSrc: '/assets/landing_page/hawk_tuah.png'
+    
+  },
+  {
+    name: 'What NOT to say at festive gatherings',
+    creator: 'Wang Jiwei',
+    imageSrc: '/assets/landing_page/festive_gatherings.jpg'
+  },
+  {
+    name: 'Know the latest trends',
+    creator: 'Zhang Zhiyuan',
+    imageSrc: '/assets/landing_page/latest_trends.jpg'
+  }
+];
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -89,9 +97,9 @@ function App() {
 
         <Carousel>
           <CarouselContent>
-            {courses.map(({ title, instructor }, i) => (
+            {courses.map(({ name, creator, imageSrc }, i) => (
               <CarouselItem className="basis-1/3" key={i}>
-                <CoursePreview title={title} instructor={instructor} />
+                <CoursePreview name={name} creator={creator} imageSrc={imageSrc} />
               </CarouselItem>
             ))}
           </CarouselContent>

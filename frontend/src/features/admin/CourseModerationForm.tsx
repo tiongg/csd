@@ -19,10 +19,6 @@ const pending = [
     creator: 'Xie Xiaofei',
   },
   {
-    name: 'Know the latest trends',
-    creator: 'Zhang Zhiyuan',
-  },
-  {
     name: 'Brainrot vs Bedrot',
     creator: 'Loh Kai Zhe',
   },
@@ -45,6 +41,10 @@ const courses = [
     name: 'What NOT to say at festive gatherings',
     creator: 'Wang Jiwei',
   },
+  {
+    name: 'Know the latest trends',
+    creator: 'Zhang Zhiyuan',
+  }
 ];
 
 function PendingApprovals() {
