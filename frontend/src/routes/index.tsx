@@ -10,6 +10,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { Heading1, Heading2 } from '@/components/ui/typography';
+import { Button } from '@/components/ui/button';
 
 export const Route = createFileRoute('/')({
   component: App,
@@ -112,7 +113,15 @@ function App() {
       <Separator />
 
       <div className="pt-6 pb-16">
-        <Heading2>Contact Us</Heading2>
+        <Button asChild variant="link">
+          <a
+            href="mailto:tg.tan.2024@computing.smu.edu.sg"
+          >
+            <Heading2>
+              Contact Us
+            </Heading2>
+          </a>
+        </Button>
       </div>
     </div>
   );
