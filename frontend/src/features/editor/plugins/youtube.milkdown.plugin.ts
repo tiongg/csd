@@ -41,9 +41,25 @@ const iframeNode = $node('iframe', () => ({
   parseDOM: [
     {
       tag: 'iframe',
-      getAttrs: (dom) => ({
-        src: (dom as HTMLElement).getAttribute('src'),
-      }),
+      getAttrs: (dom) => {
+        const src = (dom as HTMLElement).getAttribute('src');
+        if (!src) return false;
+        try {
+          const url = new URL(src, 'https://www.youtube.com');
+          const isHttpOrHttps =
+            url.protocol === 'https:' || url.protocol === 'http:';
+          const isYouTubeHost =
+            url.hostname === 'www.youtube.com' ||
+            url.hostname === 'youtube.com';
+          const isEmbedPath = url.pathname.startsWith('/embed/');
+          if (isHttpOrHttps && isYouTubeHost && isEmbedPath) {
+            return { src: url.toString() };
+          }
+        } catch {
+          return false;
+        }
+        return false;
+      },
     },
   ],
   toDOM: (node: Node) => [
@@ -61,7 +77,11 @@ const iframeNode = $node('iframe', () => ({
   parseMarkdown: {
     match: (node) => node.type === 'leafDirective' && node.name === 'iframe',
     runner: (state, node, type) => {
-      state.addNode(type, { src: (node.attributes as { src: string }).src });
+      const src = (node.attributes as { src?: string }).src;
+      if (typeof src !== 'string') return;
+      if (!/^https?:\/\/(?:www\.)?youtube\.com\/embed\/[^&]+/.test(src)) return;
+
+      state.addNode(type, { src });
     },
   },
   toMarkdown: {
