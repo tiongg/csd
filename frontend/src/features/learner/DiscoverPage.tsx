@@ -24,7 +24,7 @@ function ReelOverlay({ course, description, children }: ReelOverlayProps) {
     <div className="h-[calc(100vh-16rem)] w-full relative border-2 border-slate-300">
       <div className="h-full w-full absolute z-10">
         <div className="flex items-center py-4 flex-col bg-linear-to-b from-slate-500 to-transparent">
-          <Button className="mb-4 cursor-pointer" size="lg">View Course</Button>
+          <Button className="mb-4" size="lg">View Course</Button>
           <Heading3>{course}</Heading3>
           <p className="font-subtitle">{description}</p>
         </div>
