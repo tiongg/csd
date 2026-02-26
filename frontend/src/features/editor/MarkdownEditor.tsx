@@ -4,6 +4,7 @@ import { collab, collabServiceCtx } from '@milkdown/plugin-collab';
 import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
 import { useEffect } from 'react';
 import * as Y from 'yjs';
+import { youtubeIframePlugin } from './plugins/youtube.milkdown.plugin';
 
 import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
@@ -32,7 +33,7 @@ function MarkdownEditorInternal() {
       },
     });
 
-    return crepe.editor.use(collab);
+    return crepe.editor.use(collab).use(youtubeIframePlugin);
   });
   const { doc, provider, currentSection } = useContentEditor();
 
