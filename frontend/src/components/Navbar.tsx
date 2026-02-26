@@ -18,8 +18,12 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 flex w-full items-center justify-between bg-white p-2 px-8 shadow-lg">
-      {/* Logo placeholder */}
-      <Link className="aspect-square size-8 rounded-full bg-sky-600" to="/" />
+      <Link className="flex items-center gap-x-2" to="/" >
+        <img src="/assets/logo.jpg" alt='six seven logo' className='aspect-square size-8 rounded-full' />
+        <div className='italic font-bold font-[Noto_Sans] text-slate-950 text-lg'>
+          The Six Seven
+        </div>
+      </Link>
 
       {!user ? (
         <div>
