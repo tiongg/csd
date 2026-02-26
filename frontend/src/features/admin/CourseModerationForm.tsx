@@ -15,15 +15,35 @@ import SearchBar from '@/components/ui/searchbar';
 
 const pending = [
   {
-    name: 'Algorithms and Programming',
-    creator: 'ZZY',
+    name: 'Skibidi Chungus and its meanings',
+    creator: 'Xie Xiaofei',
+  },
+  {
+    name: 'Know the latest trends',
+    creator: 'Zhang Zhiyuan',
+  },
+  {
+    name: 'Brainrot vs Bedrot',
+    creator: 'Loh Kai Zhe',
+  },
+  {
+    name: 'Punch the Monkey: Literally?',
+    creator: 'Eng Kit Lum',
   },
 ];
 
 const courses = [
   {
-    name: 'Programming Fundamentals II',
-    creator: 'ZZY',
+    name: 'How to say Six Seven',
+    creator: 'Christoph Treude',
+  },
+  {
+    name: 'Hawk Tuah for Chinese New Year',
+    creator: 'Pius Lee',
+  },
+  {
+    name: 'What NOT to say at festive gatherings',
+    creator: 'Wang Jiwei',
   },
 ];
 
