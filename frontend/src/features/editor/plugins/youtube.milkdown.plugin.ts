@@ -52,6 +52,9 @@ const iframeNode = $node('iframe', () => ({
       ...node.attrs,
       contenteditable: false, // Prevent editing iframe content
       class: 'aspect-video h-98',
+      referrerpolicy: 'strict-origin-when-cross-origin',
+      allow:
+        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share',
     },
     0,
   ],
