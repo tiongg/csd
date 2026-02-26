@@ -86,7 +86,7 @@ function App() {
         <div className="bottom-8 absolute z-10 px-10 py-6 rounded-md bg-white left-0 right-0 mx-auto w-fit">
           <Heading1>Get Started</Heading1>
         </div>
-        <img src="/assets/landing_page/get_started.jpg" alt="Adult learners in a classroom" className='w-full h-full object-cover rounded-md' />
+        <img src="/assets/landing_page/get_started.jpg" alt="Adult learners in a classroom" className='w-full h-full object-cover rounded-md absolute -z-10' />
       </div>
 
       <Separator />
