@@ -12,7 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 
-
 type ReelOverlayProps = PropsWithChildren<{
   course: string;
   description?: string;
