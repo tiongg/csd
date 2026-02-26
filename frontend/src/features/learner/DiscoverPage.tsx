@@ -48,7 +48,7 @@ function ReelPlayer({src}: {src: string}) {
 
   return (
     <div className="h-full w-full flex justify-center items-center" ref={ref}>
-      <video loop autoPlay={inView} muted className="max-w-full max-h-full">
+      <video loop autoPlay={inView} muted className="max-w-full max-h-full" aria-label="Course preview video">
         <source src={src} type="video/mp4"/>
       </video>
     </div>
