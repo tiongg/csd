@@ -12,19 +12,22 @@ import {
 } from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
+import { useApiQuery } from '@/lib/fetch-client';
+import { useNavigate } from '@tanstack/react-router';
+import { cn } from '@/lib/utils';
 
 type ReelOverlayProps = PropsWithChildren<{
   course: string;
   description?: string;
 }>;
 
-function ReelOverlay({ course, description, children }: ReelOverlayProps) {
+function ReelOverlay({ course, description, children, onClick }: ReelOverlayProps & { onClick?: () => void }) {
   const { user } = useAuth();
 
   return (
-    <div className="relative h-[calc(100vh-16rem)] w-full border-2 border-slate-300">
+    <div className="relative h-[calc(100vh-16rem)] w-full border-2 border-slate-300 group cursor-pointer" onClick={onClick}>
       <div className="absolute z-10 h-full w-full">
-        <div className="flex flex-col items-center bg-linear-to-b from-slate-500 to-transparent py-4">
+        <div className="flex flex-col items-center bg-linear-to-b from-slate-500/80 to-transparent py-4">
           <Button className="mb-4" size="lg">
             View Course
           </Button>
@@ -88,7 +91,40 @@ function ReelError() {
   );
 }
 
+type CourseCardProps = {
+  id: string;
+  title: string;
+  description: string | null;
+  createdAt: string;
+};
+
+function CourseCard({ course }: CourseCardProps) {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate({
+      to: '/learner/courses/$courseId',
+      params: { courseId: course.id },
+    });
+  };
+
+  return (
+    <ReelOverlay
+      course={course.title}
+      description={course.description ?? 'No description'}
+      onClick={handleClick}
+    >
+      <ReelPlayer src="/skibidi_toilet.mp4" />
+    </ReelOverlay>
+  );
+}
+
 export default function DiscoverPage() {
+  const { data: courses } = useApiQuery('get', '/api/courses', {});
+
+  // Filter to show only published courses
+  const publishedCourses = (courses ?? []).filter((c) => c.isPublished === true);
+
   return (
     <div className="flex h-full w-full flex-col gap-4 p-16">
       <div>
@@ -96,33 +132,20 @@ export default function DiscoverPage() {
         <p className="font-subtitle">Take a look at what our courses offer!</p>
       </div>
 
-      <Carousel
-        className="h-full w-full"
-        plugins={[
-          Autoplay({
-            delay: 8000,
-            stopOnInteraction: false,
-            stopOnMouseEnter: true,
-          }),
-        ]}
-      >
-        <CarouselContent>
-          <CarouselItem>
-            <ReelOverlay course="skibidi" description="skibidi toilet">
-              <ReelPlayer src="/skibidi_toilet.mp4" />
-            </ReelOverlay>
-          </CarouselItem>
-
-          <CarouselItem>
-            <ReelOverlay course="skibidi" description="skibidi toilet">
-              <ReelPlayer src="/skibidi_toilet.mp4" />
-            </ReelOverlay>
-          </CarouselItem>
-        </CarouselContent>
-
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
+      {publishedCourses.length === 0 ? (
+        <div className="flex h-64 w-full items-center justify-center text-slate-500">
+          <div className="text-center">
+            <p className="text-lg font-semibold">No courses available</p>
+            <p className="text-sm">Check back later for new content!</p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {publishedCourses.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

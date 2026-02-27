@@ -25,4 +25,6 @@ As a user, I want primary navigation items to appear more prominently while seco
 
 
 link the frontend and backend so that contributor in a team can submit their course for approval to admin
-admin can then app
+admin can then approve the changes and then it will be published so that all leaners can now see it.
+also when course is published, update the dashboard overview to show the total courses, pending approvals and total learners
+
