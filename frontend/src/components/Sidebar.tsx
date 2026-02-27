@@ -1,5 +1,6 @@
 import {
   Bars3Icon,
+  BellIcon,
   Cog6ToothIcon,
   DocumentTextIcon,
   LightBulbIcon,
@@ -12,6 +13,14 @@ import {
 import { Link, useNavigate } from '@tanstack/react-router';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 import type { LinkOptions } from '@tanstack/react-router';
 import type React from 'react';
 import type { PropsWithChildren } from 'react';
@@ -19,7 +28,12 @@ import type { Account } from '@/context/AuthContext';
 import useActiveRole from '@/hooks/useActiveRole';
 import { capitalizeFirst, cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
+import { useApiQuery } from '@/lib/fetch-client';
 import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 async function getGravatarUrl(email: string, size = 40) {
   // SHA-256 hash
@@ -74,11 +88,7 @@ function SidebarByRole({ role }: { role: Account['role'] }) {
           title="User Management"
           link="/admin/user-management"
           icon={<UserIcon />}
-        >
-          <div className="absolute right-10 rounded-full bg-rose-500 px-3 text-white">
-            4
-          </div>
-        </NavItem>
+        />
 
         <NavItem
           title="Course Moderation"
@@ -131,6 +141,173 @@ function getRoleUrl(
     .exhaustive();
 }
 
+type Notification = {
+  id: string;
+  title: string;
+  message: string;
+  time: string;
+  type: 'info' | 'warning' | 'success' | 'danger';
+  link?: string;
+};
+
+function NotificationPanel({ role }: { role: Account['role'] }) {
+  const { data: pendingContributors } = useApiQuery(
+    'get',
+    '/api/admins/contributor-applications',
+    {},
+  );
+  const { data: courses } = useApiQuery('get', '/api/courses', {});
+
+  const notifications: Notification[] = match(role)
+    .with('ADMIN', () => {
+      const pendingApps = pendingContributors ?? [];
+      return [
+        ...pendingApps.map((app, index) => ({
+          id: `contrib-app-${index}`,
+          title: 'New Contributor Application',
+          message: `${app.username} applied to become a contributor`,
+          time: app.createdAt ?? dayjs().format(),
+          type: 'warning' as const,
+          link: '/admin/user-management',
+        })),
+      ];
+    })
+    .with('CONTRIBUTOR', () => {
+      const pendingCourses = (courses ?? []).filter((c) => c.status === 'PENDING');
+      return [
+        ...pendingCourses.map((course, index) => ({
+          id: `course-${course.id}`,
+          title: 'Course Awaiting Approval',
+          message: `${course.title} is pending review`,
+          time: course.updatedAt ?? dayjs().format(),
+          type: 'info' as const,
+        })),
+      ];
+    })
+    .with('LEARNER', () => {
+      return [
+        {
+          id: 'welcome-1',
+          title: 'Welcome!',
+          message: 'Start exploring our courses',
+          time: dayjs().format(),
+          type: 'success' as const,
+          link: '/learner/discover',
+        },
+      ];
+    })
+    .exhaustive();
+
+  const notificationCount = notifications.length;
+
+  if (notificationCount === 0) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="cursor-pointer"
+          >
+            <BellIcon className="size-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-80">
+          <DropdownMenuLabel>No Notifications</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <div className="px-2 py-4 text-center text-sm text-slate-500">
+            You're all caught up!
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  const getTypeColor = (type: Notification['type']) => {
+    switch (type) {
+      case 'warning':
+        return 'text-amber-500';
+      case 'success':
+        return 'text-green-500';
+      case 'danger':
+        return 'text-rose-500';
+      case 'info':
+      default:
+        return 'text-blue-500';
+    }
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="cursor-pointer relative"
+        >
+          <BellIcon className="size-5" />
+          {notificationCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-rose-500 text-xs text-white">
+              {notificationCount > 9 ? '9+' : notificationCount}
+            </span>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
+        <DropdownMenuLabel>
+          Notifications ({notificationCount})
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {notifications.map((notification) => (
+          <DropdownMenuItem
+            key={notification.id}
+            asChild
+            className="flex-col items-start gap-1 p-3"
+          >
+            {notification.link ? (
+              <Link to={notification.link}>
+                <div className="flex w-full items-start justify-between gap-2">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <BellIcon
+                        className={cn('size-4', getTypeColor(notification.type))}
+                      />
+                      <span className="font-semibold text-slate-700">
+                        {notification.title}
+                      </span>
+                    </div>
+                    <p className="text-sm text-slate-500">{notification.message}</p>
+                    <p className="text-xs text-slate-400">
+                      {dayjs(notification.time).fromNow()}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ) : (
+              <div className="flex w-full items-start justify-between gap-2">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <BellIcon
+                      className={cn('size-4', getTypeColor(notification.type))}
+                    />
+                    <span className="font-semibold text-slate-700">
+                      {notification.title}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-500">{notification.message}</p>
+                  <p className="text-xs text-slate-400">
+                    {dayjs(notification.time).fromNow()}
+                  </p>
+                </div>
+              </div>
+            )}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 export default function Sidebar() {
   const currentActiveRole = useActiveRole();
   const { user, logout } = useAuth();
@@ -161,14 +338,17 @@ export default function Sidebar() {
           {!isCollapsed && (
             <p className="font-subtitle tracking-wider">MAIN MENU</p>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="cursor-pointer"
-          >
-            <Bars3Icon className="size-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {!isCollapsed && <NotificationPanel role={currentActiveRole} />}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="cursor-pointer"
+            >
+              <Bars3Icon className="size-5" />
+            </Button>
+          </div>
         </div>
 
         {!isCollapsed && (
