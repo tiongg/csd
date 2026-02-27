@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import { capitalizeFirst } from '@/lib/utils';
+import { useNavigate } from '@tanstack/react-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -39,7 +40,8 @@ async function getGravatarUrl(email: string, size = 120) {
 }
 
 export default function UpdateProfileForm() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [gravatarUrl, setGravatarUrl] = useState('');
 
@@ -96,6 +98,11 @@ export default function UpdateProfileForm() {
 
   const onSubmit = async (data: UpdateFormValues) => {
     await updateAccount({ body: data });
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate({ to: '/' });
   };
 
   return (
@@ -213,6 +220,22 @@ export default function UpdateProfileForm() {
             </Button>
           </div>
         </form>
+      </div>
+
+      {/* Logout Section */}
+      <div className="bg-card text-card-foreground rounded-lg border p-4 shadow-sm">
+        <h3 className="mb-1 text-lg font-semibold">Account Actions</h3>
+        <p className="text-muted-foreground mb-4 text-sm">
+          Manage your account security and session
+        </p>
+
+        <Button
+          variant="destructive"
+          onClick={handleLogout}
+          className="w-full cursor-pointer"
+        >
+          Log out
+        </Button>
       </div>
     </div>
   );

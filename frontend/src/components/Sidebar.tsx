@@ -375,42 +375,41 @@ export default function Sidebar() {
                   icon={<QuestionMarkCircleIcon />}
                 />
               </div>
-
-              <Button
-                variant="ghost"
-                onClick={async () => {
-                  await logout();
-                  navigate({ to: '/' });
-                }}
-                className="my-2 w-full cursor-pointer text-slate-500 hover:text-slate-700"
-              >
-                Log out
-              </Button>
             </div>
           </>
         )}
       </div>
 
       <div className="flex items-center justify-around border-t-2 border-t-slate-300 px-4 py-1">
-        <img
-          src={gravatarUrl}
-          alt="Profile avatar"
-          className="size-10 rounded-full border-2 border-slate-300"
-          onError={(e) => {
-            // Fallback to a placeholder icon if Gravatar fails to load
-            e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"%3E%3Ccircle cx="12" cy="12" r="10" stroke="%2394a3b8"/%3E%3Ccircle cx="12" cy="9" r="3" fill="%2394a3b8"/%3E%3Cpath d="M7 21v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2" stroke="%2394a3b8"/%3E%3C/svg%3E';
+        <Link
+          to={getRoleUrl(currentActiveRole, 'settings')}
+          className={cn(
+            'flex items-center gap-2 transition-colors',
+            isCollapsed ? 'w-full justify-center' : 'w-full'
+          )}
+        >
+          <img
+            src={gravatarUrl}
+            alt="Profile avatar"
+            className="size-10 rounded-full border-2 border-slate-300 hover:border-slate-500 transition-colors"
+            onError={(e) => {
+              // Fallback to a placeholder icon if Gravatar fails to load
+              e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"%3E%3Ccircle cx="12" cy="12" r="10" stroke="%2394a3b8"/%3E%3Ccircle cx="12" cy="9" r="3" fill="%2394a3b8"/%3E%3Cpath d="M7 21v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2" stroke="%2394a3b8"/%3E%3C/svg%3E';
             }}
           />
 
-          <div className="flex flex-col p-4 text-left">
-            <div className="text-sm font-bold text-slate-700">
-              @{user.username}
+          {!isCollapsed && (
+            <div className="flex flex-col p-4 text-left">
+              <div className="text-sm font-bold text-slate-700">
+                @{user.username}
+              </div>
+              <div className="text-xs text-slate-500">
+                {capitalizeFirst(user.role)}
+              </div>
             </div>
-            <div className="text-xs text-slate-500">
-              {capitalizeFirst(user.role)}
-            </div>
-          </div>
-        </div>
+          )}
+        </Link>
+      </div>
     </div>
   );
 }
