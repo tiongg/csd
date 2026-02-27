@@ -2,6 +2,7 @@ import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { ContentEditorProvider } from '@/context/ContentEditorContext';
 import CourseEditor from '@/features/editor/CourseEditor';
 import EditorHeader from '@/features/editor/EditorHeader';
+import { EditorSchemaProvider } from '@/features/editor/EditorSchemaContext';
 import { fetchClient } from '@/lib/fetch-client';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
@@ -23,6 +24,10 @@ export const Route = createFileRoute('/contributor/editor/$courseId')({
 
     return { course };
   },
+  validateSearch: (search) => ({
+    section:
+      search?.section !== undefined ? Number(search?.section) : undefined,
+  }),
 });
 
 function RouteComponent() {
@@ -31,12 +36,14 @@ function RouteComponent() {
 
   return (
     <PageWithSideBar>
-      <ContentEditorProvider roomName={courseId} course={course}>
-        <div className="flex h-full w-full min-w-0 flex-1 flex-col">
-          <EditorHeader />
-          <CourseEditor />
-        </div>
-      </ContentEditorProvider>
+      <EditorSchemaProvider>
+        <ContentEditorProvider roomName={courseId} course={course}>
+          <div className="flex h-full w-full min-w-0 flex-1 flex-col">
+            <EditorHeader />
+            <CourseEditor />
+          </div>
+        </ContentEditorProvider>
+      </EditorSchemaProvider>
     </PageWithSideBar>
   );
 }

@@ -18,7 +18,8 @@ type EditorCourseDisplayProps = {
 export default function EditorCourseDisplay({
   course,
 }: EditorCourseDisplayProps) {
-  const { doc, addSection, setCurrentSection } = useContentEditor();
+  const { doc, addSection, setCurrentSection, getDocAsJson } =
+    useContentEditor();
 
   const sections = doc.getArray('root');
   const sectionCount = sections.length;
@@ -46,6 +47,13 @@ export default function EditorCourseDisplay({
                 <CardDescription className="text-base">
                   {course.description || 'No description provided.'}
                 </CardDescription>
+                <Button
+                  onClick={async () => {
+                    console.log(await getDocAsJson());
+                  }}
+                >
+                  Publish
+                </Button>
               </div>
             </div>
           </CardHeader>
@@ -85,11 +93,11 @@ export default function EditorCourseDisplay({
                 section.
               </p>
               <Button
+                size="lg"
                 onClick={() => {
-                  addSection();
+                  addSection('markdown');
                   setCurrentSection(0);
                 }}
-                size="lg"
               >
                 <Plus className="mr-2 size-5" />
                 Create First Section
