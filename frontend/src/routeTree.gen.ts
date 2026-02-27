@@ -32,6 +32,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminCourseModerationRouteImport } from './routes/_authenticated/admin/course-moderation'
+import { Route as AuthenticatedLearnerCoursesCourseIdRouteImport } from './routes/_authenticated/learner/courses/$courseId'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -162,6 +163,12 @@ const AuthenticatedAdminCourseModerationRoute =
     path: '/admin/course-moderation',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedLearnerCoursesCourseIdRoute =
+  AuthenticatedLearnerCoursesCourseIdRouteImport.update({
+    id: '/learner/courses/$courseId',
+    path: '/learner/courses/$courseId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -186,6 +193,7 @@ export interface FileRoutesByFullPath {
   '/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
+  '/learner/courses/$courseId': typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -210,6 +218,7 @@ export interface FileRoutesByTo {
   '/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
+  '/learner/courses/$courseId': typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -236,6 +245,7 @@ export interface FileRoutesById {
   '/_authenticated/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
+  '/_authenticated/learner/courses/$courseId': typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/learner/settings'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
+    | '/learner/courses/$courseId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/learner/settings'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
+    | '/learner/courses/$courseId'
   id:
     | '__root__'
     | '/'
@@ -311,6 +323,7 @@ export interface FileRouteTypes {
     | '/_authenticated/learner/settings'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
+    | '/_authenticated/learner/courses/$courseId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -486,6 +499,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCourseModerationRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/learner/courses/$courseId': {
+      id: '/_authenticated/learner/courses/$courseId'
+      path: '/learner/courses/$courseId'
+      fullPath: '/learner/courses/$courseId'
+      preLoaderRoute: typeof AuthenticatedLearnerCoursesCourseIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -506,6 +526,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedLearnerFaqRoute: typeof AuthenticatedLearnerFaqRoute
   AuthenticatedLearnerMyCoursesRoute: typeof AuthenticatedLearnerMyCoursesRoute
   AuthenticatedLearnerSettingsRoute: typeof AuthenticatedLearnerSettingsRoute
+  AuthenticatedLearnerCoursesCourseIdRoute: typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -527,6 +548,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedLearnerFaqRoute: AuthenticatedLearnerFaqRoute,
   AuthenticatedLearnerMyCoursesRoute: AuthenticatedLearnerMyCoursesRoute,
   AuthenticatedLearnerSettingsRoute: AuthenticatedLearnerSettingsRoute,
+  AuthenticatedLearnerCoursesCourseIdRoute:
+    AuthenticatedLearnerCoursesCourseIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
