@@ -330,7 +330,7 @@ export default function Sidebar() {
     <div
       className={cn(
         'fixed flex h-[calc(100vh-3rem)] flex-col justify-between bg-white/50 shadow-lg transition-all duration-300',
-        isCollapsed ? 'w-20' : 'w-70'
+        isCollapsed ? 'w-16' : 'w-70'
       )}
     >
       <div>
@@ -392,8 +392,8 @@ export default function Sidebar() {
             src={gravatarUrl}
             alt="Profile avatar"
             className={cn(
-              'rounded-full border-2 border-slate-300 hover:border-slate-500 hover:scale-105 transition-all',
-              isCollapsed ? 'size-12' : 'size-10'
+              'rounded-full border-2 border-slate-300 hover:border-slate-500 transition-all',
+              'size-10'
             )}
             onError={(e) => {
               // Fallback to a placeholder icon if Gravatar fails to load
