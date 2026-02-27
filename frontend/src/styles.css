@@ -155,3 +155,73 @@ code,
   @apply text-slate-500;
   margin: 0.25em 0;
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  /* Auto-collapse sidebar on smaller screens */
+  .fixed.sidebar {
+    transform: translateX(-100%);
+  }
+
+  .fixed.sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Adjust main content area */
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+
+  /* Make tables scrollable on mobile */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Adjust cards for mobile */
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Stack flex containers */
+  .flex-responsive {
+    flex-direction: column;
+  }
+
+  /* Adjust form layouts */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Tablet adjustments */
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .main-content {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  /* Desktop adjustments */
+  .card-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .main-content {
+    padding: 2rem;
+  }
+}
+
+/* Ensure proper viewport scaling on mobile devices */
+@viewport {
+  width: device-width;
+  initial-scale: 1.0;
+  maximum-scale: 1.0;
+  user-scalable: 0;
+}

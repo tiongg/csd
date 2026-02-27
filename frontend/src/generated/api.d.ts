@@ -280,6 +280,22 @@ export interface paths {
         patch: operations["updateAccount"];
         trace?: never;
     };
+    "/api/account/{accountId}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateAccountRole"];
+        trace?: never;
+    };
     "/api/teams/{teamId}/courses": {
         parameters: {
             query?: never;
@@ -528,6 +544,10 @@ export interface components {
             email: string;
             username: string;
             password: string;
+        };
+        AccountRoleUpdateRequest: {
+            /** @enum {string} */
+            role: "LEARNER" | "CONTRIBUTOR" | "ADMIN";
         };
         AccountUpdateRequest: {
             username?: string;
@@ -1193,6 +1213,41 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["AccountUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Account"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    updateAccountRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountRoleUpdateRequest"];
             };
         };
         responses: {
