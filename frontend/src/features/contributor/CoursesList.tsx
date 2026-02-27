@@ -3,15 +3,26 @@ import {
   CardWithDetails,
   CardWithPlusIcon,
 } from '@/components/ui/custom-cards';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Heading1 } from '@/components/ui/typography';
 import type { components } from '@/generated/api';
-import { useApiQuery } from '@/lib/fetch-client';
+import { apiQueryOptions, useApiMutation, useApiQuery } from '@/lib/fetch-client';
 import { capitalizeFirst, cn, type Course, type Team } from '@/lib/utils';
 import { useNavigate } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { Trash2, Users } from 'lucide-react';
+import { toast } from 'sonner';
 import { useBoolean } from 'usehooks-ts';
+import { useState } from 'react';
 import CreateCourseDialog from './CreateCourseDialog';
 import TeamCollaboratorsDialog from './TeamCollaboratorsDialog';
 
@@ -44,6 +55,25 @@ export default function CoursesList({ team }: CourseListProps) {
     setTrue: openTeamCollaboratorsDialog,
   } = useBoolean(false);
 
+  const [isDeleteTeamDialogOpen, setIsDeleteTeamDialogOpen] = useState(false);
+
+  const { mutate: deleteTeam, isPending: isDeletingTeam } = useApiMutation(
+    'delete',
+    '/api/teams/{teamId}',
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: apiQueryOptions('get', '/api/teams').queryKey,
+        });
+        toast.success('Team deleted successfully');
+        navigate({ to: '/contributor/teams' });
+      },
+      onError: (err) => {
+        toast.error(err.message || 'Failed to delete team');
+      },
+    },
+  );
+
   return (
     <div className="flex h-full w-full flex-col p-8">
       <div className="flex justify-between">
@@ -56,6 +86,7 @@ export default function CoursesList({ team }: CourseListProps) {
           <Button
             variant="destructive"
             className="cursor-pointer gap-2 rounded-full"
+            onClick={() => setIsDeleteTeamDialogOpen(true)}
           >
             <Trash2 className="size-4" />
             Delete Team
@@ -91,6 +122,36 @@ export default function CoursesList({ team }: CourseListProps) {
         isOpen={isTeamCollaboratorsDialogOpen}
         setDialogOpen={setIsTeamCollaboratorsDialogOpen}
       />
+
+      <Dialog open={isDeleteTeamDialogOpen} onOpenChange={setIsDeleteTeamDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Team?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{team.name}"? This action cannot be undone and will also delete all courses in this team.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteTeamDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() =>
+                deleteTeam({
+                  params: { path: { teamId: team.id } },
+                })
+              }
+              disabled={isDeletingTeam}
+            >
+              {isDeletingTeam ? 'Deleting...' : 'Delete Team'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -107,6 +168,33 @@ const BADGE_STYLES = {
 
 function CourseCard({ course, status }: CourseCardProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const { mutate: deleteCourse, isPending: isDeleting } = useApiMutation(
+    'delete',
+    '/api/courses/{courseId}',
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries({
+          queryKey: apiQueryOptions('get', '/api/teams/{teamId}/courses', {
+            params: { path: { teamId: team.id } },
+          }).queryKey,
+        });
+        toast.success('Course deleted successfully');
+        setIsDeleteDialogOpen(false);
+      },
+      onError: (err) => {
+        toast.error(err.message || 'Failed to delete course');
+      },
+    },
+  );
+
+  const handleDelete = () => {
+    deleteCourse({
+      params: { path: { courseId: course.id } },
+    });
+  };
 
   return (
     <div className="relative">
@@ -131,8 +219,43 @@ function CourseCard({ course, status }: CourseCardProps) {
           })
         }
       >
-        <DropdownMenuItem>Delete</DropdownMenuItem>
+        <DropdownMenuItem
+          variant="destructive"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsDeleteDialogOpen(true);
+          }}
+        >
+          Delete
+        </DropdownMenuItem>
       </CardWithDetails>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Course?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{course.title}"? This action
+              cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete Course'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

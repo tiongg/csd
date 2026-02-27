@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.request.AccountCreateRequest;
+import csd.t6.backend.account.dto.request.AccountRoleUpdateRequest;
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.account.dto.response.AccountResponse;
 import csd.t6.backend.auth.AuthUserDetails;
@@ -64,5 +65,13 @@ public class AccountController {
   public AccountResponse updateAccount(@AuthenticationPrincipal AuthUserDetails user,
       @RequestBody @Valid AccountUpdateRequest updateDTO) {
     return new AccountResponse(accountService.updateAccount(user.getAccount().getId(), updateDTO));
+  }
+
+  @PatchMapping("/{accountId}/role")
+  @BadRequestResponse()
+  @OkResponse()
+  public AccountResponse updateAccountRole(@PathVariable String accountId,
+      @RequestBody @Valid AccountRoleUpdateRequest roleUpdateDTO) {
+    return new AccountResponse(accountService.updateAccountRole(UUID.fromString(accountId), roleUpdateDTO.role()));
   }
 }

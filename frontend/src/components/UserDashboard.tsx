@@ -1,4 +1,5 @@
 import useActiveRole from '@/hooks/useActiveRole';
+import { useApiQuery } from '@/lib/fetch-client';
 import { cn } from '@/lib/utils';
 import { match } from 'ts-pattern';
 import TrendsPage from './TrendsPage';
@@ -7,26 +8,50 @@ import { Heading1 } from './ui/typography';
 function CardsByRole() {
   const dir = useActiveRole() ?? 'LEARNER';
 
+  // Fetch real metrics from backend
+  const { data: allUsers } = useApiQuery('get', '/api/account', {});
+  const { data: allCourses } = useApiQuery('get', '/api/courses', {});
+  const { data: pendingContributors } = useApiQuery(
+    'get',
+    '/api/admins/contributor-applications',
+    {},
+  );
+
+  // Calculate metrics
+  const totalLearners = (allUsers ?? []).filter(
+    (user) => user.role === 'LEARNER'
+  ).length;
+  const totalCourses = allCourses?.length ?? 0;
+  const pendingApprovals = pendingContributors?.length ?? 0;
+
   return match(dir)
     .with('ADMIN', () => (
       <>
-        <InfoCard title="Pending Approvals" value="4" variant="danger" />
-        <InfoCard title="Total Learners" value="10,000" variant="default" />
-        <InfoCard title="Total Courses" value="1000" variant="default" />
+        <InfoCard
+          title="Pending Approvals"
+          value={pendingApprovals.toString()}
+          variant={pendingApprovals > 0 ? 'danger' : 'default'}
+        />
+        <InfoCard title="Total Learners" value={totalLearners.toString()} variant="default" />
+        <InfoCard title="Total Courses" value={totalCourses.toString()} variant="default" />
       </>
     ))
     .with('CONTRIBUTOR', () => (
       <>
-        <InfoCard title="Awaiting Approvals" value="4" variant="warning" />
-        <InfoCard title="Total Learners" value="10,000" variant="default" />
-        <InfoCard title="Total Courses" value="1000" variant="default" />
+        <InfoCard
+          title="Awaiting Approvals"
+          value={pendingApprovals.toString()}
+          variant={pendingApprovals > 0 ? 'warning' : 'default'}
+        />
+        <InfoCard title="Total Learners" value={totalLearners.toString()} variant="default" />
+        <InfoCard title="Total Courses" value={totalCourses.toString()} variant="default" />
       </>
     ))
     .with('LEARNER', () => (
       <>
         <InfoCard title="Daily streak" value="4" variant="danger" />
         <InfoCard title="Current Rank" value="Top 10%" variant="default" />
-        <InfoCard title="Total Courses" value="1000" variant="default" />
+        <InfoCard title="Total Courses" value={totalCourses.toString()} variant="default" />
       </>
     ))
     .exhaustive();

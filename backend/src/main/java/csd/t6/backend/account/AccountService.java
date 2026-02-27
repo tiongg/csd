@@ -11,6 +11,7 @@ import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.auth.oauth.OAuth2ProviderRepository;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.jooq.accounts.enums.OauthProvider;
+import csd.t6.jooq.accounts.enums.Roles;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.accounts.tables.records.OauthConnectionRecord;
 
@@ -81,5 +82,13 @@ public class AccountService {
     if (deleted == 0) {
       throw new BadRequestException("Account does not exist!");
     }
+  }
+
+  public AccountRecord updateAccountRole(UUID id, Roles role) {
+    AccountRecord existingAccount = this.accountRepository.findOneBy(ACCOUNT.ID, id)
+        .orElseThrow(() -> new BadRequestException("Account does not exist"));
+
+    existingAccount.setUserRole(role);
+    return this.accountRepository.save(existingAccount);
   }
 }

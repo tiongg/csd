@@ -1,4 +1,5 @@
 import {
+  Bars3Icon,
   Cog6ToothIcon,
   DocumentTextIcon,
   LightBulbIcon,
@@ -16,8 +17,20 @@ import type React from 'react';
 import type { PropsWithChildren } from 'react';
 import type { Account } from '@/context/AuthContext';
 import useActiveRole from '@/hooks/useActiveRole';
-import { capitalizeFirst } from '@/lib/utils';
+import { capitalizeFirst, cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
+import { useEffect, useState } from 'react';
+
+async function getGravatarUrl(email: string, size = 40) {
+  // SHA-256 hash
+  const msgBuffer = new TextEncoder().encode(email.trim().toLowerCase());
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashedEmail = hashArray
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+  return `https://www.gravatar.com/avatar/${hashedEmail}?s=${size}&d=identicon`;
+}
 
 type NavItemProps = PropsWithChildren<{
   title: string;
@@ -122,63 +135,102 @@ export default function Sidebar() {
   const currentActiveRole = useActiveRole();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [gravatarUrl, setGravatarUrl] = useState('');
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (!user?.email) {
+      return;
+    }
+    getGravatarUrl(user.email).then((url) => setGravatarUrl(url));
+  }, [user]);
 
   if (!user || !currentActiveRole) {
     return null;
   }
 
   return (
-    <div className="fixed flex h-[calc(100vh-3rem)] w-70 flex-col justify-between bg-white/50 shadow-lg">
+    <div
+      className={cn(
+        'fixed flex h-[calc(100vh-3rem)] flex-col justify-between bg-white/50 shadow-lg transition-all duration-300',
+        isCollapsed ? 'w-16' : 'w-70'
+      )}
+    >
       <div>
-        <div className="px-8 py-4">
-          <p className="font-subtitle tracking-wider">MAIN MENU</p>
-          <div className="flex flex-col gap-y-4 py-4">
-            <SidebarByRole role={user.role} />
-          </div>
-        </div>
-
-        <div className="px-8 py-4">
-          <p className="font-subtitle tracking-wider">SYSTEM</p>
-
-          <div className="flex flex-col gap-y-4 py-4">
-            <NavItem
-              title="Settings"
-              link={getRoleUrl(currentActiveRole, 'settings')}
-              icon={<Cog6ToothIcon />}
-            />
-
-            <NavItem
-              title="Help & Support"
-              link={getRoleUrl(currentActiveRole, 'faq')}
-              icon={<QuestionMarkCircleIcon />}
-            />
-          </div>
-
+        <div className="flex items-center justify-between px-4 py-4">
+          {!isCollapsed && (
+            <p className="font-subtitle tracking-wider">MAIN MENU</p>
+          )}
           <Button
-            variant="default"
-            onClick={async () => {
-              await logout();
-              navigate({ to: '/' });
-            }}
-            className="my-2 w-full cursor-pointer"
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="cursor-pointer"
           >
-            Log out
+            <Bars3Icon className="size-5" />
           </Button>
         </div>
+
+        {!isCollapsed && (
+          <>
+            <div className="px-8 py-4">
+              <div className="flex flex-col gap-y-4 py-4">
+                <SidebarByRole role={user.role} />
+              </div>
+            </div>
+
+            <div className="px-8 py-4">
+              <p className="font-subtitle tracking-wider">SYSTEM</p>
+
+              <div className="flex flex-col gap-y-4 py-4">
+                <NavItem
+                  title="Settings"
+                  link={getRoleUrl(currentActiveRole, 'settings')}
+                  icon={<Cog6ToothIcon />}
+                />
+
+                <NavItem
+                  title="Help & Support"
+                  link={getRoleUrl(currentActiveRole, 'faq')}
+                  icon={<QuestionMarkCircleIcon />}
+                />
+              </div>
+
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  await logout();
+                  navigate({ to: '/' });
+                }}
+                className="my-2 w-full cursor-pointer text-slate-500 hover:text-slate-700"
+              >
+                Log out
+              </Button>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="flex items-center justify-around border-t-2 border-t-slate-300 px-4 py-1">
-        <div className="aspect-square size-10 rounded-full bg-sky-600"></div>
+        <img
+          src={gravatarUrl}
+          alt="Profile avatar"
+          className="size-10 rounded-full border-2 border-slate-300"
+          onError={(e) => {
+            // Fallback to a placeholder icon if Gravatar fails to load
+            e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"%3E%3Ccircle cx="12" cy="12" r="10" stroke="%2394a3b8"/%3E%3Ccircle cx="12" cy="9" r="3" fill="%2394a3b8"/%3E%3Cpath d="M7 21v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2" stroke="%2394a3b8"/%3E%3C/svg%3E';
+            }}
+          />
 
-        <div className="flex flex-col p-4 text-center">
-          <div className="text-sm font-bold text-slate-700">
-            @{user.username}
-          </div>
-          <div className="text-xs text-slate-500">
-            {capitalizeFirst(user.role)}
+          <div className="flex flex-col p-4 text-left">
+            <div className="text-sm font-bold text-slate-700">
+              @{user.username}
+            </div>
+            <div className="text-xs text-slate-500">
+              {capitalizeFirst(user.role)}
+            </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }
