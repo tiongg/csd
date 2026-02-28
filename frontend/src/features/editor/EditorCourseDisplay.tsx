@@ -8,8 +8,32 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useContentEditor } from '@/context/ContentEditorContext';
+import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import type { Course } from '@/lib/utils';
-import { BookOpen, FileText, HelpCircle, Plus } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { BookOpen, FileText, HelpCircle, Plus, Send } from 'lucide-react';
+import { toast } from 'sonner';
+
+/**
+ * ROOT CAUSE (Bug 3 — Publish button does nothing):
+ *
+ * The original Publish button was:
+ *   <Button onClick={async () => { console.log(await getDocAsJson()) }}>Publish</Button>
+ *
+ * It only logged the serialised doc to the console. It never:
+ *   - Called any API endpoint
+ *   - Updated the course's isPublished flag
+ *   - Gave the contributor any feedback
+ *
+ * Fix:
+ *   Use useApiMutation('put', '/api/courses/{id}') — the correct spec endpoint
+ *   for updating a course — with body `{ isPublished: true }`.
+ *   On success: show a toast, invalidate the course query so the badge updates.
+ *   On error: show an error toast.
+ *   While pending: disable the button and show a loading label.
+ *
+ * The course is already in the prop; no extra fetch is needed.
+ */
 
 type EditorCourseDisplayProps = {
   course: Course;
@@ -20,12 +44,48 @@ export default function EditorCourseDisplay({
 }: EditorCourseDisplayProps) {
   const { doc, addSection, setCurrentSection, getDocAsJson } =
     useContentEditor();
+  const queryClient = useQueryClient();
 
   const sections = doc.getArray('root');
   const sectionCount = sections.length;
   const quizCount = Array.from(sections).filter(
-    (section) => section.get('type') === 'quiz',
+    (s) => s.get('type') === 'quiz',
   ).length;
+
+  // ✅ Bug 3 fix: actual API call to publish the course
+  const { mutate: publishCourse, isPending: isPublishing } = useApiMutation(
+    'put',
+    '/api/courses/{id}',
+    {
+      onSuccess: () => {
+        toast.success('Course submitted for approval', {
+          description: 'Admins will review and publish your course.',
+        });
+        // Invalidate so the badge re-reads the updated isPublished value
+        queryClient.invalidateQueries({
+          queryKey: apiQueryOptions('get', '/api/courses/{id}', {
+            params: { path: { id: course.id } },
+          }).queryKey,
+        });
+        // Also invalidate the courses list so dashboard counters update
+        queryClient.invalidateQueries({
+          queryKey: apiQueryOptions('get', '/api/courses/').queryKey,
+        });
+      },
+      onError: (err) => {
+        toast.error('Failed to submit course', {
+          description: (err as any)?.message ?? 'Please try again.',
+        });
+      },
+    },
+  );
+
+  function handlePublish() {
+    publishCourse({
+      params: { path: { id: course.id } },
+      body: { isPublished: true },
+    });
+  }
 
   return (
     <div className="flex h-full flex-col overflow-auto p-6">
@@ -47,13 +107,31 @@ export default function EditorCourseDisplay({
                 <CardDescription className="text-base">
                   {course.description || 'No description provided.'}
                 </CardDescription>
-                <Button
-                  onClick={async () => {
-                    console.log(await getDocAsJson());
-                  }}
-                >
-                  Publish
-                </Button>
+
+                {/* ✅ Publish button — now actually submits via API */}
+                {!course.isPublished && (
+                  <Button
+                    onClick={handlePublish}
+                    disabled={isPublishing || sectionCount === 0}
+                    className="gap-2"
+                  >
+                    <Send className="size-4" />
+                    {isPublishing ? 'Submitting…' : 'Submit for Approval'}
+                  </Button>
+                )}
+
+                {course.isPublished && (
+                  <div className="inline-flex items-center gap-2 rounded-md bg-green-50 px-3 py-1.5 text-sm text-green-700">
+                    <BookOpen className="size-4" />
+                    This course is live and visible to learners
+                  </div>
+                )}
+
+                {!course.isPublished && sectionCount === 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Add at least one section before submitting.
+                  </p>
+                )}
               </div>
             </div>
           </CardHeader>

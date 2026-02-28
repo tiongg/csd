@@ -10,11 +10,29 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import type { Team } from '@/lib/utils';
+import { toast } from 'sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Dispatch, SetStateAction } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import z from 'zod';
+
+/**
+ * ROOT CAUSE (Issue 5):
+ *
+ * 1. The form was never reset after a successful submission. `useForm` exposes
+ *    a `reset()` function — it was not destructured and therefore not called.
+ *    After the dialog closed, re-opening it showed the previous values.
+ *    Fix: destructure `reset` and call it inside onSuccess before closing.
+ *
+ * 2. The success toast message was correct in the prior version, but the
+ *    form-level feedback (clearing fields + closing the dialog) was missing.
+ *    Fix: `reset()` then `setDialogOpen(false)` in onSuccess.
+ *
+ * 3. Error feedback relied on `setError('root', ...)` which only appears if
+ *    the JSX block for errors.root is rendered — it was, so that part was fine.
+ *    No change needed there beyond the existing pattern.
+ */
 
 type CreateCourseDialogProps = {
   team: Team;
@@ -41,6 +59,7 @@ export default function CreateCourseDialog({
     formState: { errors, isSubmitting },
     setError,
     control,
+    reset, // ✅ Fix 1: destructure reset
   } = useForm<CourseFormValues>({
     resolver: zodResolver(courseSchema),
     defaultValues: {
@@ -54,18 +73,27 @@ export default function CreateCourseDialog({
     '/api/courses/',
     {
       onSuccess: async () => {
-        // Invalidate courses list query to refresh the data
+        // ✅ Fix 2: invalidate courses list
         await queryClient.invalidateQueries({
           queryKey: apiQueryOptions('get', '/api/teams/{teamId}/courses', {
             params: { path: { teamId: team.id } },
           }).queryKey,
         });
+
+        // ✅ Fix 3: clear form fields so next open starts fresh
+        reset();
+
+        // ✅ Fix 4: explicit success feedback
+        toast.success('Course submitted for approval', {
+          description: 'Admins will review your course shortly.',
+        });
+
         setDialogOpen(false);
       },
       onError: (error: any) => {
         setError('root', {
           type: 'custom',
-          message: error?.message || 'Failed to create course',
+          message: error?.message ?? 'Failed to create course. Please try again.',
         });
       },
     },
@@ -80,13 +108,19 @@ export default function CreateCourseDialog({
           teamId: team.id,
         },
       });
-    } catch (error: any) {
-      // Error handled by onError callback
+    } catch {
+      // Error handled by onError callback above
     }
   }
 
+  // Also reset form when dialog is closed manually
+  function handleOpenChange(open: boolean) {
+    if (!open) reset();
+    setDialogOpen(open);
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={setDialogOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <div className="mb-3">
           <h1 className="text-3xl font-bold">Create New Course</h1>
@@ -148,12 +182,12 @@ export default function CreateCourseDialog({
 
           <div className="flex gap-4">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating...' : 'Create Course'}
+              {isSubmitting ? 'Submitting…' : 'Submit for Approval'}
             </Button>
             <Button
               type="button"
               variant="outline"
-              onClick={() => setDialogOpen(false)}
+              onClick={() => handleOpenChange(false)}
             >
               Cancel
             </Button>
