@@ -114,7 +114,7 @@ public class TeamService {
 
     // Validate that only Contributors and Admins can be added to teams
     if (accountRecord.getUserRole() == Roles.LEARNER) {
-      throw new BadRequestException("Only Contributors can be added to a team");
+      throw new BadRequestException("Only Contributors and Admins can be added to a team");
     }
 
     if (teamMemberRepository.findByTeamAndAccount(teamId, accountRecord.getId()).isPresent()) {
