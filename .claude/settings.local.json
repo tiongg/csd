@@ -1,13 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "mcp__ide__getDiagnostics",
-      "Bash(xargs cat)",
-      "Bash(docker compose exec frontend npx shadcn@latest add select)",
-      "Bash(find backend -name \"*.java\" -exec grep -l \"count\\\\|getTotal\\\\|getAll\" {} ;)",
-      "Bash(docker compose exec frontend npx shadcn@latest add collapsible)",
-      "Bash(git add -A)",
-      "Bash(git commit:*)"
+      "mcp__ide__getDiagnostics"
     ]
   }
 }
