@@ -70,8 +70,25 @@ public class AccountController {
   @PatchMapping("/{accountId}/role")
   @BadRequestResponse()
   @OkResponse()
+  @Operation(summary = "Update role of any user account", description = "Allows admins to update the role of any user account by specifying the target account ID. The requestor ID is the account ID of the admin making the request.")
+  public AccountResponse updateAnyAccountRole(@PathVariable String accountId,
+      @RequestBody @Valid AccountRoleUpdateRequest roleUpdateDTO,
+      @AuthenticationPrincipal AuthUserDetails requesterDetails) {
+    // Only admins can update roles
+    if (requesterDetails.getAccount().getUserRole() != Roles.ADMIN) {
+      throw new BadRequestException("Only admins can update user roles");
+    }
+
+    return new AccountResponse(accountService.updateAccountRole(UUID.fromString(accountId), roleUpdateDTO.role(), requesterDetails.getAccount().getId()));
+  }
+
+  @PatchMapping("/{accountId}/role")
+  @BadRequestResponse()
+  @OkResponse()
+  @Operation(summary = "Update role of user account", description = "Updates the role of the account making the request. Original method for backward compatibility.")
   public AccountResponse updateAccountRole(@PathVariable String accountId,
-      @RequestBody @Valid AccountRoleUpdateRequest roleUpdateDTO) {
+      @RequestBody @Valid AccountRoleUpdateRequest roleUpdateDTO,
+      @AuthenticationPrincipal AuthUserDetails requesterDetails) {
     return new AccountResponse(accountService.updateAccountRole(UUID.fromString(accountId), roleUpdateDTO.role()));
   }
 }
