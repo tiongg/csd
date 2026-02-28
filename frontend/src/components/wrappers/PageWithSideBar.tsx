@@ -22,11 +22,8 @@ export default function PageWithSideBar({
   return (
     <SidebarProvider>
       <div className={cn('relative flex min-h-[calc(100vh-52px)]', className)}>
-        {/* Fixed sidebar rendered outside the flow */}
         <Sidebar />
-        {/* Spacer that mirrors sidebar width — drives the smooth content shift */}
         <SidebarSpacer />
-        {/* Content area fills remaining space, no hardcoded margins */}
         <main className="flex-1 min-w-0 overflow-auto">
           {children}
         </main>
