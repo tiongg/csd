@@ -64,9 +64,7 @@ export default function CreateCourseDialog({
 
         reset();
 
-        toast.success('Course submitted for approval', {
-          description: 'Admins will review your course shortly.',
-        });
+        toast.success('Course created');
 
         setDialogOpen(false);
       },
@@ -161,7 +159,7 @@ export default function CreateCourseDialog({
 
           <div className="flex gap-4">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting…' : 'Submit for Approval'}
+              {isSubmitting ? 'Submitting…' : 'Create Course'}
             </Button>
             <Button
               type="button"
