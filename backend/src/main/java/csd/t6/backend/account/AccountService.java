@@ -8,17 +8,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
-import csd.t6.backend.account.dto.request.AccountUpdateRequest;
-import csd.t6.backend.account.dto.request.AccountRoleUpdateRequest;
-import csd.t6.backend.account.dto.request.AccountUpdateRequest;
-import csd.t6.backend.auth.AuthUserDetails;
-import csd.t6.backend.account.dto.request.AccountRoleUpdateRequest;
-import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.auth.oauth.OAuth2ProviderRepository;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.jooq.accounts.enums.OauthProvider;
 import csd.t6.jooq.accounts.enums.Roles;
-import csd.t6.jooq.accounts.records.AccountRecord;
+import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.accounts.tables.records.OauthConnectionRecord;
 
 @Service
@@ -57,14 +51,14 @@ public class AccountService {
       }
       return this.accountRepository.insert(email, username, null, realname);
     });
-    return oauthAccount;
+    return this.oAuthProviderRepository.insert(account.getId(), provider, providerId, email);
   }
 
   public AccountRecord updateAccount(UUID id, AccountUpdateRequest updateDTO) {
     AccountRecord existingAccount = this.accountRepository.findOneBy(ACCOUNT.ID, id)
         .orElseThrow(() -> new BadRequestException("Account does not exist"));
 
-    if (updateDTO.username() != null && !existingAccount.getUsername().equals(updateDTO.username()))
+    if (updateDTO.username() != null && !existingAccount.getUsername().equals(updateDTO.username())
         && this.accountRepository.exists(ACCOUNT.USERNAME, updateDTO.username())) {
       throw new BadRequestException("Username already exists");
     }
@@ -94,9 +88,9 @@ public class AccountService {
    * @param requestorId The ID of the user making the request
    * @return The updated account record
    */
-  public AccountRecord updateAccountRole(UUID targetAccountId, UUID id, Roles role, UUID requestorId) {
+  public AccountRecord updateAccountRole(UUID id, Roles role, UUID requestorId) {
     // Verify the admin making the request
-    AccountRecord requestorAccount = this.accountRepository.findById(requestorId)
+    AccountRecord requestorAccount = this.accountRepository.findOneBy(ACCOUNT.ID, requestorId)
         .orElseThrow(() -> new BadRequestException("Admin account not found"));
 
     // Verify the target account exists

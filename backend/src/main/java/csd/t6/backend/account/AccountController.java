@@ -20,6 +20,9 @@ import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.account.dto.response.AccountResponse;
 import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.decorators.auth.PublicDecorator;
+import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.jooq.accounts.enums.Roles;
+import io.swagger.v3.oas.annotations.Operation;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -80,15 +83,5 @@ public class AccountController {
     }
 
     return new AccountResponse(accountService.updateAccountRole(UUID.fromString(accountId), roleUpdateDTO.role(), requesterDetails.getAccount().getId()));
-  }
-
-  @PatchMapping("/{accountId}/role")
-  @BadRequestResponse()
-  @OkResponse()
-  @Operation(summary = "Update role of user account", description = "Updates the role of the account making the request. Original method for backward compatibility.")
-  public AccountResponse updateAccountRole(@PathVariable String accountId,
-      @RequestBody @Valid AccountRoleUpdateRequest roleUpdateDTO,
-      @AuthenticationPrincipal AuthUserDetails requesterDetails) {
-    return new AccountResponse(accountService.updateAccountRole(UUID.fromString(accountId), roleUpdateDTO.role()));
   }
 }
