@@ -5,6 +5,7 @@ import {
 import { Heading1 } from '@/components/ui/typography';
 import { useApiQuery } from '@/lib/fetch-client';
 import type { Team } from '@/lib/utils';
+import { useNavigate } from '@tanstack/react-router';
 import { useBoolean } from 'usehooks-ts';
 import CreateNewTeamDialog from './CreateNewTeamDialog';
 
@@ -29,7 +30,7 @@ export default function TeamsList() {
         {isLoading ? (
           <p>Loading...</p>
         ) : (
-          (teams ?? []).map((team, i) => <TeamCard team={team} key={team.id} />)
+          (teams ?? []).map((team) => <TeamCard team={team} key={team.id} />)
         )}
       </div>
 
@@ -47,7 +48,9 @@ type TeamCardProps = {
 
 function TeamCard({ team }: TeamCardProps) {
   const navigate = useNavigate();
-  const { data: courses } = useApiQuery('get', `/api/teams/${team.id}/courses`, {});
+  const { data: courses } = useApiQuery('get', '/api/teams/{teamId}/courses', {
+    params: { path: { teamId: team.id } },
+  });
 
   const collaboratorCount = team.members.length;
   const courseCount = courses?.length ?? 0;
