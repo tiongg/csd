@@ -5,7 +5,6 @@ import {
 import { Heading1 } from '@/components/ui/typography';
 import { useApiQuery } from '@/lib/fetch-client';
 import type { Team } from '@/lib/utils';
-import { useNavigate } from '@tanstack/react-router';
 import { useBoolean } from 'usehooks-ts';
 import CreateNewTeamDialog from './CreateNewTeamDialog';
 
@@ -46,7 +45,7 @@ type TeamCardProps = {
   team: Team;
 };
 
-function TeamCard({ team: { name, members, id } }: TeamCardProps) {
+function TeamCard({ team }: TeamCardProps) {
   const navigate = useNavigate();
   const { data: courses } = useApiQuery('get', `/api/teams/${team.id}/courses`, {});
 
@@ -55,13 +54,13 @@ function TeamCard({ team: { name, members, id } }: TeamCardProps) {
 
   return (
     <CardWithDetails
-      title={name}
+      title={team.name}
       descriptor={`${collaboratorCount} Collaborators`}
       data={`${courseCount} Courses`}
       onClick={() => {
         navigate({
           to: '/contributor/$teamId/courses',
-          params: { teamId: id },
+          params: { teamId: team.id },
         });
       }}
     />
