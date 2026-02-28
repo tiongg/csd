@@ -14,27 +14,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { BookOpen, FileText, HelpCircle, Plus, Send } from 'lucide-react';
 import { toast } from 'sonner';
 
-/**
- * ROOT CAUSE (Bug 3 — Publish button does nothing):
- *
- * The original Publish button was:
- *   <Button onClick={async () => { console.log(await getDocAsJson()) }}>Publish</Button>
- *
- * It only logged the serialised doc to the console. It never:
- *   - Called any API endpoint
- *   - Updated the course's isPublished flag
- *   - Gave the contributor any feedback
- *
- * Fix:
- *   Use useApiMutation('put', '/api/courses/{id}') — the correct spec endpoint
- *   for updating a course — with body `{ isPublished: true }`.
- *   On success: show a toast, invalidate the course query so the badge updates.
- *   On error: show an error toast.
- *   While pending: disable the button and show a loading label.
- *
- * The course is already in the prop; no extra fetch is needed.
- */
-
 type EditorCourseDisplayProps = {
   course: Course;
 };
@@ -42,8 +21,7 @@ type EditorCourseDisplayProps = {
 export default function EditorCourseDisplay({
   course,
 }: EditorCourseDisplayProps) {
-  const { doc, addSection, setCurrentSection, getDocAsJson } =
-    useContentEditor();
+  const { doc, addSection, setCurrentSection } = useContentEditor();
   const queryClient = useQueryClient();
 
   const sections = doc.getArray('root');
@@ -52,7 +30,6 @@ export default function EditorCourseDisplay({
     (s) => s.get('type') === 'quiz',
   ).length;
 
-  // ✅ Bug 3 fix: actual API call to publish the course
   const { mutate: publishCourse, isPending: isPublishing } = useApiMutation(
     'put',
     '/api/courses/{id}',
@@ -61,13 +38,11 @@ export default function EditorCourseDisplay({
         toast.success('Course submitted for approval', {
           description: 'Admins will review and publish your course.',
         });
-        // Invalidate so the badge re-reads the updated isPublished value
         queryClient.invalidateQueries({
           queryKey: apiQueryOptions('get', '/api/courses/{id}', {
             params: { path: { id: course.id } },
           }).queryKey,
         });
-        // Also invalidate the courses list so dashboard counters update
         queryClient.invalidateQueries({
           queryKey: apiQueryOptions('get', '/api/courses/').queryKey,
         });
@@ -108,7 +83,6 @@ export default function EditorCourseDisplay({
                   {course.description || 'No description provided.'}
                 </CardDescription>
 
-                {/* ✅ Publish button — now actually submits via API */}
                 {!course.isPublished && (
                   <Button
                     onClick={handlePublish}

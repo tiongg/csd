@@ -17,23 +17,6 @@ import type { Dispatch, SetStateAction } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import z from 'zod';
 
-/**
- * ROOT CAUSE (Issue 5):
- *
- * 1. The form was never reset after a successful submission. `useForm` exposes
- *    a `reset()` function — it was not destructured and therefore not called.
- *    After the dialog closed, re-opening it showed the previous values.
- *    Fix: destructure `reset` and call it inside onSuccess before closing.
- *
- * 2. The success toast message was correct in the prior version, but the
- *    form-level feedback (clearing fields + closing the dialog) was missing.
- *    Fix: `reset()` then `setDialogOpen(false)` in onSuccess.
- *
- * 3. Error feedback relied on `setError('root', ...)` which only appears if
- *    the JSX block for errors.root is rendered — it was, so that part was fine.
- *    No change needed there beyond the existing pattern.
- */
-
 type CreateCourseDialogProps = {
   team: Team;
   isOpen: boolean;
@@ -59,7 +42,7 @@ export default function CreateCourseDialog({
     formState: { errors, isSubmitting },
     setError,
     control,
-    reset, // ✅ Fix 1: destructure reset
+    reset,
   } = useForm<CourseFormValues>({
     resolver: zodResolver(courseSchema),
     defaultValues: {
@@ -73,17 +56,14 @@ export default function CreateCourseDialog({
     '/api/courses/',
     {
       onSuccess: async () => {
-        // ✅ Fix 2: invalidate courses list
         await queryClient.invalidateQueries({
           queryKey: apiQueryOptions('get', '/api/teams/{teamId}/courses', {
             params: { path: { teamId: team.id } },
           }).queryKey,
         });
 
-        // ✅ Fix 3: clear form fields so next open starts fresh
         reset();
 
-        // ✅ Fix 4: explicit success feedback
         toast.success('Course submitted for approval', {
           description: 'Admins will review your course shortly.',
         });
@@ -113,7 +93,6 @@ export default function CreateCourseDialog({
     }
   }
 
-  // Also reset form when dialog is closed manually
   function handleOpenChange(open: boolean) {
     if (!open) reset();
     setDialogOpen(open);

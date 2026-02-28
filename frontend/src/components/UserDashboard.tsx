@@ -5,30 +5,12 @@ import { match } from 'ts-pattern';
 import TrendsPage from './TrendsPage';
 import { Heading1 } from './ui/typography';
 
-/**
- * ROOT CAUSES FIXED HERE:
- *
- * Bug 2 — "Total Courses" counts pending courses too:
- *   Old: `totalCourses = allCourses?.length`  ← counts ALL regardless of status
- *   Fix: filter to `isPublished === true` before taking .length
- *
- * Bug 4 — Contributor "Awaiting Approvals" always 0:
- *   Old: used `pendingContributors` (from /api/admins/contributor-applications)
- *        for BOTH the ADMIN and CONTRIBUTOR cards.
- *        Contributors get 403 on that endpoint → query returns undefined → 0.
- *   Fix: - ADMIN card: still uses /api/admins/contributor-applications (correct)
- *          but query is disabled unless role === 'ADMIN' to avoid 403 noise.
- *        - CONTRIBUTOR card: counts allCourses where isPublished === false —
- *          these are the contributor's own courses pending admin approval.
- *          No extra request needed; allCourses is already fetched.
- */
 function CardsByRole() {
   const dir = useActiveRole() ?? 'LEARNER';
 
   const { data: allUsers } = useApiQuery('get', '/api/account/', {});
   const { data: allCourses } = useApiQuery('get', '/api/courses/', {});
 
-  // Only fetch admin-only endpoint when the user is actually an admin
   const { data: pendingContributors } = useApiQuery(
     'get',
     '/api/admins/contributor-applications',
@@ -40,24 +22,15 @@ function CardsByRole() {
     (u) => u.role === 'LEARNER',
   ).length;
 
-  // ✅ Bug 2: published only
   const totalPublishedCourses = (allCourses ?? []).filter(
     (c) => c.isPublished,
   ).length;
 
-  // ADMIN metric: contributor applications awaiting approval
   const pendingContributorApps = pendingContributors?.length ?? 0;
 
-  // ✅ Bug 4: CONTRIBUTOR metric — their own courses not yet approved
   const contributorAwaitingApproval = (allCourses ?? []).filter(
     (c) => !c.isPublished,
   ).length;
-
-  console.debug('[Dashboard] role:', dir);
-  console.debug('[Dashboard] totalPublishedCourses:', totalPublishedCourses);
-  console.debug('[Dashboard] totalLearners:', totalLearners);
-  console.debug('[Dashboard] pendingContributorApps:', pendingContributorApps);
-  console.debug('[Dashboard] contributorAwaitingApproval:', contributorAwaitingApproval);
 
   return match(dir)
     .with('ADMIN', () => (
@@ -81,7 +54,6 @@ function CardsByRole() {
     ))
     .with('CONTRIBUTOR', () => (
       <>
-        {/* ✅ Bug 4: contributor's own pending courses, not admin endpoint */}
         <InfoCard
           title="Awaiting Approvals"
           value={contributorAwaitingApproval.toString()}
@@ -145,7 +117,7 @@ type InfoCardProps = {
 
 function InfoCard({ title, value, variant }: InfoCardProps) {
   const STYLES = {
-    danger:  'text-rose-400 border-rose-400',
+    danger: 'text-rose-400 border-rose-400',
     warning: 'text-amber-500 border-amber-500',
     default: 'text-slate-800 border-slate-400',
   };

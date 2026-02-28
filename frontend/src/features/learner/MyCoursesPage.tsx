@@ -1,14 +1,9 @@
 import { FireIcon, ClockIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { Heading1 } from '@/components/ui/typography';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  CardWithDetails,
-  CardWithPlusIcon,
-} from '@/components/ui/custom-cards';
 import SearchBar from '@/components/ui/searchbar';
 import { useApiQuery } from '@/lib/fetch-client';
 import { useNavigate } from '@tanstack/react-router';
-import { cn } from '@/lib/utils';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { useState } from 'react';

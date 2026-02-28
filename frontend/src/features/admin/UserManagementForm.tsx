@@ -26,23 +26,6 @@ import AllAdminsList from './AllAdminsList';
 
 type UserRole = 'LEARNER' | 'CONTRIBUTOR' | 'ADMIN';
 
-/**
- * ROOT CAUSE (Issue 1):
- *
- * 1. Wrong API path: '/api/account' (no trailing slash) does not match the spec
- *    which defines the route as '/api/account/'. openapi-fetch does an exact path
- *    lookup — mismatch = request 404s or TypeScript errors = empty array.
- *    Fix: '/api/account/' everywhere.
- *
- * 2. Role mutation was missing queryClient.invalidateQueries on success.
- *    The PATCH completed on the server but the table never re-fetched, so the
- *    displayed role was always stale.
- *    Fix: invalidate '/api/account/' key inside onSuccess.
- *
- * 3. SearchBar `onSearch` prop didn't exist on the component — filtering was
- *    silently broken.
- *    Fix: searchbar.tsx updated to accept onSearch.
- */
 export default function UserManagementForm() {
   return (
     <div className="flex h-full w-full flex-col gap-4 p-16">
@@ -86,10 +69,8 @@ function AllUsers() {
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
 
-  // ✅ Fix 1: '/api/account/' — trailing slash required to match spec
   const { data: users, isLoading } = useApiQuery('get', '/api/account/', {});
 
-  // Cross-reference pending contributor applications for the "Pending?" column
   const { data: pendingApps } = useApiQuery(
     'get',
     '/api/admins/contributor-applications',
@@ -103,7 +84,6 @@ function AllUsers() {
       user.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  // ✅ Fix 2: invalidate after role change so table immediately re-renders
   const { mutate: updateRole, isPending: isUpdatingRole } = useApiMutation(
     'patch',
     '/api/account/{accountId}/role',
@@ -142,7 +122,6 @@ function AllUsers() {
         <span className="text-sm text-slate-500">
           {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''}
         </span>
-        {/* ✅ Fix 3: onSearch wired — SearchBar updated to accept the prop */}
         <SearchBar placeholder="Search for Users" onSearch={setSearchQuery} />
       </div>
 

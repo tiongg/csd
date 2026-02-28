@@ -13,7 +13,6 @@ public class HealthCheckController {
 
     @GetMapping
     public String healthCheck() {
-        return "Backend is running and responding correctly! Database: " +
-               (System.currentTimeMillis() / 1000) + "ms since start";
+        return "OK";
     }
 }

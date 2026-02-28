@@ -194,6 +194,7 @@ function NotificationPanel({ role }: { role: Account['role'] }) {
     'get',
     '/api/admins/contributor-applications',
     {},
+    { enabled: role === 'ADMIN' },
   );
   const { data: courses } = useApiQuery('get', '/api/courses/', {});
 

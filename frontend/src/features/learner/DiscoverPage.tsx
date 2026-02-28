@@ -1,20 +1,11 @@
-import Autoplay from 'embla-carousel-autoplay';
 import { useInView } from 'react-intersection-observer';
 import { useEffect, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import { Heading1, Heading3 } from '@/components/ui/typography';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useApiQuery } from '@/lib/fetch-client';
 import { useNavigate } from '@tanstack/react-router';
-import { cn } from '@/lib/utils';
 
 type ReelOverlayProps = PropsWithChildren<{
   course: string;
@@ -98,20 +89,20 @@ type CourseCardProps = {
   createdAt: string;
 };
 
-function CourseCard({ course }: CourseCardProps) {
+function CourseCard({ id, title, description }: CourseCardProps) {
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate({
       to: '/learner/courses/$courseId',
-      params: { courseId: course.id },
+      params: { courseId: id },
     });
   };
 
   return (
     <ReelOverlay
-      course={course.title}
-      description={course.description ?? 'No description'}
+      course={title}
+      description={description ?? 'No description'}
       onClick={handleClick}
     >
       <ReelPlayer src="/skibidi_toilet.mp4" />
@@ -142,7 +133,13 @@ export default function DiscoverPage() {
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {publishedCourses.map((course) => (
-            <CourseCard key={course.id} course={course} />
+            <CourseCard
+              key={course.id}
+              id={course.id}
+              title={course.title}
+              description={course.description}
+              createdAt={course.createdAt}
+            />
           ))}
         </div>
       )}

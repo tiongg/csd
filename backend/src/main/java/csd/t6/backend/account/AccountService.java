@@ -4,7 +4,6 @@ import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
