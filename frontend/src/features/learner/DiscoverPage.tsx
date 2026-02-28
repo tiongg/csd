@@ -110,22 +110,8 @@ function CourseCard({ id, title, description }: CourseCardProps) {
   );
 }
 
-type Course = {
-  id: string;
-  title: string;
-  description?: string | undefined;
-  creatorId: string;
-  teamId: string;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
-
 export default function DiscoverPage() {
   const { data: courses } = useApiQuery('get', '/api/courses/', {});
-
-  // Filter to show only published courses
-  const publishedCourses = (courses as Course[] ?? []).filter((c: Course) => c.isPublished === true);
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-16">
@@ -134,7 +120,7 @@ export default function DiscoverPage() {
         <p className="font-subtitle">Take a look at what our courses offer!</p>
       </div>
 
-      {publishedCourses.length === 0 ? (
+      {(courses ?? []).length === 0 ? (
         <div className="flex h-64 w-full items-center justify-center text-slate-500">
           <div className="text-center">
             <p className="text-lg font-semibold">No courses available</p>
@@ -143,7 +129,7 @@ export default function DiscoverPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {publishedCourses.map((course: Course) => (
+          {(courses ?? []).map((course) => (
             <CourseCard
               key={course.id}
               id={course.id}
