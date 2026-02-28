@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/dialog';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Heading1 } from '@/components/ui/typography';
-import type { components } from '@/generated/api';
 import { apiQueryOptions, useApiMutation, useApiQuery } from '@/lib/fetch-client';
 import { capitalizeFirst, cn, type Course, type Team } from '@/lib/utils';
 import { useNavigate } from '@tanstack/react-router';
@@ -220,6 +219,7 @@ function CourseCard({ course, teamId, status }: CourseCardProps) {
           navigate({
             to: '/contributor/editor/$courseId',
             params: { courseId: course.id },
+            search: { section: undefined },
           })
         }
       >
