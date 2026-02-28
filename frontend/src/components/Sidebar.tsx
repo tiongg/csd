@@ -10,7 +10,7 @@ import {
   UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { useSidebar } from '@/context/SidebarContext';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
@@ -320,8 +320,7 @@ function NotificationPanel({ role }: { role: Account['role'] }) {
 
 export default function Sidebar() {
   const currentActiveRole = useActiveRole();
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user  } = useAuth();
   const [gravatarUrl, setGravatarUrl] = useState('');
   const { isCollapsed, setIsCollapsed } = useSidebar();
 
