@@ -27,7 +27,6 @@ import CreateCourseDialog from './CreateCourseDialog';
 import TeamCollaboratorsDialog from './TeamCollaboratorsDialog';
 
 type TeamMember = components['schemas']['TeamMember'];
-
 type StatusType = 'approved' | 'pending';
 
 type CourseListProps = {
@@ -35,12 +34,25 @@ type CourseListProps = {
 };
 
 export default function CoursesList({ team }: CourseListProps) {
+  /**
+   * ROOT CAUSE (Bug 2 — "queryClient is not defined" / "navigate is not defined"):
+   *
+   * The original CoursesList component called `useApiMutation('delete', '/api/teams/{teamId}', ...)`
+   * and referenced `queryClient` and `navigate` inside the onSuccess callback — but NEITHER
+   * `useQueryClient()` nor `useNavigate()` were called inside CoursesList. They were only
+   * called inside the child `CourseCard` component, which is a completely separate scope.
+   *
+   * React hooks must be called at the top of the component that uses them.
+   * Fix: add `const queryClient = useQueryClient()` and `const navigate = useNavigate()` here.
+   *
+   * Additionally the invalidation used `'/api/teams'` (no trailing slash) which doesn't
+   * match the spec path `'/api/teams/'` — fixed below.
+   */
+  const queryClient = useQueryClient(); // ✅ Fix: was missing
+  const navigate = useNavigate();       // ✅ Fix: was missing
+
   const { data: courses } = useApiQuery('get', '/api/teams/{teamId}/courses', {
-    params: {
-      path: {
-        teamId: team.id,
-      },
-    },
+    params: { path: { teamId: team.id } },
   });
 
   const {
@@ -62,14 +74,16 @@ export default function CoursesList({ team }: CourseListProps) {
     '/api/teams/{teamId}',
     {
       onSuccess: async () => {
+        // ✅ Fix: queryClient and navigate now in scope
         await queryClient.invalidateQueries({
-          queryKey: apiQueryOptions('get', '/api/teams').queryKey,
+          // ✅ Fix: trailing slash to match spec '/api/teams/'
+          queryKey: apiQueryOptions('get', '/api/teams/').queryKey,
         });
         toast.success('Team deleted successfully');
         navigate({ to: '/contributor/teams' });
       },
       onError: (err) => {
-        toast.error(err.message || 'Failed to delete team');
+        toast.error((err as any)?.message || 'Failed to delete team');
       },
     },
   );
@@ -100,6 +114,7 @@ export default function CoursesList({ team }: CourseListProps) {
           </Button>
         </div>
       </div>
+
       <div className="grid grid-cols-4 justify-start gap-4 py-4">
         <CardWithPlusIcon
           title="Create New Course"
@@ -107,7 +122,8 @@ export default function CoursesList({ team }: CourseListProps) {
         />
 
         {(courses ?? []).map((course, i) => (
-          <CourseCard course={course} key={i} />
+          // ✅ Fix: pass teamId so CourseCard can invalidate the right query
+          <CourseCard course={course} teamId={team.id} key={i} />
         ))}
       </div>
 
@@ -123,12 +139,16 @@ export default function CoursesList({ team }: CourseListProps) {
         setDialogOpen={setIsTeamCollaboratorsDialogOpen}
       />
 
-      <Dialog open={isDeleteTeamDialogOpen} onOpenChange={setIsDeleteTeamDialogOpen}>
+      <Dialog
+        open={isDeleteTeamDialogOpen}
+        onOpenChange={setIsDeleteTeamDialogOpen}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete Team?</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{team.name}"? This action cannot be undone and will also delete all courses in this team.
+              Are you sure you want to delete "{team.name}"? This action cannot
+              be undone and will also delete all courses in this team.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -141,9 +161,7 @@ export default function CoursesList({ team }: CourseListProps) {
             <Button
               variant="destructive"
               onClick={() =>
-                deleteTeam({
-                  params: { path: { teamId: team.id } },
-                })
+                deleteTeam({ params: { path: { teamId: team.id } } })
               }
               disabled={isDeletingTeam}
             >
@@ -156,8 +174,32 @@ export default function CoursesList({ team }: CourseListProps) {
   );
 }
 
+// ─── Course Card ─────────────────────────────────────────────────────────────
+
 type CourseCardProps = {
   course: Course;
+  /**
+   * ✅ Fix: teamId is now a required prop.
+   *
+   * ROOT CAUSE (Bug 1 — "team is not defined" on course delete):
+   *
+   * `CourseCard` is a child component with its own scope. The original code
+   * referenced `team.id` inside the `deleteCourse` onSuccess callback, but
+   * `team` was never passed as a prop to `CourseCard` — it only existed in
+   * the parent `CoursesList` scope. When the callback ran after a successful
+   * delete, JavaScript threw `ReferenceError: team is not defined`.
+   *
+   * Additionally, the mutation used path `/api/courses/{courseId}` but the
+   * OpenAPI spec defines the path parameter as `{id}`, not `{courseId}`.
+   * This caused a 404 on the actual DELETE request (the server never matched
+   * the route), and then the onSuccess callback still ran via the toast system
+   * before crashing on the undefined `team` reference.
+   *
+   * Fixes:
+   * 1. Pass `teamId: string` as an explicit prop so it's always in scope.
+   * 2. Change mutation path to `/api/courses/{id}` and pass `{ id: course.id }`.
+   */
+  teamId: string;
   status?: StatusType;
 };
 
@@ -166,33 +208,33 @@ const BADGE_STYLES = {
   pending: 'bg-amber-500',
 } satisfies Record<StatusType, string>;
 
-function CourseCard({ course, status }: CourseCardProps) {
+function CourseCard({ course, teamId, status }: CourseCardProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const { mutate: deleteCourse, isPending: isDeleting } = useApiMutation(
     'delete',
-    '/api/courses/{courseId}',
+    '/api/courses/{id}', // ✅ Fix: was '/api/courses/{courseId}' — wrong param name
     {
       onSuccess: async () => {
         await queryClient.invalidateQueries({
           queryKey: apiQueryOptions('get', '/api/teams/{teamId}/courses', {
-            params: { path: { teamId: team.id } },
+            params: { path: { teamId } }, // ✅ Fix: teamId now in scope via prop
           }).queryKey,
         });
         toast.success('Course deleted successfully');
         setIsDeleteDialogOpen(false);
       },
       onError: (err) => {
-        toast.error(err.message || 'Failed to delete course');
+        toast.error((err as any)?.message || 'Failed to delete course');
       },
     },
   );
 
   const handleDelete = () => {
     deleteCourse({
-      params: { path: { courseId: course.id } },
+      params: { path: { id: course.id } }, // ✅ Fix: was { courseId: course.id }
     });
   };
 
@@ -212,6 +254,7 @@ function CourseCard({ course, status }: CourseCardProps) {
         title={course.title}
         descriptor="Last Edited"
         data={dayjs(course.updatedAt).fromNow()}
+        enableTooltip
         onClick={() =>
           navigate({
             to: '/contributor/editor/$courseId',
