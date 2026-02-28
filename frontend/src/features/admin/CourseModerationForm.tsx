@@ -171,6 +171,7 @@ function PendingApprovals() {
                   <Checkbox
                     checked={selectedCourses.has(course.id)}
                     className="border-slate-800"
+                    onClick={(event) => event.stopPropagation()}
                     onCheckedChange={() => handleSelect(course.id)}
                   />
                 </TableCell>
