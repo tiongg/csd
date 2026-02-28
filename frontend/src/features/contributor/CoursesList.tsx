@@ -35,6 +35,7 @@ type CourseListProps = {
 export default function CoursesList({ team }: CourseListProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const { data: courses } = useApiQuery('get', '/api/teams/{teamId}/courses', {
     params: { path: { teamId: team.id } },
