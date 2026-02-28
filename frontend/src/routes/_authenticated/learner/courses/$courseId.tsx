@@ -22,12 +22,11 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const { courseId } = Route.useParams();
   const { course } = Route.useLoaderData();
 
   return (
     <PageWithSideBar>
-      <CourseView courseId={courseId} course={course} />
+      <CourseView course={course} />
     </PageWithSideBar>
   );
 }
