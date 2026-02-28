@@ -10,33 +10,18 @@ import { useState } from 'react';
 
 dayjs.extend(relativeTime);
 
-type Course = {
-  id: string;
-  title: string;
-  creatorId: string;
-  teamId: string;
-  isPublished: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
-
 export default function MyCoursesPage() {
-  const { data: courses } = useApiQuery('get', '/api/courses', {});
+  const { data: courses } = useApiQuery('get', '/api/courses/', {});
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
-  // Filter courses based on search
   const filteredCourses = (courses ?? []).filter(
     (course) =>
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.creatorId.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Since learners can only see published courses, filter for isPublished
-  const publishedCourses = filteredCourses.filter((c) => c.isPublished === true);
-
   const handleStartNew = () => {
-    // Navigate to discover page to start exploring courses
     navigate({ to: '/learner/discover' });
   };
 
@@ -81,7 +66,7 @@ export default function MyCoursesPage() {
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center text-rose-500">
-              <div className="text-xl font-bold">{publishedCourses.length}</div>
+              <div className="text-xl font-bold">{filteredCourses.length}</div>
               <FireIcon className="size-8 ml-2" />
             </div>
             <SearchBar placeholder="Search for Courses" onSearch={setSearchQuery} />
@@ -99,7 +84,7 @@ export default function MyCoursesPage() {
           </TabsList>
 
           <TabsContent value="all">
-            {publishedCourses.length === 0 ? (
+            {filteredCourses.length === 0 ? (
               <div className="flex h-64 w-full items-center justify-center text-slate-500">
                 <div className="text-center">
                   <p className="text-lg font-semibold">No courses yet</p>
@@ -117,7 +102,7 @@ export default function MyCoursesPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {publishedCourses.map((course) => (
+                {filteredCourses.map((course) => (
                   <CourseCard
                     key={course.id}
                     name={course.title}
