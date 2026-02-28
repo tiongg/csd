@@ -217,11 +217,3 @@ code,
     padding: 2rem;
   }
 }
-
-/* Ensure proper viewport scaling on mobile devices */
-@viewport {
-  width: device-width;
-  initial-scale: 1.0;
-  maximum-scale: 1.0;
-  user-scalable: 0;
-}
