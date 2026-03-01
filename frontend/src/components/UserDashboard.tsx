@@ -8,7 +8,9 @@ import { Heading1 } from './ui/typography';
 function CardsByRole() {
   const dir = useActiveRole() ?? 'LEARNER';
 
-  const { data: allUsers } = useApiQuery('get', '/api/account/', {});
+  const { data: allUsers } = useApiQuery('get', '/api/account/', {}, {
+    enabled: dir === 'ADMIN',
+  });
   const { data: allCourses } = useApiQuery('get', '/api/courses/', {});
 
   const { data: pendingContributors } = useApiQuery(
@@ -58,11 +60,6 @@ function CardsByRole() {
           title="Awaiting Approvals"
           value={contributorAwaitingApproval.toString()}
           variant={contributorAwaitingApproval > 0 ? 'warning' : 'default'}
-        />
-        <InfoCard
-          title="Total Learners"
-          value={totalLearners.toString()}
-          variant="default"
         />
         <InfoCard
           title="Published Courses"
