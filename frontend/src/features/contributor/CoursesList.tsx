@@ -103,8 +103,8 @@ export default function CoursesList({ team }: CourseListProps) {
           onClick={openCreateCourseDialog}
         />
 
-        {(courses ?? []).map((course, i) => (
-          <CourseCard course={course} teamId={team.id} key={i} />
+        {(courses ?? []).map((course) => (
+          <CourseCard course={course} teamId={team.id} key={course.id} />
         ))}
       </div>
 

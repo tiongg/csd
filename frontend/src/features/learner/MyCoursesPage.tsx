@@ -11,7 +11,7 @@ import { useState } from 'react';
 dayjs.extend(relativeTime);
 
 export default function MyCoursesPage() {
-  const { data: courses } = useApiQuery('get', '/api/courses/', {});
+  const { data: courses, isLoading, isError } = useApiQuery('get', '/api/courses/', {});
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
 
@@ -57,6 +57,57 @@ export default function MyCoursesPage() {
     );
   }
 
+  function renderContent() {
+    if (isLoading) {
+      return (
+        <div className="flex h-64 w-full items-center justify-center text-slate-500">
+          <p className="text-sm animate-pulse">Loading courses...</p>
+        </div>
+      );
+    }
+
+    if (isError) {
+      return (
+        <div className="flex h-64 w-full items-center justify-center text-slate-500">
+          <p className="text-sm">Failed to load courses. Please try again later.</p>
+        </div>
+      );
+    }
+
+    if (filteredCourses.length === 0) {
+      return (
+        <div className="flex h-64 w-full items-center justify-center text-slate-500">
+          <div className="text-center">
+            <p className="text-lg font-semibold">No courses yet</p>
+            <p className="text-sm mb-4">
+              Explore our course catalog to start learning!
+            </p>
+            <button
+              onClick={handleStartNew}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 transition-colors"
+            >
+              <CheckCircleIcon className="size-5" />
+              Explore Courses
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {filteredCourses.map((course) => (
+          <CourseCard
+            key={course.id}
+            name={course.title}
+            date={course.updatedAt}
+            onClick={() => handleViewCourse(course.id)}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-full w-full flex-col gap-4 p-16">
       <div>
@@ -84,34 +135,7 @@ export default function MyCoursesPage() {
           </TabsList>
 
           <TabsContent value="all">
-            {filteredCourses.length === 0 ? (
-              <div className="flex h-64 w-full items-center justify-center text-slate-500">
-                <div className="text-center">
-                  <p className="text-lg font-semibold">No courses yet</p>
-                  <p className="text-sm mb-4">
-                    Explore our course catalog to start learning!
-                  </p>
-                  <button
-                    onClick={handleStartNew}
-                    className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 transition-colors"
-                  >
-                    <CheckCircleIcon className="size-5" />
-                    Explore Courses
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filteredCourses.map((course) => (
-                  <CourseCard
-                    key={course.id}
-                    name={course.title}
-                    date={course.updatedAt}
-                    onClick={() => handleViewCourse(course.id)}
-                  />
-                ))}
-              </div>
-            )}
+            {renderContent()}
           </TabsContent>
         </Tabs>
       </div>

@@ -111,7 +111,50 @@ function CourseCard({ id, title, description }: CourseCardProps) {
 }
 
 export default function DiscoverPage() {
-  const { data: courses } = useApiQuery('get', '/api/courses/', {});
+  const { data: courses, isLoading, isError } = useApiQuery('get', '/api/courses/', {});
+
+  function renderContent() {
+    if (isLoading) {
+      return (
+        <div className="flex h-64 w-full items-center justify-center text-slate-500">
+          <p className="text-sm animate-pulse">Loading courses...</p>
+        </div>
+      );
+    }
+
+    if (isError) {
+      return (
+        <div className="flex h-64 w-full items-center justify-center text-slate-500">
+          <p className="text-sm">Failed to load courses. Please try again later.</p>
+        </div>
+      );
+    }
+
+    if ((courses ?? []).length === 0) {
+      return (
+        <div className="flex h-64 w-full items-center justify-center text-slate-500">
+          <div className="text-center">
+            <p className="text-lg font-semibold">No courses available</p>
+            <p className="text-sm">Check back later for new content!</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {(courses ?? []).map((course) => (
+          <CourseCard
+            key={course.id}
+            id={course.id}
+            title={course.title}
+            description={course.description ?? null}
+            createdAt={course.createdAt}
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full w-full flex-col gap-4 p-16">
@@ -120,26 +163,7 @@ export default function DiscoverPage() {
         <p className="font-subtitle">Take a look at what our courses offer!</p>
       </div>
 
-      {(courses ?? []).length === 0 ? (
-        <div className="flex h-64 w-full items-center justify-center text-slate-500">
-          <div className="text-center">
-            <p className="text-lg font-semibold">No courses available</p>
-            <p className="text-sm">Check back later for new content!</p>
-          </div>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {(courses ?? []).map((course) => (
-            <CourseCard
-              key={course.id}
-              id={course.id}
-              title={course.title}
-              description={course.description ?? null}
-              createdAt={course.createdAt}
-            />
-          ))}
-        </div>
-      )}
+      {renderContent()}
     </div>
   );
 }
