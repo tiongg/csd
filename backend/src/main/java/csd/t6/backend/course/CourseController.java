@@ -86,8 +86,9 @@ public class CourseController {
   @Operation(summary = "Get upload URL", description = "Generates a presigned URL for uploading course materials. Only team members can get upload URLs.")
   public PresignedUrlResponse getUploadUrl(@PathVariable UUID id, @RequestParam String filename,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
-    String uploadUrl = courseService.generateCourseMaterialUploadUrl(id, filename, userDetails.getId());
-    String key = String.format("course-materials/%s/%s", id, filename);
-    return new PresignedUrlResponse(uploadUrl, key);
+    // TODO: Replace filename with determined key to prevent malicious users from
+    // uploading files with arbitrary names. This is a temporary solution to allow
+    // users to upload files with their original names.
+    return courseService.generateCourseMaterialUploadUrl(id, filename, userDetails.getId());
   }
 }

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
+import csd.t6.backend.course.dto.response.PresignedUrlResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.team.TeamService;
 import csd.t6.backend.utils.FileService;
@@ -88,7 +89,7 @@ public class CourseService {
     courseRepository.delete(id);
   }
 
-  public String generateCourseMaterialUploadUrl(UUID courseId, String filename, UUID requesterId) {
+  public PresignedUrlResponse generateCourseMaterialUploadUrl(UUID courseId, String filename, UUID requesterId) {
     CourseRecord course = courseRepository.findById(courseId)
         .orElseThrow(() -> new BadRequestException("Course not found"));
 
@@ -97,6 +98,6 @@ public class CourseService {
     }
 
     String key = String.format("course-materials/%s/%s", courseId, filename);
-    return fileService.generatePresignedUploadUrl(key);
+    return new PresignedUrlResponse(fileService.generatePresignedUploadUrl(key), key);
   }
 }
