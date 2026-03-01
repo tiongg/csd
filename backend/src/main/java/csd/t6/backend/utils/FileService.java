@@ -46,7 +46,7 @@ public class FileService {
    */
   public String generatePresignedUploadUrl(String key, Duration expiration) {
     PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(key).build();
-    PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder().signatureDuration(Duration.ofMinutes(10))
+    PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder().signatureDuration(expiration)
         .putObjectRequest(putObjectRequest).build();
     PresignedPutObjectRequest presignedRequest = this.s3Presigner.presignPutObject(presignRequest);
 
@@ -73,7 +73,7 @@ public class FileService {
   public String generatePresignedDownloadUrl(String key, Duration expiration) {
     GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(bucketName).key(key).build();
 
-    GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder().signatureDuration(Duration.ofMinutes(10))
+    GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder().signatureDuration(expiration)
         .getObjectRequest(getObjectRequest).build();
 
     PresignedGetObjectRequest presignedRequest = this.s3Presigner.presignGetObject(presignRequest);
