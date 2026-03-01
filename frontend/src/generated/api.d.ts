@@ -280,6 +280,26 @@ export interface paths {
         patch: operations["updateAccount"];
         trace?: never;
     };
+    "/api/account/{accountId}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update role of any user account
+         * @description Allows admins to update the role of any user account by specifying the target account ID. The requestor ID is the account ID of the admin making the request.
+         */
+        patch: operations["updateAnyAccountRole"];
+        trace?: never;
+    };
     "/api/teams/{teamId}/courses": {
         parameters: {
             query?: never;
@@ -312,6 +332,22 @@ export interface paths {
          * @description Returns user's role in team
          */
         get: operations["checkMembership"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["healthCheck"];
         put?: never;
         post?: never;
         delete?: never;
@@ -528,6 +564,10 @@ export interface components {
             email: string;
             username: string;
             password: string;
+        };
+        AccountRoleUpdateRequest: {
+            /** @enum {string} */
+            role: "LEARNER" | "CONTRIBUTOR" | "ADMIN";
         };
         AccountUpdateRequest: {
             username?: string;
@@ -1216,6 +1256,41 @@ export interface operations {
             };
         };
     };
+    updateAnyAccountRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountRoleUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Account"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
     getTeamCourses: {
         parameters: {
             query?: never;
@@ -1265,6 +1340,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CheckMembershipResponse"];
+                };
+            };
+        };
+    };
+    healthCheck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
                 };
             };
         };

@@ -30,7 +30,7 @@ export default function TeamsList() {
         {isLoading ? (
           <p>Loading...</p>
         ) : (
-          (teams ?? []).map((team, i) => <TeamCard team={team} key={team.id} />)
+          (teams ?? []).map((team) => <TeamCard team={team} key={team.id} />)
         )}
       </div>
 
@@ -46,18 +46,20 @@ type TeamCardProps = {
   team: Team;
 };
 
-function TeamCard({ team: { name, members, id } }: TeamCardProps) {
+function TeamCard({ team }: TeamCardProps) {
   const navigate = useNavigate();
+
+  const collaboratorCount = team.members.length;
 
   return (
     <CardWithDetails
-      title={name}
-      descriptor="Collaborators"
-      data={members.length.toString()}
+      title={team.name}
+      descriptor={`${collaboratorCount} Collaborators`}
+      data="View courses →"
       onClick={() => {
         navigate({
           to: '/contributor/$teamId/courses',
-          params: { teamId: id },
+          params: { teamId: team.id },
         });
       }}
     />

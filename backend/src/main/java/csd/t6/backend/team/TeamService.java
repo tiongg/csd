@@ -16,6 +16,7 @@ import csd.t6.backend.team.dto.request.TeamCreateRequest;
 import csd.t6.backend.team.dto.request.TeamUpdateRequest;
 import csd.t6.backend.team.dto.response.TeamMemberResponse;
 import csd.t6.backend.team.dto.response.TeamResponse;
+import csd.t6.jooq.accounts.enums.Roles;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.public_.enums.TeamRole;
 import csd.t6.jooq.public_.tables.records.TeamMemberRecord;
@@ -110,6 +111,11 @@ public class TeamService {
 
     AccountRecord accountRecord = accountRepository.findOneBy(ACCOUNT.USERNAME, request.username())
         .orElseThrow(() -> new BadRequestException("User not found"));
+
+    // Validate that only Contributors and Admins can be added to teams
+    if (accountRecord.getUserRole() == Roles.LEARNER) {
+      throw new BadRequestException("Only Contributors and Admins can be added to a team");
+    }
 
     if (teamMemberRepository.findByTeamAndAccount(teamId, accountRecord.getId()).isPresent()) {
       throw new BadRequestException("User is already a member of this team");

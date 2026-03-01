@@ -3,7 +3,9 @@ package csd.t6.backend.account;
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.auth.oauth.OAuth2ProviderRepository;
 import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.backend.exceptions.ForbiddenException;
 import csd.t6.jooq.accounts.enums.OauthProvider;
+import csd.t6.jooq.accounts.enums.Roles;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.accounts.tables.records.OauthConnectionRecord;
 import org.junit.jupiter.api.*;
@@ -213,5 +215,75 @@ class AccountServiceTest {
 
         assertThat(result).isNotNull();
         verify(accountRepository, never()).insert(anyString(), anyString(), isNull(), anyString());
+    }
+
+    // --- updateAccountRole (admin override) ---
+
+    @Test
+    @DisplayName("Should update account role successfully when requestor is admin")
+    void shouldUpdateAccountRoleSuccessfully() {
+        UUID requestorId = UUID.randomUUID();
+        UUID targetId = UUID.randomUUID();
+
+        AccountRecord requestorAccount = mock(AccountRecord.class);
+        when(requestorAccount.getUserRole()).thenReturn(Roles.ADMIN);
+
+        AccountRecord targetAccount = mock(AccountRecord.class);
+
+        when(accountRepository.findOneBy(ACCOUNT.ID, requestorId)).thenReturn(Optional.of(requestorAccount));
+        when(accountRepository.findOneBy(ACCOUNT.ID, targetId)).thenReturn(Optional.of(targetAccount));
+        when(accountRepository.save(targetAccount)).thenReturn(targetAccount);
+
+        AccountRecord result = accountService.updateAccountRole(targetId, Roles.CONTRIBUTOR, requestorId);
+
+        assertThat(result).isNotNull();
+        verify(targetAccount).setUserRole(Roles.CONTRIBUTOR);
+        verify(accountRepository).save(targetAccount);
+    }
+
+    @Test
+    @DisplayName("Should throw when requestor account not found")
+    void shouldThrowWhenRequestorNotFound() {
+        UUID requestorId = UUID.randomUUID();
+        UUID targetId = UUID.randomUUID();
+
+        when(accountRepository.findOneBy(ACCOUNT.ID, requestorId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> accountService.updateAccountRole(targetId, Roles.CONTRIBUTOR, requestorId))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("Admin account not found");
+    }
+
+    @Test
+    @DisplayName("Should throw ForbiddenException when requestor is not an admin")
+    void shouldThrowWhenRequestorIsNotAdmin() {
+        UUID requestorId = UUID.randomUUID();
+        UUID targetId = UUID.randomUUID();
+
+        AccountRecord nonAdminAccount = mock(AccountRecord.class);
+        when(nonAdminAccount.getUserRole()).thenReturn(Roles.LEARNER);
+
+        when(accountRepository.findOneBy(ACCOUNT.ID, requestorId)).thenReturn(Optional.of(nonAdminAccount));
+
+        assertThatThrownBy(() -> accountService.updateAccountRole(targetId, Roles.CONTRIBUTOR, requestorId))
+            .isInstanceOf(ForbiddenException.class)
+            .hasMessageContaining("Only admins can update user roles");
+    }
+
+    @Test
+    @DisplayName("Should throw when target account not found")
+    void shouldThrowWhenTargetAccountNotFound() {
+        UUID requestorId = UUID.randomUUID();
+        UUID targetId = UUID.randomUUID();
+
+        AccountRecord adminAccount = mock(AccountRecord.class);
+        when(adminAccount.getUserRole()).thenReturn(Roles.ADMIN);
+
+        when(accountRepository.findOneBy(ACCOUNT.ID, requestorId)).thenReturn(Optional.of(adminAccount));
+        when(accountRepository.findOneBy(ACCOUNT.ID, targetId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> accountService.updateAccountRole(targetId, Roles.CONTRIBUTOR, requestorId))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("Account does not exist");
     }
 }

@@ -7,6 +7,7 @@ import csd.t6.backend.team.dto.request.TeamCreateRequest;
 import csd.t6.backend.team.dto.request.TeamUpdateRequest;
 import csd.t6.backend.team.dto.response.TeamMemberResponse;
 import csd.t6.backend.team.dto.response.TeamResponse;
+import csd.t6.jooq.accounts.enums.Roles;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.public_.enums.TeamRole;
 import csd.t6.jooq.public_.tables.records.TeamMemberRecord;
@@ -22,7 +23,6 @@ import java.util.UUID;
 
 import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -180,12 +180,14 @@ class TeamServiceTest {
     // --- addMember ---
 
     @Test
-    @DisplayName("Should add member to team")
+    @DisplayName("Should add contributor member to team successfully")
     void shouldAddMember() {
         AccountRecord newMemberAccount = mock(AccountRecord.class);
         when(newMemberAccount.getId()).thenReturn(memberId);
         when(newMemberAccount.getUsername()).thenReturn("newmember");
         when(newMemberAccount.getEmail()).thenReturn("new@test.com");
+        // Must stub getUserRole() since LEARNER check now runs before duplicate check
+        when(newMemberAccount.getUserRole()).thenReturn(Roles.CONTRIBUTOR);
 
         TeamMemberRecord newMemberRecord = mock(TeamMemberRecord.class);
         when(newMemberRecord.getTeamRole()).thenReturn(TeamRole.MEMBER);
@@ -203,10 +205,25 @@ class TeamServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw when adding a LEARNER to a team")
+    void shouldThrowWhenAddingLearner() {
+        AccountRecord learnerAccount = mock(AccountRecord.class);
+        when(learnerAccount.getUserRole()).thenReturn(Roles.LEARNER);
+
+        when(teamMemberRepository.findByTeamAndAccount(teamId, ownerId)).thenReturn(Optional.of(ownerMember));
+        when(accountRepository.findOneBy(ACCOUNT.USERNAME, "learneruser")).thenReturn(Optional.of(learnerAccount));
+
+        assertThatThrownBy(() -> teamService.addMember(teamId, new AddMemberRequest("learneruser"), ownerId))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("Only Contributors and Admins can be added to a team");
+    }
+
+    @Test
     @DisplayName("Should throw when adding already existing member")
     void shouldThrowWhenAddingExistingMember() {
         AccountRecord existingMember = mock(AccountRecord.class);
         when(existingMember.getId()).thenReturn(memberId);
+        when(existingMember.getUserRole()).thenReturn(Roles.CONTRIBUTOR);
 
         when(teamMemberRepository.findByTeamAndAccount(teamId, ownerId)).thenReturn(Optional.of(ownerMember));
         when(accountRepository.findOneBy(ACCOUNT.USERNAME, "existing")).thenReturn(Optional.of(existingMember));

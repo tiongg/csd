@@ -15,10 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.request.AccountCreateRequest;
+import csd.t6.backend.account.dto.request.AccountRoleUpdateRequest;
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.account.dto.response.AccountResponse;
 import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.decorators.auth.PublicDecorator;
+import csd.t6.backend.exceptions.ForbiddenException;
+import csd.t6.jooq.accounts.enums.Roles;
+import io.swagger.v3.oas.annotations.Operation;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -64,5 +68,21 @@ public class AccountController {
   public AccountResponse updateAccount(@AuthenticationPrincipal AuthUserDetails user,
       @RequestBody @Valid AccountUpdateRequest updateDTO) {
     return new AccountResponse(accountService.updateAccount(user.getAccount().getId(), updateDTO));
+  }
+
+  @PatchMapping("/{accountId}/role")
+  @BadRequestResponse()
+  @OkResponse()
+  @Operation(summary = "Update role of any user account", description = "Allows admins to update the role of any user account by specifying the target account ID. The requestor ID is the account ID of the admin making the request.")
+  public AccountResponse updateAnyAccountRole(@PathVariable String accountId,
+      @RequestBody @Valid AccountRoleUpdateRequest roleUpdateDTO,
+      @AuthenticationPrincipal AuthUserDetails requesterDetails) {
+    // Only admins can update roles
+    if (requesterDetails.getAccount().getUserRole() != Roles.ADMIN) {
+if (requesterDetails.getAccount().getUserRole() != Roles.ADMIN) {
+  throw new ForbiddenException("Only admins can update user roles");
+}    }
+
+    return new AccountResponse(accountService.updateAccountRole(UUID.fromString(accountId), roleUpdateDTO.role(), requesterDetails.getAccount().getId()));
   }
 }
