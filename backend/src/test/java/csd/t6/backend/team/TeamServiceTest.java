@@ -208,7 +208,6 @@ class TeamServiceTest {
     @DisplayName("Should throw when adding a LEARNER to a team")
     void shouldThrowWhenAddingLearner() {
         AccountRecord learnerAccount = mock(AccountRecord.class);
-        when(learnerAccount.getId()).thenReturn(memberId);
         when(learnerAccount.getUserRole()).thenReturn(Roles.LEARNER);
 
         when(teamMemberRepository.findByTeamAndAccount(teamId, ownerId)).thenReturn(Optional.of(ownerMember));
