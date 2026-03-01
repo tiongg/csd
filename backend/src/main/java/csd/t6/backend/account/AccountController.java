@@ -20,7 +20,7 @@ import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.account.dto.response.AccountResponse;
 import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.decorators.auth.PublicDecorator;
-import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.backend.exceptions.ForbiddenException;
 import csd.t6.jooq.accounts.enums.Roles;
 import io.swagger.v3.oas.annotations.Operation;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
@@ -79,8 +79,9 @@ public class AccountController {
       @AuthenticationPrincipal AuthUserDetails requesterDetails) {
     // Only admins can update roles
     if (requesterDetails.getAccount().getUserRole() != Roles.ADMIN) {
-      throw new BadRequestException("Only admins can update user roles");
-    }
+if (requesterDetails.getAccount().getUserRole() != Roles.ADMIN) {
+  throw new ForbiddenException("Only admins can update user roles");
+}    }
 
     return new AccountResponse(accountService.updateAccountRole(UUID.fromString(accountId), roleUpdateDTO.role(), requesterDetails.getAccount().getId()));
   }

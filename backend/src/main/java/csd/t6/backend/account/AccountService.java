@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.auth.oauth.OAuth2ProviderRepository;
 import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.backend.exceptions.ForbiddenException;
 import csd.t6.jooq.accounts.enums.OauthProvider;
 import csd.t6.jooq.accounts.enums.Roles;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
@@ -81,16 +82,23 @@ public class AccountService {
   }
 
   /**
-   * Allow admins to update role of any user by specifying target account ID
-   * @param id The ID of the account whose role is being updated
-   * @param role The new role to assign
+   * Allow admins to update role of any user by specifying target account ID.
+   * Enforces that the requestor is an ADMIN at the service layer, independent
+   * of any controller-level checks.
+   *
+   * @param id          The ID of the account whose role is being updated
+   * @param role        The new role to assign
    * @param requestorId The ID of the user making the request
    * @return The updated account record
    */
   public AccountRecord updateAccountRole(UUID id, Roles role, UUID requestorId) {
-    // Verify the admin making the request
+    // Verify the requestor exists and is an ADMIN
     AccountRecord requestorAccount = this.accountRepository.findOneBy(ACCOUNT.ID, requestorId)
         .orElseThrow(() -> new BadRequestException("Admin account not found"));
+
+    if (requestorAccount.getUserRole() != Roles.ADMIN) {
+      throw new ForbiddenException("Only admins can update user roles");
+    }
 
     // Verify the target account exists
     AccountRecord existingAccount = this.accountRepository.findOneBy(ACCOUNT.ID, id)
@@ -101,8 +109,8 @@ public class AccountService {
   }
 
   /**
-   * Original method for backward compatibility
-   * Allows updating role only for account being modified
+   * Original method for backward compatibility.
+   * Allows updating role only for account being modified.
    */
   public AccountRecord updateAccountRole(UUID id, Roles role) {
     AccountRecord existingAccount = this.accountRepository.findOneBy(ACCOUNT.ID, id)

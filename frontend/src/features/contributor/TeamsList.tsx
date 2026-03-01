@@ -48,18 +48,14 @@ type TeamCardProps = {
 
 function TeamCard({ team }: TeamCardProps) {
   const navigate = useNavigate();
-  const { data: courses } = useApiQuery('get', '/api/teams/{teamId}/courses', {
-    params: { path: { teamId: team.id } },
-  });
 
   const collaboratorCount = team.members.length;
-  const courseCount = courses?.length ?? 0;
 
   return (
     <CardWithDetails
       title={team.name}
       descriptor={`${collaboratorCount} Collaborators`}
-      data={`${courseCount} Courses`}
+      data="View courses →"
       onClick={() => {
         navigate({
           to: '/contributor/$teamId/courses',
