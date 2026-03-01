@@ -58,7 +58,7 @@ export default function EditorCourseDisplay({
   function handlePublish() {
     publishCourse({
       params: { path: { id: course.id } },
-      body: { isPublished: true },
+      body: {},
     });
   }
 
