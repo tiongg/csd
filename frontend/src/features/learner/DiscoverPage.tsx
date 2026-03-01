@@ -105,7 +105,7 @@ function CourseCard({ id, title, description }: CourseCardProps) {
       description={description ?? 'No description'}
       onClick={handleClick}
     >
-      <ReelPlayer src="/skibidi_toilet.mp4" />
+      <ReelPlayer src="/course-preview-placeholder.mp4" />
     </ReelOverlay>
   );
 }
