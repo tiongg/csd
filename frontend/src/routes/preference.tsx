@@ -1,4 +1,3 @@
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/preference')({
@@ -6,12 +5,9 @@ export const Route = createFileRoute('/preference')({
 });
 
 function RouteComponent() {
-  <>
-    <div>Test</div>
-    <PageWithSideBar>
-      <div className="flex h-full w-full items-center justify-center">
-        Preferences page!
-      </div>
-    </PageWithSideBar>
-  </>;
+  return (
+    <div className="flex flex-1 w-full items-center justify-center">
+      <p>Preferences page </p>
+    </div>
+  );
 }
