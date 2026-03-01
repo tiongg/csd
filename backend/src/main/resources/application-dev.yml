@@ -16,7 +16,7 @@ spring:
           bucket: csd-data
           access-key: minioadmin
           secret-key: minioadmin
-          endpoint: http://minio:9000
+          endpoint: http://localhost:9000
           path-style-access: true
 
 jwt:

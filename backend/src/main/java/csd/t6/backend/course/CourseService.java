@@ -14,16 +14,19 @@ import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.team.TeamService;
+import csd.t6.backend.utils.FileService;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Service
 public class CourseService {
   private final CourseRepository courseRepository;
   private final TeamService teamService;
+  private final FileService fileService;
 
-  public CourseService(CourseRepository courseRepository, TeamService teamService) {
+  public CourseService(CourseRepository courseRepository, TeamService teamService, FileService fileService) {
     this.courseRepository = courseRepository;
     this.teamService = teamService;
+    this.fileService = fileService;
   }
 
   @Transactional
@@ -83,5 +86,17 @@ public class CourseService {
     }
 
     courseRepository.delete(id);
+  }
+
+  public String generateCourseMaterialUploadUrl(UUID courseId, String filename, UUID requesterId) {
+    CourseRecord course = courseRepository.findById(courseId)
+        .orElseThrow(() -> new BadRequestException("Course not found"));
+
+    if (!teamService.isTeamMember(course.getTeamId(), requesterId)) {
+      throw new BadRequestException("You must be a member of the team to upload course materials");
+    }
+
+    String key = String.format("course-materials/%s/%s", courseId, filename);
+    return fileService.generatePresignedUploadUrl(key);
   }
 }
