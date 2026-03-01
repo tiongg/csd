@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PreferenceRouteImport } from './routes/preference'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
@@ -37,6 +38,11 @@ import { Route as AuthenticatedLearnerCoursesCourseIdRouteImport } from './route
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PreferenceRoute = PreferenceRouteImport.update({
+  id: '/preference',
+  path: '/preference',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -172,6 +178,7 @@ const AuthenticatedLearnerCoursesCourseIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/preference': typeof PreferenceRoute
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -197,6 +204,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/preference': typeof PreferenceRoute
   '/register': typeof RegisterRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/preference': typeof PreferenceRoute
   '/register': typeof RegisterRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/login/callback': typeof LoginCallbackRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/preference'
     | '/register'
     | '/profile'
     | '/login/callback'
@@ -276,6 +286,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/preference'
     | '/register'
     | '/profile'
     | '/login/callback'
@@ -302,6 +313,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/preference'
     | '/register'
     | '/_authenticated/profile'
     | '/login/callback'
@@ -329,6 +341,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  PreferenceRoute: typeof PreferenceRoute
   RegisterRoute: typeof RegisterRoute
   LoginCallbackRoute: typeof LoginCallbackRoute
   LoginIndexRoute: typeof LoginIndexRoute
@@ -343,6 +356,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/preference': {
+      id: '/preference'
+      path: '/preference'
+      fullPath: '/preference'
+      preLoaderRoute: typeof PreferenceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -559,6 +579,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  PreferenceRoute: PreferenceRoute,
   RegisterRoute: RegisterRoute,
   LoginCallbackRoute: LoginCallbackRoute,
   LoginIndexRoute: LoginIndexRoute,

@@ -20,6 +20,7 @@ export type Account = components['schemas']['Account'];
 export type AuthContextType = {
   user: Account | undefined;
   isLoggedIn: boolean;
+  preferences: string[] | undefined;
   loginWithPassword: (
     usernameOrEmail: string,
     password: string,
@@ -94,12 +95,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     },
   );
 
-  useEffect(() => {
-    if (user?.preferences.length === 0) {
-      console.log('No preferences');
-    }
-  }, [user]);
-
   function clearAuthData() {
     setAccessToken('');
     queryClient.removeQueries({
@@ -160,6 +155,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         loginWithPassword,
         logout: () => logoutCall({}),
         isLoggedIn: !!user || (isLoggingIn && !!accessToken),
+        preferences: user?.preferences,
       }}
     >
       {children}
