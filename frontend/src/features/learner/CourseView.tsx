@@ -12,7 +12,7 @@ type CourseViewProps = {
 export default function CourseView({ course }: CourseViewProps) {
   return (
     <div
-      data-course-id={courseId}
+      data-course-id={course.id}
       className="flex h-full w-full flex-col gap-6 overflow-y-auto p-8"
     >
       {/* Course Header */}
