@@ -94,6 +94,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     },
   );
 
+  useEffect(() => {
+    if (user?.preferences.length === 0) {
+      console.log('No preferences');
+    }
+  }, [user]);
+
   function clearAuthData() {
     setAccessToken('');
     queryClient.removeQueries({
@@ -150,7 +156,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   return (
     <AuthContext.Provider
       value={{
-        user,
+        user: user?.account,
         loginWithPassword,
         logout: () => logoutCall({}),
         isLoggedIn: !!user || (isLoggingIn && !!accessToken),

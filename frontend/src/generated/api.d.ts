@@ -601,6 +601,10 @@ export interface components {
             url: string;
             key: string;
         };
+        SelfResponse: {
+            account: components["schemas"]["Account"];
+            preferences: string[];
+        };
     };
     responses: never;
     parameters: never;
@@ -1436,7 +1440,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Account"];
+                    "*/*": components["schemas"]["SelfResponse"];
                 };
             };
             /** @description Bad request */
