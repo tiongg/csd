@@ -22,15 +22,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-      minio:
-        image: lazybit/minio
-        env:
-          MINIO_ROOT_USER: minioadmin
-          MINIO_ROOT_PASSWORD: minioadmin
-        ports:
-          - 9000:9000
-        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -48,16 +39,6 @@ jobs:
             -password=password \
             -locations="filesystem:./backend/src/main/resources/db/migration" \
             -outOfOrder=true
-
-      - name: Install MinIO Client
-        run: |
-          curl https://dl.min.io/client/mc/release/linux-amd64/mc --output /usr/local/bin/mc
-          chmod +x /usr/local/bin/mc
-
-      - name: Setup MinIO bucket
-        run: |
-          ./mc alias set minio http://minio:9000 minioadmin minioadmin
-          ./mc mb --ignore-existing minio/csd-data
 
       - name: Run tests
         run: mvn verify -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password

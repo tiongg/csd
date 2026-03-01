@@ -1,33 +1,47 @@
 package csd.t6.backend.course;
 
-import csd.t6.backend.course.dto.request.CourseCreateRequest;
-import csd.t6.backend.course.dto.request.CourseUpdateRequest;
-import csd.t6.backend.course.dto.response.CourseResponse;
-import csd.t6.backend.exceptions.BadRequestException;
-import csd.t6.backend.team.TeamService;
-import csd.t6.jooq.public_.tables.records.CourseRecord;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import csd.t6.backend.course.dto.request.CourseCreateRequest;
+import csd.t6.backend.course.dto.request.CourseUpdateRequest;
+import csd.t6.backend.course.dto.response.CourseResponse;
+import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.backend.team.TeamService;
+import csd.t6.backend.utils.FileService;
+import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @ExtendWith(MockitoExtension.class)
 class CourseServiceTest {
-
     @Mock
     private CourseRepository courseRepository;
 
     @Mock
     private TeamService teamService;
+
+    @Mock
+    private FileService fileService;
 
     @InjectMocks
     private CourseService courseService;
@@ -61,8 +75,8 @@ class CourseServiceTest {
         when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
         when(courseRepository.create("Test Course", "Desc", creatorId, teamId)).thenReturn(mockCourse);
 
-        CourseResponse result = courseService.createCourse(
-            new CourseCreateRequest("Test Course", "Desc", teamId), creatorId);
+        CourseResponse result = courseService.createCourse(new CourseCreateRequest("Test Course", "Desc", teamId),
+                creatorId);
 
         assertThat(result).isNotNull();
         assertThat(result.title()).isEqualTo("Test Course");
@@ -73,10 +87,9 @@ class CourseServiceTest {
     void shouldThrowWhenCreatorNotTeamMember() {
         when(teamService.isTeamMember(teamId, creatorId)).thenReturn(false);
 
-        assertThatThrownBy(() ->
-            courseService.createCourse(new CourseCreateRequest("Title", "Desc", teamId), creatorId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("member of the team");
+        assertThatThrownBy(
+                () -> courseService.createCourse(new CourseCreateRequest("Title", "Desc", teamId), creatorId))
+                        .isInstanceOf(BadRequestException.class).hasMessageContaining("member of the team");
     }
 
     // --- getCourseById ---
@@ -97,9 +110,8 @@ class CourseServiceTest {
     void shouldThrowWhenCourseNotFound() {
         when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> courseService.getCourseById(courseId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Course not found");
+        assertThatThrownBy(() -> courseService.getCourseById(courseId)).isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Course not found");
     }
 
     // --- getAllCourses ---
@@ -121,11 +133,10 @@ class CourseServiceTest {
     void shouldUpdateCourseAsCreator() {
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
         when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
-        when(courseRepository.update(eq(courseId), anyString(), isNull(), eq(teamId), isNull()))
-            .thenReturn(mockCourse);
+        when(courseRepository.update(eq(courseId), anyString(), isNull(), eq(teamId), isNull())).thenReturn(mockCourse);
 
-        CourseResponse result = courseService.updateCourse(courseId,
-            new CourseUpdateRequest("New Title", null, null), creatorId);
+        CourseResponse result = courseService.updateCourse(courseId, new CourseUpdateRequest("New Title", null, null),
+                creatorId);
 
         assertThat(result).isNotNull();
     }
@@ -137,9 +148,9 @@ class CourseServiceTest {
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
         when(teamService.isTeamMember(teamId, otherId)).thenReturn(false);
 
-        assertThatThrownBy(() ->
-            courseService.updateCourse(courseId, new CourseUpdateRequest("Title", null, null), otherId))
-            .isInstanceOf(BadRequestException.class);
+        assertThatThrownBy(
+                () -> courseService.updateCourse(courseId, new CourseUpdateRequest("Title", null, null), otherId))
+                        .isInstanceOf(BadRequestException.class);
     }
 
     // --- deleteCourse ---
@@ -160,7 +171,6 @@ class CourseServiceTest {
         when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
 
         assertThatThrownBy(() -> courseService.deleteCourse(courseId, nonCreatorId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Only course creator");
+                .isInstanceOf(BadRequestException.class).hasMessageContaining("Only course creator");
     }
 }
