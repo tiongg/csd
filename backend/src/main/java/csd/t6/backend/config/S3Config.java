@@ -27,6 +27,9 @@ public class S3Config {
   @Value("${spring.cloud.config.server.awss3.region}")
   private String region;
 
+  @Value("${spring.cloud.config.server.awss3.path-style-access:true}")
+  private boolean pathStyleAccess;
+
   @Bean
   S3Client s3Client() {
     AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
@@ -34,7 +37,7 @@ public class S3Config {
 
     return S3Client.builder().endpointOverride(URI.create(endpoint))
         .credentialsProvider(StaticCredentialsProvider.create(credentials)).region(awsRegion)
-        .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build()).build();
+        .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(pathStyleAccess).build()).build();
   }
 
   @Bean
@@ -44,6 +47,6 @@ public class S3Config {
 
     return S3Presigner.builder().endpointOverride(URI.create(endpoint))
         .credentialsProvider(StaticCredentialsProvider.create(credentials)).region(awsRegion)
-        .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(true).build()).build();
+        .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(pathStyleAccess).build()).build();
   }
 }
