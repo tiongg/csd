@@ -56,8 +56,8 @@ jobs:
 
       - name: Setup MinIO bucket
         run: |
-          mc alias set local http://minio:9000 minioadmin minioadmin
-          mb local/csd-data
+          ./mc alias set minio http://minio:9000 minioadmin minioadmin
+          ./mc mb --ignore-existing minio/csd-data
 
       - name: Run tests
         run: mvn verify -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
