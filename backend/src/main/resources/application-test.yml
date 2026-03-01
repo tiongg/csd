@@ -15,6 +15,17 @@ spring:
     restart:
       enabled: false
 
+  cloud:
+    config:
+      server:
+        awss3:
+          region: us-east-1
+          bucket: csd-data
+          access-key: minioadmin
+          secret-key: minioadmin
+          endpoint: http://minio:9000
+          path-style-access: true
+
 jwt:
   secret: shikanokonokonokokoshitantanshikanokonokonokokoshitantanshikanokonokonokokoshitantan
   # In hours
