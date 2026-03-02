@@ -42,11 +42,10 @@ function RouteComponent() {
       }
     });
   }
-  console.log(currentSelection);
 
   return (
-    <div className="m-auto flex w-full max-w-3xl flex-1 flex-col p-8">
-      <div className="rounded-2xl border bg-white p-8 shadow-sm">
+    <div className="m-auto flex w-full flex-1 flex-col p-8">
+      <div className="rounded-2xl border bg-white p-8">
         <div className="mb-6">
           <p className="text-sm text-slate-500">Welcome {user?.realname},</p>
           <p className="mt-2 text-2xl font-semibold text-slate-900">
@@ -57,8 +56,7 @@ function RouteComponent() {
           </p>
         </div>
 
-        {/* <div className="flex flex-wrap gap-4 gap-x-2"> */}
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-4 md:gap-3">
           {allPreferences.map((preference) => (
             <Button
               variant={currentSelection.has(preference) ? 'default' : 'outline'}
