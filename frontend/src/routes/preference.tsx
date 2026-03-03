@@ -46,7 +46,7 @@ function RouteComponent() {
     });
   }
 
-  const { mutateAsync: createNewPreferenceAsync } = useApiMutation(
+  const { mutateAsync: createNewPreferenceAsync, isPending } = useApiMutation(
     'post',
     '/api/preference/',
     {
@@ -56,7 +56,11 @@ function RouteComponent() {
         await queryClient.invalidateQueries({
           queryKey: apiQueryOptions('get', '/api/auth/me').queryKey,
         });
-        navigate({ to: '/learner/dashboard' });
+
+        // Await it so /me route can be invalidated before navigation
+        setTimeout(() => {
+          navigate({ to: '/learner/dashboard', replace: true });
+        }, 1000);
       },
       onError: () => {
         toast.error('Failed to save preference(s)');
@@ -112,7 +116,7 @@ function RouteComponent() {
           <Button
             variant="default"
             size="lg"
-            disabled={currentSelection.size === 0}
+            disabled={currentSelection.size === 0 || isPending}
             onClick={selectPreferenceForm}
           >
             Save
