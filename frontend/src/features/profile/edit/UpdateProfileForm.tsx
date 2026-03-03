@@ -29,7 +29,6 @@ const updateSchema = z.object({
 type UpdateFormValues = z.infer<typeof updateSchema>;
 
 async function getGravatarUrl(email: string, size = 120) {
-  // SHA-256 hash
   const msgBuffer = new TextEncoder().encode(email.trim().toLowerCase());
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -53,7 +52,20 @@ export default function UpdateProfileForm() {
     reset,
   } = useForm<UpdateFormValues>({
     resolver: zodResolver(updateSchema),
+    defaultValues: {
+      username: user?.username ?? '',
+      realName: user?.realname ?? '',
+    },
   });
+
+  // Re-populate form if user data loads after mount (e.g. on page refresh)
+  useEffect(() => {
+    if (!user) return;
+    reset({
+      username: user.username ?? '',
+      realName: user.realname ?? '',
+    });
+  }, [user, reset]);
 
   const { mutateAsync: updateAccount } = useApiMutation(
     'patch',
@@ -68,6 +80,7 @@ export default function UpdateProfileForm() {
         queryClient.invalidateQueries({
           queryKey: apiQueryOptions('get', '/api/auth/me').queryKey,
         });
+        toast.success('Profile updated!');
       },
     },
   );
@@ -86,15 +99,11 @@ export default function UpdateProfileForm() {
   );
 
   useEffect(() => {
-    if (!user?.email) {
-      return;
-    }
+    if (!user?.email) return;
     getGravatarUrl(user.email).then((url) => setGravatarUrl(url));
-  }, [user, setGravatarUrl]);
+  }, [user]);
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
   const onSubmit = async (data: UpdateFormValues) => {
     await updateAccount({ body: data });
@@ -128,9 +137,7 @@ export default function UpdateProfileForm() {
             {user.role === 'LEARNER' && (
               <p
                 className="cursor-pointer text-sm underline"
-                onClick={() => {
-                  applyContributor({});
-                }}
+                onClick={() => applyContributor({})}
               >
                 Apply to be contributor
               </p>
@@ -210,7 +217,12 @@ export default function UpdateProfileForm() {
             <Button
               type="button"
               variant="ghost"
-              onClick={() => reset()}
+              onClick={() =>
+                reset({
+                  username: user.username ?? '',
+                  realName: user.realname ?? '',
+                })
+              }
               disabled={isSubmitting}
             >
               Reset
