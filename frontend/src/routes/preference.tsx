@@ -1,7 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { createFileRoute } from '@tanstack/react-router';
+import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
+import { useQueryClient } from '@tanstack/react-query';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/preference')({
   component: RouteComponent,
@@ -32,6 +35,34 @@ function RouteComponent() {
     new Set<preference>(),
   );
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  async function selectPreferenceForm() {
+    const preferences = [...currentSelection];
+    if (preferences.length === 0) return;
+    await createNewPreferenceAsync({
+      body: preferences,
+    });
+  }
+
+  const { mutateAsync: createNewPreferenceAsync } = useApiMutation(
+    'post',
+    '/api/preference/',
+    {
+      onSuccess: async () => {
+        toast.success('Saved Preference(s)');
+        setCurrentSelection(new Set());
+        await queryClient.invalidateQueries({
+          queryKey: apiQueryOptions('get', '/api/auth/me').queryKey,
+        });
+        navigate({ to: '/learner/dashboard' });
+      },
+      onError: () => {
+        toast.error('Failed to save preference(s)');
+      },
+    },
+  );
 
   function toggleSelection(preference: preference) {
     setCurrentSelection((prev) => {
@@ -42,7 +73,6 @@ function RouteComponent() {
       }
     });
   }
-
   return (
     <div className="m-auto flex w-full flex-1 flex-col p-8">
       <div className="rounded-2xl border bg-white p-8">
@@ -73,7 +103,7 @@ function RouteComponent() {
 
         <div className="mt-6 flex items-center justify-between">
           <p className="text-sm text-slate-500">
-            Selected:{' '}
+            Selected:
             <span className="font-medium text-slate-700">
               {currentSelection.size}
             </span>
@@ -83,6 +113,7 @@ function RouteComponent() {
             variant="default"
             size="lg"
             disabled={currentSelection.size === 0}
+            onClick={selectPreferenceForm}
           >
             Save
           </Button>
