@@ -1,24 +1,30 @@
+import Autoplay from 'embla-carousel-autoplay';
 import { useInView } from 'react-intersection-observer';
 import { useEffect, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 import { Heading1, Heading3 } from '@/components/ui/typography';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { useApiQuery } from '@/lib/fetch-client';
-import { useNavigate } from '@tanstack/react-router';
 
 type ReelOverlayProps = PropsWithChildren<{
   course: string;
   description?: string;
 }>;
 
-function ReelOverlay({ course, description, children, onClick }: ReelOverlayProps & { onClick?: () => void }) {
+function ReelOverlay({ course, description, children }: ReelOverlayProps) {
   const { user } = useAuth();
 
   return (
-    <div className="relative h-[calc(100vh-16rem)] w-full border-2 border-slate-300 group cursor-pointer" onClick={onClick}>
+    <div className="relative h-[calc(100vh-16rem)] w-full border-2 border-slate-300">
       <div className="absolute z-10 h-full w-full">
-        <div className="flex flex-col items-center bg-linear-to-b from-slate-500/80 to-transparent py-4">
+        <div className="flex flex-col items-center bg-linear-to-b from-slate-500 to-transparent py-4">
           <Button className="mb-4" size="lg">
             View Course
           </Button>
@@ -82,80 +88,7 @@ function ReelError() {
   );
 }
 
-type CourseCardProps = {
-  id: string;
-  title: string;
-  description: string | null;
-  createdAt: string;
-};
-
-function CourseCard({ id, title, description }: CourseCardProps) {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate({
-      to: '/learner/courses/$courseId',
-      params: { courseId: id },
-    });
-  };
-
-  return (
-    <ReelOverlay
-      course={title}
-      description={description ?? 'No description'}
-      onClick={handleClick}
-    >
-      <ReelPlayer src="/course-preview-placeholder.mp4" />
-    </ReelOverlay>
-  );
-}
-
 export default function DiscoverPage() {
-  const { data: courses, isLoading, isError } = useApiQuery('get', '/api/courses/', {});
-
-  function renderContent() {
-    if (isLoading) {
-      return (
-        <div className="flex h-64 w-full items-center justify-center text-slate-500">
-          <p className="text-sm animate-pulse">Loading courses...</p>
-        </div>
-      );
-    }
-
-    if (isError) {
-      return (
-        <div className="flex h-64 w-full items-center justify-center text-slate-500">
-          <p className="text-sm">Failed to load courses. Please try again later.</p>
-        </div>
-      );
-    }
-
-    if ((courses ?? []).length === 0) {
-      return (
-        <div className="flex h-64 w-full items-center justify-center text-slate-500">
-          <div className="text-center">
-            <p className="text-lg font-semibold">No courses available</p>
-            <p className="text-sm">Check back later for new content!</p>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {(courses ?? []).map((course) => (
-          <CourseCard
-            key={course.id}
-            id={course.id}
-            title={course.title}
-            description={course.description ?? null}
-            createdAt={course.createdAt}
-          />
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="flex h-full w-full flex-col gap-4 p-16">
       <div>
@@ -163,7 +96,33 @@ export default function DiscoverPage() {
         <p className="font-subtitle">Take a look at what our courses offer!</p>
       </div>
 
-      {renderContent()}
+      <Carousel
+        className="h-full w-full"
+        plugins={[
+          Autoplay({
+            delay: 8000,
+            stopOnInteraction: false,
+            stopOnMouseEnter: true,
+          }),
+        ]}
+      >
+        <CarouselContent>
+          <CarouselItem>
+            <ReelOverlay course="skibidi" description="skibidi toilet">
+              <ReelPlayer src="/skibidi_toilet.mp4" />
+            </ReelOverlay>
+          </CarouselItem>
+
+          <CarouselItem>
+            <ReelOverlay course="skibidi" description="skibidi toilet">
+              <ReelPlayer src="/skibidi_toilet.mp4" />
+            </ReelOverlay>
+          </CarouselItem>
+        </CarouselContent>
+
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
     </div>
   );
 }

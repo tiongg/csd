@@ -8,9 +8,14 @@ import { Heading1 } from './ui/typography';
 function CardsByRole() {
   const dir = useActiveRole() ?? 'LEARNER';
 
-  const { data: allUsers } = useApiQuery('get', '/api/account/', {}, {
-    enabled: dir === 'ADMIN',
-  });
+  const { data: allUsers } = useApiQuery(
+    'get',
+    '/api/account/',
+    {},
+    {
+      enabled: dir === 'ADMIN',
+    },
+  );
   const { data: allCourses } = useApiQuery('get', '/api/courses/', {});
 
   const { data: pendingContributors } = useApiQuery(
@@ -106,23 +111,24 @@ function AdminPlaceholder() {
   );
 }
 
+const INFO_CARD_STYLES = {
+  danger: 'text-rose-400 border-rose-400',
+  warning: 'text-amber-500 border-amber-500',
+  default: 'text-slate-800 border-slate-400',
+} as const;
+
 type InfoCardProps = {
   title: string;
   value: string;
-  variant: 'danger' | 'warning' | 'default';
+  variant: keyof typeof INFO_CARD_STYLES;
 };
 
 function InfoCard({ title, value, variant }: InfoCardProps) {
-  const STYLES = {
-    danger: 'text-rose-400 border-rose-400',
-    warning: 'text-amber-500 border-amber-500',
-    default: 'text-slate-800 border-slate-400',
-  };
   return (
     <div
       className={cn(
         'flex w-0 grow flex-col gap-4 rounded-lg border-2 p-8 text-center',
-        STYLES[variant],
+        INFO_CARD_STYLES[variant],
       )}
     >
       <div className="text-lg font-bold">{title}</div>
