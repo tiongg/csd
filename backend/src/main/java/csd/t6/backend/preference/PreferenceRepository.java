@@ -2,7 +2,6 @@ package csd.t6.backend.preference;
 
 import static csd.t6.jooq.accounts.tables.Preference.PREFERENCE;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,18 +23,10 @@ public class PreferenceRepository extends BaseRepository<PreferenceRecord> {
   }
 
   public List<PreferenceRecord> addPreference(UUID accountId, List<String> preference) {
-    List<PreferenceRecord> list = new ArrayList<>();
-    for (String pref : preference) {
-      PreferenceRecord rec = new PreferenceRecord(accountId, pref);
-      list.add(rec);
-    }
-    ;
+    List<PreferenceRecord> list = preference.stream().map(pref -> new PreferenceRecord(accountId, pref)).toList();
+
     this.dsl.batchInsert(list).execute();
 
-    // for (String pref : preference) {
-    // this.dsl.insertInto(PREFERENCE, PREFERENCE.ACCOUNT_ID,
-    // PREFERENCE.TOPIC).values(accountId, pref).execute();
-    // }
     return list;
   }
 }

@@ -2,15 +2,20 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import { useQueryClient } from '@tanstack/react-query';
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/preference')({
   component: RouteComponent,
+  beforeLoad: ({ context }) => {
+    if (!context.auth.isLoggedIn) {
+      throw redirect({ to: '/login' });
+    }
+  },
 });
 
-const allPreferences = [
+const ALL_PREFERENCES = [
   'Trending Memes',
   'Slang Terms',
   'Brainrot Terms',
@@ -28,11 +33,11 @@ const allPreferences = [
   'Fashion Aesthetics',
   'Online Etiquette',
 ] as const;
-type preference = (typeof allPreferences)[number];
+type PreferenceType = (typeof ALL_PREFERENCES)[number];
 
 function RouteComponent() {
   const [currentSelection, setCurrentSelection] = useState(
-    new Set<preference>(),
+    new Set<PreferenceType>(),
   );
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -68,7 +73,7 @@ function RouteComponent() {
     },
   );
 
-  function toggleSelection(preference: preference) {
+  function toggleSelection(preference: PreferenceType) {
     setCurrentSelection((prev) => {
       if (prev.has(preference)) {
         return new Set([...prev].filter((x) => x !== preference));
@@ -77,6 +82,15 @@ function RouteComponent() {
       }
     });
   }
+
+  if (!user) {
+    return (
+      <div className="m-auto flex w-full flex-1 items-center justify-center p-8">
+        <p className="text-xl text-slate-500">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="m-auto flex w-full flex-1 flex-col p-8">
       <div className="rounded-2xl border bg-white p-8">
@@ -91,7 +105,7 @@ function RouteComponent() {
         </div>
 
         <div className="grid grid-cols-1 gap-2 md:grid-cols-4 md:gap-3">
-          {allPreferences.map((preference) => (
+          {ALL_PREFERENCES.map((preference) => (
             <Button
               variant={currentSelection.has(preference) ? 'default' : 'outline'}
               className="transform transition duration-150 active:scale-95"
