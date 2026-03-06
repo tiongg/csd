@@ -3,7 +3,7 @@ import { useAuth } from '@/context/AuthContext';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import { useQueryClient } from '@tanstack/react-query';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/preference')({
@@ -36,10 +36,17 @@ const ALL_PREFERENCES = [
 type PreferenceType = (typeof ALL_PREFERENCES)[number];
 
 function RouteComponent() {
+  const { user, preferences } = useAuth();
   const [currentSelection, setCurrentSelection] = useState(
     new Set<PreferenceType>(),
   );
-  const { user } = useAuth();
+
+  useEffect(() => {
+    setCurrentSelection(
+      new Set<PreferenceType>([...(preferences ?? [])] as PreferenceType[]),
+    );
+  }, [preferences]);
+
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -62,7 +69,7 @@ function RouteComponent() {
           queryKey: apiQueryOptions('get', '/api/auth/me').queryKey,
         });
 
-        // Await it so /me route can be invalidated before navigation
+        // Await it so /me route can be refetched before navigation
         setTimeout(() => {
           navigate({ to: '/learner/dashboard', replace: true });
         }, 1000);
