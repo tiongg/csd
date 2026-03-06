@@ -5,6 +5,9 @@ export const Route = createFileRoute('/_authenticated')({
     if (!context.auth.isLoggedIn) {
       throw redirect({ to: '/login' });
     }
+    if (context.auth.preferences?.length === 0) {
+      throw redirect({ to: '/preference' });
+    }
   },
 
   component: () => <Outlet />,

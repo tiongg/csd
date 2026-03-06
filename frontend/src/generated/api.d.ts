@@ -128,6 +128,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/preference/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createNewPreference"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/courses/": {
         parameters: {
             query?: never;
@@ -601,6 +617,10 @@ export interface components {
             url: string;
             key: string;
         };
+        SelfResponse: {
+            account: components["schemas"]["Account"];
+            preferences: string[];
+        };
     };
     responses: never;
     parameters: never;
@@ -943,6 +963,37 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["Team"];
                 };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    createNewPreference: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Bad request */
             400: {
@@ -1436,7 +1487,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Account"];
+                    "*/*": components["schemas"]["SelfResponse"];
                 };
             };
             /** @description Bad request */

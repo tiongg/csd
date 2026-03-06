@@ -20,6 +20,7 @@ export type Account = components['schemas']['Account'];
 export type AuthContextType = {
   user: Account | undefined;
   isLoggedIn: boolean;
+  preferences: string[] | undefined;
   loginWithPassword: (
     usernameOrEmail: string,
     password: string,
@@ -150,10 +151,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   return (
     <AuthContext.Provider
       value={{
-        user,
+        user: user?.account,
         loginWithPassword,
         logout: () => logoutCall({}),
         isLoggedIn: !!user || (isLoggingIn && !!accessToken),
+        preferences: user?.preferences,
       }}
     >
       {children}
