@@ -372,18 +372,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/courses/{id}/upload-url": {
+    "/api/content-versions/{courseId}/upload-url": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /**
-         * Get upload URL
-         * @description Generates a presigned URL for uploading course materials. Only team members can get upload URLs.
-         */
-        get: operations["getUploadUrl"];
+        get: operations["getMaterialUploadUrl"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1439,14 +1435,14 @@ export interface operations {
             };
         };
     };
-    getUploadUrl: {
+    getMaterialUploadUrl: {
         parameters: {
             query: {
-                filename: string;
+                description: string;
             };
             header?: never;
             path: {
-                id: string;
+                courseId: string;
             };
             cookie?: never;
         };
@@ -1459,15 +1455,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PresignedUrlResponse"];
-                };
-            };
-            /** @description Bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["HttpErrorPayload"];
                 };
             };
         };

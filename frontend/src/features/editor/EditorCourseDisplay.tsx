@@ -8,11 +8,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useContentEditor } from '@/context/ContentEditorContext';
-import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
+import { uploadCourseContent } from '@/lib/file-upload';
 import type { Course } from '@/lib/utils';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { BookOpen, FileText, HelpCircle, Plus, Send } from 'lucide-react';
-import { toast } from 'sonner';
 
 type EditorCourseDisplayProps = {
   course: Course;
@@ -21,46 +20,21 @@ type EditorCourseDisplayProps = {
 export default function EditorCourseDisplay({
   course,
 }: EditorCourseDisplayProps) {
-  const { doc, addSection, setCurrentSection } = useContentEditor();
-  const queryClient = useQueryClient();
+  const { doc, addSection, setCurrentSection, getDocAsJson } =
+    useContentEditor();
+
+  const { mutateAsync: uploadContent, isPending: isPublishing } = useMutation({
+    mutationFn: async (description: string) => {
+      const docContent = await getDocAsJson();
+      return uploadCourseContent(docContent, course.id, description);
+    },
+  });
 
   const sections = doc.getArray('root');
   const sectionCount = sections.length;
   const quizCount = Array.from(sections).filter(
     (s) => s.get('type') === 'quiz',
   ).length;
-
-  const { mutate: publishCourse, isPending: isPublishing } = useApiMutation(
-    'put',
-    '/api/courses/{id}',
-    {
-      onSuccess: () => {
-        toast.success('Course submitted for approval', {
-          description: 'Admins will review and publish your course.',
-        });
-        queryClient.invalidateQueries({
-          queryKey: apiQueryOptions('get', '/api/courses/{id}', {
-            params: { path: { id: course.id } },
-          }).queryKey,
-        });
-        queryClient.invalidateQueries({
-          queryKey: apiQueryOptions('get', '/api/courses/').queryKey,
-        });
-      },
-      onError: (err) => {
-        toast.error('Failed to submit course', {
-          description: (err as any)?.message ?? 'Please try again.',
-        });
-      },
-    },
-  );
-
-  function handlePublish() {
-    publishCourse({
-      params: { path: { id: course.id } },
-      body: {},
-    });
-  }
 
   return (
     <div className="flex h-full flex-col overflow-auto p-6">
@@ -85,9 +59,13 @@ export default function EditorCourseDisplay({
 
                 {!course.isPublished && (
                   <Button
-                    onClick={handlePublish}
-                    disabled={isPublishing || sectionCount === 0}
-                    className="gap-2"
+                    onClick={() =>
+                      uploadContent(
+                        `Content update for course ${course.id} at ${new Date().toISOString()}`,
+                      )
+                    }
+                    disabled={sectionCount === 0}
+                    className="gap-2 transition duration-300 active:scale-95"
                   >
                     <Send className="size-4" />
                     {isPublishing ? 'Submitting…' : 'Submit for Approval'}
@@ -102,7 +80,7 @@ export default function EditorCourseDisplay({
                 )}
 
                 {!course.isPublished && sectionCount === 0 && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Add at least one section before submitting.
                   </p>
                 )}

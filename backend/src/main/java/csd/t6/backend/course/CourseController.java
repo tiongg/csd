@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.auth.AuthUserDetails;
@@ -22,7 +21,6 @@ import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
 import csd.t6.backend.decorators.responses.OkResponse;
-import csd.t6.backend.utils.dto.PresignedUrlResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -78,17 +76,5 @@ public class CourseController {
   @Operation(summary = "Delete course", description = "Deletes a course. Only creator can delete.")
   public void deleteCourse(@PathVariable UUID id, @AuthenticationPrincipal AuthUserDetails userDetails) {
     courseService.deleteCourse(id, userDetails.getId());
-  }
-
-  @GetMapping("/{id}/upload-url")
-  @OkResponse
-  @BadRequestResponse
-  @Operation(summary = "Get upload URL", description = "Generates a presigned URL for uploading course materials. Only team members can get upload URLs.")
-  public PresignedUrlResponse getUploadUrl(@PathVariable UUID id, @RequestParam String filename,
-      @AuthenticationPrincipal AuthUserDetails userDetails) {
-    // TODO: Replace filename with determined key to prevent malicious users from
-    // uploading files with arbitrary names. This is a temporary solution to allow
-    // users to upload files with their original names.
-    return courseService.generateCourseMaterialUploadUrl(id, filename, userDetails.getId());
   }
 }

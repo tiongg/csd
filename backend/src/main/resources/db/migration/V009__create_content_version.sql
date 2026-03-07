@@ -5,6 +5,7 @@ CREATE TABLE content_version (
   course_id UUID NOT NULL,
   version INTEGER NOT NULL,
   description TEXT NOT NULL,
+  status content_status NOT NULL DEFAULT 'PENDING',
   rejected_reason TEXT,
   published_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (course_id) REFERENCES course(id) ON DELETE CASCADE,

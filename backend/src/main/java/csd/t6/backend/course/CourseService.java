@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import csd.t6.backend.approval.ContentVersionService;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.team.TeamService;
 import csd.t6.backend.utils.FileService;
-import csd.t6.backend.utils.dto.PresignedUrlResponse;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Service
@@ -23,11 +23,14 @@ public class CourseService {
   private final CourseRepository courseRepository;
   private final TeamService teamService;
   private final FileService fileService;
+  private final ContentVersionService contentVersionService;
 
-  public CourseService(CourseRepository courseRepository, TeamService teamService, FileService fileService) {
+  public CourseService(CourseRepository courseRepository, TeamService teamService, FileService fileService,
+      ContentVersionService contentVersionService) {
     this.courseRepository = courseRepository;
     this.teamService = teamService;
     this.fileService = fileService;
+    this.contentVersionService = contentVersionService;
   }
 
   @Transactional
@@ -87,17 +90,5 @@ public class CourseService {
     }
 
     courseRepository.delete(id);
-  }
-
-  public PresignedUrlResponse generateCourseMaterialUploadUrl(UUID courseId, String filename, UUID requesterId) {
-    CourseRecord course = courseRepository.findById(courseId)
-        .orElseThrow(() -> new BadRequestException("Course not found"));
-
-    if (!teamService.isTeamMember(course.getTeamId(), requesterId)) {
-      throw new BadRequestException("You must be a member of the team to upload course materials");
-    }
-
-    String key = String.format("course-materials/%s/%s", courseId, filename);
-    return new PresignedUrlResponse(fileService.generatePresignedUploadUrl(key), key);
   }
 }
