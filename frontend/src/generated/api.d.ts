@@ -184,6 +184,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/content-versions/{courseId}/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["getMaterialUploadUrl"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/refresh": {
         parameters: {
             query?: never;
@@ -388,22 +404,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/content-versions/{courseId}/upload-url": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getMaterialUploadUrl"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -585,6 +585,13 @@ export interface components {
             /** Format: uuid */
             teamId: string;
         };
+        UploadCourseRequest: {
+            description: string;
+        };
+        PresignedUrlResponse: {
+            url: string;
+            key: string;
+        };
         Account: {
             /** Format: uuid */
             id: string;
@@ -634,10 +641,6 @@ export interface components {
             /** @enum {string} */
             status: "PENDING" | "APPROVED" | "REJECTED";
             rejectedReason?: string;
-        };
-        PresignedUrlResponse: {
-            url: string;
-            key: string;
         };
         SelfResponse: {
             account: components["schemas"]["Account"];
@@ -1108,6 +1111,32 @@ export interface operations {
             };
         };
     };
+    getMaterialUploadUrl: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadCourseRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PresignedUrlResponse"];
+                };
+            };
+        };
+    };
     refresh: {
         parameters: {
             query?: never;
@@ -1479,30 +1508,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ContentVersionResponse"][];
-                };
-            };
-        };
-    };
-    getMaterialUploadUrl: {
-        parameters: {
-            query: {
-                description: string;
-            };
-            header?: never;
-            path: {
-                courseId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PresignedUrlResponse"];
                 };
             };
         };

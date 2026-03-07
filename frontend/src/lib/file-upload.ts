@@ -1,3 +1,4 @@
+import type { SectionType } from './content.type';
 import { fetchClient } from './fetch-client';
 
 export async function uploadJson(
@@ -18,20 +19,20 @@ export async function uploadJson(
 }
 
 export async function uploadCourseContent(
-  courseContent: any,
+  courseContent: SectionType[],
   courseId: string,
   description: string,
 ) {
-  const { data } = await fetchClient.GET(
+  const { data } = await fetchClient.POST(
     '/api/content-versions/{courseId}/upload-url',
     {
       params: {
         path: {
           courseId,
         },
-        query: {
-          description,
-        },
+      },
+      body: {
+        description,
       },
     },
   );
