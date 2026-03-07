@@ -66,8 +66,6 @@ def generate_video_reel(content):
             f.write(video_bytes)
             
         print("\n---- GENERATED VIDEO REEL ----")
-        print(f"Video successfully saved in: {output_filename}")
-        print("------------------------------")
 
     except Exception as e:
         print(f"\nAn error occurred during video generation: {e}")
