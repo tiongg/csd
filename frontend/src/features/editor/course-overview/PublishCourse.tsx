@@ -110,7 +110,7 @@ export default function PublishCourse({ course }: PublishCourseProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={openDialog}
+              onClick={closeDialog}
               disabled={isPublishing}
             >
               Cancel
