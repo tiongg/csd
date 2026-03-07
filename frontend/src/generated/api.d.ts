@@ -184,6 +184,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/content-versions/{courseId}/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["getMaterialUploadUrl"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/refresh": {
         parameters: {
             query?: never;
@@ -372,18 +388,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/courses/{id}/upload-url": {
+    "/api/content-versions/{courseId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /**
-         * Get upload URL
-         * @description Generates a presigned URL for uploading course materials. Only team members can get upload URLs.
-         */
-        get: operations["getUploadUrl"];
+        get: operations["getContentVersions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -573,6 +585,13 @@ export interface components {
             /** Format: uuid */
             teamId: string;
         };
+        UploadCourseRequest: {
+            description: string;
+        };
+        PresignedUrlResponse: {
+            url: string;
+            key: string;
+        };
         Account: {
             /** Format: uuid */
             id: string;
@@ -613,9 +632,15 @@ export interface components {
             isMember: boolean;
             role: string;
         };
-        PresignedUrlResponse: {
-            url: string;
-            key: string;
+        ContentVersionResponse: {
+            id: string;
+            /** Format: int32 */
+            versionNumber: number;
+            description: string;
+            publishedAt: string;
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "REJECTED";
+            rejectedReason?: string;
         };
         SelfResponse: {
             account: components["schemas"]["Account"];
@@ -1086,6 +1111,32 @@ export interface operations {
             };
         };
     };
+    getMaterialUploadUrl: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UploadCourseRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PresignedUrlResponse"];
+                };
+            };
+        };
+    };
     refresh: {
         parameters: {
             query?: never;
@@ -1439,14 +1490,12 @@ export interface operations {
             };
         };
     };
-    getUploadUrl: {
+    getContentVersions: {
         parameters: {
-            query: {
-                filename: string;
-            };
+            query?: never;
             header?: never;
             path: {
-                id: string;
+                courseId: string;
             };
             cookie?: never;
         };
@@ -1458,16 +1507,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PresignedUrlResponse"];
-                };
-            };
-            /** @description Bad request */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["HttpErrorPayload"];
+                    "*/*": components["schemas"]["ContentVersionResponse"][];
                 };
             };
         };

@@ -11,7 +11,7 @@ import useYArrayLength from '@/hooks/useYArrayLength';
 import type { EditableQuizContent } from '@/lib/content.type';
 import _ from 'lodash';
 import { match } from 'ts-pattern';
-import EditorCourseDisplay from './EditorCourseDisplay';
+import EditorCourseDisplay from './course-overview/EditorCourseDisplay';
 import MarkdownEditor from './MarkdownEditor';
 import QuizSectionEditor from './QuizSectionEditor';
 import SectionSelect from './SectionSelect';
