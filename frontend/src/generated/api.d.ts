@@ -232,6 +232,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admins/contributor-applications/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["batchRejectContributors"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admins/contributor-applications/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["batchApproveContributors"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/account/": {
         parameters: {
             query?: never;
@@ -246,6 +278,26 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["updateAccount"];
+        trace?: never;
+    };
+    "/api/account/{accountId}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update role of any user account
+         * @description Allows admins to update the role of any user account by specifying the target account ID. The requestor ID is the account ID of the admin making the request.
+         */
+        patch: operations["updateAnyAccountRole"];
         trace?: never;
     };
     "/api/teams/{teamId}/courses": {
@@ -288,6 +340,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["healthCheck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{id}/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get upload URL
+         * @description Generates a presigned URL for uploading course materials. Only team members can get upload URLs.
+         */
+        get: operations["getUploadUrl"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -296,6 +384,38 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getSelf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admins/contributor-applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllPendingApplications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/admins/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAllAdmins"];
         put?: never;
         post?: never;
         delete?: never;
@@ -407,8 +527,6 @@ export interface components {
         CourseUpdateRequest: {
             title?: string;
             description?: string;
-            /** Format: uuid */
-            teamId?: string;
             isPublished?: boolean;
         };
         Course: {
@@ -448,21 +566,28 @@ export interface components {
             /** @enum {string} */
             role: "LEARNER" | "CONTRIBUTOR" | "ADMIN";
         };
-        LoginResponseDto: {
+        LoginResponse: {
             accessToken: string;
             account: components["schemas"]["Account"];
         };
-        LoginDto: {
+        LoginRequest: {
             usernameOrEmail: string;
             password: string;
         };
-        ExchangeCodeDto: {
+        ExchangeCodeResponse: {
             code: string;
+        };
+        BatchUpdateApplicationRequest: {
+            learnerUuids: string[];
         };
         AccountCreateRequest: {
             email: string;
             username: string;
             password: string;
+        };
+        AccountRoleUpdateRequest: {
+            /** @enum {string} */
+            role: "LEARNER" | "CONTRIBUTOR" | "ADMIN";
         };
         AccountUpdateRequest: {
             username?: string;
@@ -471,6 +596,10 @@ export interface components {
         CheckMembershipResponse: {
             isMember: boolean;
             role: string;
+        };
+        PresignedUrlResponse: {
+            url: string;
+            key: string;
         };
     };
     responses: never;
@@ -923,7 +1052,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["LoginResponseDto"];
+                    "*/*": components["schemas"]["LoginResponse"];
                 };
             };
             /** @description Bad request */
@@ -964,7 +1093,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LoginDto"];
+                "application/json": components["schemas"]["LoginRequest"];
             };
         };
         responses: {
@@ -974,7 +1103,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["LoginResponseDto"];
+                    "*/*": components["schemas"]["LoginResponse"];
                 };
             };
             /** @description Bad request */
@@ -997,7 +1126,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ExchangeCodeDto"];
+                "application/json": components["schemas"]["ExchangeCodeResponse"];
             };
         };
         responses: {
@@ -1007,7 +1136,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["LoginResponseDto"];
+                    "*/*": components["schemas"]["LoginResponse"];
                 };
             };
             /** @description Bad request */
@@ -1018,6 +1147,50 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["HttpErrorPayload"];
                 };
+            };
+        };
+    };
+    batchRejectContributors: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchUpdateApplicationRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    batchApproveContributors: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BatchUpdateApplicationRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1107,6 +1280,41 @@ export interface operations {
             };
         };
     };
+    updateAnyAccountRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AccountRoleUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Account"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
     getTeamCourses: {
         parameters: {
             query?: never;
@@ -1160,6 +1368,59 @@ export interface operations {
             };
         };
     };
+    healthCheck: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": string;
+                };
+            };
+        };
+    };
+    getUploadUrl: {
+        parameters: {
+            query: {
+                filename: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PresignedUrlResponse"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
     getSelf: {
         parameters: {
             query?: never;
@@ -1185,6 +1446,52 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    getAllPendingApplications: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Account"][];
+                };
+            };
+        };
+    };
+    getAllAdmins: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Account"][];
                 };
             };
         };

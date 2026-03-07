@@ -1,7 +1,7 @@
 import { useContentEditor } from '@/context/ContentEditorContext';
-import { Crepe } from '@milkdown/crepe';
-import { collab, collabServiceCtx } from '@milkdown/plugin-collab';
-import { Milkdown, MilkdownProvider, useEditor } from '@milkdown/react';
+import useCrepeEditor from '@/hooks/useCrepeEditor';
+import { collabServiceCtx } from '@milkdown/plugin-collab';
+import { Milkdown, MilkdownProvider } from '@milkdown/react';
 import { useEffect } from 'react';
 import * as Y from 'yjs';
 
@@ -10,9 +10,7 @@ import '@milkdown/crepe/theme/frame.css';
 import './editor.css';
 
 function MarkdownEditorInternal() {
-  const { get: getEditor } = useEditor((root) => {
-    return new Crepe({ root }).editor.use(collab);
-  });
+  const { get: getEditor } = useCrepeEditor();
   const { doc, provider, currentSection } = useContentEditor();
 
   useEffect(() => {

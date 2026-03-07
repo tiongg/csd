@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import type { Team } from '@/lib/utils';
+import { toast } from 'sonner';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import type { Dispatch, SetStateAction } from 'react';
@@ -41,6 +42,7 @@ export default function CreateCourseDialog({
     formState: { errors, isSubmitting },
     setError,
     control,
+    reset,
   } = useForm<CourseFormValues>({
     resolver: zodResolver(courseSchema),
     defaultValues: {
@@ -54,18 +56,22 @@ export default function CreateCourseDialog({
     '/api/courses/',
     {
       onSuccess: async () => {
-        // Invalidate courses list query to refresh the data
         await queryClient.invalidateQueries({
           queryKey: apiQueryOptions('get', '/api/teams/{teamId}/courses', {
             params: { path: { teamId: team.id } },
           }).queryKey,
         });
+
+        reset();
+
+        toast.success('Course created');
+
         setDialogOpen(false);
       },
       onError: (error: any) => {
         setError('root', {
           type: 'custom',
-          message: error?.message || 'Failed to create course',
+          message: error?.message ?? 'Failed to create course. Please try again.',
         });
       },
     },
@@ -80,13 +86,18 @@ export default function CreateCourseDialog({
           teamId: team.id,
         },
       });
-    } catch (error: any) {
-      // Error handled by onError callback
+    } catch {
+      // Error handled by onError callback above
     }
   }
 
+  function handleOpenChange(open: boolean) {
+    if (!open) reset();
+    setDialogOpen(open);
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={setDialogOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <div className="mb-3">
           <h1 className="text-3xl font-bold">Create New Course</h1>
@@ -148,12 +159,12 @@ export default function CreateCourseDialog({
 
           <div className="flex gap-4">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating...' : 'Create Course'}
+              {isSubmitting ? 'Submitting…' : 'Create Course'}
             </Button>
             <Button
               type="button"
               variant="outline"
-              onClick={() => setDialogOpen(false)}
+              onClick={() => handleOpenChange(false)}
             >
               Cancel
             </Button>

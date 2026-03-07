@@ -1,0 +1,8 @@
+FROM maven:3.9-eclipse-temurin-21
+
+WORKDIR /usr/src/maven
+
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+CMD ["mvn", "test", "-Dspring.profiles.active=test"]

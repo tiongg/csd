@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.course.CourseService;
-import csd.t6.backend.course.dto.CourseResponseDTO;
+import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
 import csd.t6.backend.decorators.responses.OkResponse;
-import csd.t6.backend.team.dto.AddMemberRequest;
-import csd.t6.backend.team.dto.CheckMembershipResponseDTO;
-import csd.t6.backend.team.dto.TeamCreateRequest;
-import csd.t6.backend.team.dto.TeamMemberResponseDTO;
-import csd.t6.backend.team.dto.TeamResponseDTO;
-import csd.t6.backend.team.dto.TeamUpdateRequest;
-import csd.t6.backend.team.dto.UpdateMemberRoleRequest;
+import csd.t6.backend.team.dto.request.AddMemberRequest;
+import csd.t6.backend.team.dto.request.TeamCreateRequest;
+import csd.t6.backend.team.dto.request.TeamUpdateRequest;
+import csd.t6.backend.team.dto.request.UpdateMemberRoleRequest;
+import csd.t6.backend.team.dto.response.CheckMembershipResponse;
+import csd.t6.backend.team.dto.response.TeamMemberResponse;
+import csd.t6.backend.team.dto.response.TeamResponse;
 import csd.t6.jooq.public_.enums.TeamRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -50,7 +50,7 @@ public class TeamController {
   @CreatedResponse
   @BadRequestResponse
   @Operation(summary = "Create a new team", description = "Creates a new team with the authenticated user as owner")
-  public TeamResponseDTO createTeam(@Valid @RequestBody TeamCreateRequest request,
+  public TeamResponse createTeam(@Valid @RequestBody TeamCreateRequest request,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
     return teamService.createTeam(request, userDetails.getId());
   }
@@ -59,14 +59,14 @@ public class TeamController {
   @OkResponse
   @BadRequestResponse
   @Operation(summary = "Get team by ID", description = "Retrieves team details including all members")
-  public TeamResponseDTO getTeam(@PathVariable UUID teamId) {
+  public TeamResponse getTeam(@PathVariable UUID teamId) {
     return teamService.getTeamById(teamId);
   }
 
   @GetMapping("/")
   @OkResponse
   @Operation(summary = "Get user's teams", description = "Retrieves all teams the authenticated user is a member of")
-  public List<TeamResponseDTO> getUserTeams(@AuthenticationPrincipal AuthUserDetails userDetails) {
+  public List<TeamResponse> getUserTeams(@AuthenticationPrincipal AuthUserDetails userDetails) {
     return teamService.getUserTeams(userDetails.getId());
   }
 
@@ -74,7 +74,7 @@ public class TeamController {
   @OkResponse
   @BadRequestResponse
   @Operation(summary = "Update team", description = "Updates team details. Only owner or admin can update.")
-  public TeamResponseDTO updateTeam(@PathVariable UUID teamId, @Valid @RequestBody TeamUpdateRequest request,
+  public TeamResponse updateTeam(@PathVariable UUID teamId, @Valid @RequestBody TeamUpdateRequest request,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
     return teamService.updateTeam(teamId, request, userDetails.getId());
   }
@@ -91,7 +91,7 @@ public class TeamController {
   @CreatedResponse
   @BadRequestResponse
   @Operation(summary = "Add team member", description = "Adds a new member to the team. Only owner or admin can add members.")
-  public TeamMemberResponseDTO addMember(@PathVariable UUID teamId, @Valid @RequestBody AddMemberRequest request,
+  public TeamMemberResponse addMember(@PathVariable UUID teamId, @Valid @RequestBody AddMemberRequest request,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
     return teamService.addMember(teamId, request, userDetails.getId());
   }
@@ -109,24 +109,24 @@ public class TeamController {
   @OkResponse
   @BadRequestResponse
   @Operation(summary = "Get team members", description = "Retrieves all members of a team")
-  public List<TeamMemberResponseDTO> getTeamMembers(@PathVariable UUID teamId) {
+  public List<TeamMemberResponse> getTeamMembers(@PathVariable UUID teamId) {
     return teamService.getTeamMembers(teamId);
   }
 
   @GetMapping("/{teamId}/check-membership")
   @OkResponse
   @Operation(summary = "Check if user is team member", description = "Returns user's role in team")
-  public CheckMembershipResponseDTO checkMembership(@PathVariable UUID teamId,
+  public CheckMembershipResponse checkMembership(@PathVariable UUID teamId,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
     TeamRole role = teamService.getTeamMemberRole(teamId, userDetails.getId());
-    return new CheckMembershipResponseDTO(role != null, role != null ? role.toString() : "NONE");
+    return new CheckMembershipResponse(role != null, role != null ? role.toString() : "NONE");
   }
 
   @PutMapping("/{teamId}/members/{accountId}/role")
   @OkResponse
   @BadRequestResponse
   @Operation(summary = "Update member role", description = "Updates a team member's role. Only owner and admin can update roles.")
-  public TeamMemberResponseDTO updateMemberRole(@PathVariable UUID teamId, @PathVariable UUID accountId,
+  public TeamMemberResponse updateMemberRole(@PathVariable UUID teamId, @PathVariable UUID accountId,
       @Valid @RequestBody UpdateMemberRoleRequest request, @AuthenticationPrincipal AuthUserDetails userDetails) {
     return teamService.updateMemberRole(teamId, accountId, request.role(), userDetails.getId());
   }
@@ -135,9 +135,9 @@ public class TeamController {
   @OkResponse
   @BadRequestResponse
   @Operation(summary = "Gets all team courses", description = "Retrieves all courses associated with the team")
-  public List<CourseResponseDTO> getTeamCourses(@PathVariable UUID teamId,
+  public List<CourseResponse> getTeamCourses(@PathVariable UUID teamId,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
-    return this.courseService.getCoursesByTeamId(teamId, userDetails.getId()).stream().map(CourseResponseDTO::new)
+    return this.courseService.getCoursesByTeamId(teamId, userDetails.getId()).stream().map(CourseResponse::new)
         .toList();
   }
 

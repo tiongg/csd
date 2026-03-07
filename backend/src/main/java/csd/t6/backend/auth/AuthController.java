@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import csd.t6.backend.account.dto.AccountResponseDTO;
-import csd.t6.backend.auth.dto.ExchangeCodeDto;
-import csd.t6.backend.auth.dto.LoginDto;
-import csd.t6.backend.auth.dto.LoginResponseDto;
-import csd.t6.backend.auth.dto.TokenData;
+import csd.t6.backend.account.dto.response.AccountResponse;
+import csd.t6.backend.auth.dto.request.LoginRequest;
+import csd.t6.backend.auth.dto.response.ExchangeCodeResponse;
+import csd.t6.backend.auth.dto.response.LoginResponse;
+import csd.t6.backend.auth.dto.response.TokenDataResponse;
+import csd.t6.backend.auth.oauth.OAuthCodeService;
 import csd.t6.backend.decorators.auth.PublicDecorator;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -47,7 +48,7 @@ public class AuthController {
   @PublicDecorator()
   @OkResponse()
   @BadRequestResponse()
-  public LoginResponseDto loginWithPassword(@RequestBody @Valid LoginDto loginDto, HttpServletResponse response) {
+  public LoginResponse loginWithPassword(@RequestBody @Valid LoginRequest loginDto, HttpServletResponse response) {
     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(loginDto.usernameOrEmail(),
         loginDto.password());
 
@@ -55,10 +56,10 @@ public class AuthController {
     AuthUserDetails userDetails = (AuthUserDetails) auth.getPrincipal();
 
     UUID accountId = userDetails.getAccount().getId();
-    TokenData tokenData = this.authService.generateTokenData(accountId);
+    TokenDataResponse tokenData = this.authService.generateTokenData(accountId);
     response.addCookie(tokenData.refreshCookie());
 
-    return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDTO(userDetails.getAccount()));
+    return new LoginResponse(tokenData.accessToken(), new AccountResponse(userDetails.getAccount()));
   }
 
   @PostMapping("/logout")
@@ -72,37 +73,37 @@ public class AuthController {
   @PublicDecorator() // Potentially can be called without access token, but cookie instead
   @OkResponse()
   @BadRequestResponse()
-  public LoginResponseDto refresh(@CookieValue(name = "refresh_token", required = false) String refreshTokenCookie,
+  public LoginResponse refresh(@CookieValue(name = "refresh_token", required = false) String refreshTokenCookie,
       HttpServletResponse response) {
     if (refreshTokenCookie == null || !jwtService.isTokenValid(refreshTokenCookie)) {
       throw new BadRequestException("Invalid refresh token");
     }
 
     UUID accountId = jwtService.extractAccountId(refreshTokenCookie);
-    TokenData tokenData = this.authService.generateTokenData(accountId);
+    TokenDataResponse tokenData = this.authService.generateTokenData(accountId);
     response.addCookie(tokenData.refreshCookie());
-    return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDTO(tokenData.account()));
+    return new LoginResponse(tokenData.accessToken(), new AccountResponse(tokenData.account()));
   }
 
   @GetMapping("/me")
   @BadRequestResponse()
   @OkResponse()
-  public AccountResponseDTO getSelf(@AuthenticationPrincipal AuthUserDetails user) {
+  public AccountResponse getSelf(@AuthenticationPrincipal AuthUserDetails user) {
     if (user == null) {
       throw new BadRequestException("User is not authenticated");
     }
-    return new AccountResponseDTO(user.getAccount());
+    return new AccountResponse(user.getAccount());
   }
 
   @PostMapping("/exchange")
   @PublicDecorator()
   @OkResponse()
   @BadRequestResponse()
-  public LoginResponseDto exchangeCode(@RequestBody @Valid ExchangeCodeDto exchangeCodeDto,
+  public LoginResponse exchangeCode(@RequestBody @Valid ExchangeCodeResponse exchangeCodeDto,
       HttpServletResponse response) {
     UUID accountId = oauthCodeService.consumeCode(exchangeCodeDto.code());
-    TokenData tokenData = authService.generateTokenData(accountId);
+    TokenDataResponse tokenData = authService.generateTokenData(accountId);
     response.addCookie(tokenData.refreshCookie());
-    return new LoginResponseDto(tokenData.accessToken(), new AccountResponseDTO(tokenData.account()));
+    return new LoginResponse(tokenData.accessToken(), new AccountResponse(tokenData.account()));
   }
 }

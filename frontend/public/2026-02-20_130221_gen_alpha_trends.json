@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "generated_at_utc": "2026-02-20T05:02:21.488143+00:00",
+    "date_queried_utc": "2026-02-20",
+    "model": "gpt-4.1",
+    "trend_count": 10,
+    "response_id": "resp_0cf4d59153eb33e5006997ead6c63881979aa96a2484776962"
+  },
+  "trends": [
+    {
+      "rank": 1,
+      "name": "6‑7 (six seven) meme",
+      "trend_type": "phrase + hand gesture",
+      "metric": "multiple videos on TikTok, classroom bans, Roblox search spikes in past 7 days",
+      "source": "TikTok captures and Roblox search data show kids using '6‑7' naturally (classroom videos within last week, search surges in late 2025 into early 2026)"
+    },
+    {
+      "rank": 2,
+      "name": "Skibidi",
+      "trend_type": "surreal meme slang",
+      "metric": "active Roblox games plus TikTok youth usage in last week",
+      "source": "Roblox 'Steal a Brainrot' and TikTok/YouTube fan content featuring 'skibidi' in past week"
+    },
+    {
+      "rank": 3,
+      "name": "Great Meme Reset of 2026",
+      "trend_type": "nostalgia revival movement",
+      "metric": "TikToks reviving 2010s memes since January 1, 2026",
+      "source": "TikTok users posting old memes (Keyboard Cat, Nyan Cat) in early Feb 2026"
+    },
+    {
+      "rank": 4,
+      "name": "#jujutsukaisen anime finale posts",
+      "trend_type": "anime hashtag engagement",
+      "metric": "1.45M combined TikTok posts in last week",
+      "source": "Global TikTok hashtag volume data for #jujutsukaisen ecosystem in February 2026"
+    },
+    {
+      "rank": 5,
+      "name": "#outfitswap fashion challenge",
+      "trend_type": "fashion challenge hashtag",
+      "metric": "over 400 million TikTok views this week",
+      "source": "Vogue Business TikTok tracker (Feb 19, 2026) showing high view counts"
+    },
+    {
+      "rank": 6,
+      "name": "#CoachDenim unbox trend",
+      "trend_type": "fashion unboxing hashtag",
+      "metric": "fastest‑growing hashtag on TikTok this week",
+      "source": "Vogue Business tracker reporting surging Coach denim content on Feb 19, 2026"
+    },
+    {
+      "rank": 7,
+      "name": "Aimee Carty’s “2 Days Into College” audio",
+      "trend_type": "audio trend",
+      "metric": "307k creations on TikTok currently",
+      "source": "Vogue Business trend tracker shows 307k TikTok creations as of Feb 19, 2026"
+    },
+    {
+      "rank": 8,
+      "name": "Doechii – Anxiety audio",
+      "trend_type": "audio trend",
+      "metric": "3.1M TikTok creations recently",
+      "source": "Vogue Business trend tracker Feb 2026"
+    },
+    {
+      "rank": 9,
+      "name": "“#tiffanyknot” Lunar New Year posts",
+      "trend_type": "hashtag posts",
+      "metric": "6.3M TikTok views around LNY recently",
+      "source": "Vogue Business TikTok hashtag data Feb 19, 2026"
+    },
+    {
+      "rank": 10,
+      "name": "#preppyshopping trend",
+      "trend_type": "fashion aesthetic hashtag",
+      "metric": "rising usage tied to preppy clothing posts this week",
+      "source": "Vogue Business TikTok insights show upswing in preppy aesthetic in Feb 2026"
+    }
+  ]
+}

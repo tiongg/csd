@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.auth.AuthUserDetails;
-import csd.t6.backend.course.dto.CourseCreateRequest;
-import csd.t6.backend.course.dto.CourseResponseDTO;
-import csd.t6.backend.course.dto.CourseUpdateRequest;
+import csd.t6.backend.course.dto.request.CourseCreateRequest;
+import csd.t6.backend.course.dto.request.CourseUpdateRequest;
+import csd.t6.backend.course.dto.response.CourseResponse;
+import csd.t6.backend.course.dto.response.PresignedUrlResponse;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -41,7 +43,7 @@ public class CourseController {
   @CreatedResponse
   @BadRequestResponse
   @Operation(summary = "Create a new course", description = "Creates a new course with the authenticated user as creator")
-  public CourseResponseDTO createCourse(@Valid @RequestBody CourseCreateRequest request,
+  public CourseResponse createCourse(@Valid @RequestBody CourseCreateRequest request,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
     return courseService.createCourse(request, userDetails.getId());
   }
@@ -50,14 +52,14 @@ public class CourseController {
   @OkResponse
   @BadRequestResponse
   @Operation(summary = "Get course by ID", description = "Retrieves course details")
-  public CourseResponseDTO getCourse(@PathVariable UUID id) {
+  public CourseResponse getCourse(@PathVariable UUID id) {
     return courseService.getCourseById(id);
   }
 
   @GetMapping("/")
   @OkResponse
   @Operation(summary = "Get all courses", description = "Retrieves all courses")
-  public List<CourseResponseDTO> getAllCourses() {
+  public List<CourseResponse> getAllCourses() {
     return courseService.getAllCourses();
   }
 
@@ -65,7 +67,7 @@ public class CourseController {
   @OkResponse
   @BadRequestResponse
   @Operation(summary = "Update course", description = "Updates course details. Only creator or team members can update.")
-  public CourseResponseDTO updateCourse(@PathVariable UUID id, @Valid @RequestBody CourseUpdateRequest request,
+  public CourseResponse updateCourse(@PathVariable UUID id, @Valid @RequestBody CourseUpdateRequest request,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
     return courseService.updateCourse(id, request, userDetails.getId());
   }
@@ -76,5 +78,17 @@ public class CourseController {
   @Operation(summary = "Delete course", description = "Deletes a course. Only creator can delete.")
   public void deleteCourse(@PathVariable UUID id, @AuthenticationPrincipal AuthUserDetails userDetails) {
     courseService.deleteCourse(id, userDetails.getId());
+  }
+
+  @GetMapping("/{id}/upload-url")
+  @OkResponse
+  @BadRequestResponse
+  @Operation(summary = "Get upload URL", description = "Generates a presigned URL for uploading course materials. Only team members can get upload URLs.")
+  public PresignedUrlResponse getUploadUrl(@PathVariable UUID id, @RequestParam String filename,
+      @AuthenticationPrincipal AuthUserDetails userDetails) {
+    // TODO: Replace filename with determined key to prevent malicious users from
+    // uploading files with arbitrary names. This is a temporary solution to allow
+    // users to upload files with their original names.
+    return courseService.generateCourseMaterialUploadUrl(id, filename, userDetails.getId());
   }
 }

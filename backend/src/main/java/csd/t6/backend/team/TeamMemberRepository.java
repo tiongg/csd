@@ -9,15 +9,14 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
+import csd.t6.backend.utils.BaseRepository;
 import csd.t6.jooq.public_.enums.TeamRole;
 import csd.t6.jooq.public_.tables.records.TeamMemberRecord;
 
 @Repository
-public class TeamMemberRepository {
-  private final DSLContext dsl;
-
+public class TeamMemberRepository extends BaseRepository<TeamMemberRecord> {
   public TeamMemberRepository(DSLContext dsl) {
-    this.dsl = dsl;
+    super(dsl, TEAM_MEMBER);
   }
 
   public TeamMemberRecord addMember(UUID teamId, UUID accountId, TeamRole role) {
@@ -31,11 +30,11 @@ public class TeamMemberRepository {
   }
 
   public List<TeamMemberRecord> findByTeamId(UUID teamId) {
-    return dsl.selectFrom(TEAM_MEMBER).where(TEAM_MEMBER.TEAM_ID.eq(teamId)).fetch();
+    return this.findBy(TEAM_MEMBER.TEAM_ID, teamId);
   }
 
   public List<TeamMemberRecord> findByAccountId(UUID accountId) {
-    return dsl.selectFrom(TEAM_MEMBER).where(TEAM_MEMBER.ACCOUNT_ID.eq(accountId)).fetch();
+    return this.findBy(TEAM_MEMBER.ACCOUNT_ID, accountId);
   }
 
   public void removeMember(UUID teamId, UUID accountId) {

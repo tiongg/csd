@@ -9,40 +9,44 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import csd.t6.backend.course.dto.CourseCreateRequest;
-import csd.t6.backend.course.dto.CourseResponseDTO;
-import csd.t6.backend.course.dto.CourseUpdateRequest;
+import csd.t6.backend.course.dto.request.CourseCreateRequest;
+import csd.t6.backend.course.dto.request.CourseUpdateRequest;
+import csd.t6.backend.course.dto.response.CourseResponse;
+import csd.t6.backend.course.dto.response.PresignedUrlResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.team.TeamService;
+import csd.t6.backend.utils.FileService;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Service
 public class CourseService {
   private final CourseRepository courseRepository;
   private final TeamService teamService;
+  private final FileService fileService;
 
-  public CourseService(CourseRepository courseRepository, TeamService teamService) {
+  public CourseService(CourseRepository courseRepository, TeamService teamService, FileService fileService) {
     this.courseRepository = courseRepository;
     this.teamService = teamService;
+    this.fileService = fileService;
   }
 
   @Transactional
-  public CourseResponseDTO createCourse(CourseCreateRequest request, UUID creatorId) {
+  public CourseResponse createCourse(CourseCreateRequest request, UUID creatorId) {
     if (!teamService.isTeamMember(request.teamId(), creatorId)) {
       throw new BadRequestException("You must be a member of the team to create a course for it");
     }
 
     CourseRecord course = courseRepository.create(request.title(), request.description(), creatorId, request.teamId());
-    return new CourseResponseDTO(course);
+    return new CourseResponse(course);
   }
 
-  public CourseResponseDTO getCourseById(UUID id) {
+  public CourseResponse getCourseById(UUID id) {
     CourseRecord course = courseRepository.findById(id).orElseThrow(() -> new BadRequestException("Course not found"));
-    return new CourseResponseDTO(course);
+    return new CourseResponse(course);
   }
 
-  public List<CourseResponseDTO> getAllCourses() {
-    return courseRepository.findAll().stream().map(CourseResponseDTO::new).collect(Collectors.toList());
+  public List<CourseResponse> getAllCourses() {
+    return courseRepository.findAll().stream().map(CourseResponse::new).collect(Collectors.toList());
   }
 
   public List<CourseRecord> getCoursesByTeamId(UUID teamId, UUID requesterId) {
@@ -54,7 +58,7 @@ public class CourseService {
   }
 
   @Transactional
-  public CourseResponseDTO updateCourse(UUID id, CourseUpdateRequest request, UUID requesterId) {
+  public CourseResponse updateCourse(UUID id, CourseUpdateRequest request, UUID requesterId) {
     CourseRecord existing = courseRepository.findById(id)
         .orElseThrow(() -> new BadRequestException("Course not found"));
 
@@ -65,15 +69,13 @@ public class CourseService {
       throw new BadRequestException("Only the course creator or team members can update the course");
     }
 
-    if (request.teamId() != null && !request.teamId().equals(existing.getTeamId())) {
-      if (!teamService.isTeamMember(request.teamId(), requesterId)) {
-        throw new BadRequestException("You must be a member of the team to assign the course to it");
-      }
+    if (!teamService.isTeamMember(existing.getTeamId(), requesterId)) {
+      throw new BadRequestException("You must be a member of the team to update this course");
     }
 
-    CourseRecord updated = courseRepository.update(id, request.title(), request.description(), request.teamId(),
+    CourseRecord updated = courseRepository.update(id, request.title(), request.description(), existing.getTeamId(),
         request.isPublished());
-    return new CourseResponseDTO(updated);
+    return new CourseResponse(updated);
   }
 
   @Transactional
@@ -85,5 +87,17 @@ public class CourseService {
     }
 
     courseRepository.delete(id);
+  }
+
+  public PresignedUrlResponse generateCourseMaterialUploadUrl(UUID courseId, String filename, UUID requesterId) {
+    CourseRecord course = courseRepository.findById(courseId)
+        .orElseThrow(() -> new BadRequestException("Course not found"));
+
+    if (!teamService.isTeamMember(course.getTeamId(), requesterId)) {
+      throw new BadRequestException("You must be a member of the team to upload course materials");
+    }
+
+    String key = String.format("course-materials/%s/%s", courseId, filename);
+    return new PresignedUrlResponse(fileService.generatePresignedUploadUrl(key), key);
   }
 }

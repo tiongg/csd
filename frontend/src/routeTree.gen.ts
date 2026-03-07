@@ -20,8 +20,8 @@ import { Route as ContributorTeamIdCoursesRouteImport } from './routes/contribut
 import { Route as AuthenticatedLearnerSettingsRouteImport } from './routes/_authenticated/learner/settings'
 import { Route as AuthenticatedLearnerMyCoursesRouteImport } from './routes/_authenticated/learner/my-courses'
 import { Route as AuthenticatedLearnerFaqRouteImport } from './routes/_authenticated/learner/faq'
+import { Route as AuthenticatedLearnerDiscoverRouteImport } from './routes/_authenticated/learner/discover'
 import { Route as AuthenticatedLearnerDashboardRouteImport } from './routes/_authenticated/learner/dashboard'
-import { Route as AuthenticatedLearnerChallengesRouteImport } from './routes/_authenticated/learner/challenges'
 import { Route as AuthenticatedContributorTeamsRouteImport } from './routes/_authenticated/contributor/teams'
 import { Route as AuthenticatedContributorSettingsRouteImport } from './routes/_authenticated/contributor/settings'
 import { Route as AuthenticatedContributorFaqRouteImport } from './routes/_authenticated/contributor/faq'
@@ -32,6 +32,7 @@ import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authen
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminCourseModerationRouteImport } from './routes/_authenticated/admin/course-moderation'
+import { Route as AuthenticatedLearnerCoursesCourseIdRouteImport } from './routes/_authenticated/learner/courses/$courseId'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -91,16 +92,16 @@ const AuthenticatedLearnerFaqRoute = AuthenticatedLearnerFaqRouteImport.update({
   path: '/learner/faq',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedLearnerDiscoverRoute =
+  AuthenticatedLearnerDiscoverRouteImport.update({
+    id: '/learner/discover',
+    path: '/learner/discover',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedLearnerDashboardRoute =
   AuthenticatedLearnerDashboardRouteImport.update({
     id: '/learner/dashboard',
     path: '/learner/dashboard',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedLearnerChallengesRoute =
-  AuthenticatedLearnerChallengesRouteImport.update({
-    id: '/learner/challenges',
-    path: '/learner/challenges',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedContributorTeamsRoute =
@@ -162,6 +163,12 @@ const AuthenticatedAdminCourseModerationRoute =
     path: '/admin/course-moderation',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedLearnerCoursesCourseIdRoute =
+  AuthenticatedLearnerCoursesCourseIdRouteImport.update({
+    id: '/learner/courses/$courseId',
+    path: '/learner/courses/$courseId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -179,13 +186,14 @@ export interface FileRoutesByFullPath {
   '/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
   '/contributor/teams': typeof AuthenticatedContributorTeamsRoute
-  '/learner/challenges': typeof AuthenticatedLearnerChallengesRoute
   '/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
+  '/learner/discover': typeof AuthenticatedLearnerDiscoverRoute
   '/learner/faq': typeof AuthenticatedLearnerFaqRoute
   '/learner/my-courses': typeof AuthenticatedLearnerMyCoursesRoute
   '/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
+  '/learner/courses/$courseId': typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -203,13 +211,14 @@ export interface FileRoutesByTo {
   '/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
   '/contributor/teams': typeof AuthenticatedContributorTeamsRoute
-  '/learner/challenges': typeof AuthenticatedLearnerChallengesRoute
   '/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
+  '/learner/discover': typeof AuthenticatedLearnerDiscoverRoute
   '/learner/faq': typeof AuthenticatedLearnerFaqRoute
   '/learner/my-courses': typeof AuthenticatedLearnerMyCoursesRoute
   '/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
+  '/learner/courses/$courseId': typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -229,13 +238,14 @@ export interface FileRoutesById {
   '/_authenticated/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/_authenticated/contributor/settings': typeof AuthenticatedContributorSettingsRoute
   '/_authenticated/contributor/teams': typeof AuthenticatedContributorTeamsRoute
-  '/_authenticated/learner/challenges': typeof AuthenticatedLearnerChallengesRoute
   '/_authenticated/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
+  '/_authenticated/learner/discover': typeof AuthenticatedLearnerDiscoverRoute
   '/_authenticated/learner/faq': typeof AuthenticatedLearnerFaqRoute
   '/_authenticated/learner/my-courses': typeof AuthenticatedLearnerMyCoursesRoute
   '/_authenticated/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
+  '/_authenticated/learner/courses/$courseId': typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -255,13 +265,14 @@ export interface FileRouteTypes {
     | '/contributor/faq'
     | '/contributor/settings'
     | '/contributor/teams'
-    | '/learner/challenges'
     | '/learner/dashboard'
+    | '/learner/discover'
     | '/learner/faq'
     | '/learner/my-courses'
     | '/learner/settings'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
+    | '/learner/courses/$courseId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -279,13 +290,14 @@ export interface FileRouteTypes {
     | '/contributor/faq'
     | '/contributor/settings'
     | '/contributor/teams'
-    | '/learner/challenges'
     | '/learner/dashboard'
+    | '/learner/discover'
     | '/learner/faq'
     | '/learner/my-courses'
     | '/learner/settings'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
+    | '/learner/courses/$courseId'
   id:
     | '__root__'
     | '/'
@@ -304,13 +316,14 @@ export interface FileRouteTypes {
     | '/_authenticated/contributor/faq'
     | '/_authenticated/contributor/settings'
     | '/_authenticated/contributor/teams'
-    | '/_authenticated/learner/challenges'
     | '/_authenticated/learner/dashboard'
+    | '/_authenticated/learner/discover'
     | '/_authenticated/learner/faq'
     | '/_authenticated/learner/my-courses'
     | '/_authenticated/learner/settings'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
+    | '/_authenticated/learner/courses/$courseId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -402,18 +415,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearnerFaqRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/learner/discover': {
+      id: '/_authenticated/learner/discover'
+      path: '/learner/discover'
+      fullPath: '/learner/discover'
+      preLoaderRoute: typeof AuthenticatedLearnerDiscoverRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/learner/dashboard': {
       id: '/_authenticated/learner/dashboard'
       path: '/learner/dashboard'
       fullPath: '/learner/dashboard'
       preLoaderRoute: typeof AuthenticatedLearnerDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/learner/challenges': {
-      id: '/_authenticated/learner/challenges'
-      path: '/learner/challenges'
-      fullPath: '/learner/challenges'
-      preLoaderRoute: typeof AuthenticatedLearnerChallengesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/contributor/teams': {
@@ -486,6 +499,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCourseModerationRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/learner/courses/$courseId': {
+      id: '/_authenticated/learner/courses/$courseId'
+      path: '/learner/courses/$courseId'
+      fullPath: '/learner/courses/$courseId'
+      preLoaderRoute: typeof AuthenticatedLearnerCoursesCourseIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -501,11 +521,12 @@ interface AuthenticatedRouteChildren {
   AuthenticatedContributorFaqRoute: typeof AuthenticatedContributorFaqRoute
   AuthenticatedContributorSettingsRoute: typeof AuthenticatedContributorSettingsRoute
   AuthenticatedContributorTeamsRoute: typeof AuthenticatedContributorTeamsRoute
-  AuthenticatedLearnerChallengesRoute: typeof AuthenticatedLearnerChallengesRoute
   AuthenticatedLearnerDashboardRoute: typeof AuthenticatedLearnerDashboardRoute
+  AuthenticatedLearnerDiscoverRoute: typeof AuthenticatedLearnerDiscoverRoute
   AuthenticatedLearnerFaqRoute: typeof AuthenticatedLearnerFaqRoute
   AuthenticatedLearnerMyCoursesRoute: typeof AuthenticatedLearnerMyCoursesRoute
   AuthenticatedLearnerSettingsRoute: typeof AuthenticatedLearnerSettingsRoute
+  AuthenticatedLearnerCoursesCourseIdRoute: typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -522,11 +543,13 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedContributorFaqRoute: AuthenticatedContributorFaqRoute,
   AuthenticatedContributorSettingsRoute: AuthenticatedContributorSettingsRoute,
   AuthenticatedContributorTeamsRoute: AuthenticatedContributorTeamsRoute,
-  AuthenticatedLearnerChallengesRoute: AuthenticatedLearnerChallengesRoute,
   AuthenticatedLearnerDashboardRoute: AuthenticatedLearnerDashboardRoute,
+  AuthenticatedLearnerDiscoverRoute: AuthenticatedLearnerDiscoverRoute,
   AuthenticatedLearnerFaqRoute: AuthenticatedLearnerFaqRoute,
   AuthenticatedLearnerMyCoursesRoute: AuthenticatedLearnerMyCoursesRoute,
   AuthenticatedLearnerSettingsRoute: AuthenticatedLearnerSettingsRoute,
+  AuthenticatedLearnerCoursesCourseIdRoute:
+    AuthenticatedLearnerCoursesCourseIdRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

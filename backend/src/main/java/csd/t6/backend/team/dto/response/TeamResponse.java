@@ -1,0 +1,19 @@
+package csd.t6.backend.team.dto.response;
+
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import csd.t6.jooq.public_.tables.records.TeamRecord;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
+
+@Schema(name = "Team")
+public record TeamResponse(@NotNull UUID id, @NotNull String name, String description, @NotNull UUID ownerId,
+    @NotNull OffsetDateTime createdAt, @NotNull OffsetDateTime updatedAt, @NotNull List<TeamMemberResponse> members) {
+
+  public TeamResponse(TeamRecord team, List<TeamMemberResponse> members) {
+    this(team.getId(), team.getName(), team.getDescription(), team.getOwnerId(), team.getCreatedAt(),
+        team.getUpdatedAt(), members);
+  }
+}

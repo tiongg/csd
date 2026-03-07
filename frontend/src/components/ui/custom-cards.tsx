@@ -53,7 +53,7 @@ export function CardWithDetails({
   return (
     <div
       className={cn(
-        'flex cursor-pointer flex-col overflow-hidden rounded-2xl border transition-all hover:border-slate-300 hover:shadow-lg',
+        'flex cursor-pointer flex-col overflow-hidden rounded-2xl border-2 transition-all hover:border-slate-500 hover:shadow-lg',
         className,
       )}
       {...rest}

@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: db-test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  flyway:
+    image: flyway/flyway:10
+    volumes:
+      - ./backend/src/main/resources/db/migration:/flyway/sql
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      -url=jdbc:postgresql://db:5432/postgres
+      -user=postgres
+      -password=password
+      -outOfOrder=true
+      migrate
+
+  backend:
+    image: csd-backend:test
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+    container_name: backend-test
+    depends_on:
+      db:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    volumes:
+      - ./backend:/usr/src/maven
+      - maven-repo:/root/.m2
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      FRONTEND_URL: http://localhost:3000
+
+volumes:
+  maven-repo:

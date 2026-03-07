@@ -1,8 +1,0 @@
-Email, password, username all same (email using @gmail.com)
-
-admin1
-admin2
-contri1
-contri2
-user12
-user22
