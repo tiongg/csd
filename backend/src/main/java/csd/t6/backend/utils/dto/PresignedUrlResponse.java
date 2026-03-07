@@ -1,4 +1,4 @@
-package csd.t6.backend.course.dto.response;
+package csd.t6.backend.utils.dto;
 
 import jakarta.validation.constraints.NotNull;
 

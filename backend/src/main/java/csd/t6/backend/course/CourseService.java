@@ -12,10 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
-import csd.t6.backend.course.dto.response.PresignedUrlResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.team.TeamService;
 import csd.t6.backend.utils.FileService;
+import csd.t6.backend.utils.dto.PresignedUrlResponse;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Service
