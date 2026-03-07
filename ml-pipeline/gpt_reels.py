@@ -59,7 +59,8 @@ def generate_video_reel(content):
         response = client.videos.download_content(video_id=video_id)
         video_bytes = response.read()
         
-        output_filename = os.path.join(output_dir, "skibidi_course_sora_reel.mp4")
+        timestamp = time.strftime("%Y%m%d_%H%M%S")
+        output_filename = os.path.join(output_dir, f"reels_{timestamp}.mp4")
         
         with open(output_filename, "wb") as f:
             f.write(video_bytes)
