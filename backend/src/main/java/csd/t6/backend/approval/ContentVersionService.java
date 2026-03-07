@@ -1,6 +1,9 @@
 package csd.t6.backend.approval;
 
+import static csd.t6.jooq.public_.tables.ContentVersion.CONTENT_VERSION;
+
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -44,5 +47,10 @@ public class ContentVersionService {
 
     String key = String.format("course-materials/%s/%s.json", courseId, latestVersion.getId().toString());
     return new PresignedUrlResponse(this.fileService.generatePresignedUploadUrl(key, Duration.ofMinutes(5)), key);
+  }
+
+  public List<ContentVersionRecord> getPastVersions(UUID courseId) {
+    return this.contentVersionRepository.findBy(CONTENT_VERSION.COURSE_ID, courseId).stream()
+        .sorted((v1, v2) -> v2.getVersion() - v1.getVersion()).toList();
   }
 }

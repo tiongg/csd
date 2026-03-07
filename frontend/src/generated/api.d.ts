@@ -372,6 +372,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/content-versions/{courseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getContentVersions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/content-versions/{courseId}/upload-url": {
         parameters: {
             query?: never;
@@ -608,6 +624,16 @@ export interface components {
         CheckMembershipResponse: {
             isMember: boolean;
             role: string;
+        };
+        ContentVersionResponse: {
+            id: string;
+            /** Format: int32 */
+            versionNumber: number;
+            description: string;
+            publishedAt: string;
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "REJECTED";
+            rejectedReason?: string;
         };
         PresignedUrlResponse: {
             url: string;
@@ -1431,6 +1457,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": string;
+                };
+            };
+        };
+    };
+    getContentVersions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ContentVersionResponse"][];
                 };
             };
         };

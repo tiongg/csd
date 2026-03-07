@@ -1,6 +1,7 @@
 import { useContentEditor } from '@/context/ContentEditorContext';
 import type { Course } from '@/lib/utils';
 import CourseEditorOverview from './CourseEditorOverview';
+import CourseVersions from './CourseVersions';
 import NoCourseSectionsYet from './NoCourseSectionsYet';
 
 type EditorCourseDisplayProps = {
@@ -18,6 +19,7 @@ export default function EditorCourseDisplay({
       <div className="mx-auto w-full max-w-4xl space-y-2">
         <CourseEditorOverview course={course} />
         {sectionCount === 0 && <NoCourseSectionsYet />}
+        <CourseVersions course={course} />
       </div>
     </div>
   );

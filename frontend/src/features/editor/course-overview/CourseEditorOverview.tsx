@@ -1,4 +1,3 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -8,10 +7,11 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useContentEditor } from '@/context/ContentEditorContext';
+import { apiQueryOptions } from '@/lib/fetch-client';
 import { uploadCourseContent } from '@/lib/file-upload';
 import type { Course } from '@/lib/utils';
-import { useMutation } from '@tanstack/react-query';
-import { BookOpen, FileText, HelpCircle, Send } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { FileText, HelpCircle, Send } from 'lucide-react';
 
 type CourseEditorOverviewProps = {
   course: Course;
@@ -21,11 +21,23 @@ export default function CourseEditorOverview({
   course,
 }: CourseEditorOverviewProps) {
   const { doc, getDocAsJson } = useContentEditor();
+  const queryClient = useQueryClient();
 
   const { mutateAsync: uploadContent, isPending: isPublishing } = useMutation({
     mutationFn: async (description: string) => {
       const docContent = await getDocAsJson();
       return uploadCourseContent(docContent, course.id, description);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries(
+        apiQueryOptions('get', '/api/content-versions/{courseId}', {
+          params: {
+            path: {
+              courseId: course.id,
+            },
+          },
+        }),
+      );
     },
   });
 
@@ -40,15 +52,6 @@ export default function CourseEditorOverview({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-2">
-              <Badge variant={course.isPublished ? 'default' : 'secondary'}>
-                {course.isPublished ? 'Published' : 'Draft'}
-              </Badge>
-              <Badge variant="outline" className="gap-1">
-                <BookOpen className="size-3" />
-                Course
-              </Badge>
-            </div>
             <CardTitle className="text-2xl">{course.title}</CardTitle>
             <CardDescription className="text-base">
               {course.description || 'No description provided.'}
