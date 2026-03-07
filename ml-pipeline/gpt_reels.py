@@ -59,7 +59,6 @@ def generate_video_reel(content):
         response = client.videos.download_content(video_id=video_id)
         video_bytes = response.read()
         
-        # Set path to the /reels folder
         output_filename = os.path.join(output_dir, "skibidi_course_sora_reel.mp4")
         
         with open(output_filename, "wb") as f:
