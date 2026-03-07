@@ -6,8 +6,12 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useApiQuery } from '@/lib/fetch-client';
-import type { ContentVersion, Course } from '@/lib/utils';
-import { capitalizeFirst, cn } from '@/lib/utils';
+import {
+  type ContentVersion,
+  type Course,
+  capitalizeFirst,
+  cn,
+} from '@/lib/utils';
 import dayjs from 'dayjs';
 import { CalendarIcon, FileTextIcon } from 'lucide-react';
 
@@ -55,7 +59,6 @@ function StatusChip({ version, isShown }: CourseVersionProps) {
 function CourseVersion({ version, isShown }: CourseVersionProps) {
   return (
     <div
-      key={version.id}
       className={cn(
         'group flex cursor-default items-start gap-4 rounded-lg border p-4 transition-all',
         'hover:bg-accent/50 hover:border-accent',
