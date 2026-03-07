@@ -17,10 +17,14 @@ export default function Navbar() {
   const dir = useActiveRole() ?? '';
 
   return (
-    <header className="sticky top-0 flex w-full items-center justify-between bg-white p-2 px-8 shadow-lg">
-      <Link className="flex items-center gap-x-2" to="/" >
-        <img src="/assets/logo.jpg" alt='six seven logo' className='aspect-square size-8 rounded-full' />
-        <div className='italic font-bold font-[Noto_Sans] text-slate-950 text-lg'>
+    <header className="sticky top-0 z-50 flex w-full items-center justify-between bg-white p-2 px-8 shadow-lg">
+      <Link className="flex items-center gap-x-2" to="/">
+        <img
+          src="/assets/logo.jpg"
+          alt="six seven logo"
+          className="aspect-square size-8 rounded-full"
+        />
+        <div className="font-[Noto_Sans] text-lg font-bold text-slate-950 italic">
           The Six Seven
         </div>
       </Link>

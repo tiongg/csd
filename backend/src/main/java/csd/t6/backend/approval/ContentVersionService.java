@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import csd.t6.backend.course.CourseRepository;
 import csd.t6.backend.exceptions.BadRequestException;
@@ -36,6 +37,7 @@ public class ContentVersionService {
     return this.contentVersionRepository.create(courseId, versionNumber, description);
   }
 
+  @Transactional
   public PresignedUrlResponse generateCourseMaterialUploadUrl(UUID courseId, UUID requesterId, String description) {
     CourseRecord course = courseRepository.findById(courseId)
         .orElseThrow(() -> new BadRequestException("Course not found"));
@@ -43,14 +45,20 @@ public class ContentVersionService {
     if (!teamService.isTeamMember(course.getTeamId(), requesterId)) {
       throw new BadRequestException("You must be a member of the team to upload course materials");
     }
-    ContentVersionRecord latestVersion = this.createNewContentVersion(courseId, description);
 
-    String key = String.format("course-materials/%s/%s.json", courseId, latestVersion.getId().toString());
+    this.contentVersionRepository.rejectAllPendingVersions(courseId);
+    ContentVersionRecord newVersion = this.createNewContentVersion(courseId, description);
+
+    String key = String.format("course-materials/%s/%s.json", courseId, newVersion.getId().toString());
     return new PresignedUrlResponse(this.fileService.generatePresignedUploadUrl(key, Duration.ofMinutes(5)), key);
   }
 
   public List<ContentVersionRecord> getPastVersions(UUID courseId) {
     return this.contentVersionRepository.findBy(CONTENT_VERSION.COURSE_ID, courseId).stream()
         .sorted((v1, v2) -> v2.getVersion() - v1.getVersion()).toList();
+  }
+
+  public void rejectAllPendingVersions(UUID courseId) {
+    this.contentVersionRepository.rejectAllPendingVersions(courseId);
   }
 }

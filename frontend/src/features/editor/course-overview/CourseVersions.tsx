@@ -1,5 +1,10 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useApiQuery } from '@/lib/fetch-client';
 import type { ContentVersion, Course } from '@/lib/utils';
 import { capitalizeFirst, cn } from '@/lib/utils';
@@ -10,19 +15,44 @@ type CourseVersionsProps = {
   course: Course;
 };
 
+type CourseVersionProps = {
+  version: ContentVersion;
+  isShown: boolean;
+};
+
 const statusVariants = {
   APPROVED: 'default',
   PENDING: 'secondary',
   REJECTED: 'destructive',
 } as const;
 
-function CourseVersion({
-  version,
-  isShown,
-}: {
-  version: ContentVersion;
-  isShown: boolean;
-}) {
+function StatusChip({ version, isShown }: CourseVersionProps) {
+  if (isShown) {
+    return <Badge variant="success">Currently Shown</Badge>;
+  }
+
+  if (version.status === 'REJECTED') {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Badge variant="destructive">Rejected</Badge>
+        </TooltipTrigger>
+
+        <TooltipContent>
+          <p>{version.rejectedReason || 'No reason provided'}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return (
+    <Badge variant={statusVariants[version.status]}>
+      {capitalizeFirst(version.status)}
+    </Badge>
+  );
+}
+
+function CourseVersion({ version, isShown }: CourseVersionProps) {
   return (
     <div
       key={version.id}
@@ -34,23 +64,11 @@ function CourseVersion({
       <div className="min-w-0 flex-1 space-y-2">
         <div className="flex items-center justify-between gap-2">
           <h3 className="font-medium">Version {version.versionNumber}</h3>
-          {isShown ? (
-            <Badge variant="success">Currently Shown</Badge>
-          ) : (
-            <Badge variant={statusVariants[version.status]}>
-              {capitalizeFirst(version.status)}
-            </Badge>
-          )}
+          <StatusChip version={version} isShown={isShown} />
         </div>
         <div className="text-muted-foreground flex items-center gap-1 text-sm">
           {version.description || 'No description provided'}
         </div>
-        {version.status === 'REJECTED' && (
-          <div className="text-destructive flex items-center gap-1 text-sm">
-            <span className="font-medium">Rejection Reason:</span>
-            <span>{version.rejectedReason || 'No reason provided'}</span>
-          </div>
-        )}
         <div className="text-muted-foreground flex items-center gap-1 text-sm">
           <CalendarIcon className="size-3" />
           <time dateTime={version.publishedAt}>
