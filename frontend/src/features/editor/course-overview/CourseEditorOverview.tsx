@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -7,11 +6,9 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useContentEditor } from '@/context/ContentEditorContext';
-import { apiQueryOptions } from '@/lib/fetch-client';
-import { uploadCourseContent } from '@/lib/file-upload';
 import type { Course } from '@/lib/utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FileText, HelpCircle, Send } from 'lucide-react';
+import { FileText, HelpCircle } from 'lucide-react';
+import PublishCourse from './PublishCourse';
 
 type CourseEditorOverviewProps = {
   course: Course;
@@ -20,26 +17,7 @@ type CourseEditorOverviewProps = {
 export default function CourseEditorOverview({
   course,
 }: CourseEditorOverviewProps) {
-  const { doc, getDocAsJson } = useContentEditor();
-  const queryClient = useQueryClient();
-
-  const { mutateAsync: uploadContent, isPending: isPublishing } = useMutation({
-    mutationFn: async (description: string) => {
-      const docContent = await getDocAsJson();
-      return uploadCourseContent(docContent, course.id, description);
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries(
-        apiQueryOptions('get', '/api/content-versions/{courseId}', {
-          params: {
-            path: {
-              courseId: course.id,
-            },
-          },
-        }),
-      );
-    },
-  });
+  const { doc } = useContentEditor();
 
   const sections = doc.getArray('root');
   const sectionCount = sections.length;
@@ -57,18 +35,7 @@ export default function CourseEditorOverview({
               {course.description || 'No description provided.'}
             </CardDescription>
 
-            <Button
-              onClick={() =>
-                uploadContent(
-                  `Content update for course ${course.id} at ${new Date().toISOString()}`,
-                )
-              }
-              disabled={sectionCount === 0}
-              className="gap-2 transition duration-300 active:scale-95"
-            >
-              <Send className="size-4" />
-              {isPublishing ? 'Submitting…' : 'Submit for Approval'}
-            </Button>
+            <PublishCourse course={course} />
           </div>
         </div>
       </CardHeader>
