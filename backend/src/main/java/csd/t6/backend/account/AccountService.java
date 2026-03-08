@@ -1,6 +1,8 @@
 package csd.t6.backend.account;
 
 import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.auth.oauth.OAuth2ProviderRepository;
+import csd.t6.backend.contributor.PendingContributorRepository;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.exceptions.ForbiddenException;
 import csd.t6.jooq.accounts.enums.OauthProvider;
@@ -19,10 +22,13 @@ import csd.t6.jooq.accounts.tables.records.OauthConnectionRecord;
 public class AccountService {
   private final AccountRepository accountRepository;
   private final OAuth2ProviderRepository oAuthProviderRepository;
+  private final PendingContributorRepository pendingContributorRepository;
 
-  public AccountService(AccountRepository accountRepository, OAuth2ProviderRepository oAuthProviderRepository) {
+  public AccountService(AccountRepository accountRepository, OAuth2ProviderRepository oAuthProviderRepository,
+      PendingContributorRepository pendingContributorRepository) {
     this.accountRepository = accountRepository;
     this.oAuthProviderRepository = oAuthProviderRepository;
+    this.pendingContributorRepository = pendingContributorRepository;
   }
 
   public List<AccountRecord> getAllAccounts() {
@@ -83,8 +89,8 @@ public class AccountService {
 
   /**
    * Allow admins to update role of any user by specifying target account ID.
-   * Enforces that the requestor is an ADMIN at the service layer, independent
-   * of any controller-level checks.
+   * Enforces that the requestor is an ADMIN at the service layer, independent of
+   * any controller-level checks.
    *
    * @param id          The ID of the account whose role is being updated
    * @param role        The new role to assign
@@ -104,18 +110,18 @@ public class AccountService {
     AccountRecord existingAccount = this.accountRepository.findOneBy(ACCOUNT.ID, id)
         .orElseThrow(() -> new BadRequestException("Account does not exist"));
 
+    this.pendingContributorRepository.deletePendingContributors(Arrays.asList(id));
     existingAccount.setUserRole(role);
     return this.accountRepository.save(existingAccount);
   }
 
   /**
-   * Original method for backward compatibility.
-   * Allows updating role only for account being modified.
+   * Original method for backward compatibility. Allows updating role only for
+   * account being modified.
    */
   public AccountRecord updateAccountRole(UUID id, Roles role) {
     AccountRecord existingAccount = this.accountRepository.findOneBy(ACCOUNT.ID, id)
         .orElseThrow(() -> new BadRequestException("Account does not exist"));
-
     existingAccount.setUserRole(role);
     return this.accountRepository.save(existingAccount);
   }
