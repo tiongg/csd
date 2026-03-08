@@ -1,3 +1,6 @@
+import { FilePlay, FileText, HelpCircle } from 'lucide-react';
+import PublishCourse from './PublishCourse';
+import type { Course } from '@/lib/utils';
 import {
   Card,
   CardContent,
@@ -6,9 +9,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useContentEditor } from '@/context/ContentEditorContext';
-import type { Course } from '@/lib/utils';
-import { FileText, HelpCircle } from 'lucide-react';
-import PublishCourse from './PublishCourse';
 
 type CourseEditorOverviewProps = {
   course: Course;
@@ -24,6 +24,7 @@ export default function CourseEditorOverview({
   const quizCount = Array.from(sections).filter(
     (s) => s.get('type') === 'quiz',
   ).length;
+  const reelsCount = 0;
 
   return (
     <Card>
@@ -57,6 +58,15 @@ export default function CourseEditorOverview({
             <div>
               <p className="text-muted-foreground text-sm">Quizzes</p>
               <p className="font-semibold">{quizCount}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-lg border p-3">
+            <div className="bg-primary/10 flex size-10 items-center justify-center rounded-full">
+              <FilePlay className="text-primary size-5" />
+            </div>
+            <div>
+              <p className="text-muted-foreground text-sm">Reels</p>
+              <p className="font-semibold">{reelsCount}</p>
             </div>
           </div>
         </div>
