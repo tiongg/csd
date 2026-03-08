@@ -21,11 +21,11 @@ import {
   useApiMutation,
   useApiQuery,
 } from '@/lib/fetch-client';
-import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import PendingContributorsForm from './PendingContributorsForm';
+import { useAuth } from '@/context/AuthContext';
 
 type UserRole = 'LEARNER' | 'CONTRIBUTOR' | 'ADMIN';
 
@@ -64,15 +64,9 @@ export default function UserManagementForm() {
 function AllUsers() {
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
 
   const { data: users, isLoading } = useApiQuery('get', '/api/account/', {});
-
-  const { data: pendingApps } = useApiQuery(
-    'get',
-    '/api/admins/contributor-applications',
-    {},
-  );
-  const pendingSet = new Set<string>((pendingApps ?? []).map((a) => a.id));
 
   const filteredUsers = (users ?? []).filter(
     (user) =>
@@ -111,19 +105,6 @@ function AllUsers() {
     });
   };
 
-  const getRoleColorClasses = (role: UserRole) => {
-    switch (role) {
-      case 'ADMIN':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'CONTRIBUTOR':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'LEARNER':
-        return 'bg-green-100 text-green-800 border-green-200';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
     <div className="flex flex-col gap-4 py-4">
       <div className="flex w-full items-center justify-end">
@@ -136,9 +117,7 @@ function AllUsers() {
             <TableHead className="w-2/12">Username</TableHead>
             <TableHead className="w-3/12">Email</TableHead>
             <TableHead className="w-2/12">Real Name</TableHead>
-            <TableHead className="w-2/12">Current Role</TableHead>
-            <TableHead className="w-2/12">Pending Contributor?</TableHead>
-            <TableHead className="w-1/12">Change Role</TableHead>
+            <TableHead className="w-1/12">Role</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -168,28 +147,9 @@ function AllUsers() {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.realname ?? '—'}</TableCell>
                 <TableCell>
-                  <span
-                    className={cn(
-                      'inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold',
-                      getRoleColorClasses(user.role as UserRole),
-                    )}
-                  >
-                    {user.role}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {pendingSet.has(user.id) ? (
-                    <span className="inline-flex rounded-full border border-yellow-300 bg-yellow-100 px-2.5 py-0.5 text-xs font-semibold text-yellow-800">
-                      Pending
-                    </span>
-                  ) : (
-                    <span className="text-sm text-slate-400">—</span>
-                  )}
-                </TableCell>
-                <TableCell>
                   <Select
                     value={user.role}
-                    disabled={isUpdatingRole}
+                    disabled={isUpdatingRole || user.role === currentUser?.role}
                     onValueChange={(value) =>
                       handleRoleChange(user.id, value as UserRole)
                     }
