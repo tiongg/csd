@@ -149,7 +149,7 @@ function AllUsers() {
                 <TableCell>
                   <Select
                     value={user.role}
-                    disabled={isUpdatingRole || user.role === currentUser?.role}
+                    disabled={isUpdatingRole || user.id === currentUser?.id}
                     onValueChange={(value) =>
                       handleRoleChange(user.id, value as UserRole)
                     }
