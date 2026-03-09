@@ -27,7 +27,6 @@ import { Route as AuthenticatedContributorTeamsRouteImport } from './routes/_aut
 import { Route as AuthenticatedContributorSettingsRouteImport } from './routes/_authenticated/contributor/settings'
 import { Route as AuthenticatedContributorFaqRouteImport } from './routes/_authenticated/contributor/faq'
 import { Route as AuthenticatedContributorDashboardRouteImport } from './routes/_authenticated/contributor/dashboard'
-import { Route as AuthenticatedContributorCoursesRouteImport } from './routes/_authenticated/contributor/courses'
 import { Route as AuthenticatedAdminUserManagementRouteImport } from './routes/_authenticated/admin/user-management'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
@@ -134,12 +133,6 @@ const AuthenticatedContributorDashboardRoute =
     path: '/contributor/dashboard',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedContributorCoursesRoute =
-  AuthenticatedContributorCoursesRouteImport.update({
-    id: '/contributor/courses',
-    path: '/contributor/courses',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedAdminUserManagementRoute =
   AuthenticatedAdminUserManagementRouteImport.update({
     id: '/admin/user-management',
@@ -188,7 +181,6 @@ export interface FileRoutesByFullPath {
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
-  '/contributor/courses': typeof AuthenticatedContributorCoursesRoute
   '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
   '/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
@@ -214,7 +206,6 @@ export interface FileRoutesByTo {
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
-  '/contributor/courses': typeof AuthenticatedContributorCoursesRoute
   '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
   '/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
@@ -242,7 +233,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
-  '/_authenticated/contributor/courses': typeof AuthenticatedContributorCoursesRoute
   '/_authenticated/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
   '/_authenticated/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/_authenticated/contributor/settings': typeof AuthenticatedContributorSettingsRoute
@@ -270,7 +260,6 @@ export interface FileRouteTypes {
     | '/admin/faq'
     | '/admin/settings'
     | '/admin/user-management'
-    | '/contributor/courses'
     | '/contributor/dashboard'
     | '/contributor/faq'
     | '/contributor/settings'
@@ -296,7 +285,6 @@ export interface FileRouteTypes {
     | '/admin/faq'
     | '/admin/settings'
     | '/admin/user-management'
-    | '/contributor/courses'
     | '/contributor/dashboard'
     | '/contributor/faq'
     | '/contributor/settings'
@@ -323,7 +311,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/faq'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/user-management'
-    | '/_authenticated/contributor/courses'
     | '/_authenticated/contributor/dashboard'
     | '/_authenticated/contributor/faq'
     | '/_authenticated/contributor/settings'
@@ -477,13 +464,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContributorDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/contributor/courses': {
-      id: '/_authenticated/contributor/courses'
-      path: '/contributor/courses'
-      fullPath: '/contributor/courses'
-      preLoaderRoute: typeof AuthenticatedContributorCoursesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/admin/user-management': {
       id: '/_authenticated/admin/user-management'
       path: '/admin/user-management'
@@ -536,7 +516,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminFaqRoute: typeof AuthenticatedAdminFaqRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminUserManagementRoute: typeof AuthenticatedAdminUserManagementRoute
-  AuthenticatedContributorCoursesRoute: typeof AuthenticatedContributorCoursesRoute
   AuthenticatedContributorDashboardRoute: typeof AuthenticatedContributorDashboardRoute
   AuthenticatedContributorFaqRoute: typeof AuthenticatedContributorFaqRoute
   AuthenticatedContributorSettingsRoute: typeof AuthenticatedContributorSettingsRoute
@@ -557,7 +536,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminFaqRoute: AuthenticatedAdminFaqRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminUserManagementRoute: AuthenticatedAdminUserManagementRoute,
-  AuthenticatedContributorCoursesRoute: AuthenticatedContributorCoursesRoute,
   AuthenticatedContributorDashboardRoute:
     AuthenticatedContributorDashboardRoute,
   AuthenticatedContributorFaqRoute: AuthenticatedContributorFaqRoute,
