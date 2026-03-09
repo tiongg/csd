@@ -1,21 +1,16 @@
+import { Button } from '@/components/ui/button';
+import { Field, FieldError, FieldGroup } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+import { Heading1 } from '@/components/ui/typography';
+import { useAuth } from '@/context/AuthContext';
+import { constructAuthUrl } from '@/lib/auth-urls';
+import { useApiMutation } from '@/lib/fetch-client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Controller, useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { FcGoogle } from 'react-icons/fc';
-import { Button } from '@/components/ui/button';
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { useAuth } from '@/context/AuthContext';
-import { useApiMutation } from '@/lib/fetch-client';
-import { Heading1, Heading4 } from '@/components/ui/typography';
-import { Separator } from '@/components/ui/separator';
-import { constructAuthUrl } from '@/lib/auth-urls';
+import { z } from 'zod';
 
 const registerSchema = z
   .object({
@@ -89,7 +84,11 @@ export default function RegistrationForm() {
   return (
     <div className="flex h-full w-full">
       <div className="h-full w-1/2 bg-slate-200">
-        <img src="/assets/login-signup/signup.jpg" alt="Adult learner thinking" className='h-full w-full object-cover' />
+        <img
+          src="/assets/login-signup/signup.jpg"
+          alt="Adult learner thinking"
+          className="h-full w-full object-cover"
+        />
       </div>
       <div className="flex h-full w-1/2 justify-center">
         <div className="flex w-8/10 min-w-120 flex-col justify-between p-18">

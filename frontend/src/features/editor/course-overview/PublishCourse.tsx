@@ -29,7 +29,6 @@ export default function PublishCourse({ course }: PublishCourseProps) {
   const queryClient = useQueryClient();
   const {
     value: open,
-    setTrue: openDialog,
     setFalse: closeDialog,
     setValue: setOpen,
   } = useBoolean(false);

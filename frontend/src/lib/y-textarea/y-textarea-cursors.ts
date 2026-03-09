@@ -1,4 +1,5 @@
-import type { color, options } from './y-textarea-options';
+import type { TextAreaBindingOptions } from './y-textarea-options';
+type color = NonNullable<TextAreaBindingOptions['color']>;
 
 import intersection from 'rectangle-overlap';
 import getCaretCoordinates from 'textarea-caret';
@@ -167,7 +168,7 @@ export class TextAreaCursors {
   constructor(
     yText: Y.Text,
     textField: HTMLTextAreaElement | HTMLInputElement,
-    options: options,
+    options: TextAreaBindingOptions,
   ) {
     this._areaID = textField.id;
     this._textField = textField;
