@@ -28,9 +28,6 @@ const fileSizeLimit = 5 * 1024 * 1024;
 const reelSchema = z.object({
     title: z.string().min(3, "Reel name must be at least 3 characters").max(50, "Reel name must not exceed 50 characters"),
     description: z.string().optional(),
-    tags: z.string().transform(
-        (tagString) => tagString.split("#").map((tagArr) => tagArr.trim()).filter((tagArr) => tagArr !== "")
-    ).pipe(z.string().array()).optional(),
     reelFile: z.instanceof(File)
         .refine(
             (file) =>
@@ -61,7 +58,6 @@ export default function UploadReelDialog({
         defaultValues: {
             title: '',
             description: "",
-            tags: [],
             reelFile: new File([], "")
         },
     });
@@ -122,27 +118,6 @@ export default function UploadReelDialog({
                                         aria-invalid={fieldState.invalid}
                                         placeholder="Describe your reel"
                                         className="resize-none"
-                                    />
-                                    {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                    )}
-                                </Field>
-                            )}
-                        />
-                    </FieldGroup>
-
-                    <FieldGroup>
-                        <Controller
-                            control={control}
-                            name="tags"
-                            render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="tags">Tags (Optional) (separated by #)</FieldLabel>
-                                    <Input
-                                        {...field}
-                                        id="tags"
-                                        aria-invalid={fieldState.invalid}
-                                        placeholder="e.g., #genalpha #skibidi"
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
