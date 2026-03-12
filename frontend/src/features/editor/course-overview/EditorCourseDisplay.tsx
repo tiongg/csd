@@ -3,8 +3,8 @@ import type { Course } from '@/lib/utils';
 import CourseEditorOverview from './CourseEditorOverview';
 import CourseVersions from './CourseVersions';
 import NoCourseSectionsYet from './NoCourseSectionsYet';
-import NoReelsYet from './NoReelsYet';
-import ReelsOverview from './ReelsOverview';
+import NoReelsYet from '../reel-overview/NoReelsYet';
+import ReelsOverview from '../reel-overview/ReelsOverview';
 
 type EditorCourseDisplayProps = {
   course: Course;
