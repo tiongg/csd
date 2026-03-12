@@ -21,7 +21,7 @@ function VideoPreview({ reelUrl }: { reelUrl?: string }) {
         <div>
             {!hasError ? (
                 <div className='relative'>
-                    <video height="480" className='max-w-full' muted autoPlay loop>
+                    <video height="480" className='max-h-screen max-w-full' muted autoPlay loop>
                         <source
                             src={`${reelUrl}?t=${new Date()}`}
                             type="video/mp4"
