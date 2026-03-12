@@ -200,22 +200,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/content-versions/{courseId}/upload-reel-url": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["getReelUploadUrl"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/auth/refresh": {
         parameters: {
             query?: never;
@@ -404,14 +388,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/content-versions/{courseId}": {
+    "/api/courses/{courseId}/upload-reel-url": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getContentVersions"];
+        get: operations["getUploadReelUrl"];
         put?: never;
         post?: never;
         delete?: never;
@@ -420,14 +404,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/content-versions/{courseId}/reel": {
+    "/api/content-versions/{courseId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getReelUrl"];
+        get: operations["getContentVersions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -603,6 +587,7 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            reelUrl?: string;
         };
         AddMemberRequest: {
             username: string;
@@ -1169,32 +1154,6 @@ export interface operations {
             };
         };
     };
-    getReelUploadUrl: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                courseId: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UploadCourseRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PresignedUrlResponse"];
-                };
-            };
-        };
-    };
     refresh: {
         parameters: {
             query?: never;
@@ -1548,6 +1507,28 @@ export interface operations {
             };
         };
     };
+    getUploadReelUrl: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PresignedUrlResponse"];
+                };
+            };
+        };
+    };
     getContentVersions: {
         parameters: {
             query?: never;
@@ -1566,28 +1547,6 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ContentVersionResponse"][];
-                };
-            };
-        };
-    };
-    getReelUrl: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                courseId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": string;
                 };
             };
         };

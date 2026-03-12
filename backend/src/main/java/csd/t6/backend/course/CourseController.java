@@ -21,6 +21,7 @@ import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
 import csd.t6.backend.decorators.responses.OkResponse;
+import csd.t6.backend.utils.dto.PresignedUrlResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -77,4 +78,11 @@ public class CourseController {
   public void deleteCourse(@PathVariable UUID id, @AuthenticationPrincipal AuthUserDetails userDetails) {
     courseService.deleteCourse(id, userDetails.getId());
   }
+
+  @GetMapping("/{courseId}/upload-reel-url")
+  public PresignedUrlResponse getUploadReelUrl(@PathVariable UUID courseId,
+      @AuthenticationPrincipal AuthUserDetails userDetails) {
+    return courseService.generateReelUploadUrl(courseId, userDetails.getId());
+  }
+
 }

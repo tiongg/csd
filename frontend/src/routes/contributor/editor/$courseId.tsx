@@ -3,27 +3,11 @@ import { ContentEditorProvider } from '@/context/ContentEditorContext';
 import CourseEditor from '@/features/editor/CourseEditor';
 import EditorHeader from '@/features/editor/EditorHeader';
 import { EditorSchemaProvider } from '@/features/editor/EditorSchemaContext';
-import { fetchClient } from '@/lib/fetch-client';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { useApiQuery } from '@/lib/fetch-client';
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/contributor/editor/$courseId')({
   component: RouteComponent,
-  loader: async ({ params: { courseId } }) => {
-    const { data: course } = await fetchClient.GET('/api/courses/{id}', {
-      params: {
-        path: {
-          id: courseId,
-        },
-      },
-    });
-    if (!course) {
-      throw redirect({
-        to: '/contributor/dashboard',
-      });
-    }
-
-    return { course };
-  },
   validateSearch: (search) => ({
     section:
       search?.section !== undefined ? Number(search?.section) : undefined,
@@ -32,7 +16,21 @@ export const Route = createFileRoute('/contributor/editor/$courseId')({
 
 function RouteComponent() {
   const { courseId } = Route.useParams();
-  const { course } = Route.useLoaderData();
+  const { data: course, isLoading } = useApiQuery('get', '/api/courses/{id}', {
+    params: {
+      path: {
+        id: courseId,
+      },
+    },
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!course) {
+    return <div>Course not found</div>;
+  }
 
   return (
     <PageWithSideBar>

@@ -18,7 +18,7 @@ export async function uploadJson(
   }
 }
 
-export async function uploadVideoFile (
+export async function uploadVideoFile(
   videoFile: File,
   presignedUrl: string,
 ): Promise<void> {
@@ -61,24 +61,17 @@ export async function uploadCourseContent(
   return await uploadJson(courseContent, data.url);
 }
 
-export async function uploadReel(
-  videoFile: File,
-  courseId: string,
-  description: string,
-) {
-  const { data } = await fetchClient.POST(
-    '/api/content-versions/{courseId}/upload-reel-url',
+export async function uploadReel(videoFile: File, courseId: string) {
+  const { data } = await fetchClient.GET(
+    '/api/courses/{courseId}/upload-reel-url',
     {
       params: {
         path: {
-          courseId
+          courseId,
         },
       },
-      body: {
-        description
-      }
-    }
-  )
+    },
+  );
 
   if (!data || !data.url) {
     throw new Error('Failed to get upload URL');

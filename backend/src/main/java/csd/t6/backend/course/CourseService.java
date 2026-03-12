@@ -2,6 +2,7 @@ package csd.t6.backend.course;
 
 import static csd.t6.jooq.public_.tables.Course.COURSE;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,16 +15,20 @@ import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.team.TeamService;
+import csd.t6.backend.utils.FileService;
+import csd.t6.backend.utils.dto.PresignedUrlResponse;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Service
 public class CourseService {
   private final CourseRepository courseRepository;
   private final TeamService teamService;
+  private final FileService fileService;
 
-  public CourseService(CourseRepository courseRepository, TeamService teamService) {
+  public CourseService(CourseRepository courseRepository, TeamService teamService, FileService fileService) {
     this.courseRepository = courseRepository;
     this.teamService = teamService;
+    this.fileService = fileService;
   }
 
   @Transactional
@@ -33,24 +38,26 @@ public class CourseService {
     }
 
     CourseRecord course = courseRepository.create(request.title(), request.description(), creatorId, request.teamId());
-    return new CourseResponse(course);
+    return new CourseResponse(course, getReelUrlForCourse(course));
   }
 
   public CourseResponse getCourseById(UUID id) {
     CourseRecord course = courseRepository.findById(id).orElseThrow(() -> new BadRequestException("Course not found"));
-    return new CourseResponse(course);
+    return new CourseResponse(course, getReelUrlForCourse(course));
   }
 
   public List<CourseResponse> getAllCourses() {
-    return courseRepository.findAll().stream().map(CourseResponse::new).collect(Collectors.toList());
+    return courseRepository.findAll().stream().map(record -> new CourseResponse(record, getReelUrlForCourse(record)))
+        .collect(Collectors.toList());
   }
 
-  public List<CourseRecord> getCoursesByTeamId(UUID teamId, UUID requesterId) {
+  public List<CourseResponse> getCoursesByTeamId(UUID teamId, UUID requesterId) {
     if (!teamService.isTeamMember(teamId, requesterId)) {
       throw new BadRequestException("You must be a member of the team to view its courses");
     }
 
-    return this.courseRepository.findBy(COURSE.TEAM_ID, teamId);
+    return this.courseRepository.findBy(COURSE.TEAM_ID, teamId).stream()
+        .map(record -> new CourseResponse(record, getReelUrlForCourse(record))).collect(Collectors.toList());
   }
 
   @Transactional
@@ -71,7 +78,7 @@ public class CourseService {
 
     CourseRecord updated = courseRepository.update(id, request.title(), request.description(), existing.getTeamId(),
         request.isPublished());
-    return new CourseResponse(updated);
+    return new CourseResponse(updated, this.getReelUrlForCourse(updated));
   }
 
   @Transactional
@@ -83,5 +90,22 @@ public class CourseService {
     }
 
     courseRepository.delete(id);
+  }
+
+  @Transactional
+  public PresignedUrlResponse generateReelUploadUrl(UUID courseId, UUID requesterId) {
+    CourseRecord course = courseRepository.findById(courseId)
+        .orElseThrow(() -> new BadRequestException("Course not found"));
+
+    if (!teamService.isTeamMember(course.getTeamId(), requesterId)) {
+      throw new BadRequestException("You must be a member of the team to upload reels");
+    }
+
+    String key = String.format("reels/%s.mp4", courseId);
+    return new PresignedUrlResponse(this.fileService.generatePresignedUploadUrl(key, Duration.ofMinutes(5)), key);
+  }
+
+  private String getReelUrlForCourse(CourseRecord course) {
+    return this.fileService.getPublicUrl(String.format("reels/%s.mp4", course.getId()));
   }
 }
