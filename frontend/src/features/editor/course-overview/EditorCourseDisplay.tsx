@@ -15,7 +15,7 @@ export default function EditorCourseDisplay({
 }: EditorCourseDisplayProps) {
   const { doc } = useContentEditor();
   const sectionCount = doc.getArray('root').length;
-  const reelsCount = 1;
+  const reelsCount = 0;
 
   return (
     <div className="flex h-full flex-col overflow-auto p-6">
