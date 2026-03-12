@@ -10,7 +10,7 @@ import {
   UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { useSidebar } from '@/context/SidebarContext';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
@@ -53,14 +53,6 @@ type NavItemProps = PropsWithChildren<{
   isCollapsed?: boolean;
 }>;
 
-/**
- * ROOT CAUSE (Issue 3 — icons resize):
- * Previously NavItem rendered icon + title as siblings inside a flex button.
- * When `isCollapsed` hid the entire nav section, icons disappeared entirely
- * (they weren't "resizing", they were gone). The fix renders icon-only buttons
- * in collapsed mode with a `title` tooltip. Icons are always `size-5 shrink-0`
- * so they never change size.
- */
 function NavItem({ title, link, icon, isCollapsed, children }: NavItemProps) {
   return (
     <div className="w-full">
@@ -69,9 +61,7 @@ function NavItem({ title, link, icon, isCollapsed, children }: NavItemProps) {
         title={isCollapsed ? title : undefined}
         className={cn(
           'cursor-pointer rounded-full text-slate-700 transition-all duration-300',
-          isCollapsed
-            ? 'w-full justify-center px-0'
-            : 'w-full justify-start',
+          isCollapsed ? 'w-full justify-center px-0' : 'w-full justify-start',
         )}
         asChild
       >
@@ -81,7 +71,7 @@ function NavItem({ title, link, icon, isCollapsed, children }: NavItemProps) {
         >
           {/* Icon wrapper: fixed size, never affected by collapse */}
           {icon && (
-            <span className="size-5 shrink-0 flex items-center justify-center">
+            <span className="flex size-5 shrink-0 items-center justify-center">
               {icon}
             </span>
           )}
@@ -242,26 +232,33 @@ function NotificationPanel({ role }: { role: Account['role'] }) {
 
   const getTypeColor = (type: Notification['type']) => {
     switch (type) {
-      case 'warning': return 'text-amber-500';
-      case 'success': return 'text-green-500';
-      case 'danger':  return 'text-rose-500';
-      default:        return 'text-blue-500';
+      case 'warning':
+        return 'text-amber-500';
+      case 'success':
+        return 'text-green-500';
+      case 'danger':
+        return 'text-rose-500';
+      default:
+        return 'text-blue-500';
     }
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="cursor-pointer relative">
+        <Button variant="ghost" size="icon" className="relative cursor-pointer">
           <BellIcon className="size-5" />
           {notificationCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full bg-rose-500 text-xs text-white">
+            <span className="absolute -top-1 -right-1 flex size-5 items-center justify-center rounded-full bg-rose-500 text-xs text-white">
               {notificationCount > 9 ? '9+' : notificationCount}
             </span>
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto">
+      <DropdownMenuContent
+        align="end"
+        className="max-h-96 w-80 overflow-y-auto"
+      >
         <DropdownMenuLabel>
           {notificationCount === 0
             ? 'No Notifications'
@@ -289,7 +286,9 @@ function NotificationPanel({ role }: { role: Account['role'] }) {
                       {notification.title}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-500">{notification.message}</p>
+                  <p className="text-sm text-slate-500">
+                    {notification.message}
+                  </p>
                   <p className="text-xs text-slate-400">
                     {dayjs(notification.time).fromNow()}
                   </p>
@@ -304,7 +303,9 @@ function NotificationPanel({ role }: { role: Account['role'] }) {
                       {notification.title}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-500">{notification.message}</p>
+                  <p className="text-sm text-slate-500">
+                    {notification.message}
+                  </p>
                   <p className="text-xs text-slate-400">
                     {dayjs(notification.time).fromNow()}
                   </p>
@@ -320,7 +321,8 @@ function NotificationPanel({ role }: { role: Account['role'] }) {
 
 export default function Sidebar() {
   const currentActiveRole = useActiveRole();
-  const { user  } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [gravatarUrl, setGravatarUrl] = useState('');
   const { isCollapsed, setIsCollapsed } = useSidebar();
 
@@ -334,7 +336,7 @@ export default function Sidebar() {
   return (
     <div
       className={cn(
-        'fixed flex h-[calc(100vh-3rem)] flex-col justify-between bg-white/50 shadow-lg transition-all duration-300 z-40',
+        'fixed z-40 flex h-[calc(100vh-3rem)] flex-col justify-between bg-white/50 shadow-lg transition-all duration-300',
         isCollapsed ? 'w-16' : 'w-70',
       )}
     >
@@ -355,7 +357,7 @@ export default function Sidebar() {
               variant="ghost"
               size="icon"
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="cursor-pointer shrink-0"
+              className="shrink-0 cursor-pointer"
             >
               <Bars3Icon className="size-5" />
             </Button>
@@ -387,12 +389,21 @@ export default function Sidebar() {
                 isCollapsed={false}
               />
             </div>
+            <Button
+              className="w-full"
+              onClick={async () => {
+                await logout();
+                navigate({ to: '/' });
+              }}
+            >
+              Logout
+            </Button>
           </div>
         )}
 
         {/* Collapsed: show system icons */}
         {isCollapsed && (
-          <div className="px-2 py-2 flex flex-col gap-y-2">
+          <div className="flex flex-col gap-y-2 px-2 py-2">
             <NavItem
               title="Settings"
               link={getRoleUrl(currentActiveRole, 'settings')}
@@ -422,15 +433,15 @@ export default function Sidebar() {
           <img
             src={gravatarUrl}
             alt="Profile avatar"
-            className="size-10 shrink-0 rounded-full border-2 border-slate-300 hover:border-slate-500 transition-all"
+            className="size-10 shrink-0 rounded-full border-2 border-slate-300 transition-all hover:border-slate-500"
             onError={(e) => {
               e.currentTarget.src =
                 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"%3E%3Ccircle cx="12" cy="12" r="10" stroke="%2394a3b8"/%3E%3Ccircle cx="12" cy="9" r="3" fill="%2394a3b8"/%3E%3Cpath d="M7 21v-2a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4v2" stroke="%2394a3b8"/%3E%3C/svg%3E';
             }}
           />
           {!isCollapsed && (
-            <div className="flex flex-col p-2 text-left overflow-hidden">
-              <div className="text-sm font-bold text-slate-700 truncate">
+            <div className="flex flex-col overflow-hidden p-2 text-left">
+              <div className="truncate text-sm font-bold text-slate-700">
                 @{user.username}
               </div>
               <div className="text-xs text-slate-500">
