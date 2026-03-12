@@ -33,8 +33,21 @@ public class ContentVersionController {
         request.description());
   }
 
+  @PostMapping("/{courseId}/upload-reel-url")
+  public PresignedUrlResponse getReelUploadUrl(@PathVariable UUID courseId,
+      @AuthenticationPrincipal AuthUserDetails userDetails, @Valid @RequestBody UploadCourseRequest request) {
+    return this.contentVersionService.generateReelUploadUrl(courseId, userDetails.getId(),
+        request.description());
+  }
+
   @GetMapping("/{courseId}")
   public List<ContentVersionResponse> getContentVersions(@PathVariable UUID courseId) {
     return this.contentVersionService.getPastVersions(courseId).stream().map(ContentVersionResponse::new).toList();
+  }
+
+  @GetMapping("/{courseId}/reel")
+  public String getReelUrl(@PathVariable UUID courseId) {
+    System.out.println(this.contentVersionService.getReelPublicUrl(courseId));
+    return this.contentVersionService.getReelPublicUrl(courseId);
   }
 }

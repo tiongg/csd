@@ -67,7 +67,7 @@ export async function uploadReel(
   description: string,
 ) {
   const { data } = await fetchClient.POST(
-    '/api/content-versions/{courseId}/upload-url',
+    '/api/content-versions/{courseId}/upload-reel-url',
     {
       params: {
         path: {

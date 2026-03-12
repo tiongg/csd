@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/card';
 import { CardWithPlusIcon } from '@/components/ui/custom-cards';
 import { useContentEditor } from '@/context/ContentEditorContext';
+import { useApiQuery } from '@/lib/fetch-client';
 
 export default function ReelsOverview() {
     const {
@@ -18,6 +19,21 @@ export default function ReelsOverview() {
         setValue: setUploadReelDialogOpen,
     } = useBoolean(false);
     const { course } = useContentEditor();
+
+    const { data } = useApiQuery(
+        "get",
+        '/api/content-versions/{courseId}/reel',
+        {
+            params: {
+                path: {
+                    courseId: course.id,
+                },
+            },
+        },
+    )
+
+    console.log("reel:");
+    console.log(data);
 
     return (
         <div>
@@ -42,6 +58,9 @@ export default function ReelsOverview() {
                 <CardContent>
                     <CardWithPlusIcon title="Add New Reel" onClick={openUploadReelDialog} />
                     {/* reels go here */}
+                    <video>
+                        <source src={data} />
+                    </video>
                 </CardContent>
             </Card >
             <UploadReelDialog isOpen={isUploadReelDialogOpen} setDialogOpen={setUploadReelDialogOpen} course={course} />

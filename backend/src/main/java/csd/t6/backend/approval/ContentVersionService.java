@@ -53,6 +53,24 @@ public class ContentVersionService {
     return new PresignedUrlResponse(this.fileService.generatePresignedUploadUrl(key, Duration.ofMinutes(5)), key);
   }
 
+  @Transactional
+  public PresignedUrlResponse generateReelUploadUrl(UUID courseId, UUID requesterId, String description) {
+    CourseRecord course = courseRepository.findById(courseId)
+        .orElseThrow(() -> new BadRequestException("Course not found"));
+
+    if (!teamService.isTeamMember(course.getTeamId(), requesterId)) {
+      throw new BadRequestException("You must be a member of the team to upload reels");
+    }
+
+    String key = String.format("reels/%s.mp4", courseId);
+    return new PresignedUrlResponse(this.fileService.generatePresignedUploadUrl(key, Duration.ofMinutes(5)), key);
+  }
+  
+  public String getReelPublicUrl(UUID courseId) {
+    String key = String.format("reels/%s.mp4", courseId);
+    return this.fileService.generatePresignedDownloadUrl(key, Duration.ofHours(1));
+  }
+
   public List<ContentVersionRecord> getPastVersions(UUID courseId) {
     return this.contentVersionRepository.findBy(CONTENT_VERSION.COURSE_ID, courseId).stream()
         .sorted((v1, v2) -> v2.getVersion() - v1.getVersion()).toList();
