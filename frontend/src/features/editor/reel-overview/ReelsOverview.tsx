@@ -56,7 +56,7 @@ export default function ReelsOverview() {
                 </CardHeader>
 
                 <CardContent>
-                    <CardWithPlusIcon title="Add New Reel" onClick={openUploadReelDialog} />
+                    <CardWithPlusIcon title="Add New Reel" onInteract={openUploadReelDialog}/>
                     {/* reels go here */}
                     <video>
                         <source src={data} />
