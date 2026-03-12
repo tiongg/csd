@@ -18,6 +18,23 @@ export async function uploadJson(
   }
 }
 
+export async function uploadVideoFile (
+  videoFile: File,
+  presignedUrl: string,
+): Promise<void> {
+  const response = await fetch(presignedUrl, {
+    method: 'PUT',
+    body: videoFile,
+    headers: {
+      'Content-Type': 'video/mp4, video/webm',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to upload file: ${response.statusText}`);
+  }
+}
+
 export async function uploadCourseContent(
   courseContent: SectionType[],
   courseId: string,
@@ -42,4 +59,30 @@ export async function uploadCourseContent(
   }
 
   return await uploadJson(courseContent, data.url);
+}
+
+export async function uploadReel(
+  videoFile: File,
+  courseId: string,
+  description: string,
+) {
+  const { data } = await fetchClient.POST(
+    '/api/content-versions/{courseId}/upload-url',
+    {
+      params: {
+        path: {
+          courseId
+        },
+      },
+      body: {
+        description
+      }
+    }
+  )
+
+  if (!data || !data.url) {
+    throw new Error('Failed to get upload URL');
+  }
+
+  return await uploadVideoFile(videoFile, data.url);
 }

@@ -9,6 +9,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { CardWithPlusIcon } from '@/components/ui/custom-cards';
+import { useContentEditor } from '@/context/ContentEditorContext';
 
 export default function ReelsOverview() {
     const {
@@ -16,7 +17,8 @@ export default function ReelsOverview() {
         setTrue: openUploadReelDialog,
         setValue: setUploadReelDialogOpen,
     } = useBoolean(false);
-    
+    const { course } = useContentEditor();
+
     return (
         <div>
             <Card>
@@ -42,7 +44,7 @@ export default function ReelsOverview() {
                     {/* reels go here */}
                 </CardContent>
             </Card >
-            <UploadReelDialog isOpen={isUploadReelDialogOpen} setDialogOpen={setUploadReelDialogOpen} />
+            <UploadReelDialog isOpen={isUploadReelDialogOpen} setDialogOpen={setUploadReelDialogOpen} course={course} />
         </div>
     )
 }

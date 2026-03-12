@@ -3,6 +3,7 @@ import { useBoolean } from 'usehooks-ts';
 import UploadReelDialog from './UploadReelDialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useContentEditor } from '@/context/ContentEditorContext';
 
 export default function NoReelsYet() {
     const {
@@ -10,6 +11,8 @@ export default function NoReelsYet() {
         setTrue: openUploadReelDialog,
         setValue: setUploadReelDialogOpen,
     } = useBoolean(false);
+    const { course } = useContentEditor();
+
     return (
         <div>
             <Card>
@@ -30,7 +33,7 @@ export default function NoReelsYet() {
                     </Button>
                 </CardContent>
             </Card>
-            <UploadReelDialog isOpen={ isUploadReelDialogOpen } setDialogOpen={ setUploadReelDialogOpen } />
+            <UploadReelDialog isOpen={ isUploadReelDialogOpen } setDialogOpen={ setUploadReelDialogOpen } course={ course }/>
         </div>
     )
 }

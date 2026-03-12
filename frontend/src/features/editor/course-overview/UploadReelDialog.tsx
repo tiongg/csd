@@ -1,6 +1,8 @@
 import { z } from 'zod';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import type { Course } from '@/lib/utils';
 import {
     Dialog,
     DialogContent,
@@ -16,11 +18,13 @@ import {
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { uploadReel } from '@/lib/file-upload';
+import { apiQueryOptions } from '@/lib/fetch-client';
 
 type UploadReelDialogProps = {
     isOpen: boolean;
     setDialogOpen: (isOpen: boolean) => void;
+    course: Course;
 };
 
 const fileSizeLimit = 5 * 1024 * 1024;
@@ -45,11 +49,12 @@ type ReelFormValues = z.infer<typeof reelSchema>;
 
 export default function UploadReelDialog({
     isOpen,
-    setDialogOpen
+    setDialogOpen,
+    course
 }: UploadReelDialogProps) {
     const {
         handleSubmit,
-        formState: { errors, isSubmitting },
+        formState: { errors },
         setError,
         control
     } = useForm<ReelFormValues>({
@@ -59,16 +64,35 @@ export default function UploadReelDialog({
             reelFile: new File([], "")
         },
     });
+    const queryClient = useQueryClient();
 
-    async function onSubmit(data: ReelFormValues) {
-        try {
-            await console.log(data);
-        } catch (error) {
+    const { mutateAsync: uploadReelAsync, isPending: isPublishing } = useMutation({
+        mutationFn: async (data: ReelFormValues) => {
+            return uploadReel(data.reelFile, course.id, data.title);
+        },
+        onSuccess: async () => {
+            await queryClient.invalidateQueries(
+                apiQueryOptions('get', '/api/content-versions/{courseId}', {
+                    params: {
+                        path: {
+                            courseId: course.id,
+                        },
+                    },
+                }),
+            );
+        },
+        onError: () => {
             setError("root", {
                 type: "custom",
                 message: "Failed to upload reel"
             });
         }
+    })
+
+    async function onSubmit(data: ReelFormValues) {
+        await uploadReelAsync(data);
+
+        setDialogOpen(false);
     }
 
     return (
@@ -133,8 +157,8 @@ export default function UploadReelDialog({
                     )}
 
                     <div className="flex gap-4">
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Uploading...' : 'Upload Reel'}
+                        <Button type="submit" disabled={isPublishing}>
+                            {isPublishing ? 'Uploading...' : 'Upload Reel'}
                         </Button>
                         <Button
                             type="button"
