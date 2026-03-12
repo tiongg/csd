@@ -79,3 +79,16 @@ export async function uploadReel(videoFile: File, courseId: string) {
 
   return await uploadVideoFile(videoFile, data.url);
 }
+
+export async function deleteReel(courseId: string) {
+  await fetchClient.DELETE(
+    '/api/courses/{courseId}/reel',
+    {
+      params: {
+        path: {
+          courseId,
+        },
+      },
+    },
+  );
+}

@@ -85,4 +85,12 @@ public class CourseController {
     return courseService.generateReelUploadUrl(courseId, userDetails.getId());
   }
 
+  @DeleteMapping("/{courseId}/reel")
+  @NoContentResponse
+  @BadRequestResponse
+  @Operation(summary = "Delete reel", description = "Deletes a reel. Only team members can delete.")
+  public void deleteReel(@PathVariable UUID courseId,
+      @AuthenticationPrincipal AuthUserDetails userDetails) {
+    courseService.deleteReel(courseId, userDetails.getId());
+  }
 }

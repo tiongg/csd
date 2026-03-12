@@ -92,6 +92,18 @@ public class CourseService {
     courseRepository.delete(id);
   }
 
+  public void deleteReel(UUID courseId, UUID requesterId) {
+    CourseRecord course = courseRepository.findById(courseId)
+        .orElseThrow(() -> new BadRequestException("Course not found"));
+
+    if (!teamService.isTeamMember(course.getTeamId(), requesterId)) {
+      throw new BadRequestException("You must be a member of the team to delete reels");
+    }
+
+    String key = String.format("reels/%s.mp4", courseId);
+    this.fileService.deleteObject(key);
+  }
+
   @Transactional
   public PresignedUrlResponse generateReelUploadUrl(UUID courseId, UUID requesterId) {
     CourseRecord course = courseRepository.findById(courseId)

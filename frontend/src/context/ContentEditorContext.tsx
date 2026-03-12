@@ -30,6 +30,7 @@ export type ContentEditorContextType = {
   getDocAsJson: () => Promise<SectionType[]>;
   deleteSection: (index: number) => void;
   addSection: (type: ContentType) => void;
+  deleteReelUrl: () => void;
 };
 
 const ContentEditorContext = createContext<ContentEditorContextType | null>(
@@ -189,6 +190,10 @@ export function ContentEditorProvider({
     });
   }
 
+  function deleteReelUrl() {
+    course.reelUrl = undefined;
+  }
+
   return (
     <ContentEditorContext.Provider
       value={{
@@ -200,6 +205,7 @@ export function ContentEditorProvider({
         getDocAsJson,
         deleteSection,
         addSection,
+        deleteReelUrl
       }}
     >
       {children}

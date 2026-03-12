@@ -15,7 +15,6 @@ export default function EditorCourseDisplay({
 }: EditorCourseDisplayProps) {
   const { doc } = useContentEditor();
   const sectionCount = doc.getArray('root').length;
-  const reelsCount = 1;
 
   return (
     <div className="flex h-full flex-col overflow-auto p-6">
@@ -23,13 +22,13 @@ export default function EditorCourseDisplay({
         <CourseEditorOverview course={course} />
         <div
           className={
-            sectionCount === 0 && reelsCount === 0
+            sectionCount === 0 && course.reelUrl === undefined
               ? 'lg:grid lg:grid-cols-2 lg:gap-x-2'
               : 'flex flex-col gap-y-2'
           }
         >
           {sectionCount === 0 && <NoCourseSectionsYet />}
-          {reelsCount === 0 ? <NoReelsYet/> : <ReelsOverview />}
+          {course.reelUrl === undefined ? <NoReelsYet/> : <ReelsOverview />}
         </div>
         <CourseVersions course={course} />
       </div>
