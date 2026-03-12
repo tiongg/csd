@@ -68,7 +68,11 @@ export default function UploadReelDialog({
 
     const { mutateAsync: uploadReelAsync, isPending: isPublishing } = useMutation({
         mutationFn: async (data: ReelFormValues) => {
-            return uploadReel(data.reelFile, course.id, data.title);
+            return uploadReel(
+                data.reelFile, 
+                course.id,
+                `Reel added: ${data.title}` 
+            );
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries(
