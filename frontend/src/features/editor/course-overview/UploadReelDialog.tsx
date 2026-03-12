@@ -27,7 +27,6 @@ const fileSizeLimit = 5 * 1024 * 1024;
 
 const reelSchema = z.object({
     title: z.string().min(3, "Reel name must be at least 3 characters").max(50, "Reel name must not exceed 50 characters"),
-    description: z.string().optional(),
     reelFile: z.instanceof(File)
         .refine(
             (file) =>
@@ -57,7 +56,6 @@ export default function UploadReelDialog({
         resolver: zodResolver(reelSchema),
         defaultValues: {
             title: '',
-            description: "",
             reelFile: new File([], "")
         },
     });
@@ -96,28 +94,6 @@ export default function UploadReelDialog({
                                         id="title"
                                         aria-invalid={fieldState.invalid}
                                         placeholder="e.g., How to Say Six Seven"
-                                    />
-                                    {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                    )}
-                                </Field>
-                            )}
-                        />
-                    </FieldGroup>
-
-                    <FieldGroup>
-                        <Controller
-                            control={control}
-                            name="description"
-                            render={({ field, fieldState }) => (
-                                <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor="description">Description (Optional)</FieldLabel>
-                                    <Textarea
-                                        {...field}
-                                        id="description"
-                                        aria-invalid={fieldState.invalid}
-                                        placeholder="Describe your reel"
-                                        className="resize-none"
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
