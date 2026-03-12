@@ -20,7 +20,7 @@ export default function ReelsOverview() {
 
   return (
     <div>
-      <Card>
+      <Card className='h-full'>
         <CardHeader>
           <div className="flex items-center gap-x-4">
             <div className="bg-primary/10 flex size-12 items-center justify-center rounded-full">
