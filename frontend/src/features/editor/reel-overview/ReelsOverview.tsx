@@ -20,7 +20,7 @@ type VideoPreviewProps = {
 }
 
 function VideoPreview({ reelUrl, setError }: VideoPreviewProps) {
-    const { course, deleteReelUrl } = useContentEditor();
+    const { course } = useContentEditor();
     return (
         <div>
             <div className='relative'>
@@ -35,7 +35,6 @@ function VideoPreview({ reelUrl, setError }: VideoPreviewProps) {
                 </video>
                 <button className='cursor-pointer' onClick={() => {
                     deleteReel(course.id);
-                    deleteReelUrl();
                 }}>
                     <XCircleIcon className='absolute right-0 top-0 m-2 z-10 rounded-full size-10 text-white bg-slate-700 hover:bg-rose-600 hover:shadow-lg transition' />
                 </button>
