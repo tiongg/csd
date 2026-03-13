@@ -32,11 +32,11 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const { course } = Route.useLoaderData();
+  const { course, content } = Route.useLoaderData();
 
   return (
     <PageWithSideBar>
-      <CourseView course={course} />
+      <CourseView course={course} content={content} />
     </PageWithSideBar>
   );
 }

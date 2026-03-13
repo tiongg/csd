@@ -1,0 +1,4 @@
+/* God knows where this padding comes from */
+.milkdown .ProseMirror {
+  padding: 0;
+}
