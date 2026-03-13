@@ -16,21 +16,24 @@ import { Heading3 } from './typography';
 export function CardWithPlusIcon({
   title,
   className,
+  onInteract,
   ...rest
-}: { title: string } & ComponentProps<'div'>) {
+}: { title: string, onInteract: () => void } & ComponentProps<'div'>) {
   return (
-    <Card
-      className={cn(
-        'col-span-1 cursor-pointer border-2 transition hover:border-slate-500 hover:shadow-lg',
-        className,
-      )}
-      {...rest}
-    >
-      <CardContent className="flex h-full flex-col items-center justify-center gap-y-8">
-        <PlusCircleIcon className="size-28" />
-        <Heading3>{title}</Heading3>
-      </CardContent>
-    </Card>
+    <button className='w-full' onClick={onInteract}>
+      <Card
+        className={cn(
+          'h-full cursor-pointer border-2 transition hover:border-slate-500 hover:shadow-lg',
+          className,
+        )}
+        {...rest}
+      >
+        <CardContent className="flex h-full flex-col items-center justify-center gap-y-8">
+          <PlusCircleIcon className="size-28" />
+          <Heading3>{title}</Heading3>
+        </CardContent>
+      </Card>
+    </button>
   );
 }
 
@@ -39,6 +42,7 @@ type CardWithDetailsProps = {
   descriptor: string;
   data: string;
   enableTooltip?: boolean;
+  onInteract?: () => void;
 } & ComponentProps<'div'>;
 
 export function CardWithDetails({
@@ -47,48 +51,51 @@ export function CardWithDetails({
   data,
   children,
   enableTooltip = false,
+  onInteract = () => {},
   className,
   ...rest
 }: CardWithDetailsProps) {
   return (
-    <div
-      className={cn(
-        'flex cursor-pointer flex-col overflow-hidden rounded-2xl border-2 transition-all hover:border-slate-500 hover:shadow-lg',
-        className,
-      )}
-      {...rest}
-    >
-      <div className="h-40 bg-sky-200" />
-      <Separator />
-      <div className="flex items-end justify-between p-4">
-        <div className="flex flex-col gap-1">
-          <div className="group relative">
-           {enableTooltip && <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-lg bg-slate-800 px-2 py-1 text-sm whitespace-nowrap text-white opacity-0 shadow-md transition group-hover:opacity-100">
-              {title}
-            </div>}
-            <Heading3 className="max-w-full truncate">{title}</Heading3>
+    <button className='w-full' onClick={onInteract}>
+      <div
+        className={cn(
+          'h-full flex cursor-pointer flex-col overflow-hidden rounded-2xl border-2 transition-all hover:border-slate-500 hover:shadow-lg shadow-sm',
+          className,
+        )}
+        {...rest}
+      >
+        <div className="h-40 bg-sky-200" />
+        <Separator />
+        <div className="flex items-end justify-between p-4">
+          <div className="flex flex-col gap-1">
+            <div className="group relative">
+              {enableTooltip && <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-lg bg-slate-800 px-2 py-1 text-sm whitespace-nowrap text-white opacity-0 shadow-md transition group-hover:opacity-100">
+                {title}
+              </div>}
+              <Heading3 className="max-w-full truncate">{title}</Heading3>
+            </div>
+            <p className="text-sm text-slate-600">
+              {descriptor}: {data}
+            </p>
           </div>
-          <p className="text-sm text-slate-600">
-            {descriptor}: {data}
-          </p>
+          {children ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="cursor-pointer text-slate-600 hover:text-slate-800 transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <EllipsisVerticalIcon className="size-6" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {children}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
         </div>
-        {children ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="cursor-pointer text-slate-600 hover:text-slate-800 transition-colors"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <EllipsisVerticalIcon className="size-6" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {children}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : null}
       </div>
-    </div>
+    </button>
   );
 }

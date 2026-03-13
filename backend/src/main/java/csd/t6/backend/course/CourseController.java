@@ -21,6 +21,7 @@ import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
 import csd.t6.backend.decorators.responses.OkResponse;
+import csd.t6.backend.utils.dto.PresignedUrlResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -76,5 +77,19 @@ public class CourseController {
   @Operation(summary = "Delete course", description = "Deletes a course. Only creator can delete.")
   public void deleteCourse(@PathVariable UUID id, @AuthenticationPrincipal AuthUserDetails userDetails) {
     courseService.deleteCourse(id, userDetails.getId());
+  }
+
+  @GetMapping("/{courseId}/upload-reel-url")
+  public PresignedUrlResponse getUploadReelUrl(@PathVariable UUID courseId,
+      @AuthenticationPrincipal AuthUserDetails userDetails) {
+    return courseService.generateReelUploadUrl(courseId, userDetails.getId());
+  }
+
+  @DeleteMapping("/{courseId}/reel")
+  @NoContentResponse
+  @BadRequestResponse
+  @Operation(summary = "Delete reel", description = "Deletes a reel. Only team members can delete.")
+  public void deleteReel(@PathVariable UUID courseId, @AuthenticationPrincipal AuthUserDetails userDetails) {
+    courseService.deleteReel(courseId, userDetails.getId());
   }
 }

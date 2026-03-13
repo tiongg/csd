@@ -1,5 +1,6 @@
 import { useContentEditor } from '@/context/ContentEditorContext';
 import type { Course } from '@/lib/utils';
+import ReelsOverview from '../reel-overview/ReelsOverview';
 import CourseEditorOverview from './CourseEditorOverview';
 import CourseVersions from './CourseVersions';
 import NoCourseSectionsYet from './NoCourseSectionsYet';
@@ -18,7 +19,10 @@ export default function EditorCourseDisplay({
     <div className="flex h-full flex-col overflow-auto p-6">
       <div className="mx-auto w-full max-w-4xl space-y-2">
         <CourseEditorOverview course={course} />
-        {sectionCount === 0 && <NoCourseSectionsYet />}
+        <div className='flex flex-col gap-y-2'>
+          {sectionCount === 0 && <NoCourseSectionsYet />}
+          <ReelsOverview/>
+        </div>
         <CourseVersions course={course} />
       </div>
     </div>

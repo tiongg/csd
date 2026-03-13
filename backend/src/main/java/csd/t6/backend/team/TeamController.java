@@ -137,8 +137,7 @@ public class TeamController {
   @Operation(summary = "Gets all team courses", description = "Retrieves all courses associated with the team")
   public List<CourseResponse> getTeamCourses(@PathVariable UUID teamId,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
-    return this.courseService.getCoursesByTeamId(teamId, userDetails.getId()).stream().map(CourseResponse::new)
-        .toList();
+    return this.courseService.getCoursesByTeamId(teamId, userDetails.getId());
   }
 
 }

@@ -388,6 +388,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/courses/{courseId}/upload-reel-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getUploadReelUrl"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/content-versions/{courseId}": {
         parameters: {
             query?: never;
@@ -488,6 +504,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/courses/{courseId}/reel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete reel
+         * @description Deletes a reel. Only team members can delete.
+         */
+        delete: operations["deleteReel"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/account/{accountId}": {
         parameters: {
             query?: never;
@@ -571,6 +607,7 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            reelUrl?: string;
         };
         AddMemberRequest: {
             username: string;
@@ -1490,6 +1527,28 @@ export interface operations {
             };
         };
     };
+    getUploadReelUrl: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PresignedUrlResponse"];
+                };
+            };
+        };
+    };
     getContentVersions: {
         parameters: {
             query?: never;
@@ -1614,6 +1673,35 @@ export interface operations {
             path: {
                 teamId: string;
                 accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    deleteReel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
             };
             cookie?: never;
         };

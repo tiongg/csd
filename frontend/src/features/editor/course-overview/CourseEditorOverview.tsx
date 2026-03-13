@@ -1,3 +1,6 @@
+import { FileText, HelpCircle } from 'lucide-react';
+import PublishCourse from './PublishCourse';
+import type { Course } from '@/lib/utils';
 import {
   Card,
   CardContent,
@@ -6,9 +9,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useContentEditor } from '@/context/ContentEditorContext';
-import type { Course } from '@/lib/utils';
-import { FileText, HelpCircle } from 'lucide-react';
-import PublishCourse from './PublishCourse';
 
 type CourseEditorOverviewProps = {
   course: Course;

@@ -25,7 +25,7 @@ export default function TeamsList() {
         <p className="font-subtitle">Here's what's happening today!</p>
       </div>
       <div className="grid grid-cols-4 justify-start gap-4 py-4">
-        <CardWithPlusIcon title="Add New Team" onClick={openCreateTeamDialog} />
+        <CardWithPlusIcon title="Add New Team" onInteract={openCreateTeamDialog} />
 
         {isLoading ? (
           <p>Loading...</p>
@@ -56,7 +56,7 @@ function TeamCard({ team }: TeamCardProps) {
       title={team.name}
       descriptor={`${collaboratorCount} Collaborators`}
       data="View courses →"
-      onClick={() => {
+      onInteract={() => {
         navigate({
           to: '/contributor/$teamId/courses',
           params: { teamId: team.id },

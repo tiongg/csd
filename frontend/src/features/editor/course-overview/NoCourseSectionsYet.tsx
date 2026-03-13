@@ -8,7 +8,7 @@ export default function NoCourseSectionsYet() {
 
   return (
     <Card>
-      <CardContent className="flex min-h-75 flex-col items-center justify-center p-8">
+      <CardContent className="flex min-h-75 flex-col items-center justify-between p-8">
         <div className="bg-muted mb-4 flex size-16 items-center justify-center rounded-full">
           <FileText className="text-muted-foreground size-8" />
         </div>

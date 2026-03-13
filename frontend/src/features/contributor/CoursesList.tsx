@@ -100,7 +100,7 @@ export default function CoursesList({ team }: CourseListProps) {
       <div className="grid grid-cols-4 justify-start gap-4 py-4">
         <CardWithPlusIcon
           title="Create New Course"
-          onClick={openCreateCourseDialog}
+          onInteract={openCreateCourseDialog}
         />
 
         {(courses ?? []).map((course) => (
@@ -215,7 +215,7 @@ function CourseCard({ course, teamId, status }: CourseCardProps) {
         descriptor="Last Edited"
         data={dayjs(course.updatedAt).fromNow()}
         enableTooltip
-        onClick={() =>
+        onInteract={() =>
           navigate({
             to: '/contributor/editor/$courseId',
             params: { courseId: course.id },
