@@ -1,30 +1,19 @@
 import { cn } from '@/lib/utils';
 import type { PropsWithChildren } from 'react';
 import Sidebar from '../Sidebar';
-import { SidebarProvider, useSidebar } from '@/context/SidebarContext';
-
-function SidebarSpacer() {
-  const { isCollapsed } = useSidebar();
-  return (
-    <div
-      className={cn(
-        'shrink-0 transition-all duration-300',
-        isCollapsed ? 'w-16' : 'w-70',
-      )}
-    />
-  );
-}
+import { SidebarProvider, SidebarTrigger } from '../ui/sidebar';
 
 export default function PageWithSideBar({
   children,
   className,
 }: PropsWithChildren<{ className?: string }>) {
   return (
-    <SidebarProvider>
-      <div className={cn('relative flex min-h-[calc(100vh-52px)]', className)}>
+    <SidebarProvider defaultOpen>
+      <div className={cn('absolute flex w-full', className)}>
         <Sidebar />
-        <SidebarSpacer />
-        <main className="flex-1 min-w-0 overflow-auto">
+
+        <main className="min-w-0 flex-1">
+          <SidebarTrigger className="sticky top-16 p-6" />
           {children}
         </main>
       </div>

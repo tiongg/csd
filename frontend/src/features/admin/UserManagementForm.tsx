@@ -16,13 +16,16 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heading1 } from '@/components/ui/typography';
-import { apiQueryOptions, useApiMutation, useApiQuery } from '@/lib/fetch-client';
-import { cn } from '@/lib/utils';
+import {
+  apiQueryOptions,
+  useApiMutation,
+  useApiQuery,
+} from '@/lib/fetch-client';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import PendingContributorsForm from './PendingContributorsForm';
-import AllAdminsList from './AllAdminsList';
+import { useAuth } from '@/context/AuthContext';
 
 type UserRole = 'LEARNER' | 'CONTRIBUTOR' | 'ADMIN';
 
@@ -40,9 +43,6 @@ export default function UserManagementForm() {
             <TabsTrigger value="pending" className="cursor-pointer">
               Pending Approvals
             </TabsTrigger>
-            <TabsTrigger value="admins" className="cursor-pointer">
-              All Admins
-            </TabsTrigger>
             <TabsTrigger value="users" className="cursor-pointer">
               All Users
             </TabsTrigger>
@@ -50,10 +50,6 @@ export default function UserManagementForm() {
 
           <TabsContent value="pending">
             <PendingContributorsForm />
-          </TabsContent>
-
-          <TabsContent value="admins">
-            <AllAdminsList />
           </TabsContent>
 
           <TabsContent value="users">
@@ -68,15 +64,9 @@ export default function UserManagementForm() {
 function AllUsers() {
   const [searchQuery, setSearchQuery] = useState('');
   const queryClient = useQueryClient();
+  const { user: currentUser } = useAuth();
 
   const { data: users, isLoading } = useApiQuery('get', '/api/account/', {});
-
-  const { data: pendingApps } = useApiQuery(
-    'get',
-    '/api/admins/contributor-applications',
-    {},
-  );
-  const pendingSet = new Set<string>((pendingApps ?? []).map((a) => a.id));
 
   const filteredUsers = (users ?? []).filter(
     (user) =>
@@ -88,11 +78,19 @@ function AllUsers() {
     'patch',
     '/api/account/{accountId}/role',
     {
-      onSuccess: () => {
+      onSuccess: async () => {
         toast.success('Role updated successfully');
-        queryClient.invalidateQueries({
-          queryKey: apiQueryOptions('get', '/api/account/').queryKey,
-        });
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: apiQueryOptions('get', '/api/account/').queryKey,
+          }),
+          queryClient.invalidateQueries({
+            queryKey: apiQueryOptions(
+              'get',
+              '/api/admins/contributor-applications',
+            ).queryKey,
+          }),
+        ]);
       },
       onError: (err) => {
         toast.error((err as any)?.message ?? 'Failed to update role');
@@ -107,21 +105,9 @@ function AllUsers() {
     });
   };
 
-  const getRoleColorClasses = (role: UserRole) => {
-    switch (role) {
-      case 'ADMIN':       return 'bg-red-100 text-red-800 border-red-200';
-      case 'CONTRIBUTOR': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'LEARNER':     return 'bg-green-100 text-green-800 border-green-200';
-      default:            return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
     <div className="flex flex-col gap-4 py-4">
-      <div className="flex w-full items-center justify-between gap-x-2">
-        <span className="text-sm text-slate-500">
-          {filteredUsers.length} user{filteredUsers.length !== 1 ? 's' : ''}
-        </span>
+      <div className="flex w-full items-center justify-end">
         <SearchBar placeholder="Search for Users" onSearch={setSearchQuery} />
       </div>
 
@@ -131,22 +117,26 @@ function AllUsers() {
             <TableHead className="w-2/12">Username</TableHead>
             <TableHead className="w-3/12">Email</TableHead>
             <TableHead className="w-2/12">Real Name</TableHead>
-            <TableHead className="w-2/12">Current Role</TableHead>
-            <TableHead className="w-2/12">Pending Contributor?</TableHead>
-            <TableHead className="w-1/12">Change Role</TableHead>
+            <TableHead className="w-1/12">Role</TableHead>
           </TableRow>
         </TableHeader>
 
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-slate-400">
+              <TableCell
+                colSpan={6}
+                className="py-8 text-center text-slate-400"
+              >
                 Loading users…
               </TableCell>
             </TableRow>
           ) : filteredUsers.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-slate-400">
+              <TableCell
+                colSpan={6}
+                className="py-8 text-center text-slate-400"
+              >
                 No users found.
               </TableCell>
             </TableRow>
@@ -157,28 +147,9 @@ function AllUsers() {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.realname ?? '—'}</TableCell>
                 <TableCell>
-                  <span
-                    className={cn(
-                      'inline-flex rounded-full border px-2.5 py-0.5 text-xs font-semibold',
-                      getRoleColorClasses(user.role as UserRole),
-                    )}
-                  >
-                    {user.role}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {pendingSet.has(user.id) ? (
-                    <span className="inline-flex rounded-full border border-yellow-300 bg-yellow-100 px-2.5 py-0.5 text-xs font-semibold text-yellow-800">
-                      Pending
-                    </span>
-                  ) : (
-                    <span className="text-slate-400 text-sm">—</span>
-                  )}
-                </TableCell>
-                <TableCell>
                   <Select
                     value={user.role}
-                    disabled={isUpdatingRole}
+                    disabled={isUpdatingRole || user.id === currentUser?.id}
                     onValueChange={(value) =>
                       handleRoleChange(user.id, value as UserRole)
                     }
