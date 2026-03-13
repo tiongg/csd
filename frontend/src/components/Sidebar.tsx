@@ -206,7 +206,7 @@ export default function Sidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="pb-0">
+      <SidebarFooter className="pb-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex items-center justify-between px-4">

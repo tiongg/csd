@@ -13,7 +13,7 @@ export default function PageWithSideBar({
         <Sidebar />
 
         <main className="min-w-0 flex-1">
-          <SidebarTrigger className="sticky top-16 p-8" />
+          <SidebarTrigger className="sticky top-16 p-6" />
           {children}
         </main>
       </div>
