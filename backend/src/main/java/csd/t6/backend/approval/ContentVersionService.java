@@ -9,11 +9,14 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import csd.t6.backend.approval.dto.response.LatestContentVersionResponse;
 import csd.t6.backend.course.CourseRepository;
+import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.team.TeamService;
 import csd.t6.backend.utils.FileService;
 import csd.t6.backend.utils.dto.PresignedUrlResponse;
+import csd.t6.jooq.public_.enums.ContentStatus;
 import csd.t6.jooq.public_.tables.records.ContentVersionRecord;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 
@@ -49,7 +52,7 @@ public class ContentVersionService {
     this.contentVersionRepository.rejectAllPendingVersions(courseId);
     ContentVersionRecord newVersion = this.createNewContentVersion(courseId, description);
 
-    String key = String.format("course-materials/%s/%s.json", courseId, newVersion.getId().toString());
+    String key = this.getVersionKey(courseId, newVersion.getId());
     return new PresignedUrlResponse(this.fileService.generatePresignedUploadUrl(key, Duration.ofMinutes(5)), key);
   }
 
@@ -60,5 +63,24 @@ public class ContentVersionService {
 
   public void rejectAllPendingVersions(UUID courseId) {
     this.contentVersionRepository.rejectAllPendingVersions(courseId);
+  }
+
+  public LatestContentVersionResponse getLatestApprovedVersion(UUID courseId) {
+    ContentVersionRecord version = this.contentVersionRepository.findBy(CONTENT_VERSION.COURSE_ID, courseId).stream()
+        .sorted((v1, v2) -> v2.getVersion() - v1.getVersion())
+        .filter((v) -> v.getStatus().equals(ContentStatus.APPROVED)).findFirst()
+        .orElseThrow(() -> new BadRequestException("No content version found for the course"));
+
+    String key = this.getVersionKey(courseId, version.getId());
+    String url = this.fileService.generatePresignedDownloadUrl(key, Duration.ofMinutes(5));
+
+    CourseResponse course = courseRepository.findById(courseId).map(CourseResponse::new)
+        .orElseThrow(() -> new BadRequestException("Course not found"));
+
+    return new LatestContentVersionResponse(url, course);
+  }
+
+  private String getVersionKey(UUID courseId, UUID versionId) {
+    return String.format("course-materials/%s/%s.json", courseId, versionId);
   }
 }
