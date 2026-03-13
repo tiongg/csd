@@ -1,10 +1,42 @@
 import type { SectionType } from './content.type';
 import { fetchClient } from './fetch-client';
 
-export async function uploadJson(
-  json: unknown,
-  presignedUrl: string,
-): Promise<void> {
+export async function uploadFile(file: File, courseId: string) {
+  const { data: presignedUrlData } = await fetchClient.GET(
+    '/api/contributor/{courseId}/image-upload-url',
+    {
+      params: {
+        path: {
+          courseId,
+        },
+        query: {
+          extension: file.name.split('.').pop() || '',
+        },
+      },
+    },
+  );
+
+  if (!presignedUrlData) {
+    throw new Error('Failed to get presigned URL');
+  }
+  const { url: presignedUrl, publicUrl } = presignedUrlData;
+
+  const response = await fetch(presignedUrl, {
+    method: 'PUT',
+    body: file,
+    headers: {
+      'Content-Type': file.type,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to upload file: ${response.statusText}`);
+  }
+
+  return publicUrl;
+}
+
+export async function uploadJson(json: unknown, presignedUrl: string) {
   const response = await fetch(presignedUrl, {
     method: 'PUT',
     body: JSON.stringify(json),
