@@ -4,7 +4,6 @@ import ReelsOverview from '../reel-overview/ReelsOverview';
 import CourseEditorOverview from './CourseEditorOverview';
 import CourseVersions from './CourseVersions';
 import NoCourseSectionsYet from './NoCourseSectionsYet';
-import NoReelsYet from '../reel-overview/NoReelsYet';
 
 type EditorCourseDisplayProps = {
   course: Course;
@@ -15,20 +14,15 @@ export default function EditorCourseDisplay({
 }: EditorCourseDisplayProps) {
   const { doc } = useContentEditor();
   const sectionCount = doc.getArray('root').length;
+  console.log(course.reelUrl);
 
   return (
     <div className="flex h-full flex-col overflow-auto p-6">
       <div className="mx-auto w-full max-w-4xl space-y-2">
         <CourseEditorOverview course={course} />
-        <div
-          className={
-            sectionCount === 0 && course.reelUrl === undefined
-              ? 'lg:grid lg:grid-cols-2 lg:gap-x-2'
-              : 'flex flex-col gap-y-2'
-          }
-        >
+        <div className='flex flex-col gap-y-2'>
           {sectionCount === 0 && <NoCourseSectionsYet />}
-          {course.reelUrl === undefined ? <NoReelsYet/> : <ReelsOverview />}
+          <ReelsOverview/>
         </div>
         <CourseVersions course={course} />
       </div>
