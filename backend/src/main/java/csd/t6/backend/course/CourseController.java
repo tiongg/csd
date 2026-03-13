@@ -33,9 +33,11 @@ import jakarta.validation.Valid;
 @SecurityRequirement(name = "bearerAuth")
 public class CourseController {
   private final CourseService courseService;
+  private final CourseReelService courseReelService;
 
-  public CourseController(CourseService courseService) {
+  public CourseController(CourseService courseService, CourseReelService courseReelService) {
     this.courseService = courseService;
+    this.courseReelService = courseReelService;
   }
 
   @PostMapping("/")
@@ -87,7 +89,7 @@ public class CourseController {
   @GetMapping("/{courseId}/upload-reel-url")
   public PresignedUrlResponse getUploadReelUrl(@PathVariable UUID courseId,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
-    return courseService.generateReelUploadUrl(courseId, userDetails.getId());
+    return this.courseReelService.generateReelUploadUrl(courseId, userDetails.getId());
   }
 
   @DeleteMapping("/{courseId}/reel")
@@ -95,6 +97,6 @@ public class CourseController {
   @BadRequestResponse
   @Operation(summary = "Delete reel", description = "Deletes a reel. Only team members can delete.")
   public void deleteReel(@PathVariable UUID courseId, @AuthenticationPrincipal AuthUserDetails userDetails) {
-    courseService.deleteReel(courseId, userDetails.getId());
+    this.courseReelService.deleteReel(courseId, userDetails.getId());
   }
 }
