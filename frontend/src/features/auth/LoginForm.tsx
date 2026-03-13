@@ -1,3 +1,4 @@
+import AuthSplitShell from '@/components/auth/AuthSplitShell';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -50,7 +51,28 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-xl rounded-3xl border border-white/60 bg-white/70 p-8 shadow-2xl shadow-slate-300/40 backdrop-blur-xl md:p-10">
+    <AuthSplitShell
+      tags={['Gen-Alpha', 'Pro Learning', 'Insights']}
+      title="Welcome back"
+      description="Continue with concise, credible Gen-Alpha insights you can apply in real work."
+      benefits={[
+        {
+          title: 'Insight Snapshot',
+          description: 'Review the latest youth behavior patterns in minutes.',
+          icon: 'insight',
+        },
+        {
+          title: 'Action-Ready Guidance',
+          description: 'Translate trends into classroom, team, or content decisions.',
+          icon: 'strategy',
+        },
+        {
+          title: 'Progress Continuity',
+          description: 'Pick up from saved modules, notes, and completed lessons.',
+          icon: 'progress',
+        },
+      ]}
+    >
       <div className="flex flex-col gap-4">
         <div className="flex justify-center">
           <Heading1>Login</Heading1>
@@ -115,14 +137,12 @@ export default function LoginForm() {
           </Button>
         </form>
 
-        <div className="mx-auto mt-1 flex w-8/10 justify-center">
-          <div className="w-1/6">
+        <div className="mx-auto flex w-8/10 items-center justify-center">
+          <div className="w-2/5">
             <Separator className="inline-block bg-slate-500" />
           </div>
-          <p className="font-subtitle inline-block w-2/3 px-4 text-center">
-            Other login options
-          </p>
-          <div className="w-1/6">
+          <p className="font-subtitle inline-block w-1/5 px-2 text-center">OR</p>
+          <div className="w-2/5">
             <Separator className="inline-block bg-slate-500" />
           </div>
         </div>
@@ -146,6 +166,6 @@ export default function LoginForm() {
           </Link>
         </div>
       </div>
-    </div>
+    </AuthSplitShell>
   );
 }

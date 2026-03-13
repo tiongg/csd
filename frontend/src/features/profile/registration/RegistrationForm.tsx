@@ -1,3 +1,4 @@
+import AuthSplitShell from '@/components/auth/AuthSplitShell';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -82,7 +83,33 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div className="w-full max-w-xl rounded-3xl border border-white/60 bg-white/70 p-8 shadow-2xl shadow-slate-300/40 backdrop-blur-xl md:p-10">
+    <AuthSplitShell
+      tags={['Professional Access', 'Gen-Alpha Insights', 'Team Ready']}
+      title="Create your account"
+      description="Start with structured Gen-Alpha learning designed for modern professional practice."
+      benefits={[
+        {
+          title: 'Structured Learning Path',
+          description: 'Follow curated modules built for practical implementation.',
+          icon: 'progress',
+        },
+        {
+          title: 'Applied Strategy',
+          description: 'Use clear frameworks for education, coaching, and planning.',
+          icon: 'strategy',
+        },
+        {
+          title: 'Shared Team Context',
+          description: 'Align colleagues around a common view of young audiences.',
+          icon: 'team',
+        },
+        {
+          title: 'Trend Monitoring',
+          description: 'Stay updated as youth signals shift across platforms.',
+          icon: 'insight',
+        },
+      ]}
+    >
       <div className="flex flex-col gap-4">
         <div className="flex justify-center">
           <Heading1>Sign Up</Heading1>
@@ -192,14 +219,12 @@ export default function RegistrationForm() {
           </Button>
         </form>
 
-        <div className="mx-auto mt-1 flex w-8/10 justify-center">
-          <div className="w-1/6">
+        <div className="mx-auto flex w-8/10 items-center justify-center">
+          <div className="w-2/5">
             <Separator className="inline-block bg-slate-500" />
           </div>
-          <p className="font-subtitle inline-block w-2/3 px-4 text-center">
-            Other sign up options
-          </p>
-          <div className="w-1/6">
+          <p className="font-subtitle inline-block w-1/5 px-2 text-center">OR</p>
+          <div className="w-2/5">
             <Separator className="inline-block bg-slate-500" />
           </div>
         </div>
@@ -223,6 +248,6 @@ export default function RegistrationForm() {
           </Link>
         </div>
       </div>
-    </div>
+    </AuthSplitShell>
   );
 }
