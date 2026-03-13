@@ -1,26 +1,40 @@
 package csd.t6.backend.account;
 
+import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.auth.oauth.OAuth2ProviderRepository;
+import csd.t6.backend.contributor.PendingContributorRepository;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.exceptions.ForbiddenException;
 import csd.t6.jooq.accounts.enums.OauthProvider;
 import csd.t6.jooq.accounts.enums.Roles;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.accounts.tables.records.OauthConnectionRecord;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class AccountServiceTest {
@@ -30,6 +44,9 @@ class AccountServiceTest {
 
     @Mock
     private OAuth2ProviderRepository oAuthProviderRepository;
+
+    @Mock
+    private PendingContributorRepository pendingContributorRepository;
 
     @InjectMocks
     private AccountService accountService;
@@ -64,10 +81,8 @@ class AccountServiceTest {
     void shouldThrowWhenUsernameExists() {
         when(accountRepository.exists(ACCOUNT.USERNAME, "testuser")).thenReturn(true);
 
-        assertThatThrownBy(() ->
-            accountService.createNewAccount("testuser", "test@example.com", "hashedpw"))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Username already exists");
+        assertThatThrownBy(() -> accountService.createNewAccount("testuser", "test@example.com", "hashedpw"))
+                .isInstanceOf(BadRequestException.class).hasMessageContaining("Username already exists");
     }
 
     @Test
@@ -76,10 +91,8 @@ class AccountServiceTest {
         when(accountRepository.exists(ACCOUNT.USERNAME, "testuser")).thenReturn(false);
         when(accountRepository.exists(ACCOUNT.EMAIL, "test@example.com")).thenReturn(true);
 
-        assertThatThrownBy(() ->
-            accountService.createNewAccount("testuser", "test@example.com", "hashedpw"))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Email already exists");
+        assertThatThrownBy(() -> accountService.createNewAccount("testuser", "test@example.com", "hashedpw"))
+                .isInstanceOf(BadRequestException.class).hasMessageContaining("Email already exists");
     }
 
     // --- getAllAccounts ---
@@ -111,9 +124,8 @@ class AccountServiceTest {
         UUID id = UUID.randomUUID();
         when(accountRepository.delete(ACCOUNT.ID, id)).thenReturn(0);
 
-        assertThatThrownBy(() -> accountService.deleteAccount(id))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Account does not exist");
+        assertThatThrownBy(() -> accountService.deleteAccount(id)).isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Account does not exist");
     }
 
     // --- updateAccount ---
@@ -146,9 +158,8 @@ class AccountServiceTest {
 
         AccountUpdateRequest request = new AccountUpdateRequest("takenuser", null);
 
-        assertThatThrownBy(() -> accountService.updateAccount(id, request))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Username already exists");
+        assertThatThrownBy(() -> accountService.updateAccount(id, request)).isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Username already exists");
     }
 
     @Test
@@ -173,10 +184,8 @@ class AccountServiceTest {
         UUID id = UUID.randomUUID();
         when(accountRepository.findOneBy(ACCOUNT.ID, id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() ->
-            accountService.updateAccount(id, new AccountUpdateRequest("newuser", null)))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Account does not exist");
+        assertThatThrownBy(() -> accountService.updateAccount(id, new AccountUpdateRequest("newuser", null)))
+                .isInstanceOf(BadRequestException.class).hasMessageContaining("Account does not exist");
     }
 
     // --- createWithOAuthLogin ---
@@ -184,18 +193,16 @@ class AccountServiceTest {
     @Test
     @DisplayName("Should create new account for OAuth login when email not found")
     void shouldCreateNewAccountForOAuthLogin() {
-        when(accountRepository.findOneBy(ACCOUNT.EMAIL, "oauth@example.com"))
-            .thenReturn(Optional.empty());
+        when(accountRepository.findOneBy(ACCOUNT.EMAIL, "oauth@example.com")).thenReturn(Optional.empty());
         when(accountRepository.exists(ACCOUNT.USERNAME, "oauth")).thenReturn(false);
-        when(accountRepository.insert("oauth@example.com", "oauth", null, "OAuth User"))
-            .thenReturn(mockAccount);
+        when(accountRepository.insert("oauth@example.com", "oauth", null, "OAuth User")).thenReturn(mockAccount);
 
         OauthConnectionRecord oauthRecord = mock(OauthConnectionRecord.class);
         when(oAuthProviderRepository.insert(any(), eq(OauthProvider.GOOGLE), eq("google123"), eq("oauth@example.com")))
-            .thenReturn(oauthRecord);
+                .thenReturn(oauthRecord);
 
-        OauthConnectionRecord result = accountService.createWithOAuthLogin(
-            "oauth@example.com", "OAuth User", OauthProvider.GOOGLE, "google123");
+        OauthConnectionRecord result = accountService.createWithOAuthLogin("oauth@example.com", "OAuth User",
+                OauthProvider.GOOGLE, "google123");
 
         assertThat(result).isNotNull();
     }
@@ -203,15 +210,14 @@ class AccountServiceTest {
     @Test
     @DisplayName("Should use existing account for OAuth login when email found")
     void shouldUseExistingAccountForOAuthLogin() {
-        when(accountRepository.findOneBy(ACCOUNT.EMAIL, "existing@example.com"))
-            .thenReturn(Optional.of(mockAccount));
+        when(accountRepository.findOneBy(ACCOUNT.EMAIL, "existing@example.com")).thenReturn(Optional.of(mockAccount));
 
         OauthConnectionRecord oauthRecord = mock(OauthConnectionRecord.class);
-        when(oAuthProviderRepository.insert(any(), eq(OauthProvider.GOOGLE), eq("google456"), eq("existing@example.com")))
-            .thenReturn(oauthRecord);
+        when(oAuthProviderRepository.insert(any(), eq(OauthProvider.GOOGLE), eq("google456"),
+                eq("existing@example.com"))).thenReturn(oauthRecord);
 
-        OauthConnectionRecord result = accountService.createWithOAuthLogin(
-            "existing@example.com", "Existing User", OauthProvider.GOOGLE, "google456");
+        OauthConnectionRecord result = accountService.createWithOAuthLogin("existing@example.com", "Existing User",
+                OauthProvider.GOOGLE, "google456");
 
         assertThat(result).isNotNull();
         verify(accountRepository, never()).insert(anyString(), anyString(), isNull(), anyString());
@@ -250,8 +256,7 @@ class AccountServiceTest {
         when(accountRepository.findOneBy(ACCOUNT.ID, requestorId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> accountService.updateAccountRole(targetId, Roles.CONTRIBUTOR, requestorId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Admin account not found");
+                .isInstanceOf(BadRequestException.class).hasMessageContaining("Admin account not found");
     }
 
     @Test
@@ -266,8 +271,7 @@ class AccountServiceTest {
         when(accountRepository.findOneBy(ACCOUNT.ID, requestorId)).thenReturn(Optional.of(nonAdminAccount));
 
         assertThatThrownBy(() -> accountService.updateAccountRole(targetId, Roles.CONTRIBUTOR, requestorId))
-            .isInstanceOf(ForbiddenException.class)
-            .hasMessageContaining("Only admins can update user roles");
+                .isInstanceOf(ForbiddenException.class).hasMessageContaining("Only admins can update user roles");
     }
 
     @Test
@@ -283,7 +287,6 @@ class AccountServiceTest {
         when(accountRepository.findOneBy(ACCOUNT.ID, targetId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> accountService.updateAccountRole(targetId, Roles.CONTRIBUTOR, requestorId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Account does not exist");
+                .isInstanceOf(BadRequestException.class).hasMessageContaining("Account does not exist");
     }
 }
