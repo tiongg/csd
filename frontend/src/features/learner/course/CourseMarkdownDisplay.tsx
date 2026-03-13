@@ -3,7 +3,7 @@ import { Milkdown, MilkdownProvider } from '@milkdown/react';
 
 import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
-import './viewer.css';
+import '../viewer.css';
 
 type CourseMarkdownDisplayProps = {
   content: string;

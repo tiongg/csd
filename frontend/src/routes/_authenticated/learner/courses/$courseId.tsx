@@ -1,6 +1,6 @@
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
 import { CourseViewerProvider } from '@/context/CourseViewingContext';
-import CourseView from '@/features/learner/CourseView';
+import CourseView from '@/features/learner/course/CourseView';
 import type { SectionType } from '@/lib/content.type';
 import { fetchClient } from '@/lib/fetch-client';
 import { createFileRoute, redirect } from '@tanstack/react-router';
