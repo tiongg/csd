@@ -10,8 +10,15 @@ import '@milkdown/crepe/theme/frame.css';
 import './editor.css';
 
 function MarkdownEditorInternal() {
-  const { get: getEditor } = useCrepeEditor();
-  const { doc, provider, currentSection } = useContentEditor();
+  const {
+    doc,
+    provider,
+    currentSection,
+    course: { id },
+  } = useContentEditor();
+  const { get: getEditor } = useCrepeEditor({
+    courseId: id,
+  });
 
   useEffect(() => {
     const editorInstance = getEditor();
