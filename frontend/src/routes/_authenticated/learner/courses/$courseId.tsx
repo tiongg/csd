@@ -1,32 +1,45 @@
-import { createFileRoute } from '@tanstack/react-router';
 import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
-import CourseView from '@/features/learner/CourseView';
+import { CourseViewerProvider } from '@/context/CourseViewingContext';
+import CourseView from '@/features/learner/course/CourseView';
+import type { SectionType } from '@/lib/content.type';
 import { fetchClient } from '@/lib/fetch-client';
-import { redirect } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute(
   '/_authenticated/learner/courses/$courseId',
 )({
   component: RouteComponent,
   loader: async ({ params: { courseId } }) => {
-    const { data: course, error } = await fetchClient.GET('/api/courses/{id}', {
-      params: { path: { id: courseId } },
-    });
+    const { data: contentVersion, error } = await fetchClient.GET(
+      '/api/content-versions/{courseId}/latest',
+      {
+        params: { path: { courseId } },
+      },
+    );
 
-    if (!course || error) {
+    if (!contentVersion || error) {
       throw redirect({ to: '/learner/discover' });
     }
 
-    return { course };
+    const courseContent = (await fetch(contentVersion.downloadUrl).then((res) =>
+      res.json(),
+    )) as SectionType[];
+
+    return {
+      course: contentVersion.course,
+      content: courseContent,
+    };
   },
 });
 
 function RouteComponent() {
-  const { course } = Route.useLoaderData();
+  const { course, content } = Route.useLoaderData();
 
   return (
     <PageWithSideBar>
-      <CourseView course={course} />
+      <CourseViewerProvider sections={content} course={course}>
+        <CourseView />
+      </CourseViewerProvider>
     </PageWithSideBar>
   );
 }

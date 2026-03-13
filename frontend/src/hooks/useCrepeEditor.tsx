@@ -10,12 +10,19 @@ const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
 type UseCrepeEditorProps = {
   courseId?: string;
+  readOnly?: boolean;
+  defaultContent?: string;
 };
 
-export default function useCrepeEditor({ courseId }: UseCrepeEditorProps = {}) {
+export default function useCrepeEditor({
+  courseId,
+  readOnly = false,
+  defaultContent = '',
+}: UseCrepeEditorProps = {}) {
   return useEditor((root) => {
     const crepe = new Crepe({
       root,
+      defaultValue: defaultContent,
       featureConfigs: {
         [CrepeFeature.ImageBlock]: {
           onUpload: async (file: File) => {
@@ -34,6 +41,8 @@ export default function useCrepeEditor({ courseId }: UseCrepeEditorProps = {}) {
         },
       },
     });
+
+    crepe.setReadonly(readOnly);
 
     return crepe.editor.use(collab).use(youtubeIframePlugin);
   });

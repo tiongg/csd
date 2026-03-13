@@ -24,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import csd.t6.backend.approval.ContentVersionRepository;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
@@ -34,143 +35,148 @@ import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @ExtendWith(MockitoExtension.class)
 class CourseServiceTest {
-    @Mock
-    private CourseRepository courseRepository;
+  @Mock
+  private CourseRepository courseRepository;
 
-    @Mock
-    private TeamService teamService;
+  @Mock
+  private TeamService teamService;
 
-    @Mock
-    private FileService fileService;
+  @Mock
+  private FileService fileService;
 
-    @InjectMocks
-    private CourseService courseService;
+  @Mock
+  private ContentVersionRepository contentVersionRepository;
 
-    private UUID creatorId;
-    private UUID teamId;
-    private UUID courseId;
-    private CourseRecord mockCourse;
+  @Mock
+  private CourseReelService courseReelService;
 
-    @BeforeEach
-    void setUp() {
-        creatorId = UUID.randomUUID();
-        teamId = UUID.randomUUID();
-        courseId = UUID.randomUUID();
+  @InjectMocks
+  private CourseService courseService;
 
-        mockCourse = mock(CourseRecord.class);
-        lenient().when(mockCourse.getId()).thenReturn(courseId);
-        lenient().when(mockCourse.getTitle()).thenReturn("Test Course");
-        lenient().when(mockCourse.getCreatorId()).thenReturn(creatorId);
-        lenient().when(mockCourse.getTeamId()).thenReturn(teamId);
-        lenient().when(mockCourse.getIsPublished()).thenReturn(false);
-        lenient().when(mockCourse.getCreatedAt()).thenReturn(OffsetDateTime.now());
-        lenient().when(mockCourse.getUpdatedAt()).thenReturn(OffsetDateTime.now());
-    }
+  private UUID creatorId;
+  private UUID teamId;
+  private UUID courseId;
+  private CourseRecord mockCourse;
 
-    // --- createCourse ---
+  @BeforeEach
+  void setUp() {
+    creatorId = UUID.randomUUID();
+    teamId = UUID.randomUUID();
+    courseId = UUID.randomUUID();
 
-    @Test
-    @DisplayName("Should create course successfully when user is team member")
-    void shouldCreateCourseSuccessfully() {
-        when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
-        when(courseRepository.create("Test Course", "Desc", creatorId, teamId)).thenReturn(mockCourse);
+    mockCourse = mock(CourseRecord.class);
+    lenient().when(mockCourse.getId()).thenReturn(courseId);
+    lenient().when(mockCourse.getTitle()).thenReturn("Test Course");
+    lenient().when(mockCourse.getCreatorId()).thenReturn(creatorId);
+    lenient().when(mockCourse.getTeamId()).thenReturn(teamId);
+    lenient().when(mockCourse.getIsPublished()).thenReturn(false);
+    lenient().when(mockCourse.getCreatedAt()).thenReturn(OffsetDateTime.now());
+    lenient().when(mockCourse.getUpdatedAt()).thenReturn(OffsetDateTime.now());
+  }
 
-        CourseResponse result = courseService.createCourse(new CourseCreateRequest("Test Course", "Desc", teamId),
-                creatorId);
+  // --- createCourse ---
 
-        assertThat(result).isNotNull();
-        assertThat(result.title()).isEqualTo("Test Course");
-    }
+  @Test
+  @DisplayName("Should create course successfully when user is team member")
+  void shouldCreateCourseSuccessfully() {
+    when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
+    when(courseRepository.create("Test Course", "Desc", creatorId, teamId)).thenReturn(mockCourse);
 
-    @Test
-    @DisplayName("Should throw when creator is not team member")
-    void shouldThrowWhenCreatorNotTeamMember() {
-        when(teamService.isTeamMember(teamId, creatorId)).thenReturn(false);
+    CourseResponse result = courseService.createCourse(new CourseCreateRequest("Test Course", "Desc", teamId),
+        creatorId);
 
-        assertThatThrownBy(
-                () -> courseService.createCourse(new CourseCreateRequest("Title", "Desc", teamId), creatorId))
-                        .isInstanceOf(BadRequestException.class).hasMessageContaining("member of the team");
-    }
+    assertThat(result).isNotNull();
+    assertThat(result.title()).isEqualTo("Test Course");
+  }
 
-    // --- getCourseById ---
+  @Test
+  @DisplayName("Should throw when creator is not team member")
+  void shouldThrowWhenCreatorNotTeamMember() {
+    when(teamService.isTeamMember(teamId, creatorId)).thenReturn(false);
 
-    @Test
-    @DisplayName("Should return course by ID")
-    void shouldReturnCourseById() {
-        when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
+    assertThatThrownBy(() -> courseService.createCourse(new CourseCreateRequest("Title", "Desc", teamId), creatorId))
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("member of the team");
+  }
 
-        CourseResponse result = courseService.getCourseById(courseId);
+  // --- getCourseById ---
 
-        assertThat(result).isNotNull();
-        assertThat(result.id()).isEqualTo(courseId);
-    }
+  @Test
+  @DisplayName("Should return course by ID")
+  void shouldReturnCourseById() {
+    when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
 
-    @Test
-    @DisplayName("Should throw when course not found")
-    void shouldThrowWhenCourseNotFound() {
-        when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
+    CourseResponse result = courseService.getCourseById(courseId);
 
-        assertThatThrownBy(() -> courseService.getCourseById(courseId)).isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("Course not found");
-    }
+    assertThat(result).isNotNull();
+    assertThat(result.id()).isEqualTo(courseId);
+  }
 
-    // --- getAllCourses ---
+  @Test
+  @DisplayName("Should throw when course not found")
+  void shouldThrowWhenCourseNotFound() {
+    when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
-    @Test
-    @DisplayName("Should return all courses")
-    void shouldReturnAllCourses() {
-        when(courseRepository.findAll()).thenReturn(List.of(mockCourse));
+    assertThatThrownBy(() -> courseService.getCourseById(courseId)).isInstanceOf(BadRequestException.class)
+        .hasMessageContaining("Course not found");
+  }
 
-        List<CourseResponse> result = courseService.getAllCourses();
+  // --- getAllCourses ---
 
-        assertThat(result).hasSize(1);
-    }
+  @Test
+  @DisplayName("Should return all courses")
+  void shouldReturnAllCourses() {
+    when(courseRepository.findAll()).thenReturn(List.of(mockCourse));
 
-    // --- updateCourse ---
+    List<CourseResponse> result = courseService.getAllCourses();
 
-    @Test
-    @DisplayName("Should update course when requester is creator")
-    void shouldUpdateCourseAsCreator() {
-        when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
-        when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
-        when(courseRepository.update(eq(courseId), anyString(), isNull(), eq(teamId), isNull())).thenReturn(mockCourse);
+    assertThat(result).hasSize(1);
+  }
 
-        CourseResponse result = courseService.updateCourse(courseId, new CourseUpdateRequest("New Title", null, null),
-                creatorId);
+  // --- updateCourse ---
 
-        assertThat(result).isNotNull();
-    }
+  @Test
+  @DisplayName("Should update course when requester is creator")
+  void shouldUpdateCourseAsCreator() {
+    when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
+    when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
+    when(courseRepository.update(eq(courseId), anyString(), isNull(), eq(teamId), isNull())).thenReturn(mockCourse);
 
-    @Test
-    @DisplayName("Should throw when updater is not creator or team member")
-    void shouldThrowWhenUpdaterHasNoPermission() {
-        UUID otherId = UUID.randomUUID();
-        when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
-        when(teamService.isTeamMember(teamId, otherId)).thenReturn(false);
+    CourseResponse result = courseService.updateCourse(courseId, new CourseUpdateRequest("New Title", null, null),
+        creatorId);
 
-        assertThatThrownBy(
-                () -> courseService.updateCourse(courseId, new CourseUpdateRequest("Title", null, null), otherId))
-                        .isInstanceOf(BadRequestException.class);
-    }
+    assertThat(result).isNotNull();
+  }
 
-    // --- deleteCourse ---
+  @Test
+  @DisplayName("Should throw when updater is not creator or team member")
+  void shouldThrowWhenUpdaterHasNoPermission() {
+    UUID otherId = UUID.randomUUID();
+    when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
+    when(teamService.isTeamMember(teamId, otherId)).thenReturn(false);
 
-    @Test
-    @DisplayName("Should delete course when requester is creator")
-    void shouldDeleteCourseAsCreator() {
-        when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
+    assertThatThrownBy(
+        () -> courseService.updateCourse(courseId, new CourseUpdateRequest("Title", null, null), otherId))
+            .isInstanceOf(BadRequestException.class);
+  }
 
-        assertThatNoException().isThrownBy(() -> courseService.deleteCourse(courseId, creatorId));
-        verify(courseRepository).delete(courseId);
-    }
+  // --- deleteCourse ---
 
-    @Test
-    @DisplayName("Should throw when non-creator tries to delete course")
-    void shouldThrowWhenNonCreatorDeletesCourse() {
-        UUID nonCreatorId = UUID.randomUUID();
-        when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
+  @Test
+  @DisplayName("Should delete course when requester is creator")
+  void shouldDeleteCourseAsCreator() {
+    when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
 
-        assertThatThrownBy(() -> courseService.deleteCourse(courseId, nonCreatorId))
-                .isInstanceOf(BadRequestException.class).hasMessageContaining("Only course creator");
-    }
+    assertThatNoException().isThrownBy(() -> courseService.deleteCourse(courseId, creatorId));
+    verify(courseRepository).delete(courseId);
+  }
+
+  @Test
+  @DisplayName("Should throw when non-creator tries to delete course")
+  void shouldThrowWhenNonCreatorDeletesCourse() {
+    UUID nonCreatorId = UUID.randomUUID();
+    when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
+
+    assertThatThrownBy(() -> courseService.deleteCourse(courseId, nonCreatorId)).isInstanceOf(BadRequestException.class)
+        .hasMessageContaining("Only course creator");
+  }
 }

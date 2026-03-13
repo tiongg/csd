@@ -404,6 +404,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/courses/published": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPublishedCourses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/contributor/{courseId}/image-upload-url": {
         parameters: {
             query?: never;
@@ -428,6 +444,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getContentVersions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/content-versions/{courseId}/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getLatestApprovedVersion"];
         put?: never;
         post?: never;
         delete?: never;
@@ -699,6 +731,10 @@ export interface components {
             /** @enum {string} */
             status: "PENDING" | "APPROVED" | "REJECTED";
             rejectedReason?: string;
+        };
+        LatestContentVersionResponse: {
+            downloadUrl: string;
+            course: components["schemas"]["Course"];
         };
         SelfResponse: {
             account: components["schemas"]["Account"];
@@ -1570,6 +1606,26 @@ export interface operations {
             };
         };
     };
+    getPublishedCourses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Course"][];
+                };
+            };
+        };
+    };
     getEditorImageUpload: {
         parameters: {
             query: {
@@ -1612,6 +1668,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ContentVersionResponse"][];
+                };
+            };
+        };
+    };
+    getLatestApprovedVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LatestContentVersionResponse"];
                 };
             };
         };

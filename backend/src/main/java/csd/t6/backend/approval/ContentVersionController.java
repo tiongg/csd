@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.approval.dto.request.UploadCourseRequest;
 import csd.t6.backend.approval.dto.response.ContentVersionResponse;
+import csd.t6.backend.approval.dto.response.LatestContentVersionResponse;
 import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.utils.dto.PresignedUrlResponse;
 import jakarta.validation.Valid;
@@ -31,6 +32,11 @@ public class ContentVersionController {
       @AuthenticationPrincipal AuthUserDetails userDetails, @Valid @RequestBody UploadCourseRequest request) {
     return this.contentVersionService.generateCourseMaterialUploadUrl(courseId, userDetails.getId(),
         request.description());
+  }
+
+  @GetMapping("/{courseId}/latest")
+  public LatestContentVersionResponse getLatestApprovedVersion(@PathVariable UUID courseId) {
+    return this.contentVersionService.getLatestApprovedVersion(courseId);
   }
 
   @GetMapping("/{courseId}")

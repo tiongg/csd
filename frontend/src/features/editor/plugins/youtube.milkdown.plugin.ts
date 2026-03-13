@@ -12,7 +12,7 @@ const remarkDirective = $remark('remarkDirective', () => directive);
 const iframeInputRule = $inputRule(
   (ctx) =>
     new InputRule(
-      /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=(?<id>[^&]+)/,
+      /https?:\/\/(?:www\.)?youtube\.com\/watch\?v=(?<id>[^&]+).*/,
       (state, match, start, end) => {
         const [full, id = ''] = match;
         const { tr } = state;

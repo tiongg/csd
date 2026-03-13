@@ -46,7 +46,7 @@ function MarkdownEditorInternal() {
   }, [getEditor, doc, provider, currentSection]);
 
   return (
-    <div className="px-2">
+    <div className="p-8">
       <Milkdown />
     </div>
   );

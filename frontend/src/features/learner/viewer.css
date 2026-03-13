@@ -1,0 +1,4 @@
+/* Remove unwanted padding from Milkdown */
+.milkdown .ProseMirror {
+  padding: 0;
+}
