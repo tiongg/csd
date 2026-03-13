@@ -1,4 +1,4 @@
-/* God knows where this padding comes from */
+/* Remove unwanted padding from Milkdown */
 .milkdown .ProseMirror {
   padding: 0;
 }

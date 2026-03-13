@@ -1,6 +1,5 @@
 import useCrepeEditor from '@/hooks/useCrepeEditor';
 import { Milkdown, MilkdownProvider } from '@milkdown/react';
-import { useEffect } from 'react';
 
 import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
@@ -11,20 +10,13 @@ type CourseMarkdownDisplayProps = {
 };
 
 function ViewerInternal({ content }: CourseMarkdownDisplayProps) {
-  const { get: getViewer } = useCrepeEditor({
+  useCrepeEditor({
     readOnly: true,
     defaultContent: content,
   });
 
-  useEffect(() => {
-    const viewerInstance = getViewer();
-    if (!viewerInstance) return;
-
-    viewerInstance.action((ctx) => {});
-  }, [getViewer]);
-
   return (
-    <div className="px-2">
+    <div className="bg-card rounded-lg border px-8 shadow-sm">
       <Milkdown />
     </div>
   );
