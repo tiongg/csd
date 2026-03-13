@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useState,
+  useEffect,
   type PropsWithChildren,
 } from 'react';
 
@@ -21,6 +22,9 @@ type CourseViewerContextType = {
 
   goNextSection: () => void;
   goPreviousSection: () => void;
+
+  canNavigate: boolean;
+  setCanNavigate: (canNavigate: boolean) => void;
 };
 
 const CourseViewerContext = createContext<CourseViewerContextType | undefined>(
@@ -33,7 +37,17 @@ export function CourseViewerProvider({
   children,
 }: PropsWithChildren<CourseViewerContextProps>) {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(-1);
+  const [canNavigate, setCanNavigate] = useState(true);
   const currentSection = sections[currentSectionIndex];
+
+  // Reset navigation lock when section changes
+  useEffect(() => {
+    if (currentSection?.type === 'quiz') {
+      setCanNavigate(false);
+    } else {
+      setCanNavigate(true);
+    }
+  }, [currentSection]);
 
   function goNextSection() {
     setCurrentSectionIndex((prev) => Math.min(prev + 1, sections.length - 1));
@@ -54,6 +68,9 @@ export function CourseViewerProvider({
 
         goNextSection,
         goPreviousSection,
+
+        canNavigate,
+        setCanNavigate,
       }}
     >
       {children}

@@ -4,6 +4,7 @@ import { match } from 'ts-pattern';
 import CourseMarkdownDisplay from './CourseMarkdownDisplay';
 import CourseNavigationFooter from './CourseNavigationFooter';
 import CourseOverview from './CourseOverview';
+import CourseQuiz from './CourseQuiz';
 
 export default function CourseView() {
   const { sections, currentSectionIndex, currentSection } = useCourseViewer();
@@ -37,9 +38,7 @@ export default function CourseView() {
               .with({ type: 'markdown' }, (section) => (
                 <CourseMarkdownDisplay content={section.content} />
               ))
-              .with({ type: 'quiz' }, (section) => (
-                <div>Quiz: {section.content.question}</div>
-              ))
+              .with({ type: 'quiz' }, (section) => <CourseQuiz quiz={section.content} />)
               .exhaustive()}
           </div>
         </div>

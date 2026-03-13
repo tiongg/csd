@@ -11,9 +11,12 @@ export default function CourseNavigationFooter() {
     goNextSection,
     currentSectionIndex,
     currentSection,
+    canNavigate,
   } = useCourseViewer();
 
   const currentSectionTitle = currentSection?.title ?? course.title;
+  const isQuiz = currentSection?.type === 'quiz';
+  const isDisabled = isQuiz && !canNavigate;
 
   return (
     <>
@@ -24,7 +27,7 @@ export default function CourseNavigationFooter() {
             variant="outline"
             size="sm"
             onClick={goPreviousSection}
-            disabled={currentSectionIndex === -1}
+            disabled={currentSectionIndex === -1 || isDisabled}
             className="gap-2 transition duration-300 active:scale-95"
           >
             <ChevronLeft className="size-4" />
@@ -38,7 +41,7 @@ export default function CourseNavigationFooter() {
           <Button
             size="sm"
             onClick={goNextSection}
-            disabled={currentSectionIndex === sections.length - 1}
+            disabled={currentSectionIndex === sections.length - 1 || isDisabled}
             className="gap-2 transition duration-300 active:scale-95"
           >
             Next
