@@ -40,7 +40,7 @@ export function EnrolledCourses({ searchQuery }: EnrolledCoursesProps) {
     data: courses,
     isLoading,
     isError,
-  } = useApiQuery('get', '/api/courses/');
+  } = useApiQuery('get', '/api/courses/published');
   const filteredCourses = (courses ?? []).filter(
     (course) =>
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -1,16 +1,25 @@
 package csd.t6.backend.approval;
 
 import static csd.t6.jooq.public_.tables.ContentVersion.CONTENT_VERSION;
+import static csd.t6.jooq.public_.tables.Course.COURSE;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record2;
+import org.jooq.Table;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
 import csd.t6.backend.utils.BaseRepository;
 import csd.t6.jooq.public_.enums.ContentStatus;
+import csd.t6.jooq.public_.tables.ContentVersion;
+import csd.t6.jooq.public_.tables.Course;
 import csd.t6.jooq.public_.tables.records.ContentVersionRecord;
+import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Repository
 public class ContentVersionRepository extends BaseRepository<ContentVersionRecord> {
@@ -36,5 +45,21 @@ public class ContentVersionRepository extends BaseRepository<ContentVersionRecor
     dsl.update(CONTENT_VERSION).set(CONTENT_VERSION.STATUS, ContentStatus.REJECTED)
         .set(CONTENT_VERSION.REJECTED_REASON, "Newer version uploaded")
         .where(CONTENT_VERSION.COURSE_ID.eq(courseId).and(CONTENT_VERSION.STATUS.eq(ContentStatus.PENDING))).execute();
+  }
+
+  public List<CourseRecord> findCoursesWithApprovedVersion() {
+    ContentVersion cv = CONTENT_VERSION;
+    Course c = COURSE;
+
+    Table<Record2<UUID, Integer>> latest = DSL
+        .select(cv.COURSE_ID.as("course_id"), DSL.max(cv.VERSION).as("max_version")).from(cv)
+        .where(cv.STATUS.eq(ContentStatus.APPROVED)).groupBy(cv.COURSE_ID).asTable("latest");
+
+    Field<UUID> L_COURSE_ID = latest.field("course_id", UUID.class);
+    Field<Integer> L_VERSION = latest.field("max_version", Integer.class);
+
+    return this.dsl.select(c).from(c).join(cv).on(cv.COURSE_ID.eq(c.ID)).join(latest).on(L_COURSE_ID.eq(cv.COURSE_ID))
+        .and(L_VERSION.eq(cv.VERSION)).where(cv.STATUS.eq(ContentStatus.APPROVED)).fetch()
+        .map(record -> record.value1());
   }
 }

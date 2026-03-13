@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import csd.t6.backend.approval.ContentVersionRepository;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
@@ -24,11 +25,14 @@ public class CourseService {
   private final CourseRepository courseRepository;
   private final TeamService teamService;
   private final FileService fileService;
+  private final ContentVersionRepository contentVersionRepository;
 
-  public CourseService(CourseRepository courseRepository, TeamService teamService, FileService fileService) {
+  public CourseService(CourseRepository courseRepository, TeamService teamService, FileService fileService,
+      ContentVersionRepository contentVersionRepository) {
     this.courseRepository = courseRepository;
     this.teamService = teamService;
     this.fileService = fileService;
+    this.contentVersionRepository = contentVersionRepository;
   }
 
   @Transactional
@@ -49,6 +53,11 @@ public class CourseService {
   public List<CourseResponse> getAllCourses() {
     return courseRepository.findAll().stream().map(record -> new CourseResponse(record, getReelUrlForCourse(record)))
         .collect(Collectors.toList());
+  }
+
+  public List<CourseResponse> getCoursesWithApprovedVersion() {
+    return contentVersionRepository.findCoursesWithApprovedVersion().stream()
+        .map(record -> new CourseResponse(record, getReelUrlForCourse(record))).collect(Collectors.toList());
   }
 
   public List<CourseResponse> getCoursesByTeamId(UUID teamId, UUID requesterId) {

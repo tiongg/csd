@@ -62,6 +62,11 @@ public class CourseController {
     return courseService.getAllCourses();
   }
 
+  @GetMapping("/published")
+  public List<CourseResponse> getPublishedCourses() {
+    return courseService.getCoursesWithApprovedVersion();
+  }
+
   @PutMapping("/{id}")
   @OkResponse
   @BadRequestResponse
