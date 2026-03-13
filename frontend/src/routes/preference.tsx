@@ -128,7 +128,7 @@ function RouteComponent() {
 
         <div className="mt-6 flex items-center justify-between">
           <p className="text-sm text-slate-500">
-            Selected:
+            Selected:{" "}
             <span className="font-medium text-slate-700">
               {currentSelection.size}
             </span>
