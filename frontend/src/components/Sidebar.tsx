@@ -1,3 +1,7 @@
+import type { Account } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
+import useActiveRole from '@/hooks/useActiveRole';
+import { capitalizeFirst, cn } from '@/lib/utils';
 import {
   Cog6ToothIcon,
   DocumentTextIcon,
@@ -8,7 +12,14 @@ import {
   UserIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
+import type { LinkOptions } from '@tanstack/react-router';
 import { Link, useNavigate } from '@tanstack/react-router';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { ChevronUp } from 'lucide-react';
+import type React from 'react';
+import type { PropsWithChildren } from 'react';
+import { useEffect, useState } from 'react';
 import { P, match } from 'ts-pattern';
 import { Button } from './ui/button';
 import {
@@ -17,16 +28,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import type { LinkOptions } from '@tanstack/react-router';
-import type React from 'react';
-import type { PropsWithChildren } from 'react';
-import type { Account } from '@/context/AuthContext';
-import useActiveRole from '@/hooks/useActiveRole';
-import { capitalizeFirst, cn } from '@/lib/utils';
-import { useAuth } from '@/context/AuthContext';
-import { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import {
   Sidebar as ShadcnSidebar,
   SidebarContent,
@@ -37,7 +38,6 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from './ui/sidebar';
-import { ChevronUp } from 'lucide-react';
 
 dayjs.extend(relativeTime);
 
@@ -171,7 +171,7 @@ export default function Sidebar() {
   return (
     <ShadcnSidebar>
       <SidebarHeader />
-      <SidebarContent className="py-8">
+      <SidebarContent className="pt-8">
         <SidebarGroup>
           <SidebarGroupLabel className="font-subtitle tracking-wider">
             MAIN MENU
@@ -183,12 +183,9 @@ export default function Sidebar() {
           </SidebarMenu>
         </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-subtitle tracking-wider">
-            SYSTEM
-          </SidebarGroupLabel>
+        <SidebarGroup className="mt-auto">
           <SidebarMenu>
-            <div className="flex flex-col gap-y-2 py-4">
+            <div className="flex flex-col gap-y-2 py-2">
               <NavItem
                 title="Settings"
                 link={getRoleUrl(currentActiveRole, 'settings')}
@@ -206,7 +203,7 @@ export default function Sidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="pb-2">
+      <SidebarFooter className="border-t border-slate-300">
         <SidebarMenu>
           <SidebarMenuItem>
             <div className="flex items-center justify-between px-4">
