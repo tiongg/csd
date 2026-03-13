@@ -21,10 +21,10 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 public class FileService {
   @Value("${spring.cloud.config.server.awss3.endpoint}")
   private String endpoint;
-  
+
   @Value("${spring.cloud.config.server.awss3.bucket}")
   private String bucketName;
-  
+
   private final S3Client s3Client;
 
   private final S3Presigner s3Presigner;
@@ -101,10 +101,16 @@ public class FileService {
 
   public void deleteObject(String key) {
     DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(key).build();
-    
+
+    DeleteObjectResponse deleteObjectResponse = this.s3Client.deleteObject(deleteObjectRequest);
+  }
+
+  public boolean exists(String key) {
     try {
-      DeleteObjectResponse deleteObjectResponse = this.s3Client.deleteObject(deleteObjectRequest);
-    } catch (SdkException e) {}
-    
+      this.s3Client.headObject(builder -> builder.bucket(bucketName).key(key).build());
+      return true;
+    } catch (SdkException e) {
+      return false;
+    }
   }
 }

@@ -199,7 +199,7 @@ export function ContentEditorProvider({
         setCurrentSection,
         getDocAsJson,
         deleteSection,
-        addSection
+        addSection,
       }}
     >
       {children}

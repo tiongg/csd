@@ -100,7 +100,7 @@ public class CourseService {
       throw new BadRequestException("You must be a member of the team to delete reels");
     }
 
-    String key = String.format("reels/%s.mp4", courseId);
+    String key = this.getReelKeyForCourse(courseId);
     this.fileService.deleteObject(key);
   }
 
@@ -113,11 +113,20 @@ public class CourseService {
       throw new BadRequestException("You must be a member of the team to upload reels");
     }
 
-    String key = String.format("reels/%s.mp4", courseId);
+    String key = this.getReelKeyForCourse(courseId);
     return new PresignedUrlResponse(this.fileService.generatePresignedUploadUrl(key, Duration.ofMinutes(5)), key);
   }
 
   private String getReelUrlForCourse(CourseRecord course) {
-    return this.fileService.getPublicUrl(String.format("reels/%s.mp4", course.getId()));
+    String defaultReelKey = String.format("reels/%s.mp4", course.getId());
+    if (this.fileService.exists(getReelKeyForCourse(course.getId()))) {
+      return this.fileService.getPublicUrl(defaultReelKey);
+    }
+
+    return null;
+  }
+
+  private String getReelKeyForCourse(UUID courseId) {
+    return String.format("reels/%s.mp4", courseId);
   }
 }

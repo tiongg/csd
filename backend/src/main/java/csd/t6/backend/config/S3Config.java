@@ -18,6 +18,9 @@ public class S3Config {
   @Value("${spring.cloud.config.server.awss3.endpoint}")
   private String endpoint;
 
+  @Value("${spring.cloud.config.server.awss3.private_endpoint}")
+  private String privateEndpoint;
+
   @Value("${spring.cloud.config.server.awss3.access-key}")
   private String accessKey;
 
@@ -35,7 +38,7 @@ public class S3Config {
     AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
     Region awsRegion = Region.of(region);
 
-    return S3Client.builder().endpointOverride(URI.create(endpoint))
+    return S3Client.builder().endpointOverride(URI.create(privateEndpoint))
         .credentialsProvider(StaticCredentialsProvider.create(credentials)).region(awsRegion)
         .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(pathStyleAccess).build()).build();
   }
