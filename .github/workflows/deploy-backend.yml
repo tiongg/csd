@@ -21,8 +21,9 @@ jobs:
         with:
           args: >
             deploy
+            -a sixsevennn
             --remote-only
-            --config ../.fly/fly-backend.toml
+            --config ./.fly/fly.toml
             --build-arg JOOQ_JDBC_URL=${{ vars.SPRING_DATASOURCE_URL }}
             --build-arg JOOQ_JDBC_USER=${{ vars.SPRING_DATASOURCE_USERNAME }}
             --build-arg JOOQ_JDBC_PASSWORD=${{ vars.SPRING_DATASOURCE_PASSWORD }}
