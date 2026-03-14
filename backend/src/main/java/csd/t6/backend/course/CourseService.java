@@ -88,8 +88,7 @@ public class CourseService {
       throw new BadRequestException("You must be a member of the team to update this course");
     }
 
-    CourseRecord updated = courseRepository.update(id, request.title(), request.description(), existing.getTeamId(),
-        request.isPublished());
+    CourseRecord updated = courseRepository.update(id, request.title(), request.description(), existing.getTeamId());
     return new CourseResponse(updated, this.courseReelService.getReelUrlForCourse(updated));
   }
 

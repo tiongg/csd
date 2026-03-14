@@ -1,21 +1,24 @@
 package csd.t6.backend.course;
 
-import csd.t6.backend.account.AccountRepository;
-import csd.t6.backend.team.TeamRepository;
-import csd.t6.jooq.accounts.tables.records.AccountRecord;
-import csd.t6.jooq.public_.tables.records.CourseRecord;
-import csd.t6.jooq.public_.tables.records.TeamRecord;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+import csd.t6.backend.account.AccountRepository;
+import csd.t6.backend.team.TeamRepository;
+import csd.t6.jooq.accounts.tables.records.AccountRecord;
+import csd.t6.jooq.public_.tables.records.CourseRecord;
+import csd.t6.jooq.public_.tables.records.TeamRecord;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -51,13 +54,13 @@ class CourseRepositoryTest {
         assertThat(course.getDescription()).isEqualTo("Learn Java");
         assertThat(course.getCreatorId()).isEqualTo(creator.getId());
         assertThat(course.getTeamId()).isEqualTo(team.getId());
-        assertThat(course.getIsPublished()).isFalse();
     }
 
     @Test
     @DisplayName("Should find course by ID")
     void shouldFindById() {
-        CourseRecord created = courseRepository.create("Spring Boot", "Spring Boot course", creator.getId(), team.getId());
+        CourseRecord created = courseRepository.create("Spring Boot", "Spring Boot course", creator.getId(),
+                team.getId());
 
         Optional<CourseRecord> found = courseRepository.findById(created.getId());
 
@@ -89,20 +92,10 @@ class CourseRepositoryTest {
     void shouldUpdateCourseTitle() {
         CourseRecord course = courseRepository.create("Old Title", "Desc", creator.getId(), team.getId());
 
-        CourseRecord updated = courseRepository.update(course.getId(), "New Title", null, null, null);
+        CourseRecord updated = courseRepository.update(course.getId(), "New Title", null, null);
 
         assertThat(updated.getTitle()).isEqualTo("New Title");
         assertThat(updated.getDescription()).isEqualTo("Desc");
-    }
-
-    @Test
-    @DisplayName("Should update course published status")
-    void shouldUpdatePublishedStatus() {
-        CourseRecord course = courseRepository.create("Test Course", null, creator.getId(), team.getId());
-
-        CourseRecord updated = courseRepository.update(course.getId(), null, null, null, true);
-
-        assertThat(updated.getIsPublished()).isTrue();
     }
 
     @Test

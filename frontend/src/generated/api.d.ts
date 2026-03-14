@@ -735,7 +735,6 @@ export interface components {
         CourseUpdateRequest: {
             title?: string;
             description?: string;
-            isPublished?: boolean;
         };
         Course: {
             /** Format: uuid */
@@ -746,7 +745,6 @@ export interface components {
             creatorId: string;
             /** Format: uuid */
             teamId: string;
-            isPublished: boolean;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
