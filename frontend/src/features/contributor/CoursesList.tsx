@@ -13,15 +13,19 @@ import {
 } from '@/components/ui/dialog';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Heading1 } from '@/components/ui/typography';
-import { apiQueryOptions, useApiMutation, useApiQuery } from '@/lib/fetch-client';
+import {
+  apiQueryOptions,
+  useApiMutation,
+  useApiQuery,
+} from '@/lib/fetch-client';
 import { capitalizeFirst, cn, type Course, type Team } from '@/lib/utils';
-import { useNavigate } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import { Trash2, Users } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { useBoolean } from 'usehooks-ts';
-import { useState } from 'react';
 import CreateCourseDialog from './CreateCourseDialog';
 import TeamCollaboratorsDialog from './TeamCollaboratorsDialog';
 
@@ -155,8 +159,6 @@ export default function CoursesList({ team }: CourseListProps) {
   );
 }
 
-// ─── Course Card ─────────────────────────────────────────────────────────────
-
 type CourseCardProps = {
   course: Course;
   teamId: string;
@@ -214,7 +216,6 @@ function CourseCard({ course, teamId, status }: CourseCardProps) {
         title={course.title}
         descriptor="Last Edited"
         data={dayjs(course.updatedAt).fromNow()}
-        enableTooltip
         onInteract={() =>
           navigate({
             to: '/contributor/editor/$courseId',

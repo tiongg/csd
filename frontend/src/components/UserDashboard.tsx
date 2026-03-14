@@ -29,15 +29,11 @@ function CardsByRole() {
     (u) => u.role === 'LEARNER',
   ).length;
 
-  const totalPublishedCourses = (allCourses ?? []).filter(
-    (c) => c.isPublished,
-  ).length;
+  const totalPublishedCourses = (allCourses ?? []).length;
 
   const pendingContributorApps = pendingContributors?.length ?? 0;
 
-  const contributorAwaitingApproval = (allCourses ?? []).filter(
-    (c) => !c.isPublished,
-  ).length;
+  const contributorAwaitingApproval = (allCourses ?? []).length;
 
   return match(dir)
     .with('ADMIN', () => (

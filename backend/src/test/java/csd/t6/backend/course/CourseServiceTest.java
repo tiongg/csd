@@ -69,7 +69,6 @@ class CourseServiceTest {
     lenient().when(mockCourse.getTitle()).thenReturn("Test Course");
     lenient().when(mockCourse.getCreatorId()).thenReturn(creatorId);
     lenient().when(mockCourse.getTeamId()).thenReturn(teamId);
-    lenient().when(mockCourse.getIsPublished()).thenReturn(false);
     lenient().when(mockCourse.getCreatedAt()).thenReturn(OffsetDateTime.now());
     lenient().when(mockCourse.getUpdatedAt()).thenReturn(OffsetDateTime.now());
   }
@@ -139,10 +138,9 @@ class CourseServiceTest {
   void shouldUpdateCourseAsCreator() {
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
-    when(courseRepository.update(eq(courseId), anyString(), isNull(), eq(teamId), isNull())).thenReturn(mockCourse);
+    when(courseRepository.update(eq(courseId), anyString(), isNull(), eq(teamId))).thenReturn(mockCourse);
 
-    CourseResponse result = courseService.updateCourse(courseId, new CourseUpdateRequest("New Title", null, null),
-        creatorId);
+    CourseResponse result = courseService.updateCourse(courseId, new CourseUpdateRequest("New Title", null), creatorId);
 
     assertThat(result).isNotNull();
   }
@@ -154,9 +152,8 @@ class CourseServiceTest {
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
     when(teamService.isTeamMember(teamId, otherId)).thenReturn(false);
 
-    assertThatThrownBy(
-        () -> courseService.updateCourse(courseId, new CourseUpdateRequest("Title", null, null), otherId))
-            .isInstanceOf(BadRequestException.class);
+    assertThatThrownBy(() -> courseService.updateCourse(courseId, new CourseUpdateRequest("Title", null), otherId))
+        .isInstanceOf(BadRequestException.class);
   }
 
   // --- deleteCourse ---
