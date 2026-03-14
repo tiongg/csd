@@ -37,13 +37,17 @@ export const Route = createFileRoute('/_authenticated/admin/review/$versionId')(
 );
 
 function RouteComponent() {
-  const { course, courseContent, versionId } = Route.useLoaderData();
+  const { course, courseContent, contentVersion } = Route.useLoaderData();
 
   return (
     <PageWithNavBar>
-      <ContentReviewProvider course={course} content={courseContent}>
+      <ContentReviewProvider
+        course={course}
+        content={courseContent}
+        contentVersion={contentVersion}
+      >
         <div className="flex h-full w-full min-w-0 flex-1 flex-col">
-          <ReviewHeader versionId={versionId} />
+          <ReviewHeader />
           <CourseReview />
         </div>
       </ContentReviewProvider>

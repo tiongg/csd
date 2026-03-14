@@ -1,9 +1,20 @@
 import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { useContentReview } from '@/context/ContentReviewContext';
 import { type SectionType } from '@/lib/content.type';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { match } from 'ts-pattern';
 import MarkdownViewer from './MarkdownViewer';
 import QuizViewer from './QuizViewer';
+
+dayjs.extend(relativeTime);
 
 type ReviewSectionViewerProps = {
   section: SectionType;
@@ -11,26 +22,32 @@ type ReviewSectionViewerProps = {
 
 function ReviewSectionViewer({ section }: ReviewSectionViewerProps) {
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto">
-      {match(section)
-        .with({ type: 'markdown' }, (s) => (
-          <MarkdownViewer content={s.content} />
-        ))
-        .with({ type: 'quiz' }, (s) => (
-          <div className="p-4">
-            <QuizViewer quiz={s.content} />
-          </div>
-        ))
-        .exhaustive()}
+    <div className="flex h-full w-full flex-1 flex-col overflow-hidden">
+      <div className="flex-1">
+        <div className="mx-auto max-w-4xl p-8">
+          {match(section)
+            .with({ type: 'markdown' }, (s) => (
+              <MarkdownViewer content={s.content} />
+            ))
+            .with({ type: 'quiz' }, (s) => (
+              <div className="p-4">
+                <QuizViewer quiz={s.content} />
+              </div>
+            ))
+            .exhaustive()}
+        </div>
+      </div>
     </div>
   );
 }
 
 export default function CourseReview() {
-  const { content, currentSection, setCurrentSection } = useContentReview();
+  const { content, currentSection, setCurrentSection, contentVersion, course } =
+    useContentReview();
 
   const sectionCount = content.length;
-  const currentSectionData = currentSection >= 0 ? content[currentSection] : null;
+  const currentSectionData =
+    currentSection >= 0 ? content[currentSection] : null;
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -58,11 +75,73 @@ export default function CourseReview() {
       </nav>
       {currentSection === -1 || !currentSectionData ? (
         <div className="min-h-0 flex-1 overflow-y-auto p-6">
-          <div className="mx-auto w-full max-w-4xl">
-            <h2 className="text-xl font-semibold">Course Content Overview</h2>
-            <p className="text-muted-foreground">
-              This course has {sectionCount} {sectionCount === 1 ? 'section' : 'sections'}.
-            </p>
+          <div className="mx-auto w-full max-w-4xl space-y-4">
+            {/* Course Info Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl">{course.title}</CardTitle>
+                {course.description && (
+                  <CardDescription>{course.description}</CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap items-center gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Version:</span>
+                    <span className="font-medium">
+                      v{contentVersion.versionNumber}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Published:</span>
+                    <span className="font-medium">
+                      {dayjs(contentVersion.publishedAt).fromNow()}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Version Description</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {contentVersion.description ? (
+                  <p className="text-sm">{contentVersion.description}</p>
+                ) : (
+                  <p className="text-muted-foreground text-sm">
+                    No description provided for this version.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Content Overview</CardTitle>
+                <CardDescription>
+                  This course contains {sectionCount}{' '}
+                  {sectionCount === 1 ? 'section' : 'sections'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {content.map((section, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      className="justify-start text-left"
+                      onClick={() => setCurrentSection(index)}
+                    >
+                      <span className="truncate">
+                        {index + 1}. {section.title}
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       ) : (

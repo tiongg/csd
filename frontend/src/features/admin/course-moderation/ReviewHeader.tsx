@@ -10,17 +10,15 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useContentReview } from '@/context/ContentReviewContext';
 import { useApiMutation } from '@/lib/fetch-client';
 import { useNavigate } from '@tanstack/react-router';
 import { CheckCircleIcon, XCircleIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-type ReviewHeaderProps = {
-  versionId: string;
-};
-
-export default function ReviewHeader({ versionId }: ReviewHeaderProps) {
+export default function ReviewHeader() {
+  const { contentVersion } = useContentReview();
   const navigate = useNavigate();
   const [rejectOpen, setRejectOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
@@ -30,7 +28,7 @@ export default function ReviewHeader({ versionId }: ReviewHeaderProps) {
     '/api/content-versions/{contentVersionId}/approve',
     {
       params: {
-        path: { contentVersionId: versionId },
+        path: { contentVersionId: contentVersion.id },
       },
       onSuccess: () => {
         toast.success('Course approved successfully');
@@ -47,7 +45,7 @@ export default function ReviewHeader({ versionId }: ReviewHeaderProps) {
     '/api/content-versions/{contentVersionId}/reject',
     {
       params: {
-        path: { contentVersionId: versionId },
+        path: { contentVersionId: contentVersion.id },
       },
       onSuccess: () => {
         toast.success('Course rejected');
@@ -65,7 +63,7 @@ export default function ReviewHeader({ versionId }: ReviewHeaderProps) {
     if (!rejectReason.trim()) return;
     rejectVersion({
       params: {
-        path: { contentVersionId: versionId },
+        path: { contentVersionId: contentVersion.id },
       },
       body: {
         rejectedReason: rejectReason.trim(),
@@ -129,7 +127,7 @@ export default function ReviewHeader({ versionId }: ReviewHeaderProps) {
           onClick={() =>
             approveVersion({
               params: {
-                path: { contentVersionId: versionId },
+                path: { contentVersionId: contentVersion.id },
               },
             })
           }

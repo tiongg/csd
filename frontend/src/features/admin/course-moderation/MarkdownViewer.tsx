@@ -15,7 +15,7 @@ function MarkdownViewerInternal({ content }: MarkdownViewerProps) {
   });
 
   return (
-    <div className="p-8">
+    <div>
       <Milkdown />
     </div>
   );

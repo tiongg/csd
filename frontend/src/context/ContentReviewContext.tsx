@@ -1,5 +1,5 @@
-import type { Course } from '@/lib/utils';
 import type { SectionType } from '@/lib/content.type';
+import type { ContentVersion, Course } from '@/lib/utils';
 import {
   createContext,
   useContext,
@@ -10,6 +10,7 @@ import {
 export type ContentReviewContextType = {
   course: Course;
   content: SectionType[];
+  contentVersion: ContentVersion;
   currentSection: number;
   setCurrentSection: (section: number) => void;
 };
@@ -21,14 +22,16 @@ const ContentReviewContext = createContext<ContentReviewContextType | null>(
 type ContentReviewProviderProps = PropsWithChildren<{
   course: Course;
   content: SectionType[];
+  contentVersion: ContentVersion;
   defaultSection?: number;
 }>;
 
 export function ContentReviewProvider({
-  children,
   course,
   content,
+  contentVersion,
   defaultSection = -1,
+  children,
 }: ContentReviewProviderProps) {
   const [currentSection, setCurrentSection] = useState(defaultSection);
 
@@ -37,6 +40,7 @@ export function ContentReviewProvider({
       value={{
         course,
         content,
+        contentVersion,
         currentSection,
         setCurrentSection,
       }}
