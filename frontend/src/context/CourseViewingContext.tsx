@@ -1,5 +1,11 @@
 import type { SectionType } from '@/lib/content.type';
-import type { Course, EnrolledCourse } from '@/lib/utils';
+import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
+import type {
+  Course,
+  EnrolledCourse,
+  LearnerCourseMetadata,
+} from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
 import {
   createContext,
   useContext,
@@ -39,9 +45,41 @@ export function CourseViewerProvider({
   enrollment,
   children,
 }: PropsWithChildren<CourseViewerContextProps>) {
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(-1);
+  const metadata = enrollment.metadata as LearnerCourseMetadata;
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(
+    metadata?.currentIndex ?? -1,
+  );
   const [canNavigate, setCanNavigate] = useState(true);
   const currentSection = sections[currentSectionIndex];
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: updateEnrollmentMetadata } = useApiMutation(
+    'put',
+    '/api/learner/lesson/{lessonId}/metadata',
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(
+          apiQueryOptions('get', '/api/learner/lesson/enrolled'),
+        );
+      },
+    },
+  );
+
+  function updateMetadata(newMetadata: LearnerCourseMetadata) {
+    return updateEnrollmentMetadata({
+      params: {
+        path: {
+          lessonId: enrollment.lessonSessionId,
+        },
+      },
+      body: {
+        metadata: {
+          ...metadata,
+          ...newMetadata,
+        },
+      },
+    });
+  }
 
   // Reset navigation lock when section changes
   useEffect(() => {
@@ -50,10 +88,14 @@ export function CourseViewerProvider({
 
   function goNextSection() {
     setCurrentSectionIndex((prev) => Math.min(prev + 1, sections.length - 1));
+    const newIndex = Math.min(currentSectionIndex + 1, sections.length - 1);
+    updateMetadata({ currentIndex: newIndex });
   }
 
   function goPreviousSection() {
     setCurrentSectionIndex((prev) => Math.max(prev - 1, -1));
+    const newIndex = Math.max(currentSectionIndex - 1, -1);
+    updateMetadata({ currentIndex: newIndex });
   }
 
   return (

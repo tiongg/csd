@@ -5,12 +5,19 @@ import java.util.UUID;
 
 import org.jooq.JSONB;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.learner.util.LessonCourseRecord;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
-public record LessonSessionFullResponse(@NotNull UUID lessonSessionId, @NotNull Map<String, Object> metadata,
+@Schema(description = "Full lesson session response")
+public record LessonSessionFullResponse(@NotNull UUID lessonSessionId,
+    @Schema(type = "object", additionalProperties = Schema.AdditionalPropertiesValue.TRUE) @NotNull Map<String, Object> metadata,
     @NotNull CourseResponse course) {
+
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   public LessonSessionFullResponse(LessonCourseRecord lessonCourseRecord) {
     this(lessonCourseRecord.learnerCourseRecord().getId(),
@@ -26,6 +33,13 @@ public record LessonSessionFullResponse(@NotNull UUID lessonSessionId, @NotNull 
     Object data = jsonb.data();
     if (data instanceof Map) {
       return (Map<String, Object>) data;
+    }
+    if (data instanceof String) {
+      try {
+        return OBJECT_MAPPER.readValue((String) data, Map.class);
+      } catch (Exception e) {
+        return Map.of();
+      }
     }
     return Map.of();
   }

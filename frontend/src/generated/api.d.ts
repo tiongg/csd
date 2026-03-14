@@ -700,18 +700,20 @@ export interface components {
             /** @enum {string} */
             role: "OWNER" | "ADMIN" | "MEMBER";
         };
+        /** @description Update lesson session request */
         UpdateLessonSessionRequest: {
             metadata: {
-                [key: string]: Record<string, never>;
+                [key: string]: unknown;
             };
         };
+        /** @description Lesson session response */
         LessonSessionResponse: {
             /** Format: uuid */
             courseId: string;
             /** Format: uuid */
             lessonSessionId: string;
             metadata: {
-                [key: string]: Record<string, never>;
+                [key: string]: unknown;
             };
         };
         CourseUpdateRequest: {
@@ -795,11 +797,12 @@ export interface components {
             isMember: boolean;
             role: string;
         };
+        /** @description Full lesson session response */
         LessonSessionFullResponse: {
             /** Format: uuid */
             lessonSessionId: string;
             metadata: {
-                [key: string]: Record<string, never>;
+                [key: string]: unknown;
             };
             course: components["schemas"]["Course"];
         };
@@ -973,10 +976,12 @@ export interface operations {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                lessonId: string;
+            };
             cookie?: never;
         };
-        requestBody?: {
+        requestBody: {
             content: {
                 "application/json": components["schemas"]["UpdateLessonSessionRequest"];
             };
