@@ -15,11 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions@1.5
+        working-directory: ./backend
         with:
           args: >
             deploy
             --remote-only
-            --config .fly/fly-backend.toml
+            --config ../.fly/fly-backend.toml
             --build-arg JOOQ_JDBC_URL=${{ vars.SPRING_DATASOURCE_URL }}
             --build-arg JOOQ_JDBC_USER=${{ vars.SPRING_DATASOURCE_USERNAME }}
             --build-arg JOOQ_JDBC_PASSWORD=${{ vars.SPRING_DATASOURCE_PASSWORD }}
