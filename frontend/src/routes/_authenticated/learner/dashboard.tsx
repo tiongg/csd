@@ -1,6 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import LearnerDashboardPage from '@/features/learner/LearnerDashboardPage';
 import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
+import { EnrolledCourseProvider } from '@/context/EnrolledCourseContext';
+import LearnerDashboardPage from '@/features/learner/LearnerDashboardPage';
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_authenticated/learner/dashboard')({
   component: RouteComponent,
@@ -9,8 +10,9 @@ export const Route = createFileRoute('/_authenticated/learner/dashboard')({
 function RouteComponent() {
   return (
     <PageWithNavBar>
-      <LearnerDashboardPage />
+      <EnrolledCourseProvider>
+        <LearnerDashboardPage />
+      </EnrolledCourseProvider>
     </PageWithNavBar>
   );
 }
-
