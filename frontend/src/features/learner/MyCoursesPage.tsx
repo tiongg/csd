@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heading1 } from '@/components/ui/typography';
 import { FireIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
+import { AllCourses } from './all-courses/AllCourses';
 import { EnrolledCourses } from './enrolled-courses/EnrolledCourses';
 
 export default function MyCoursesPage() {
@@ -35,10 +36,16 @@ export default function MyCoursesPage() {
             <TabsTrigger value="enrolled" className="cursor-pointer">
               Enrolled
             </TabsTrigger>
+            <TabsTrigger value="all" className="cursor-pointer">
+              All Courses
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="enrolled">
             <EnrolledCourses searchQuery={searchQuery} />
+          </TabsContent>
+          <TabsContent value="all">
+            <AllCourses searchQuery={searchQuery} />
           </TabsContent>
         </Tabs>
       </div>
