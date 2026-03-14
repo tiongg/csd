@@ -548,6 +548,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/content-versions/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPendingCourses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -842,6 +858,10 @@ export interface components {
         };
         LatestContentVersionResponse: {
             downloadUrl: string;
+            course: components["schemas"]["Course"];
+        };
+        PendingVersionResponse: {
+            contentVersion: components["schemas"]["ContentVersionResponse"];
             course: components["schemas"]["Course"];
         };
         SelfResponse: {
@@ -1908,6 +1928,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["LatestContentVersionResponse"];
+                };
+            };
+        };
+    };
+    getPendingCourses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PendingVersionResponse"][];
                 };
             };
         };

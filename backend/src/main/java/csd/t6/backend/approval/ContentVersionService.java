@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import csd.t6.backend.approval.dto.response.LatestContentVersionResponse;
+import csd.t6.backend.approval.util.ContentVersionWithCourseRecord;
 import csd.t6.backend.course.CourseReelService;
 import csd.t6.backend.course.CourseRepository;
 import csd.t6.backend.course.dto.response.CourseResponse;
@@ -82,6 +83,10 @@ public class ContentVersionService {
         .orElseThrow(() -> new BadRequestException("Course not found"));
 
     return new LatestContentVersionResponse(url, course);
+  }
+
+  public List<ContentVersionWithCourseRecord> getAllPendingVersions() {
+    return this.contentVersionRepository.findByStatusWithCourse(ContentStatus.PENDING);
   }
 
   private String getVersionKey(UUID courseId, UUID versionId) {

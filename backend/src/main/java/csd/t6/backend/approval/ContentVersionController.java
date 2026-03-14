@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import csd.t6.backend.approval.dto.request.UploadCourseRequest;
 import csd.t6.backend.approval.dto.response.ContentVersionResponse;
 import csd.t6.backend.approval.dto.response.LatestContentVersionResponse;
+import csd.t6.backend.approval.dto.response.PendingVersionResponse;
 import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.utils.dto.PresignedUrlResponse;
 import jakarta.validation.Valid;
@@ -42,5 +43,10 @@ public class ContentVersionController {
   @GetMapping("/{courseId}")
   public List<ContentVersionResponse> getContentVersions(@PathVariable UUID courseId) {
     return this.contentVersionService.getPastVersions(courseId).stream().map(ContentVersionResponse::new).toList();
+  }
+
+  @GetMapping("/pending")
+  public List<PendingVersionResponse> getPendingCourses() {
+    return this.contentVersionService.getAllPendingVersions().stream().map(PendingVersionResponse::new).toList();
   }
 }
