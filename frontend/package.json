@@ -66,7 +66,10 @@
     "y-websocket": "^3.0.0",
     "yjs": "^13.6.29",
     "zod": "^4.3.6",
-    "zustand": "^5.0.11"
+    "zustand": "^5.0.11",
+    "@types/textarea-caret": "^3.0.4",
+    "yjs-types": "^0.0.1",
+    "web-vitals": "^5.1.0"
   },
   "devDependencies": {
     "@tanstack/eslint-config": "^0.3.0",
@@ -75,7 +78,6 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
-    "@types/textarea-caret": "^3.0.4",
     "jsdom": "^27.0.0",
     "openapi-typescript": "^7.13.0",
     "prettier": "^3.5.3",
@@ -83,8 +85,6 @@
     "shadcn": "^3.7.0",
     "typescript": "^5.7.2",
     "vite": "^7.1.7",
-    "vitest": "^3.0.5",
-    "web-vitals": "^5.1.0",
-    "yjs-types": "^0.0.1"
+    "vitest": "^3.0.5"
   }
 }

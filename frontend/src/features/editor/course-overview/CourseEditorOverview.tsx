@@ -1,6 +1,3 @@
-import { FileText, HelpCircle } from 'lucide-react';
-import PublishCourse from './PublishCourse';
-import type { Course } from '@/lib/utils';
 import {
   Card,
   CardContent,
@@ -9,6 +6,10 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useContentEditor } from '@/context/ContentEditorContext';
+import type { EditableSectionType } from '@/lib/content.type';
+import type { Course } from '@/lib/utils';
+import { FileText, HelpCircle } from 'lucide-react';
+import PublishCourse from './PublishCourse';
 
 type CourseEditorOverviewProps = {
   course: Course;
@@ -21,8 +22,8 @@ export default function CourseEditorOverview({
 
   const sections = doc.getArray('root');
   const sectionCount = sections.length;
-  const quizCount = Array.from(sections).filter(
-    (s) => s.get('type') === 'quiz',
+  const quizCount = Array.from<EditableSectionType>(sections).filter(
+    (section) => section.get('type') === 'quiz',
   ).length;
 
   return (
