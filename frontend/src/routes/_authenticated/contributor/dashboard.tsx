@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import UserDashboard from '@/components/UserDashboard';
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 
 export const Route = createFileRoute('/_authenticated/contributor/dashboard')({
   component: RouteComponent,
@@ -8,8 +8,9 @@ export const Route = createFileRoute('/_authenticated/contributor/dashboard')({
 
 function RouteComponent() {
   return (
-    <PageWithSideBar>
+    <PageWithNavBar>
       <UserDashboard />
-    </PageWithSideBar>
+    </PageWithNavBar>
   );
 }
+

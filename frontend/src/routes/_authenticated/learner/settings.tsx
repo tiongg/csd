@@ -1,4 +1,4 @@
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import UpdateProfileForm from '@/features/profile/edit/UpdateProfileForm';
 import { createFileRoute } from '@tanstack/react-router';
 
@@ -8,10 +8,11 @@ export const Route = createFileRoute('/_authenticated/learner/settings')({
 
 function RouteComponent() {
   return (
-    <PageWithSideBar>
+    <PageWithNavBar>
       <div className="flex h-full w-full items-center justify-center">
         <UpdateProfileForm />
       </div>
-    </PageWithSideBar>
+    </PageWithNavBar>
   );
 }
+

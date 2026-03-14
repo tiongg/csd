@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import TeamsList from '@/features/contributor/TeamsList';
 
 export const Route = createFileRoute('/_authenticated/contributor/teams')({
@@ -8,8 +8,9 @@ export const Route = createFileRoute('/_authenticated/contributor/teams')({
 
 function RouteComponent() {
   return (
-    <PageWithSideBar>
+    <PageWithNavBar>
       <TeamsList />
-    </PageWithSideBar>
+    </PageWithNavBar>
   );
 }
+

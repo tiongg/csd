@@ -1,4 +1,4 @@
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import { CourseViewerProvider } from '@/context/CourseViewingContext';
 import CourseView from '@/features/learner/course/CourseView';
 import type { SectionType } from '@/lib/content.type';
@@ -36,10 +36,11 @@ function RouteComponent() {
   const { course, content } = Route.useLoaderData();
 
   return (
-    <PageWithSideBar>
+    <PageWithNavBar>
       <CourseViewerProvider sections={content} course={course}>
         <CourseView />
       </CourseViewerProvider>
-    </PageWithSideBar>
+    </PageWithNavBar>
   );
 }
+

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import CourseModerationForm from '@/features/admin/CourseModerationForm';
 
 export const Route = createFileRoute('/_authenticated/admin/course-moderation')(
@@ -10,8 +10,9 @@ export const Route = createFileRoute('/_authenticated/admin/course-moderation')(
 
 function RouteComponent() {
   return (
-    <PageWithSideBar>
+    <PageWithNavBar>
       <CourseModerationForm />
-    </PageWithSideBar>
+    </PageWithNavBar>
   );
 }
+

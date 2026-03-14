@@ -1,4 +1,4 @@
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import CoursesList from '@/features/contributor/CoursesList';
 import { useApiQuery } from '@/lib/fetch-client';
 import { createFileRoute } from '@tanstack/react-router';
@@ -22,8 +22,9 @@ function RouteComponent() {
   }
 
   return (
-    <PageWithSideBar>
+    <PageWithNavBar>
       <CoursesList team={team} />
-    </PageWithSideBar>
+    </PageWithNavBar>
   );
 }
+
