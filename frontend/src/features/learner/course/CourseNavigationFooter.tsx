@@ -41,7 +41,7 @@ export default function CourseNavigationFooter() {
           <Button
             size="sm"
             onClick={goNextSection}
-            disabled={currentSectionIndex === sections.length - 1 || isDisabled}
+            disabled={currentSectionIndex === sections.length || isDisabled}
             className="gap-2 transition duration-300 active:scale-95"
           >
             Next

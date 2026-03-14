@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { SectionType } from '@/lib/content.type';
-import { capitalizeFirst, type Course } from '@/lib/utils';
+import { capitalizeFirst, type Course, type EnrolledCourse } from '@/lib/utils';
 import { BookOpen, Clock, FileText } from 'lucide-react';
 import DropCourse from './DropCourse';
 import EnrollCourse from './EnrollCourse';
@@ -9,13 +9,13 @@ import EnrollCourse from './EnrollCourse';
 type CourseOverviewProps = {
   course: Course;
   sections: SectionType[];
-  lessonId?: string;
+  enrollment?: EnrolledCourse;
 };
 
 export default function CourseOverview({
   course,
   sections,
-  lessonId,
+  enrollment,
 }: CourseOverviewProps) {
   const markdownCount = sections.filter((s) => s.type === 'markdown').length;
   const quizCount = sections.filter((s) => s.type === 'quiz').length;
@@ -33,6 +33,9 @@ export default function CourseOverview({
                 {course.description ?? 'No description provided'}
               </p>
             </div>
+            {enrollment?.status === 'COMPLETED' && (
+              <Badge variant="success">Complete</Badge>
+            )}
             <Badge variant="secondary" className="gap-1.5">
               <BookOpen className="h-3 w-3" />
               Course
@@ -113,8 +116,8 @@ export default function CourseOverview({
         </CardContent>
       </Card>
 
-      {lessonId ? (
-        <DropCourse lessonId={lessonId} />
+      {enrollment ? (
+        <DropCourse lessonId={enrollment.lessonSessionId} />
       ) : (
         <EnrollCourse courseId={course.id} />
       )}

@@ -176,6 +176,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/learner/lesson/{lessonId}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["completeLesson"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/learner/lesson/{courseId}/enroll": {
         parameters: {
             query?: never;
@@ -801,6 +817,8 @@ export interface components {
         LessonSessionFullResponse: {
             /** Format: uuid */
             lessonSessionId: string;
+            /** @enum {string} */
+            status: "ENROLLED" | "COMPLETED";
             metadata: {
                 [key: string]: unknown;
             };
@@ -1260,6 +1278,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    completeLesson: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lessonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LessonSessionResponse"];
+                };
             };
         };
     };

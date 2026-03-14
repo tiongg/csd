@@ -14,6 +14,7 @@ import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.exceptions.ForbiddenException;
 import csd.t6.backend.learner.dto.response.LessonSessionFullResponse;
 import csd.t6.backend.learner.dto.response.UserEnrolledLessonsResponse;
+import csd.t6.jooq.public_.enums.LearnerCourseStatus;
 import csd.t6.jooq.public_.tables.records.LearnerCourseRecord;
 
 @Service
@@ -58,5 +59,12 @@ public class LearnerLessonService {
     if (deleted == 0) {
       throw new BadRequestException("Failed to drop course");
     }
+  }
+
+  public LearnerCourseRecord completeLesson(UUID lessonId) {
+    LearnerCourseRecord learnerCourse = this.learnerCourseRepository.findOneBy(LEARNER_COURSE.ID, lessonId)
+        .orElseThrow(() -> new RuntimeException("Learner course not found"));
+    learnerCourse.setStatus(LearnerCourseStatus.COMPLETED);
+    return this.learnerCourseRepository.save(learnerCourse);
   }
 }

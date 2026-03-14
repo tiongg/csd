@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import useCourseViewer from '@/context/CourseViewingContext';
 import { match } from 'ts-pattern';
+import CourseFinish from './CourseFinish';
 import CourseMarkdownDisplay from './CourseMarkdownDisplay';
 import CourseNavigationFooter from './CourseNavigationFooter';
 import CourseOverview from './CourseOverview';
@@ -21,11 +22,12 @@ export default function CourseView() {
       <div className="flex-1">
         <div className="mx-auto max-w-4xl p-8">
           <div className="mb-4 flex items-center gap-2">
-            {currentSectionIndex >= 0 && (
-              <Badge variant="secondary" className="text-xs">
-                Section {currentSectionIndex + 1} of {sections.length}
-              </Badge>
-            )}
+            {currentSectionIndex >= 0 &&
+              currentSectionIndex < sections.length && (
+                <Badge variant="secondary" className="text-xs">
+                  Section {currentSectionIndex + 1} of {sections.length}
+                </Badge>
+              )}
             {currentSectionIndex >= 0 && (
               <Badge variant="outline" className="text-xs">
                 {progressPercent}% complete
@@ -36,11 +38,17 @@ export default function CourseView() {
           <div className="min-h-[400px]">
             {match(currentSection)
               .with(undefined, () => (
-                <CourseOverview
-                  course={course}
-                  sections={sections}
-                  lessonId={enrollment.lessonSessionId}
-                />
+                <>
+                  {currentSectionIndex == -1 ? (
+                    <CourseOverview
+                      course={course}
+                      sections={sections}
+                      enrollment={enrollment}
+                    />
+                  ) : (
+                    <CourseFinish />
+                  )}
+                </>
               ))
               .with({ type: 'markdown' }, (section) => (
                 <CourseMarkdownDisplay content={section.content} />

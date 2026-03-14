@@ -49,4 +49,10 @@ public class LearnerLessonController {
   public void dropCourse(@PathVariable UUID lessonId) {
     this.learnerLessonService.dropCourse(lessonId);
   }
+
+  @PostMapping("/{lessonId}/complete")
+  public LessonSessionResponse completeLesson(@PathVariable UUID lessonId) {
+    return new LessonSessionResponse(this.learnerLessonService.completeLesson(lessonId));
+  }
+
 }

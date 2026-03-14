@@ -65,6 +65,18 @@ export function CourseViewerProvider({
     },
   );
 
+  const { mutateAsync: finishCourse } = useApiMutation(
+    'post',
+    '/api/learner/lesson/{lessonId}/complete',
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(
+          apiQueryOptions('get', '/api/learner/lesson/enrolled'),
+        );
+      },
+    },
+  );
+
   function updateMetadata(newMetadata: LearnerCourseMetadata) {
     return updateEnrollmentMetadata({
       params: {
@@ -81,15 +93,30 @@ export function CourseViewerProvider({
     });
   }
 
+  function completeCourse() {
+    return finishCourse({
+      params: {
+        path: {
+          lessonId: enrollment.lessonSessionId,
+        },
+      },
+    });
+  }
+
   // Reset navigation lock when section changes
   useEffect(() => {
     setCanNavigate(currentSection?.type !== 'quiz');
   }, [currentSection]);
 
   function goNextSection() {
-    setCurrentSectionIndex((prev) => Math.min(prev + 1, sections.length - 1));
-    const newIndex = Math.min(currentSectionIndex + 1, sections.length - 1);
-    updateMetadata({ currentIndex: newIndex });
+    setCurrentSectionIndex((prev) => Math.min(prev + 1, sections.length));
+    const newIndex = Math.min(currentSectionIndex + 1, sections.length);
+    if (newIndex === sections.length) {
+      completeCourse();
+      updateMetadata({ currentIndex: -1 });
+    } else {
+      updateMetadata({ currentIndex: newIndex });
+    }
   }
 
   function goPreviousSection() {
