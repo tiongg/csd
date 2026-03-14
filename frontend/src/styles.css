@@ -155,3 +155,28 @@ code,
   @apply text-slate-500;
   margin: 0.25em 0;
 }
+
+/* Editor styles can only be controlled by css :( */
+.ProseMirror-yjs-cursor {
+  pointer-events: none;
+  user-select: none;
+  position: relative;
+  z-index: 10;
+
+  content: '';
+  position: absolute;
+  border-left: 2px solid;
+}
+
+.ProseMirror-yjs-cursor div {
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  position: absolute;
+  top: calc(var(--text-base) * var(--text-base--line-height) * -1);
+  left: 1px;
+  padding: 0px 4px;
+}
+
+.milkdown .ProseMirror {
+  padding: 0 !important;
+}

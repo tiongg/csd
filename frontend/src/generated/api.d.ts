@@ -264,6 +264,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/content-versions/{contentVersionId}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["rejectVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/content-versions/{contentVersionId}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["approveVersion"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/refresh": {
         parameters: {
             query?: never;
@@ -548,6 +580,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/content-versions/review/{contentVersionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getReviewVersion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/content-versions/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPendingCourses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -771,6 +835,9 @@ export interface components {
             url: string;
             key: string;
         };
+        RejectVersionRequest: {
+            rejectedReason: string;
+        };
         Account: {
             /** Format: uuid */
             id: string;
@@ -842,6 +909,15 @@ export interface components {
         };
         LatestContentVersionResponse: {
             downloadUrl: string;
+            course: components["schemas"]["Course"];
+        };
+        ReviewVersionResponse: {
+            downloadUrl: string;
+            contentVersion: components["schemas"]["ContentVersionResponse"];
+            course: components["schemas"]["Course"];
+        };
+        PendingVersionResponse: {
+            contentVersion: components["schemas"]["ContentVersionResponse"];
             course: components["schemas"]["Course"];
         };
         SelfResponse: {
@@ -1429,6 +1505,50 @@ export interface operations {
             };
         };
     };
+    rejectVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contentVersionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectVersionRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    approveVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contentVersionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     refresh: {
         parameters: {
             query?: never;
@@ -1908,6 +2028,48 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["LatestContentVersionResponse"];
+                };
+            };
+        };
+    };
+    getReviewVersion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                contentVersionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReviewVersionResponse"];
+                };
+            };
+        };
+    };
+    getPendingCourses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PendingVersionResponse"][];
                 };
             };
         };

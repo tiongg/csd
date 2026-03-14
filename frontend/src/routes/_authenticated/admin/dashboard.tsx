@@ -1,6 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router';
-import UserDashboard from '@/components/UserDashboard';
+import { AdminDashboard } from '@/components/dashboard/AdminDashboard';
+import { Heading1 } from '@/components/ui/typography';
 import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_authenticated/admin/dashboard')({
   component: RouteComponent,
@@ -9,8 +10,13 @@ export const Route = createFileRoute('/_authenticated/admin/dashboard')({
 function RouteComponent() {
   return (
     <PageWithNavBar>
-      <UserDashboard />
+      <div className="flex h-full w-full flex-col gap-4 p-16">
+        <div>
+          <Heading1>Dashboard Overview</Heading1>
+          <p className="font-subtitle">Here's what's happening today!</p>
+        </div>
+        <AdminDashboard />
+      </div>
     </PageWithNavBar>
   );
 }
-

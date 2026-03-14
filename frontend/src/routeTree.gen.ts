@@ -36,6 +36,7 @@ import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminCourseModerationRouteImport } from './routes/_authenticated/admin/course-moderation'
 import { Route as AuthenticatedLearnerCoursesCourseIdRouteImport } from './routes/_authenticated/learner/courses/$courseId'
+import { Route as AuthenticatedAdminReviewVersionIdRouteImport } from './routes/_authenticated/admin/review/$versionId'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -189,6 +190,12 @@ const AuthenticatedLearnerCoursesCourseIdRoute =
     path: '/learner/courses/$courseId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminReviewVersionIdRoute =
+  AuthenticatedAdminReviewVersionIdRouteImport.update({
+    id: '/admin/review/$versionId',
+    path: '/admin/review/$versionId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -216,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
+  '/admin/review/$versionId': typeof AuthenticatedAdminReviewVersionIdRoute
   '/learner/courses/$courseId': typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 export interface FileRoutesByTo {
@@ -244,6 +252,7 @@ export interface FileRoutesByTo {
   '/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
+  '/admin/review/$versionId': typeof AuthenticatedAdminReviewVersionIdRoute
   '/learner/courses/$courseId': typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 export interface FileRoutesById {
@@ -274,6 +283,7 @@ export interface FileRoutesById {
   '/_authenticated/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
   '/contributor/editor/$courseId': typeof ContributorEditorCourseIdRoute
+  '/_authenticated/admin/review/$versionId': typeof AuthenticatedAdminReviewVersionIdRoute
   '/_authenticated/learner/courses/$courseId': typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 export interface FileRouteTypes {
@@ -304,6 +314,7 @@ export interface FileRouteTypes {
     | '/learner/settings'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
+    | '/admin/review/$versionId'
     | '/learner/courses/$courseId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -332,6 +343,7 @@ export interface FileRouteTypes {
     | '/learner/settings'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
+    | '/admin/review/$versionId'
     | '/learner/courses/$courseId'
   id:
     | '__root__'
@@ -361,6 +373,7 @@ export interface FileRouteTypes {
     | '/_authenticated/learner/settings'
     | '/contributor/$teamId/courses'
     | '/contributor/editor/$courseId'
+    | '/_authenticated/admin/review/$versionId'
     | '/_authenticated/learner/courses/$courseId'
   fileRoutesById: FileRoutesById
 }
@@ -566,6 +579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearnerCoursesCourseIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/review/$versionId': {
+      id: '/_authenticated/admin/review/$versionId'
+      path: '/admin/review/$versionId'
+      fullPath: '/admin/review/$versionId'
+      preLoaderRoute: typeof AuthenticatedAdminReviewVersionIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -588,6 +608,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedLearnerGlossaryRoute: typeof AuthenticatedLearnerGlossaryRoute
   AuthenticatedLearnerMyCoursesRoute: typeof AuthenticatedLearnerMyCoursesRoute
   AuthenticatedLearnerSettingsRoute: typeof AuthenticatedLearnerSettingsRoute
+  AuthenticatedAdminReviewVersionIdRoute: typeof AuthenticatedAdminReviewVersionIdRoute
   AuthenticatedLearnerCoursesCourseIdRoute: typeof AuthenticatedLearnerCoursesCourseIdRoute
 }
 
@@ -612,6 +633,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedLearnerGlossaryRoute: AuthenticatedLearnerGlossaryRoute,
   AuthenticatedLearnerMyCoursesRoute: AuthenticatedLearnerMyCoursesRoute,
   AuthenticatedLearnerSettingsRoute: AuthenticatedLearnerSettingsRoute,
+  AuthenticatedAdminReviewVersionIdRoute:
+    AuthenticatedAdminReviewVersionIdRoute,
   AuthenticatedLearnerCoursesCourseIdRoute:
     AuthenticatedLearnerCoursesCourseIdRoute,
 }

@@ -9,7 +9,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import csd.t6.backend.approval.dto.response.ContentVersionResponse;
 import csd.t6.backend.approval.dto.response.LatestContentVersionResponse;
+import csd.t6.backend.approval.dto.response.ReviewVersionResponse;
+import csd.t6.backend.approval.util.ContentVersionWithCourseRecord;
 import csd.t6.backend.course.CourseReelService;
 import csd.t6.backend.course.CourseRepository;
 import csd.t6.backend.course.dto.response.CourseResponse;
@@ -82,6 +85,52 @@ public class ContentVersionService {
         .orElseThrow(() -> new BadRequestException("Course not found"));
 
     return new LatestContentVersionResponse(url, course);
+  }
+
+  public ReviewVersionResponse getReviewVersion(UUID contentVersionId) {
+    ContentVersionRecord version = this.contentVersionRepository.findOneBy(CONTENT_VERSION.ID, contentVersionId)
+        .orElseThrow(() -> new BadRequestException("Content version not found"));
+
+    String key = this.getVersionKey(version.getCourseId(), version.getId());
+    String url = this.fileService.generatePresignedDownloadUrl(key, Duration.ofMinutes(10));
+
+    CourseResponse course = courseRepository.findById(version.getCourseId())
+        .map((record) -> new CourseResponse(record, courseReelService.getReelUrlForCourse(record)))
+        .orElseThrow(() -> new BadRequestException("Course not found"));
+
+    return new ReviewVersionResponse(url, new ContentVersionResponse(version), course);
+  }
+
+  public List<ContentVersionWithCourseRecord> getAllPendingVersions() {
+    return this.contentVersionRepository.findByStatusWithCourse(ContentStatus.PENDING);
+  }
+
+  @Transactional
+  public void approveVersion(UUID contentVersionId) {
+    ContentVersionRecord version = this.contentVersionRepository.findOneBy(CONTENT_VERSION.ID, contentVersionId)
+        .orElseThrow(() -> new BadRequestException("Content version not found"));
+
+    if (!version.getStatus().equals(ContentStatus.PENDING)) {
+      throw new BadRequestException("Can only approve pending versions");
+    }
+
+    // Reject all other pending versions for this course
+    this.contentVersionRepository.rejectAllPendingVersions(version.getCourseId());
+
+    // Approve this version (clear rejected reason since it's approved)
+    this.contentVersionRepository.updateStatus(contentVersionId, ContentStatus.APPROVED, null);
+  }
+
+  @Transactional
+  public void rejectVersion(UUID contentVersionId, String rejectedReason) {
+    ContentVersionRecord version = this.contentVersionRepository.findOneBy(CONTENT_VERSION.ID, contentVersionId)
+        .orElseThrow(() -> new BadRequestException("Content version not found"));
+
+    if (!version.getStatus().equals(ContentStatus.PENDING)) {
+      throw new BadRequestException("Can only reject pending versions");
+    }
+
+    this.contentVersionRepository.updateStatus(contentVersionId, ContentStatus.REJECTED, rejectedReason);
   }
 
   private String getVersionKey(UUID courseId, UUID versionId) {
