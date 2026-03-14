@@ -1,0 +1,2 @@
+ALTER TABLE learner_course
+ADD COLUMN enrolled_at TIMESTAMP NOT NULL DEFAULT now();

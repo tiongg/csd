@@ -2,6 +2,7 @@ package csd.t6.backend.learner;
 
 import static csd.t6.jooq.public_.tables.LearnerCourse.LEARNER_COURSE;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -65,6 +66,7 @@ public class LearnerLessonService {
     LearnerCourseRecord learnerCourse = this.learnerCourseRepository.findOneBy(LEARNER_COURSE.ID, lessonId)
         .orElseThrow(() -> new RuntimeException("Learner course not found"));
     learnerCourse.setStatus(LearnerCourseStatus.COMPLETED);
+    learnerCourse.setCompletedAt(LocalDateTime.now());
     return this.learnerCourseRepository.save(learnerCourse);
   }
 }
