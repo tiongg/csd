@@ -24,15 +24,18 @@ function getPrimaryNavItems(currentActiveRole: Account['role']): PrimaryNavItem[
       { label: 'Dashboard', to: '/admin/dashboard' as const },
       { label: 'User Management', to: '/admin/user-management' as const },
       { label: 'Course Moderation', to: '/admin/course-moderation' as const },
+      { label: 'Glossary', to: '/admin/glossary' as const },
     ])
     .with('CONTRIBUTOR', () => [
       { label: 'Dashboard', to: '/contributor/dashboard' as const },
       { label: 'Teams', to: '/contributor/teams' as const },
+      { label: 'Glossary', to: '/contributor/glossary' as const },
     ])
     .with('LEARNER', () => [
       { label: 'Dashboard', to: '/learner/dashboard' as const },
       { label: 'Discover', to: '/learner/discover' as const },
       { label: 'My Courses', to: '/learner/my-courses' as const },
+      { label: 'Glossary', to: '/learner/glossary' as const },
     ])
     .exhaustive();
 }
