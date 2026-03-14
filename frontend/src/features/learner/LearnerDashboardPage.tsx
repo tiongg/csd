@@ -3,7 +3,7 @@ import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { PersonalAnalytics } from './dashboard/PersonalAnalytics';
+import PersonalAnalytics from './dashboard/PersonalAnalytics';
 import { PublishedCoursesCard } from './dashboard/PublishedCoursesCard';
 import { TopTrendsTable } from './dashboard/TopTrendsTable';
 import { TrendCourseSearchDialog } from './dashboard/TrendCourseSearchDialog';
