@@ -484,6 +484,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/learner/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAnalytics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -891,6 +907,17 @@ export interface components {
         };
         UserEnrolledLessonsResponse: {
             enrolledLessons: components["schemas"]["LessonSessionFullResponse"][];
+        };
+        LearnerAnalyticsResponse: {
+            weeklyCadence: number[];
+            /** Format: int32 */
+            activeDays: number;
+            /** Format: int32 */
+            focusScore: number;
+            /** Format: int32 */
+            completedCoursesCount: number;
+            /** Format: int32 */
+            currentStreak: number;
         };
         ImageUploadResponse: {
             url: string;
@@ -1898,6 +1925,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["UserEnrolledLessonsResponse"];
+                };
+            };
+        };
+    };
+    getAnalytics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LearnerAnalyticsResponse"];
                 };
             };
         };

@@ -31,6 +31,15 @@ export function hexToRgb(hex: string) {
   return { r, g, b };
 }
 
+export function cleanText(text: string) {
+  return text
+    .replaceAll('â€‘', '-')
+    .replaceAll('â€™', "'")
+    .replaceAll('â€œ', '"')
+    .replaceAll('â€\u009d', '"')
+    .replaceAll('â€“', '-');
+}
+
 export type Team = components['schemas']['Team'];
 export type Course = components['schemas']['Course'];
 export type ContentVersion = components['schemas']['ContentVersionResponse'];

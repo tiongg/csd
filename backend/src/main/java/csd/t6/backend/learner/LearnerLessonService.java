@@ -15,15 +15,19 @@ import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.exceptions.ForbiddenException;
 import csd.t6.backend.learner.dto.response.LessonSessionFullResponse;
 import csd.t6.backend.learner.dto.response.UserEnrolledLessonsResponse;
+import csd.t6.jooq.public_.enums.LearnerActivityType;
 import csd.t6.jooq.public_.enums.LearnerCourseStatus;
 import csd.t6.jooq.public_.tables.records.LearnerCourseRecord;
 
 @Service
 public class LearnerLessonService {
   private final LearnerCourseRepository learnerCourseRepository;
+  private final LearnerAnalyticsService learnerAnalyticsService;
 
-  public LearnerLessonService(LearnerCourseRepository learnerCourseRepository) {
+  public LearnerLessonService(LearnerCourseRepository learnerCourseRepository,
+      LearnerAnalyticsService learnerAnalyticsService) {
     this.learnerCourseRepository = learnerCourseRepository;
+    this.learnerAnalyticsService = learnerAnalyticsService;
   }
 
   public LearnerCourseRecord enrollToCourse(UUID courseId, UUID userId) {
@@ -31,7 +35,9 @@ public class LearnerLessonService {
       throw new BadRequestException("Already enrolled to this course");
     }
 
-    return this.learnerCourseRepository.insert(userId, courseId);
+    var result = this.learnerCourseRepository.insert(userId, courseId);
+    this.learnerAnalyticsService.logActivity(userId, courseId, LearnerActivityType.COURSE_ENROLLED);
+    return result;
   }
 
   public LearnerCourseRecord updateLessonSessionMetadata(UUID lessonSessionId, UUID userId,
@@ -47,7 +53,9 @@ public class LearnerLessonService {
     } catch (Exception e) {
       throw new BadRequestException("Failed to serialize metadata");
     }
-    return this.learnerCourseRepository.save(learnerCourse);
+    var result = this.learnerCourseRepository.save(learnerCourse);
+    this.learnerAnalyticsService.logActivity(userId, learnerCourse.getCourseId(), LearnerActivityType.METADATA_UPDATED);
+    return result;
   }
 
   public UserEnrolledLessonsResponse getEnrolledLessons(UUID userId) {
@@ -67,6 +75,10 @@ public class LearnerLessonService {
         .orElseThrow(() -> new RuntimeException("Learner course not found"));
     learnerCourse.setStatus(LearnerCourseStatus.COMPLETED);
     learnerCourse.setCompletedAt(LocalDateTime.now());
-    return this.learnerCourseRepository.save(learnerCourse);
+    var result = this.learnerCourseRepository.save(learnerCourse);
+    this.learnerAnalyticsService.logActivity(learnerCourse.getUserId(), learnerCourse.getCourseId(),
+        LearnerActivityType.COURSE_COMPLETED);
+    return result;
   }
+
 }
