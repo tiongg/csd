@@ -70,14 +70,12 @@ export default function LearnerDashboardPage() {
           className="flex flex-col gap-5 lg:flex-row lg:gap-0"
           style={{ '--left-pane': `${leftPaneWidth}%` } as CSSProperties}
         >
-          <section className="min-w-0 basis-full rounded-2xl border border-slate-200 bg-white p-5 md:p-6 lg:[flex-basis:var(--left-pane)]">
-            <TopTrendsTable
-              onTrendClick={(trendName) => {
-                setTrendSearch(trendName);
-                setIsTrendModalOpen(true);
-              }}
-            />
-          </section>
+          <TopTrendsTable
+            onTrendClick={(trendName) => {
+              setTrendSearch(trendName);
+              setIsTrendModalOpen(true);
+            }}
+          />
 
           <div className="hidden lg:flex lg:w-5 lg:items-center lg:justify-center">
             <button
