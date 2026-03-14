@@ -71,4 +71,12 @@ public class ContentVersionRepository extends BaseRepository<ContentVersionRecor
     return this.dsl.select(cv, c).from(cv).join(c).on(cv.COURSE_ID.eq(c.ID)).where(cv.STATUS.eq(status)).fetch()
         .map(record -> new ContentVersionWithCourseRecord(record.value1(), record.value2()));
   }
+
+  public void updateStatus(UUID contentVersionId, ContentStatus status, String rejectedReason) {
+    dsl.update(CONTENT_VERSION)
+        .set(CONTENT_VERSION.STATUS, status)
+        .set(CONTENT_VERSION.REJECTED_REASON, rejectedReason)
+        .where(CONTENT_VERSION.ID.eq(contentVersionId))
+        .execute();
+  }
 }

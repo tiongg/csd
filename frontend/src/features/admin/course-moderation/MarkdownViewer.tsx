@@ -4,29 +4,27 @@ import { Milkdown, MilkdownProvider } from '@milkdown/react';
 import '@milkdown/crepe/theme/common/style.css';
 import '@milkdown/crepe/theme/frame.css';
 
-type CourseMarkdownDisplayProps = {
+type MarkdownViewerProps = {
   content: string;
 };
 
-function ViewerInternal({ content }: CourseMarkdownDisplayProps) {
+function MarkdownViewerInternal({ content }: MarkdownViewerProps) {
   useCrepeEditor({
     readOnly: true,
     defaultContent: content,
   });
 
   return (
-    <div className="bg-card rounded-lg border px-8 shadow-sm">
+    <div className="p-8">
       <Milkdown />
     </div>
   );
 }
 
-export default function CourseMarkdownDisplay({
-  content,
-}: CourseMarkdownDisplayProps) {
+export default function MarkdownViewer({ content }: MarkdownViewerProps) {
   return (
     <MilkdownProvider>
-      <ViewerInternal content={content} />
+      <MarkdownViewerInternal content={content} />
     </MilkdownProvider>
   );
 }
