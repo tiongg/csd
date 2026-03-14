@@ -104,7 +104,7 @@ services:
   y-websocket:
     build:
       context: ./external-services
-      dockerfile: yWsDockerfile
+      dockerfile: yws.Dockerfile
     container_name: y-websocket
     ports:
       - '8081:8081'

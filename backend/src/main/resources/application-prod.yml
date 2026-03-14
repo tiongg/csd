@@ -21,6 +21,14 @@ spring:
           endpoint: ${AWS_S3_ENDPOINT:http://localhost:9000}
           private_endpoint: ${AWS_S3_ENDPOINT:http://minio:9000}
           path-style-access: ${AWS_S3_PATH_STYLE_ACCESS:true}
+          
+jwt:
+  secret: ${JWT_SECRET:shikanokonokonokokoshitantanshikanokonokonokokoshitantanshikanokonokonokokoshitantan}
+  # In hours
+  access-token:
+    expiration: 1
+  refresh-token:
+    expiration: 720
 
 springdoc:
   swagger-ui:
