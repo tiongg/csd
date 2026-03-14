@@ -178,5 +178,5 @@ code,
 }
 
 .milkdown .ProseMirror {
-  padding: 0;
+  padding: 0 !important;
 }
