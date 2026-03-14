@@ -20,15 +20,18 @@ import { Route as ContributorEditorCourseIdRouteImport } from './routes/contribu
 import { Route as ContributorTeamIdCoursesRouteImport } from './routes/contributor/$teamId/courses'
 import { Route as AuthenticatedLearnerSettingsRouteImport } from './routes/_authenticated/learner/settings'
 import { Route as AuthenticatedLearnerMyCoursesRouteImport } from './routes/_authenticated/learner/my-courses'
+import { Route as AuthenticatedLearnerGlossaryRouteImport } from './routes/_authenticated/learner/glossary'
 import { Route as AuthenticatedLearnerFaqRouteImport } from './routes/_authenticated/learner/faq'
 import { Route as AuthenticatedLearnerDiscoverRouteImport } from './routes/_authenticated/learner/discover'
 import { Route as AuthenticatedLearnerDashboardRouteImport } from './routes/_authenticated/learner/dashboard'
 import { Route as AuthenticatedContributorTeamsRouteImport } from './routes/_authenticated/contributor/teams'
 import { Route as AuthenticatedContributorSettingsRouteImport } from './routes/_authenticated/contributor/settings'
+import { Route as AuthenticatedContributorGlossaryRouteImport } from './routes/_authenticated/contributor/glossary'
 import { Route as AuthenticatedContributorFaqRouteImport } from './routes/_authenticated/contributor/faq'
 import { Route as AuthenticatedContributorDashboardRouteImport } from './routes/_authenticated/contributor/dashboard'
 import { Route as AuthenticatedAdminUserManagementRouteImport } from './routes/_authenticated/admin/user-management'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminGlossaryRouteImport } from './routes/_authenticated/admin/glossary'
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminCourseModerationRouteImport } from './routes/_authenticated/admin/course-moderation'
@@ -92,6 +95,12 @@ const AuthenticatedLearnerMyCoursesRoute =
     path: '/learner/my-courses',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedLearnerGlossaryRoute =
+  AuthenticatedLearnerGlossaryRouteImport.update({
+    id: '/learner/glossary',
+    path: '/learner/glossary',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedLearnerFaqRoute = AuthenticatedLearnerFaqRouteImport.update({
   id: '/learner/faq',
   path: '/learner/faq',
@@ -121,6 +130,12 @@ const AuthenticatedContributorSettingsRoute =
     path: '/contributor/settings',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedContributorGlossaryRoute =
+  AuthenticatedContributorGlossaryRouteImport.update({
+    id: '/contributor/glossary',
+    path: '/contributor/glossary',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedContributorFaqRoute =
   AuthenticatedContributorFaqRouteImport.update({
     id: '/contributor/faq',
@@ -143,6 +158,12 @@ const AuthenticatedAdminSettingsRoute =
   AuthenticatedAdminSettingsRouteImport.update({
     id: '/admin/settings',
     path: '/admin/settings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedAdminGlossaryRoute =
+  AuthenticatedAdminGlossaryRouteImport.update({
+    id: '/admin/glossary',
+    path: '/admin/glossary',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedAdminFaqRoute = AuthenticatedAdminFaqRouteImport.update({
@@ -179,15 +200,18 @@ export interface FileRoutesByFullPath {
   '/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
+  '/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
   '/contributor/faq': typeof AuthenticatedContributorFaqRoute
+  '/contributor/glossary': typeof AuthenticatedContributorGlossaryRoute
   '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
   '/contributor/teams': typeof AuthenticatedContributorTeamsRoute
   '/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
   '/learner/discover': typeof AuthenticatedLearnerDiscoverRoute
   '/learner/faq': typeof AuthenticatedLearnerFaqRoute
+  '/learner/glossary': typeof AuthenticatedLearnerGlossaryRoute
   '/learner/my-courses': typeof AuthenticatedLearnerMyCoursesRoute
   '/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
@@ -204,15 +228,18 @@ export interface FileRoutesByTo {
   '/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
+  '/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
   '/contributor/faq': typeof AuthenticatedContributorFaqRoute
+  '/contributor/glossary': typeof AuthenticatedContributorGlossaryRoute
   '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
   '/contributor/teams': typeof AuthenticatedContributorTeamsRoute
   '/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
   '/learner/discover': typeof AuthenticatedLearnerDiscoverRoute
   '/learner/faq': typeof AuthenticatedLearnerFaqRoute
+  '/learner/glossary': typeof AuthenticatedLearnerGlossaryRoute
   '/learner/my-courses': typeof AuthenticatedLearnerMyCoursesRoute
   '/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
@@ -231,15 +258,18 @@ export interface FileRoutesById {
   '/_authenticated/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
   '/_authenticated/admin/faq': typeof AuthenticatedAdminFaqRoute
+  '/_authenticated/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/_authenticated/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
   '/_authenticated/contributor/faq': typeof AuthenticatedContributorFaqRoute
+  '/_authenticated/contributor/glossary': typeof AuthenticatedContributorGlossaryRoute
   '/_authenticated/contributor/settings': typeof AuthenticatedContributorSettingsRoute
   '/_authenticated/contributor/teams': typeof AuthenticatedContributorTeamsRoute
   '/_authenticated/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
   '/_authenticated/learner/discover': typeof AuthenticatedLearnerDiscoverRoute
   '/_authenticated/learner/faq': typeof AuthenticatedLearnerFaqRoute
+  '/_authenticated/learner/glossary': typeof AuthenticatedLearnerGlossaryRoute
   '/_authenticated/learner/my-courses': typeof AuthenticatedLearnerMyCoursesRoute
   '/_authenticated/learner/settings': typeof AuthenticatedLearnerSettingsRoute
   '/contributor/$teamId/courses': typeof ContributorTeamIdCoursesRoute
@@ -258,15 +288,18 @@ export interface FileRouteTypes {
     | '/admin/course-moderation'
     | '/admin/dashboard'
     | '/admin/faq'
+    | '/admin/glossary'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
     | '/contributor/faq'
+    | '/contributor/glossary'
     | '/contributor/settings'
     | '/contributor/teams'
     | '/learner/dashboard'
     | '/learner/discover'
     | '/learner/faq'
+    | '/learner/glossary'
     | '/learner/my-courses'
     | '/learner/settings'
     | '/contributor/$teamId/courses'
@@ -283,15 +316,18 @@ export interface FileRouteTypes {
     | '/admin/course-moderation'
     | '/admin/dashboard'
     | '/admin/faq'
+    | '/admin/glossary'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
     | '/contributor/faq'
+    | '/contributor/glossary'
     | '/contributor/settings'
     | '/contributor/teams'
     | '/learner/dashboard'
     | '/learner/discover'
     | '/learner/faq'
+    | '/learner/glossary'
     | '/learner/my-courses'
     | '/learner/settings'
     | '/contributor/$teamId/courses'
@@ -309,15 +345,18 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/course-moderation'
     | '/_authenticated/admin/dashboard'
     | '/_authenticated/admin/faq'
+    | '/_authenticated/admin/glossary'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/user-management'
     | '/_authenticated/contributor/dashboard'
     | '/_authenticated/contributor/faq'
+    | '/_authenticated/contributor/glossary'
     | '/_authenticated/contributor/settings'
     | '/_authenticated/contributor/teams'
     | '/_authenticated/learner/dashboard'
     | '/_authenticated/learner/discover'
     | '/_authenticated/learner/faq'
+    | '/_authenticated/learner/glossary'
     | '/_authenticated/learner/my-courses'
     | '/_authenticated/learner/settings'
     | '/contributor/$teamId/courses'
@@ -415,6 +454,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearnerMyCoursesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/learner/glossary': {
+      id: '/_authenticated/learner/glossary'
+      path: '/learner/glossary'
+      fullPath: '/learner/glossary'
+      preLoaderRoute: typeof AuthenticatedLearnerGlossaryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/learner/faq': {
       id: '/_authenticated/learner/faq'
       path: '/learner/faq'
@@ -450,6 +496,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContributorSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/contributor/glossary': {
+      id: '/_authenticated/contributor/glossary'
+      path: '/contributor/glossary'
+      fullPath: '/contributor/glossary'
+      preLoaderRoute: typeof AuthenticatedContributorGlossaryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/contributor/faq': {
       id: '/_authenticated/contributor/faq'
       path: '/contributor/faq'
@@ -476,6 +529,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/glossary': {
+      id: '/_authenticated/admin/glossary'
+      path: '/admin/glossary'
+      fullPath: '/admin/glossary'
+      preLoaderRoute: typeof AuthenticatedAdminGlossaryRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/faq': {
@@ -514,15 +574,18 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminCourseModerationRoute: typeof AuthenticatedAdminCourseModerationRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
   AuthenticatedAdminFaqRoute: typeof AuthenticatedAdminFaqRoute
+  AuthenticatedAdminGlossaryRoute: typeof AuthenticatedAdminGlossaryRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminUserManagementRoute: typeof AuthenticatedAdminUserManagementRoute
   AuthenticatedContributorDashboardRoute: typeof AuthenticatedContributorDashboardRoute
   AuthenticatedContributorFaqRoute: typeof AuthenticatedContributorFaqRoute
+  AuthenticatedContributorGlossaryRoute: typeof AuthenticatedContributorGlossaryRoute
   AuthenticatedContributorSettingsRoute: typeof AuthenticatedContributorSettingsRoute
   AuthenticatedContributorTeamsRoute: typeof AuthenticatedContributorTeamsRoute
   AuthenticatedLearnerDashboardRoute: typeof AuthenticatedLearnerDashboardRoute
   AuthenticatedLearnerDiscoverRoute: typeof AuthenticatedLearnerDiscoverRoute
   AuthenticatedLearnerFaqRoute: typeof AuthenticatedLearnerFaqRoute
+  AuthenticatedLearnerGlossaryRoute: typeof AuthenticatedLearnerGlossaryRoute
   AuthenticatedLearnerMyCoursesRoute: typeof AuthenticatedLearnerMyCoursesRoute
   AuthenticatedLearnerSettingsRoute: typeof AuthenticatedLearnerSettingsRoute
   AuthenticatedLearnerCoursesCourseIdRoute: typeof AuthenticatedLearnerCoursesCourseIdRoute
@@ -534,16 +597,19 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedAdminCourseModerationRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
   AuthenticatedAdminFaqRoute: AuthenticatedAdminFaqRoute,
+  AuthenticatedAdminGlossaryRoute: AuthenticatedAdminGlossaryRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminUserManagementRoute: AuthenticatedAdminUserManagementRoute,
   AuthenticatedContributorDashboardRoute:
     AuthenticatedContributorDashboardRoute,
   AuthenticatedContributorFaqRoute: AuthenticatedContributorFaqRoute,
+  AuthenticatedContributorGlossaryRoute: AuthenticatedContributorGlossaryRoute,
   AuthenticatedContributorSettingsRoute: AuthenticatedContributorSettingsRoute,
   AuthenticatedContributorTeamsRoute: AuthenticatedContributorTeamsRoute,
   AuthenticatedLearnerDashboardRoute: AuthenticatedLearnerDashboardRoute,
   AuthenticatedLearnerDiscoverRoute: AuthenticatedLearnerDiscoverRoute,
   AuthenticatedLearnerFaqRoute: AuthenticatedLearnerFaqRoute,
+  AuthenticatedLearnerGlossaryRoute: AuthenticatedLearnerGlossaryRoute,
   AuthenticatedLearnerMyCoursesRoute: AuthenticatedLearnerMyCoursesRoute,
   AuthenticatedLearnerSettingsRoute: AuthenticatedLearnerSettingsRoute,
   AuthenticatedLearnerCoursesCourseIdRoute:

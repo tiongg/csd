@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import UserManagementForm from '@/features/admin/UserManagementForm';
 
 export const Route = createFileRoute('/_authenticated/admin/user-management')({
@@ -8,8 +8,9 @@ export const Route = createFileRoute('/_authenticated/admin/user-management')({
 
 function RouteComponent() {
   return (
-    <PageWithSideBar>
+    <PageWithNavBar>
       <UserManagementForm />
-    </PageWithSideBar>
+    </PageWithNavBar>
   );
 }
+

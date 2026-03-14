@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import MyCoursesPage from '@/features/learner/MyCoursesPage';
 
 export const Route = createFileRoute('/_authenticated/learner/my-courses')({
@@ -8,8 +8,9 @@ export const Route = createFileRoute('/_authenticated/learner/my-courses')({
 
 function RouteComponent() {
   return (
-    <PageWithSideBar>
+    <PageWithNavBar>
       <MyCoursesPage />
-    </PageWithSideBar>
+    </PageWithNavBar>
   );
 }
+

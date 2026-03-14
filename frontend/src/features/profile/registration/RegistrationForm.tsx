@@ -1,3 +1,4 @@
+import AuthSplitShell from '@/components/auth/AuthSplitShell';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
@@ -82,160 +83,171 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div className="flex h-full w-full">
-      <div className="h-full w-1/2 bg-slate-200">
-        <img
-          src="/assets/login-signup/signup.jpg"
-          alt="Adult learner thinking"
-          className="h-full w-full object-cover"
-        />
-      </div>
-      <div className="flex h-full w-1/2 justify-center">
-        <div className="flex w-8/10 min-w-120 flex-col justify-between p-18">
-          <div>
-            <div className="flex justify-center">
-              <Heading1>Sign Up</Heading1>
-            </div>
+    <AuthSplitShell
+      tags={['Professional Access', 'Gen-Alpha Insights', 'Team Ready']}
+      title="Create your account"
+      description="Start with structured Gen-Alpha learning designed for modern professional practice."
+      benefits={[
+        {
+          title: 'Structured Learning Path',
+          description: 'Follow curated modules built for practical implementation.',
+          icon: 'progress',
+        },
+        {
+          title: 'Applied Strategy',
+          description: 'Use clear frameworks for education, coaching, and planning.',
+          icon: 'strategy',
+        },
+        {
+          title: 'Shared Team Context',
+          description: 'Align colleagues around a common view of young audiences.',
+          icon: 'team',
+        },
+        {
+          title: 'Trend Monitoring',
+          description: 'Stay updated as youth signals shift across platforms.',
+          icon: 'insight',
+        },
+      ]}
+    >
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-center">
+          <Heading1>Sign Up</Heading1>
+        </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-8">
-              <FieldGroup>
-                <Controller
-                  control={control}
-                  name="username"
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <Input
-                        {...field}
-                        id="username"
-                        aria-invalid={fieldState.invalid}
-                        placeholder="Username"
-                        className="h-12 text-slate-700"
-                        aria-label="Username"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
+          <FieldGroup>
+            <Controller
+              control={control}
+              name="username"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <Input
+                    {...field}
+                    id="username"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Username"
+                    className="h-12 text-slate-700"
+                    aria-label="Username"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
                   )}
-                />
-              </FieldGroup>
-
-              <FieldGroup>
-                <Controller
-                  control={control}
-                  name="email"
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <Input
-                        {...field}
-                        id="email"
-                        aria-invalid={fieldState.invalid}
-                        placeholder="Email address"
-                        className="h-12 text-slate-700"
-                        aria-label="Email"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
-
-              <FieldGroup>
-                <Controller
-                  control={control}
-                  name="password"
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <Input
-                        {...field}
-                        id="password"
-                        type="password"
-                        aria-invalid={fieldState.invalid}
-                        placeholder="Password"
-                        className="h-12 text-slate-700"
-                        aria-label="Password"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
-
-              <FieldGroup>
-                <Controller
-                  control={control}
-                  name="confirmPassword"
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <Input
-                        {...field}
-                        id="confirmPassword"
-                        type="password"
-                        aria-invalid={fieldState.invalid}
-                        placeholder="Confirm password"
-                        className="h-12 text-slate-700"
-                        aria-label="Confirm password"
-                      />
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-              </FieldGroup>
-
-              {errors.root && (
-                <div className="text-destructive text-sm">
-                  {errors.root.message}
-                </div>
+                </Field>
               )}
+            />
+          </FieldGroup>
 
-              <Button
-                type="submit"
-                className="my-4 w-full"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Creating account…' : 'Create account'}
-              </Button>
-            </form>
+          <FieldGroup>
+            <Controller
+              control={control}
+              name="email"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <Input
+                    {...field}
+                    id="email"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Email address"
+                    className="h-12 text-slate-700"
+                    aria-label="Email"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
 
-            <div className="mx-auto flex w-8/10 justify-center">
-              <div className="w-1/6">
-                <Separator className="inline-block bg-slate-500" />
-              </div>
-              <p className="font-subtitle inline-block w-2/3 px-4 text-center">
-                Other sign up options
-              </p>
-              <div className="w-1/6">
-                <Separator className="inline-block bg-slate-500" />
-              </div>
-            </div>
-            <div className="flex justify-center">
-              <Button
-                variant="outline"
-                className="m-4 size-16"
-                size="icon-lg"
-                asChild
-              >
-                <a href={constructAuthUrl('google')}>
-                  <FcGoogle className="size-8" />
-                </a>
-              </Button>
-            </div>
+          <FieldGroup>
+            <Controller
+              control={control}
+              name="password"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <Input
+                    {...field}
+                    id="password"
+                    type="password"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Password"
+                    className="h-12 text-slate-700"
+                    aria-label="Password"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+
+          <FieldGroup>
+            <Controller
+              control={control}
+              name="confirmPassword"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <Input
+                    {...field}
+                    id="confirmPassword"
+                    type="password"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Confirm password"
+                    className="h-12 text-slate-700"
+                    aria-label="Confirm password"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+
+          {errors.root && (
+            <div className="text-destructive text-sm">{errors.root.message}</div>
+          )}
+
+          <Button
+            type="submit"
+            className="mt-5 h-12 w-full text-base font-semibold"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creating account...' : 'Create account'}
+          </Button>
+        </form>
+
+        <div className="mx-auto flex w-8/10 items-center justify-center">
+          <div className="w-2/5">
+            <Separator className="inline-block bg-slate-500" />
           </div>
-
-          <div className="text-center font-[Noto_Sans] font-bold text-slate-700">
-            Already have an account?{' '}
-            <Link to="/login" className="underline">
-              Log in
-            </Link>
+          <p className="font-subtitle inline-block w-1/5 px-2 text-center">OR</p>
+          <div className="w-2/5">
+            <Separator className="inline-block bg-slate-500" />
           </div>
         </div>
+        <div className="flex justify-center pt-1">
+          <Button
+            variant="outline"
+            className="h-13 w-auto px-8 text-base"
+            asChild
+          >
+            <a href={constructAuthUrl('google')}>
+              <FcGoogle className="size-5" />
+              <span>Sign up with Google</span>
+            </a>
+          </Button>
+        </div>
+
+        <div className="pt-1 text-center font-[Noto_Sans] font-bold text-slate-700">
+          Already have an account?{' '}
+          <Link to="/login" className="underline">
+            Log in
+          </Link>
+        </div>
       </div>
-    </div>
+    </AuthSplitShell>
   );
 }

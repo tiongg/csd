@@ -1,4 +1,4 @@
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import { ContentEditorProvider } from '@/context/ContentEditorContext';
 import CourseEditor from '@/features/editor/CourseEditor';
 import EditorHeader from '@/features/editor/EditorHeader';
@@ -33,7 +33,7 @@ function RouteComponent() {
   }
 
   return (
-    <PageWithSideBar>
+    <PageWithNavBar>
       <EditorSchemaProvider>
         <ContentEditorProvider roomName={courseId} course={course}>
           <div className="flex h-full w-full min-w-0 flex-1 flex-col">
@@ -42,6 +42,7 @@ function RouteComponent() {
           </div>
         </ContentEditorProvider>
       </EditorSchemaProvider>
-    </PageWithSideBar>
+    </PageWithNavBar>
   );
 }
+

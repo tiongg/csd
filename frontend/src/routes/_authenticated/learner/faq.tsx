@@ -4,7 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import PageWithSideBar from '@/components/wrappers/PageWithSideBar';
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import { createFileRoute } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 
@@ -40,7 +40,7 @@ const items = [
 
 function RouteComponent() {
   return (
-    <PageWithSideBar className="h-[calc(100vh-4rem)] overflow-hidden">
+    <PageWithNavBar className="h-[calc(100vh-4rem)] overflow-hidden">
       <div className="flex h-full w-full flex-col items-center justify-center gap-8">
         <Accordion
           type="multiple"
@@ -66,6 +66,7 @@ function RouteComponent() {
           </Button>
         </div>
       </div>
-    </PageWithSideBar>
+    </PageWithNavBar>
   );
 }
+

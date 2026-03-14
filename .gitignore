@@ -2,3 +2,4 @@
 /**/.env
 *.csv
 .claude
+CODEX_README.md
