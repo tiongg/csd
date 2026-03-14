@@ -34,3 +34,4 @@ export function hexToRgb(hex: string) {
 export type Team = components['schemas']['Team'];
 export type Course = components['schemas']['Course'];
 export type ContentVersion = components['schemas']['ContentVersionResponse'];
+export type EnrolledCourse = components['schemas']['LessonSessionFullResponse'];

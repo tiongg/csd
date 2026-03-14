@@ -7,7 +7,8 @@ import CourseOverview from './CourseOverview';
 import CourseQuiz from './CourseQuiz';
 
 export default function CourseView() {
-  const { sections, currentSectionIndex, currentSection } = useCourseViewer();
+  const { sections, currentSectionIndex, currentSection, course, enrollment } =
+    useCourseViewer();
 
   // Progress is based on completed sections (current position), not including current
   const progressPercent =
@@ -34,11 +35,19 @@ export default function CourseView() {
 
           <div className="min-h-[400px]">
             {match(currentSection)
-              .with(undefined, () => <CourseOverview />)
+              .with(undefined, () => (
+                <CourseOverview
+                  course={course}
+                  sections={sections}
+                  lessonId={enrollment.lessonSessionId}
+                />
+              ))
               .with({ type: 'markdown' }, (section) => (
                 <CourseMarkdownDisplay content={section.content} />
               ))
-              .with({ type: 'quiz' }, (section) => <CourseQuiz quiz={section.content} />)
+              .with({ type: 'quiz' }, (section) => (
+                <CourseQuiz quiz={section.content} />
+              ))
               .exhaustive()}
           </div>
         </div>

@@ -52,6 +52,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/learner/lesson/{lessonId}/metadata": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateLessonSessionMetadata"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/courses/{id}": {
         parameters: {
             query?: never;
@@ -138,6 +154,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["createNewPreference"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/learner/lesson/{lessonId}/drop": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["dropCourse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/learner/lesson/{courseId}/enroll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["enrollToCourse"];
         delete?: never;
         options?: never;
         head?: never;
@@ -364,6 +412,22 @@ export interface paths {
          * @description Returns user's role in team
          */
         get: operations["checkMembership"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/learner/lesson/enrolled": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getEnrolledLessons"];
         put?: never;
         post?: never;
         delete?: never;
@@ -636,6 +700,20 @@ export interface components {
             /** @enum {string} */
             role: "OWNER" | "ADMIN" | "MEMBER";
         };
+        UpdateLessonSessionRequest: {
+            metadata: {
+                [key: string]: Record<string, never>;
+            };
+        };
+        LessonSessionResponse: {
+            /** Format: uuid */
+            courseId: string;
+            /** Format: uuid */
+            lessonSessionId: string;
+            metadata: {
+                [key: string]: Record<string, never>;
+            };
+        };
         CourseUpdateRequest: {
             title?: string;
             description?: string;
@@ -716,6 +794,17 @@ export interface components {
         CheckMembershipResponse: {
             isMember: boolean;
             role: string;
+        };
+        LessonSessionFullResponse: {
+            /** Format: uuid */
+            lessonSessionId: string;
+            metadata: {
+                [key: string]: Record<string, never>;
+            };
+            course: components["schemas"]["Course"];
+        };
+        UserEnrolledLessonsResponse: {
+            enrolledLessons: components["schemas"]["LessonSessionFullResponse"][];
         };
         ImageUploadResponse: {
             url: string;
@@ -876,6 +965,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    updateLessonSessionMetadata: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["UpdateLessonSessionRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LessonSessionResponse"];
                 };
             };
         };
@@ -1121,6 +1234,48 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    dropCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lessonId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    enrollToCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LessonSessionResponse"];
                 };
             };
         };
@@ -1560,6 +1715,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CheckMembershipResponse"];
+                };
+            };
+        };
+    };
+    getEnrolledLessons: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserEnrolledLessonsResponse"];
                 };
             };
         };

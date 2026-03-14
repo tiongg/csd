@@ -1,21 +1,23 @@
 import type { SectionType } from '@/lib/content.type';
-import type { Course } from '@/lib/utils';
+import type { Course, EnrolledCourse } from '@/lib/utils';
 import {
   createContext,
   useContext,
-  useState,
   useEffect,
+  useState,
   type PropsWithChildren,
 } from 'react';
 
 type CourseViewerContextProps = {
   course: Course;
   sections: SectionType[];
+  enrollment: EnrolledCourse;
 };
 
 type CourseViewerContextType = {
   course: Course;
   sections: SectionType[];
+  enrollment: EnrolledCourse;
 
   currentSectionIndex: number;
   currentSection?: SectionType;
@@ -34,6 +36,7 @@ const CourseViewerContext = createContext<CourseViewerContextType | undefined>(
 export function CourseViewerProvider({
   course,
   sections,
+  enrollment,
   children,
 }: PropsWithChildren<CourseViewerContextProps>) {
   const [currentSectionIndex, setCurrentSectionIndex] = useState(-1);
@@ -42,11 +45,7 @@ export function CourseViewerProvider({
 
   // Reset navigation lock when section changes
   useEffect(() => {
-    if (currentSection?.type === 'quiz') {
-      setCanNavigate(false);
-    } else {
-      setCanNavigate(true);
-    }
+    setCanNavigate(currentSection?.type !== 'quiz');
   }, [currentSection]);
 
   function goNextSection() {
@@ -62,6 +61,7 @@ export function CourseViewerProvider({
       value={{
         course,
         sections,
+        enrollment,
 
         currentSectionIndex,
         currentSection,
