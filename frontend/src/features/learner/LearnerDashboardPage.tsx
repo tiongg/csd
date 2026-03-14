@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
-import useEnrolledCourse from '@/context/EnrolledCourseContext';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { PersonalAnalytics } from './dashboard/PersonalAnalytics';
@@ -16,15 +15,6 @@ export default function LearnerDashboardPage() {
   const [isResizing, setIsResizing] = useState(false);
   const [isTrendModalOpen, setIsTrendModalOpen] = useState(false);
   const [trendSearch, setTrendSearch] = useState('');
-
-  const { enrolledCourses } = useEnrolledCourse();
-
-  const weeklyCadence = [1, 0, 1, 1, 0, 1, 0];
-  const activeDays = weeklyCadence.reduce((sum, day) => sum + day, 0);
-  const focusScore = Math.round((activeDays / 7) * 100);
-  const completedCoursesCount = enrolledCourses.filter(
-    (course) => course.status === 'COMPLETED',
-  ).length;
 
   useEffect(() => {
     if (!isResizing) return;
@@ -101,12 +91,7 @@ export default function LearnerDashboardPage() {
             />
           </div>
 
-          <PersonalAnalytics
-            weeklyCadence={weeklyCadence}
-            activeDays={activeDays}
-            focusScore={focusScore}
-            completedCoursesCount={completedCoursesCount}
-          />
+          <PersonalAnalytics />
         </div>
 
         <TrendCourseSearchDialog
