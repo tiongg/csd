@@ -10,12 +10,14 @@ jobs:
   deploy:
     name: Deploy app
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
     environment: prod
     concurrency: deploy-group
     steps:
       - uses: actions/checkout@v4
       - uses: superfly/flyctl-actions@1.5
-        working-directory: ./backend
         with:
           args: >
             deploy
