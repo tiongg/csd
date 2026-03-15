@@ -26,6 +26,7 @@ export default function CourseEditor() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <nav className="bg-muted/40 flex shrink-0 items-center gap-2 overflow-x-auto border-b p-2">
+        <div></div>
         <Button
           size="sm"
           variant={currentSection === -1 ? 'default' : 'ghost'}
@@ -57,19 +58,23 @@ export default function CourseEditor() {
           </DropdownMenu>
         </div>
       </nav>
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        {currentSection === -1 || !section ? (
-          <EditorCourseDisplay course={course} />
-        ) : (
-          match(section.get('type')!)
-            .with('markdown', () => <MarkdownEditor />)
-            .with('quiz', () => (
-              <QuizSectionEditor
-                quizContent={section.get('content') as EditableQuizContent}
-              />
-            ))
-            .exhaustive()
-        )}
+      <div className="flex h-full w-full flex-1 flex-col overflow-hidden">
+        <div className="flex-1">
+          <div className="mx-auto max-w-4xl p-8">
+            {currentSection === -1 || !section ? (
+              <EditorCourseDisplay course={course} />
+            ) : (
+              match(section.get('type')!)
+                .with('markdown', () => <MarkdownEditor />)
+                .with('quiz', () => (
+                  <QuizSectionEditor
+                    quizContent={section.get('content') as EditableQuizContent}
+                  />
+                ))
+                .exhaustive()
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

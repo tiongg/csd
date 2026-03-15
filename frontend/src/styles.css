@@ -162,6 +162,17 @@ code,
   user-select: none;
   position: relative;
   z-index: 10;
+  font-family: 'Geist',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue';
 
   content: '';
   position: absolute;
