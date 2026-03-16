@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import csd.t6.backend.account.AccountRepository;
 import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.backend.notification.NotificationService;
 import csd.t6.backend.team.dto.request.AddMemberRequest;
 import csd.t6.backend.team.dto.request.TeamCreateRequest;
 import csd.t6.backend.team.dto.request.TeamUpdateRequest;
@@ -18,6 +19,7 @@ import csd.t6.backend.team.dto.response.TeamMemberResponse;
 import csd.t6.backend.team.dto.response.TeamResponse;
 import csd.t6.jooq.accounts.enums.Roles;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
+import csd.t6.jooq.public_.enums.NotificationType;
 import csd.t6.jooq.public_.enums.TeamRole;
 import csd.t6.jooq.public_.tables.records.TeamMemberRecord;
 import csd.t6.jooq.public_.tables.records.TeamRecord;
@@ -27,12 +29,14 @@ public class TeamService {
   private final TeamRepository teamRepository;
   private final TeamMemberRepository teamMemberRepository;
   private final AccountRepository accountRepository;
+  private final NotificationService notificationService;
 
   public TeamService(TeamRepository teamRepository, TeamMemberRepository teamMemberRepository,
-      AccountRepository accountRepository) {
+      AccountRepository accountRepository, NotificationService notificationService) {
     this.teamRepository = teamRepository;
     this.teamMemberRepository = teamMemberRepository;
     this.accountRepository = accountRepository;
+    this.notificationService = notificationService;
   }
 
   // Helper function for permission checks
@@ -122,6 +126,17 @@ public class TeamService {
     }
 
     TeamMemberRecord memberRecord = teamMemberRepository.addMember(teamId, accountRecord.getId(), TeamRole.MEMBER);
+
+    TeamRecord teamRecord = teamRepository.findById(teamId)
+        .orElseThrow(() -> new BadRequestException("Team not found"));
+
+    notificationService.sendToAccount(
+        accountRecord.getId(),
+        NotificationType.TEAM_INVITATION,
+        "Team Invitation",
+        "You have been invited to join the team: " + teamRecord.getName(),
+        teamId
+    );
 
     return new TeamMemberResponse(memberRecord, accountRecord.getUsername(), accountRecord.getEmail());
   }

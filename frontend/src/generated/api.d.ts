@@ -408,6 +408,46 @@ export interface paths {
         patch: operations["updateAccount"];
         trace?: never;
     };
+    "/api/notifications/mark-read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Mark notification as read
+         * @description Mark a specific notification as read
+         */
+        patch: operations["markAsRead"];
+        trace?: never;
+    };
+    "/api/notifications/mark-all-read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Mark all as read
+         * @description Mark all notifications as read for the authenticated user
+         */
+        patch: operations["markAllAsRead"];
+        trace?: never;
+    };
     "/api/account/{accountId}/role": {
         parameters: {
             query?: never;
@@ -460,6 +500,46 @@ export interface paths {
          * @description Returns user's role in team
          */
         get: operations["checkMembership"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get unread count
+         * @description Get the count of unread notifications for the authenticated user
+         */
+        get: operations["getUnreadCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get user notifications
+         * @description Retrieve notifications for the authenticated user
+         */
+        get: operations["getNotifications"];
         put?: never;
         post?: never;
         delete?: never;
@@ -712,6 +792,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notifications/{notificationId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete notification
+         * @description Delete a specific notification
+         */
+        delete: operations["deleteNotification"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/courses/{courseId}/reel": {
         parameters: {
             query?: never;
@@ -882,6 +982,10 @@ export interface components {
             username: string;
             password: string;
         };
+        MarkAsReadRequest: {
+            /** Format: uuid */
+            notificationId: string;
+        };
         AccountRoleUpdateRequest: {
             /** @enum {string} */
             role: "LEARNER" | "CONTRIBUTOR" | "ADMIN";
@@ -893,6 +997,23 @@ export interface components {
         CheckMembershipResponse: {
             isMember: boolean;
             role: string;
+        };
+        UnreadCount: {
+            /** Format: int64 */
+            count?: number;
+        };
+        Notification: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            type: "CONTRIBUTOR_APPLIED" | "COURSE_AWAITING_REVIEW" | "TEAM_INVITATION" | "COURSE_APPROVED";
+            title: string;
+            message: string;
+            /** Format: uuid */
+            itemId?: string;
+            isRead: boolean;
+            /** Format: date-time */
+            createdAt: string;
         };
         /** @description Full lesson session response */
         LessonSessionFullResponse: {
@@ -1821,6 +1942,55 @@ export interface operations {
             };
         };
     };
+    markAsRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MarkAsReadRequest"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    markAllAsRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     updateAnyAccountRole: {
         parameters: {
             query?: never;
@@ -1905,6 +2075,50 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CheckMembershipResponse"];
+                };
+            };
+        };
+    };
+    getUnreadCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UnreadCount"];
+                };
+            };
+        };
+    };
+    getNotifications: {
+        parameters: {
+            query?: {
+                unreadOnly?: boolean;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Notification"][];
                 };
             };
         };
@@ -2223,6 +2437,35 @@ export interface operations {
             path: {
                 teamId: string;
                 accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    deleteNotification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                notificationId: string;
             };
             cookie?: never;
         };
