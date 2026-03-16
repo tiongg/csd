@@ -422,30 +422,10 @@ export interface paths {
         options?: never;
         head?: never;
         /**
-         * Mark notification as read
-         * @description Mark a specific notification as read
+         * Mark notifications as read
+         * @description Mark notifications as read. Provide an empty array to mark all as read, or specific IDs to mark only those.
          */
         patch: operations["markAsRead"];
-        trace?: never;
-    };
-    "/api/notifications/mark-all-read": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        /**
-         * Mark all as read
-         * @description Mark all notifications as read for the authenticated user
-         */
-        patch: operations["markAllAsRead"];
         trace?: never;
     };
     "/api/account/{accountId}/role": {
@@ -983,8 +963,7 @@ export interface components {
             password: string;
         };
         MarkAsReadRequest: {
-            /** Format: uuid */
-            notificationId: string;
+            notificationIds: string[];
         };
         AccountRoleUpdateRequest: {
             /** @enum {string} */
@@ -1970,24 +1949,6 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["HttpErrorPayload"];
                 };
-            };
-        };
-    };
-    markAllAsRead: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description No Content */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
