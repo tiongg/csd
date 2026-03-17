@@ -202,6 +202,7 @@ class TeamServiceTest {
         when(teamMemberRepository.findByTeamAndAccount(teamId, ownerId)).thenReturn(Optional.of(ownerMember));
         when(accountRepository.findOneBy(ACCOUNT.USERNAME, "newmember")).thenReturn(Optional.of(newMemberAccount));
         when(teamMemberRepository.findByTeamAndAccount(teamId, memberId)).thenReturn(Optional.empty());
+        when(teamRepository.findById(teamId)).thenReturn(Optional.of(mockTeam));
         when(teamMemberRepository.addMember(teamId, memberId, TeamRole.MEMBER)).thenReturn(newMemberRecord);
 
         TeamMemberResponse result = teamService.addMember(teamId, new AddMemberRequest("newmember"), ownerId);
