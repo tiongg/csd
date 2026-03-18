@@ -22,7 +22,6 @@ const updateSchema = z.object({
     .string()
     .min(3, 'Username must be at least 3 characters')
     .optional(),
-  realName: z.string().optional(),
 });
 
 type UpdateFormValues = z.infer<typeof updateSchema>;
@@ -52,7 +51,6 @@ export default function UpdateProfileForm() {
     resolver: zodResolver(updateSchema),
     defaultValues: {
       username: user?.username ?? '',
-      realName: user?.realname ?? '',
     },
   });
 
@@ -61,7 +59,6 @@ export default function UpdateProfileForm() {
     if (!user) return;
     reset({
       username: user.username ?? '',
-      realName: user.realname ?? '',
     });
   }, [user, reset]);
 
@@ -121,10 +118,10 @@ export default function UpdateProfileForm() {
           </div>
           <div className="flex flex-1 flex-col gap-1 text-center sm:text-left">
             <h2 className="text-xl font-semibold">
-              {user?.realname || 'No name set'}
+              @{user?.username}
             </h2>
             <p className="text-muted-foreground">
-              @{user?.username} ({capitalizeFirst(user?.role)})
+              {capitalizeFirst(user?.role)}
             </p>
             <p className="text-muted-foreground text-sm">{user?.email}</p>
             {user.role === 'LEARNER' && (
@@ -179,27 +176,6 @@ export default function UpdateProfileForm() {
             />
           </FieldGroup>
 
-          <FieldGroup>
-            <Controller
-              control={control}
-              name="realName"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="realName">Real Name</FieldLabel>
-                  <Input
-                    {...field}
-                    id="realName"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Your real name"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
           {errors.root && (
             <div className="text-destructive text-sm">
               {errors.root.message}
@@ -213,7 +189,6 @@ export default function UpdateProfileForm() {
               onClick={() =>
                 reset({
                   username: user.username ?? '',
-                  realName: user.realname ?? '',
                 })
               }
               disabled={isSubmitting}
