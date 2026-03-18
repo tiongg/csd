@@ -20,7 +20,7 @@ export function AllCourses({ searchQuery }: AllCoursesProps) {
 
   if (isLoading) {
     return (
-      <div className="flex h-64 w-full items-center justify-center text-slate-500">
+      <div className="flex min-h-[360px] h-full w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
         <p className="animate-pulse text-sm">Loading courses...</p>
       </div>
     );
@@ -28,7 +28,7 @@ export function AllCourses({ searchQuery }: AllCoursesProps) {
 
   if (isError) {
     return (
-      <div className="flex h-64 w-full items-center justify-center text-slate-500">
+      <div className="flex min-h-[360px] h-full w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
         <p className="text-sm">
           Failed to load courses. Please try again later.
         </p>
@@ -38,7 +38,7 @@ export function AllCourses({ searchQuery }: AllCoursesProps) {
 
   if (filteredCourses.length === 0) {
     return (
-      <div className="flex h-64 w-full items-center justify-center text-slate-500">
+      <div className="flex min-h-[360px] h-full w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
         <p className="text-lg font-semibold">No courses found</p>
       </div>
     );

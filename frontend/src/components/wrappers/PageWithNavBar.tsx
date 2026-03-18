@@ -6,7 +6,7 @@ export default function PageWithNavBar({
   className,
 }: PropsWithChildren<{ className?: string }>) {
   return (
-    <main className={cn('min-h-screen w-full bg-slate-50/80', className)}>
+    <main className={cn('flex min-h-full w-full flex-col bg-slate-50/80', className)}>
       {children}
     </main>
   );

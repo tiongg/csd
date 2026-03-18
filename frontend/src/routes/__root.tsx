@@ -17,7 +17,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     <main className="flex min-h-dvh w-full flex-col">
       <Navbar />
       <TooltipProvider>
-        <Outlet />
+        <div className="flex min-h-0 flex-1 flex-col">
+          <Outlet />
+        </div>
       </TooltipProvider>
       <Toaster />
     </main>
