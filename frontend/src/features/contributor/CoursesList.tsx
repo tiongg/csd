@@ -1,9 +1,5 @@
 import { Button } from '@/components/ui/button';
 import {
-  CardWithDetails,
-  CardWithPlusIcon,
-} from '@/components/ui/custom-cards';
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -11,25 +7,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Heading1 } from '@/components/ui/typography';
 import {
   apiQueryOptions,
   useApiMutation,
   useApiQuery,
 } from '@/lib/fetch-client';
-import { capitalizeFirst, cn, type Course, type Team } from '@/lib/utils';
+import type { Course, Team } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { Trash2, Users } from 'lucide-react';
+import { ArrowUpRight, Plus, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useBoolean } from 'usehooks-ts';
 import CreateCourseDialog from './CreateCourseDialog';
 import TeamCollaboratorsDialog from './TeamCollaboratorsDialog';
-
-type StatusType = 'approved' | 'pending';
 
 type CourseListProps = {
   team: Team;
@@ -39,9 +32,13 @@ export default function CoursesList({ team }: CourseListProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { data: courses } = useApiQuery('get', '/api/teams/{teamId}/courses', {
-    params: { path: { teamId: team.id } },
-  });
+  const { data: courses, isLoading: isCoursesLoading } = useApiQuery(
+    'get',
+    '/api/teams/{teamId}/courses',
+    {
+      params: { path: { teamId: team.id } },
+    },
+  );
 
   const {
     value: isCreateCourseDialogOpen,
@@ -91,32 +88,34 @@ export default function CoursesList({ team }: CourseListProps) {
 
         <div className="flex flex-wrap items-center gap-2">
           <Button
+            variant="outline"
+            className="h-9 cursor-pointer gap-2 rounded-lg border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            onClick={openTeamCollaboratorsDialog}
+          >
+            <Users className="size-4" />
+            Team Members
+          </Button>
+          <Button
             variant="destructive"
-            className="cursor-pointer gap-2 rounded-full"
+            className="h-9 cursor-pointer gap-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700"
             onClick={() => setIsDeleteTeamDialogOpen(true)}
           >
             <Trash2 className="size-4" />
             Delete Team
           </Button>
-          <Button
-            className="cursor-pointer gap-2 rounded-full"
-            onClick={openTeamCollaboratorsDialog}
-          >
-            <Users className="size-4" />
-            Collaborators
-          </Button>
         </div>
       </div>
 
-      <div className="grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        <CardWithPlusIcon
-          title="Create New Course"
-          onInteract={openCreateCourseDialog}
-        />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <CreateCourseCard onInteract={openCreateCourseDialog} />
 
-        {(courses ?? []).map((course) => (
-          <CourseCard course={course} teamId={team.id} key={course.id} />
-        ))}
+        {isCoursesLoading
+          ? Array.from({ length: 3 }).map((_, idx) => (
+              <LoadingCourseCard key={idx} />
+            ))
+          : (courses ?? []).map((course) => (
+              <CourseCard course={course} teamId={team.id} key={course.id} />
+            ))}
       </div>
 
       <CreateCourseDialog
@@ -169,15 +168,9 @@ export default function CoursesList({ team }: CourseListProps) {
 type CourseCardProps = {
   course: Course;
   teamId: string;
-  status?: StatusType;
 };
 
-const BADGE_STYLES = {
-  approved: 'bg-slate-800',
-  pending: 'bg-amber-500',
-} satisfies Record<StatusType, string>;
-
-function CourseCard({ course, teamId, status }: CourseCardProps) {
+function CourseCard({ course, teamId }: CourseCardProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -209,21 +202,10 @@ function CourseCard({ course, teamId, status }: CourseCardProps) {
 
   return (
     <div className="relative">
-      {status && (
-        <div
-          className={cn(
-            'absolute top-4 right-4 w-26 rounded-full px-2 py-1 text-center text-white',
-            BADGE_STYLES[status],
-          )}
-        >
-          {capitalizeFirst(status)}
-        </div>
-      )}
-      <CardWithDetails
-        title={course.title}
-        descriptor="Last Edited"
-        data={dayjs(course.updatedAt).fromNow()}
-        onInteract={() =>
+      <button
+        type="button"
+        className="h-full w-full text-left"
+        onClick={() =>
           navigate({
             to: '/contributor/editor/$courseId',
             params: { courseId: course.id },
@@ -231,16 +213,39 @@ function CourseCard({ course, teamId, status }: CourseCardProps) {
           })
         }
       >
-        <DropdownMenuItem
-          variant="destructive"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsDeleteDialogOpen(true);
-          }}
-        >
-          Delete
-        </DropdownMenuItem>
-      </CardWithDetails>
+        <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
+          <div className="space-y-1.5">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
+                {course.title}
+              </h3>
+              <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition-colors group-hover:text-sky-600" />
+            </div>
+            <p className="line-clamp-2 text-sm leading-5 text-slate-600">
+              {course.description?.trim() || 'No description yet.'}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between pt-4">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                {dayjs(course.updatedAt).fromNow()}
+              </span>
+            </div>
+            <button
+              type="button"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsDeleteDialogOpen(true);
+              }}
+              aria-label={`Delete ${course.title}`}
+            >
+              <Trash2 className="size-4" />
+            </button>
+          </div>
+        </article>
+      </button>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
@@ -268,6 +273,39 @@ function CourseCard({ course, teamId, status }: CourseCardProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function CreateCourseCard({ onInteract }: { onInteract: () => void }) {
+  return (
+    <button
+      type="button"
+      className="h-full w-full text-left"
+      onClick={onInteract}
+    >
+      <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-dashed border-slate-300 bg-white p-4 transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
+        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition-colors group-hover:bg-sky-100 group-hover:text-sky-700">
+          <Plus className="size-4" />
+        </span>
+        <div className="space-y-0.5">
+          <h3 className="text-lg font-bold text-slate-900">
+            Create New Course
+          </h3>
+          <p className="text-xs text-slate-600">Add a new course</p>
+        </div>
+      </article>
+    </button>
+  );
+}
+
+function LoadingCourseCard() {
+  return (
+    <div className="h-full min-h-40 animate-pulse rounded-xl border border-slate-200 bg-white p-4">
+      <div className="mb-3 h-6 w-2/3 rounded bg-slate-200" />
+      <div className="mb-2 h-3.5 w-full rounded bg-slate-200" />
+      <div className="mb-5 h-3.5 w-4/5 rounded bg-slate-200" />
+      <div className="h-6 w-1/3 rounded-full bg-slate-200" />
     </div>
   );
 }
