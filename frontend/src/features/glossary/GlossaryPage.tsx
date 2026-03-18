@@ -88,7 +88,7 @@ export default function GlossaryPage() {
   return (
     <div className="w-full bg-slate-50 p-6 md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
+        <section className="rounded-2xl border border-slate-200 bg-white/85 p-6 md:p-8">
           <Heading1>Gen-Alpha Glossary</Heading1>
           <p className="mt-2 text-sm text-slate-600">
             Shared reference for current slang, meme terms, and format language.
@@ -101,7 +101,7 @@ export default function GlossaryPage() {
           </div>
         </section>
 
-        <section className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+        <section className="overflow-x-auto rounded-2xl border border-slate-200 bg-white/85">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="bg-slate-50 text-slate-600">
               <tr>
@@ -128,4 +128,5 @@ export default function GlossaryPage() {
     </div>
   );
 }
+
 

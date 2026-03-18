@@ -274,7 +274,7 @@ export default function ContributorDashboardPage() {
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <section className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-8">
+        <section className="rounded-2xl border border-slate-200/70 bg-white/85 p-6 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-8">
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center">
             <div>
               <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
@@ -316,7 +316,7 @@ export default function ContributorDashboardPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6">
+        <section className="rounded-2xl border border-slate-200/70 bg-white/85 p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold text-slate-900">Course Uptake</h2>
@@ -329,7 +329,7 @@ export default function ContributorDashboardPage() {
                 type="button"
                 className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
                   uptakeWindow === '1D'
-                    ? 'bg-white text-slate-900 shadow-sm'
+                    ? 'bg-white/85 text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-800'
                 }`}
                 onClick={() => setUptakeWindow('1D')}
@@ -340,7 +340,7 @@ export default function ContributorDashboardPage() {
                 type="button"
                 className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
                   uptakeWindow === '7D'
-                    ? 'bg-white text-slate-900 shadow-sm'
+                    ? 'bg-white/85 text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-800'
                 }`}
                 onClick={() => setUptakeWindow('7D')}
@@ -351,7 +351,7 @@ export default function ContributorDashboardPage() {
                 type="button"
                 className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
                   uptakeWindow === '30D'
-                    ? 'bg-white text-slate-900 shadow-sm'
+                    ? 'bg-white/85 text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-800'
                 }`}
                 onClick={() => setUptakeWindow('30D')}
@@ -362,7 +362,7 @@ export default function ContributorDashboardPage() {
                 type="button"
                 className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
                   uptakeWindow === 'ALL'
-                    ? 'bg-white text-slate-900 shadow-sm'
+                    ? 'bg-white/85 text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-800'
                 }`}
                 onClick={() => setUptakeWindow('ALL')}
@@ -441,7 +441,7 @@ export default function ContributorDashboardPage() {
           className="flex flex-col gap-5 lg:flex-row lg:gap-0"
           style={{ '--left-pane': `${leftPaneWidth}%` } as CSSProperties}
         >
-          <section className="basis-full min-w-0 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6 lg:[flex-basis:var(--left-pane)]">
+          <section className="basis-full min-w-0 rounded-2xl border border-slate-200/70 bg-white/85 p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6 lg:[flex-basis:var(--left-pane)]">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-900">Review Queue</h2>
               <p className="text-sm text-slate-500">{pendingCount} pending</p>
@@ -493,7 +493,7 @@ export default function ContributorDashboardPage() {
             />
           </div>
 
-          <section className="basis-full min-w-0 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6 lg:flex-1">
+          <section className="basis-full min-w-0 rounded-2xl border border-slate-200/70 bg-white/85 p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6 lg:flex-1">
             <h2 className="text-lg font-semibold text-slate-900">Today&apos;s Top Trends</h2>
             <p className="mt-1 text-sm text-slate-600">Top 5 signals to monitor.</p>
 
@@ -563,7 +563,7 @@ export default function ContributorDashboardPage() {
                       params={{ courseId: course.id }}
                       search={{ section: undefined }}
                       onClick={() => setIsTrendModalOpen(false)}
-                      className="block rounded-lg border border-slate-200 bg-white p-3 hover:border-slate-300"
+                      className="block rounded-lg border border-slate-200 bg-white/85 p-3 hover:border-slate-300"
                     >
                       <p className="text-sm font-semibold text-slate-900">{course.title}</p>
                       <p className="mt-1 text-xs text-slate-500">
@@ -584,3 +584,4 @@ export default function ContributorDashboardPage() {
     </div>
   );
 }
+

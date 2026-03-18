@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 import useActiveRole from '@/hooks/useActiveRole';
 import type { LinkOptions } from '@tanstack/react-router';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { UserCircle2 } from 'lucide-react';
+import { ChevronDown, UserCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { match } from 'ts-pattern';
 import NotificationBell from './notifications/NotificationBell';
@@ -67,10 +67,17 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-300/80 bg-slate-50/85 shadow-[0_6px_18px_-14px_rgba(15,23,42,0.45)] backdrop-blur-xl">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-300/90 to-transparent"
+      />
       <div className="flex h-16 w-full items-center justify-between gap-4 px-4 md:px-8">
         <div className="flex min-w-0 items-center gap-3">
-          <Link className="flex items-center gap-x-3" to="/">
+          <Link
+            className="flex items-center gap-x-3 rounded-full px-2 py-1 transition-colors hover:bg-white/70"
+            to="/"
+          >
             <img
               src="/assets/logo.jpg"
               alt="six seven logo"
@@ -88,7 +95,7 @@ export default function Navbar() {
               <Link
                 key={item.label}
                 to={item.to}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 [&.active]:bg-slate-100 [&.active]:text-slate-900"
+                className="rounded-full px-4 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white/75 hover:text-slate-900 [&.active]:bg-white [&.active]:text-slate-900 [&.active]:shadow-sm [&.active]:shadow-slate-300/40"
               >
                 {item.label}
               </Link>
@@ -114,7 +121,7 @@ export default function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="flex h-9 min-w-26 items-center justify-between gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                    className="flex h-9 min-w-26 items-center justify-between gap-1.5 rounded-full border border-slate-200/90 bg-white/80 px-3 text-sm font-medium text-slate-700 shadow-sm shadow-slate-200/50 transition-colors hover:bg-white"
                   >
                     <span>
                       {match(navRole)
@@ -123,13 +130,11 @@ export default function Navbar() {
                         .with('LEARNER', () => 'Learner')
                         .exhaustive()}
                     </span>
-                    <span
-                      className={`text-slate-500 transition-transform ${
+                    <ChevronDown
+                      className={`size-4 text-slate-500 transition-transform ${
                         roleMenuOpen ? 'rotate-180' : ''
                       }`}
-                    >
-                      ▾
-                    </span>
+                    />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
@@ -162,7 +167,7 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="inline-flex size-10 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 transition-colors hover:bg-slate-100"
+                  className="inline-flex size-10 items-center justify-center rounded-full border border-slate-200/90 bg-white/80 text-slate-500 shadow-sm shadow-slate-200/60 transition-colors hover:bg-white"
                   aria-label="Account menu"
                 >
                   <UserCircle2 className="size-6" />

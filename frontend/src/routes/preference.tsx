@@ -100,7 +100,7 @@ function RouteComponent() {
 
   return (
     <div className="m-auto flex w-full flex-1 flex-col p-8">
-      <div className="rounded-2xl border bg-white p-8">
+      <div className="rounded-2xl border bg-white/85 p-8">
         <div className="mb-6">
           {/* <p className="text-sm text-slate-500">Welcome {user?.realname},</p> */}
           <p className="mt-2 text-2xl font-semibold text-slate-900">
@@ -147,3 +147,4 @@ function RouteComponent() {
     </div>
   );
 }
+

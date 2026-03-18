@@ -143,7 +143,7 @@ export default function LearnerDashboardPage() {
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <section className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm ring-1 shadow-slate-900/5 ring-slate-200/60 md:p-8">
+        <section className="rounded-2xl border border-slate-200/70 bg-white/85 p-6 shadow-sm ring-1 shadow-slate-900/5 ring-slate-200/60 md:p-8">
           <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
             Learner Dashboard
           </div>
@@ -155,7 +155,7 @@ export default function LearnerDashboardPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm ring-1 shadow-slate-900/5 ring-slate-200/60 md:p-5">
+        <section className="rounded-2xl border border-slate-200/70 bg-white/85 p-4 shadow-sm ring-1 shadow-slate-900/5 ring-slate-200/60 md:p-5">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-700">
               Discover Courses
@@ -251,7 +251,7 @@ export default function LearnerDashboardPage() {
               </CarouselContent>
             </Carousel>
           ) : (
-            <div className="mt-3 rounded-lg border border-dashed border-slate-300 bg-white p-3 text-sm text-slate-600">
+            <div className="mt-3 rounded-lg border border-dashed border-slate-300 bg-white/85 p-3 text-sm text-slate-600">
               No suggested courses yet.
             </div>
           )}
