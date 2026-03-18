@@ -21,12 +21,12 @@ const GLOSSARY_ITEMS: GlossaryItem[] = [
   },
   {
     term: 'Fanum tax',
-    meaning: 'Jokingly taking a bite/share of someone else’s food.',
+    meaning: "Jokingly taking a bite/share of someone else's food.",
     context: 'Creator/streamer slang',
   },
   {
     term: 'Gyatt',
-    meaning: 'Exclamatory slang reacting to someone’s appearance.',
+    meaning: "Exclamatory slang reacting to someone's appearance.",
     context: 'Reaction slang',
   },
   {
@@ -56,7 +56,7 @@ const GLOSSARY_ITEMS: GlossaryItem[] = [
   },
   {
     term: 'GRWM',
-    meaning: '“Get Ready With Me” format showing routines and daily prep.',
+    meaning: '"Get Ready With Me" format showing routines and daily prep.',
     context: 'Short-form content format',
   },
   {
@@ -86,13 +86,25 @@ export default function GlossaryPage() {
   }, [query]);
 
   return (
-    <div className="w-full bg-slate-50 p-6 md:p-8">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <section className="rounded-2xl border border-slate-200 bg-white/85 p-6 md:p-8">
-          <Heading1>Gen-Alpha Glossary</Heading1>
-          <p className="mt-2 text-sm text-slate-600">
-            Shared reference for current slang, meme terms, and format language.
-          </p>
+    <div className="w-full bg-slate-50/60 p-4 md:p-6">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
+                Reference
+              </p>
+              <Heading1 className="bg-none mt-1 text-4xl leading-tight tracking-tight">
+                Gen-Alpha Glossary
+              </Heading1>
+              <p className="mt-2 text-sm text-slate-600">
+                Shared reference for current slang, meme terms, and format language.
+              </p>
+            </div>
+            <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700">
+              {filteredItems.length} term{filteredItems.length === 1 ? '' : 's'}
+            </div>
+          </div>
           <div className="mt-4 w-full max-w-md">
             <SearchBar
               placeholder="Search term, meaning, or context"
@@ -101,21 +113,24 @@ export default function GlossaryPage() {
           </div>
         </section>
 
-        <section className="overflow-x-auto rounded-2xl border border-slate-200 bg-white/85">
+        <section className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead className="bg-slate-50 text-slate-600">
               <tr>
-                <th className="px-5 py-3 font-semibold">Term</th>
-                <th className="px-5 py-3 font-semibold">Meaning</th>
-                <th className="px-5 py-3 font-semibold">Context</th>
+                <th className="px-5 py-3.5 font-semibold">Term</th>
+                <th className="px-5 py-3.5 font-semibold">Meaning</th>
+                <th className="px-5 py-3.5 font-semibold">Context</th>
               </tr>
             </thead>
             <tbody>
               {filteredItems.map((item) => (
-                <tr key={item.term} className="border-t border-slate-200 text-slate-800">
-                  <td className="px-5 py-3 font-semibold">{item.term}</td>
-                  <td className="px-5 py-3">{item.meaning}</td>
-                  <td className="px-5 py-3 text-slate-600">{item.context}</td>
+                <tr
+                  key={item.term}
+                  className="border-t border-slate-200 text-slate-800 transition-colors hover:bg-slate-50/70"
+                >
+                  <td className="px-5 py-4 font-semibold text-slate-900">{item.term}</td>
+                  <td className="px-5 py-4 leading-6 text-slate-700">{item.meaning}</td>
+                  <td className="px-5 py-4 text-slate-600">{item.context}</td>
                 </tr>
               ))}
             </tbody>
@@ -128,5 +143,3 @@ export default function GlossaryPage() {
     </div>
   );
 }
-
-
