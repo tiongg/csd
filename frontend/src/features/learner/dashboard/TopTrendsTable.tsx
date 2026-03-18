@@ -94,10 +94,10 @@ export function TopTrendsTable({ onTrendClick }: TopTrendsTableProps) {
 
   if (isLoading) {
     return (
-      <section className="min-w-0 basis-full rounded-2xl border border-slate-200 bg-white p-5 md:p-6 lg:[flex-basis:var(--left-pane)]">
+      <section className="flex min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
         <h2 className="text-xl font-semibold text-slate-900">Top Trends</h2>
         <p className="mt-1 text-sm text-slate-600">Top 5 this week</p>
-        <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200">
+        <div className="mt-4 flex-1 overflow-x-auto rounded-xl border border-slate-200">
           <table className="w-full min-w-[420px] text-left text-sm">
             <thead className="bg-slate-50 text-slate-600">
               <tr>
@@ -118,10 +118,10 @@ export function TopTrendsTable({ onTrendClick }: TopTrendsTableProps) {
   }
 
   return (
-    <section className="min-w-0 basis-full rounded-2xl border border-slate-200 bg-white p-5 md:p-6 lg:[flex-basis:var(--left-pane)]">
+    <section className="flex min-w-0 flex-col rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
       <h2 className="text-xl font-semibold text-slate-900">Top Trends</h2>
       <p className="mt-1 text-sm text-slate-600">Top 5 this week</p>
-      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200">
+      <div className="mt-4 flex-1 overflow-x-auto rounded-xl border border-slate-200">
         <table className="w-full min-w-[420px] text-left text-sm">
           <thead className="bg-slate-50 text-slate-600">
             <tr>
