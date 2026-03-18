@@ -96,8 +96,8 @@ export default function CoursesList({ team }: CourseListProps) {
             Team Members
           </Button>
           <Button
-            variant="destructive"
-            className="h-9 cursor-pointer gap-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700"
+            variant="outline"
+            className="h-9 cursor-pointer gap-2 rounded-lg border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100"
             onClick={() => setIsDeleteTeamDialogOpen(true)}
           >
             <Trash2 className="size-4" />
