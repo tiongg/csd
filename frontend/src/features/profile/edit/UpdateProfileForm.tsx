@@ -105,7 +105,7 @@ export default function UpdateProfileForm() {
   };
 
   return (
-    <div className="w-full max-w-lg space-y-4">
+    <div className="mx-auto w-full max-w-lg space-y-4">
       {/* Profile Header Card */}
       <div className="bg-card text-card-foreground rounded-lg border p-4 shadow-sm">
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-4">
@@ -117,9 +117,7 @@ export default function UpdateProfileForm() {
             />
           </div>
           <div className="flex flex-1 flex-col gap-1 text-center sm:text-left">
-            <h2 className="text-xl font-semibold">
-              @{user?.username}
-            </h2>
+            <h2 className="text-xl font-semibold">{user?.username}</h2>
             <p className="text-muted-foreground">
               {capitalizeFirst(user?.role)}
             </p>
@@ -143,7 +141,7 @@ export default function UpdateProfileForm() {
           rel="noopener noreferrer"
           className="text-primary hover:text-primary/80 inline-flex items-center justify-center text-sm transition-colors"
         >
-          Change profile picture on Gravatar →
+          Change profile picture on Gravatar &rarr;
         </a>
       </div>
 
@@ -196,7 +194,7 @@ export default function UpdateProfileForm() {
               Reset
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving…' : 'Save changes'}
+              {isSubmitting ? 'Saving...' : 'Save changes'}
             </Button>
           </div>
         </form>

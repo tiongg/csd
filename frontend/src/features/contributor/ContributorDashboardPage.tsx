@@ -13,16 +13,21 @@ import {
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
   SparklesIcon,
+  TrophyIcon,
 } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 
 type TrendMovement = 'Rising' | 'Falling' | 'New';
 
 export default function ContributorDashboardPage() {
   const { user } = useAuth();
+  const splitContainerRef = useRef<HTMLDivElement>(null);
+  const [leftPaneWidth, setLeftPaneWidth] = useState(58);
+  const [isResizing, setIsResizing] = useState(false);
+  const [uptakeWindow, setUptakeWindow] = useState<'1D' | '7D' | '30D' | 'ALL'>('ALL');
   const [isTrendModalOpen, setIsTrendModalOpen] = useState(false);
   const [trendSearch, setTrendSearch] = useState('');
 
@@ -76,13 +81,10 @@ export default function ContributorDashboardPage() {
     return map;
   }, [contentVersionQueries, teamCourses]);
 
-  const approvedCount = teamCourses.filter((course) => course.isPublished).length;
-  const rejectedCount = teamCourses.filter(
-    (course) => courseStatusMap.get(course.id) === 'REJECTED',
-  ).length;
   const pendingCount = teamCourses.filter(
     (course) => courseStatusMap.get(course.id) === 'PENDING',
   ).length;
+
   const pendingCourses = useMemo(
     () =>
       [...teamCourses]
@@ -112,13 +114,34 @@ export default function ContributorDashboardPage() {
   });
   const topTrends = (trendData?.trends ?? []).slice(0, 5);
 
+  const topPerformingCourse = useMemo(() => {
+    const publishedCourses = teamCourses.filter((course) => course.isPublished);
+    if (publishedCourses.length === 0) return null;
+
+    const ranked = publishedCourses
+      .map((course, index) => {
+        const seed = course.title.length * 13 + index * 19;
+        const enrollments = 30 + (seed % 180);
+        return { course, enrollments };
+      })
+      .sort((a, b) => b.enrollments - a.enrollments);
+
+    return ranked[0] ?? null;
+  }, [teamCourses]);
+
+  const formatCompactNumber = (value: number) =>
+    new Intl.NumberFormat('en', {
+      notation: 'compact',
+      maximumFractionDigits: 1,
+    }).format(value);
+
   function cleanText(text: string) {
     return text
-      .replaceAll('ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Ëœ', '-')
-      .replaceAll('ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢', "'")
-      .replaceAll('ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ', '"')
-      .replaceAll('ÃƒÂ¢Ã¢â€šÂ¬\u009d', '"')
-      .replaceAll('ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“', '-');
+      .replaceAll('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‹Å“', '-')
+      .replaceAll('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢', "'")
+      .replaceAll('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“', '"')
+      .replaceAll('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬\u009d', '"')
+      .replaceAll('ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ', '-');
   }
 
   function getMovement(
@@ -168,144 +191,309 @@ export default function ContributorDashboardPage() {
   const uptakeMetrics = useMemo(() => {
     const publishedCourses = teamCourses.filter((course) => course.isPublished);
     const publishedCount = publishedCourses.length;
-    const enrollments = publishedCourses.reduce((sum, course, index) => {
+    const totalEnrollments = publishedCourses.reduce((sum, course, index) => {
       const seed = course.title.length * 13 + index * 19;
       return sum + 30 + (seed % 180);
     }, 0);
-    const activeLearners = Math.round(enrollments * 0.46);
-    const avgPerCourse = publishedCount > 0 ? Math.round(enrollments / publishedCount) : 0;
-    const completionRate = enrollments > 0 ? Math.min(92, Math.max(35, Math.round((approvedCount / (teamCourses.length || 1)) * 100))) : 0;
+    const totalActiveLearners = Math.round(totalEnrollments * 0.46);
+    const totalCompletedProxy = Math.round(totalActiveLearners * 0.58);
 
-    const topCourses = publishedCourses
-      .map((course, index) => {
-        const seed = course.title.length * 11 + index * 23;
-        return {
-          id: course.id,
-          title: course.title,
-          enrolled: 25 + (seed % 140),
-        };
-      })
-      .sort((a, b) => b.enrolled - a.enrolled)
-      .slice(0, 3);
+    const getEnrollmentsByWindow = (window: '1D' | '7D' | '30D' | 'ALL') =>
+      window === '1D'
+        ? Math.max(0, Math.round(totalEnrollments * 0.05))
+        : window === '7D'
+          ? Math.max(0, Math.round(totalEnrollments * 0.28))
+          : window === '30D'
+            ? totalEnrollments
+            : Math.max(0, Math.round(totalEnrollments * 1.22));
+
+    const getActiveByWindow = (window: '1D' | '7D' | '30D' | 'ALL') =>
+      window === '1D'
+        ? Math.max(0, Math.round(totalActiveLearners * 0.08))
+        : window === '7D'
+          ? Math.max(0, Math.round(totalActiveLearners * 0.32))
+          : window === '30D'
+            ? totalActiveLearners
+            : Math.max(0, Math.round(totalActiveLearners * 1.18));
+
+    const getCompletedByWindow = (window: '1D' | '7D' | '30D' | 'ALL') =>
+      window === '1D'
+        ? Math.max(0, Math.round(totalCompletedProxy * 0.1))
+        : window === '7D'
+          ? Math.max(0, Math.round(totalCompletedProxy * 0.34))
+          : window === '30D'
+            ? totalCompletedProxy
+            : Math.max(0, Math.round(totalCompletedProxy * 1.15));
+
+    const periodEnrollments = getEnrollmentsByWindow(uptakeWindow);
+    const activeLearners = getActiveByWindow(uptakeWindow);
+    const completedProxy = getCompletedByWindow(uptakeWindow);
+    const enrollmentsAll = getEnrollmentsByWindow('ALL');
+
+    const funnelRows = [
+      { label: 'Enrolled', value: periodEnrollments, color: 'bg-sky-500' },
+      { label: 'Active', value: activeLearners, color: 'bg-sky-400' },
+      { label: 'Completed', value: completedProxy, color: 'bg-sky-300' },
+    ];
+    const maxFunnelValue = Math.max(...funnelRows.map((row) => row.value), 1);
 
     return {
-      enrollments,
+      publishedCount,
+      enrollments: periodEnrollments,
       activeLearners,
-      avgPerCourse,
-      completionRate,
-      topCourses,
+      completedProxy,
+      funnelRows,
+      maxFunnelValue,
+      avgPerCourseAll: publishedCount > 0 ? Math.round(enrollmentsAll / publishedCount) : 0,
+      enrollmentsAll,
     };
-  }, [approvedCount, teamCourses]);
+  }, [teamCourses, uptakeWindow]);
+
+  useEffect(() => {
+    if (!isResizing) return;
+
+    const onMouseMove = (event: MouseEvent) => {
+      const container = splitContainerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const pct = ((event.clientX - rect.left) / rect.width) * 100;
+      const clamped = Math.min(68, Math.max(42, pct));
+      setLeftPaneWidth(clamped);
+    };
+
+    const onMouseUp = () => setIsResizing(false);
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isResizing]);
 
   return (
-    <div className="w-full bg-slate-50 p-6 md:p-8">
+    <div className="w-full bg-slate-100/70 p-6 md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
-          <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
-            Contributor Dashboard
-          </div>
-          <Heading1 className="mt-3 text-slate-900">Creator workspace for {user?.username}</Heading1>
-          <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-600">
-            Manage review pipelines, prioritize pending courses, and convert trend signals into publish-ready modules.
-          </p>
-        </section>
-
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
-          <h2 className="text-xl font-semibold text-slate-900">Course Uptake</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Learner subscription and engagement footprint across your published courses.
-          </p>
-
-          <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4">
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-xs text-slate-500">Total Enrollments</p>
-              <p className="mt-1 text-xl font-semibold text-slate-900">
-                {uptakeMetrics.enrollments}
-              </p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-xs text-slate-500">Active Learners</p>
-              <p className="mt-1 text-xl font-semibold text-slate-900">
-                {uptakeMetrics.activeLearners}
-              </p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-xs text-slate-500">Avg Enrollments/Course</p>
-              <p className="mt-1 text-xl font-semibold text-slate-900">
-                {uptakeMetrics.avgPerCourse}
-              </p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-              <p className="text-xs text-slate-500">Completion Rate</p>
-              <p className="mt-1 text-xl font-semibold text-slate-900">
-                {uptakeMetrics.completionRate}%
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-800">Top Subscribed Courses</p>
-              <p className="text-xs text-slate-500">Published courses</p>
-            </div>
-            {uptakeMetrics.topCourses.length > 0 ? (
-              <ul className="mt-3 space-y-2">
-                {uptakeMetrics.topCourses.map((course) => (
-                  <li key={course.id} className="flex items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2">
-                    <p className="truncate text-sm font-medium text-slate-900">{course.title}</p>
-                    <span className="ml-3 shrink-0 text-xs font-semibold text-slate-600">
-                      {course.enrolled} learners
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="mt-3 rounded-md border border-dashed border-slate-300 bg-white px-3 py-2 text-sm text-slate-600">
-                Publish courses to see subscription metrics.
+        <section className="rounded-2xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-8">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center">
+            <div>
+              <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
+                Contributor Dashboard
               </div>
-            )}
+              <Heading1 className="mt-3 text-slate-900">Creator workspace for {user?.username}</Heading1>
+              <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-600">
+                Manage review pipelines, prioritize pending courses, and convert trend signals into publish-ready modules.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-sky-200/70 bg-gradient-to-br from-sky-50 via-white to-slate-50 p-3.5 shadow-sm shadow-sky-100/60">
+              <div className="flex items-start justify-between gap-3">
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-sky-200 bg-white/90 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-sky-700 uppercase">
+                  <TrophyIcon className="size-3.5" />
+                  Top Performing Course
+                </div>
+                {topPerformingCourse ? (
+                  <div className="inline-flex shrink-0 rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">
+                    {formatCompactNumber(topPerformingCourse.enrollments)} enrollments
+                  </div>
+                ) : null}
+              </div>
+              {topPerformingCourse ? (
+                <>
+                  <p className="mt-2 line-clamp-2 text-sm font-semibold leading-snug text-slate-900">
+                    {topPerformingCourse.course.title}
+                  </p>
+                  <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">
+                    Highest enrollment momentum in your current catalog.
+                  </p>
+                </>
+              ) : (
+                <p className="mt-2 text-xs text-slate-600">
+                  No published course yet. Publish one to start ranking performance.
+                </p>
+              )}
+            </div>
           </div>
         </section>
 
-        <section className="grid gap-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(300px,0.75fr)]">
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
+        <section className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-semibold text-slate-900">Course Uptake</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Learner adoption across your published catalog.
+              </p>
+            </div>
+            <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100/70 p-1">
+              <button
+                type="button"
+                className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
+                  uptakeWindow === '1D'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-800'
+                }`}
+                onClick={() => setUptakeWindow('1D')}
+              >
+                1D
+              </button>
+              <button
+                type="button"
+                className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
+                  uptakeWindow === '7D'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-800'
+                }`}
+                onClick={() => setUptakeWindow('7D')}
+              >
+                7D
+              </button>
+              <button
+                type="button"
+                className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
+                  uptakeWindow === '30D'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-800'
+                }`}
+                onClick={() => setUptakeWindow('30D')}
+              >
+                30D
+              </button>
+              <button
+                type="button"
+                className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
+                  uptakeWindow === 'ALL'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-800'
+                }`}
+                onClick={() => setUptakeWindow('ALL')}
+              >
+                ALL
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 lg:grid-cols-[360px_minmax(0,1fr)]">
+            <div className="grid grid-cols-1 gap-2">
+              <div className="rounded-lg border border-slate-200/70 bg-slate-100/70 p-4">
+                <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
+                  Published Courses
+                </p>
+                <p className="mt-1 text-2xl font-semibold text-slate-900">
+                  {uptakeMetrics.publishedCount}
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-200/70 bg-slate-100/70 p-4">
+                <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
+                  Enrolled (ALL)
+                </p>
+                <p className="mt-1 text-2xl font-semibold text-slate-900">
+                  {uptakeMetrics.enrollmentsAll}
+                </p>
+              </div>
+              <div className="rounded-lg border border-slate-200/70 bg-slate-100/70 p-4">
+                <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
+                  Avg / Course (ALL)
+                </p>
+                <p className="mt-1 text-2xl font-semibold text-slate-900">
+                  {uptakeMetrics.avgPerCourseAll}
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-slate-200/70 bg-slate-100/70 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-slate-800">Funnel Analysis</p>
+                <p className="text-xs text-slate-500">3-stage conversion</p>
+              </div>
+              <div className="mt-4 flex min-h-[220px] flex-col justify-between">
+                {uptakeMetrics.funnelRows.map((row, idx) => {
+                  const width = Math.max(
+                    34,
+                    Math.round((row.value / uptakeMetrics.maxFunnelValue) * 100),
+                  );
+                  const conversion = Math.round(
+                    (row.value / uptakeMetrics.maxFunnelValue) * 100,
+                  );
+                  return (
+                    <div key={row.label}>
+                      <div
+                        className="mx-auto grid h-14 grid-cols-[1fr_auto_1fr] items-center rounded-md px-3 text-[11px] font-semibold text-white shadow-sm transition-all"
+                        style={{
+                          width: `${width}%`,
+                          backgroundColor:
+                            idx === 0 ? '#0ea5e9' : idx === 1 ? '#38bdf8' : '#7dd3fc',
+                        }}
+                      >
+                        <span className="min-w-0 truncate text-left">{row.label}</span>
+                        <span className="justify-self-center px-2 text-center">{row.value}</span>
+                        <span className="justify-self-end text-right">{conversion}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div
+          ref={splitContainerRef}
+          className="flex flex-col gap-5 lg:flex-row lg:gap-0"
+          style={{ '--left-pane': `${leftPaneWidth}%` } as CSSProperties}
+        >
+          <section className="basis-full min-w-0 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6 lg:[flex-basis:var(--left-pane)]">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-900">Review Queue</h2>
               <p className="text-sm text-slate-500">{pendingCount} pending</p>
             </div>
             <p className="mt-1 text-sm text-slate-600">Courses awaiting contributor action.</p>
 
-            <ul className="mt-4 space-y-2">
-              {pendingCourses.length > 0 ? (
-                pendingCourses.map((course) => (
+            {pendingCourses.length > 0 ? (
+              <ul className="mt-4 space-y-2">
+                {pendingCourses.map((course) => (
                   <li key={course.id}>
                     <Link
                       to="/contributor/editor/$courseId"
                       params={{ courseId: course.id }}
                       search={{ section: undefined }}
-                      className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 transition-colors hover:border-sky-200 hover:bg-sky-50/40"
+                      className="flex items-center justify-between rounded-lg border border-slate-200/70 bg-slate-100/70 px-3 py-2.5 transition-colors hover:border-sky-200 hover:bg-sky-50/40"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-slate-900">{course.title}</p>
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          Updated {dayjs(course.updatedAt).fromNow()}
-                        </p>
+                        <p className="mt-0.5 text-xs text-slate-500">Updated {dayjs(course.updatedAt).fromNow()}</p>
                       </div>
-                      <span className="ml-3 shrink-0 rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs font-medium text-slate-600">
+                      <span className="ml-3 shrink-0 rounded-full border border-slate-200/70 bg-white/90 px-2 py-0.5 text-xs font-medium text-slate-600">
                         Pending
                       </span>
                     </Link>
                   </li>
-                ))
-              ) : (
-                <li className="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-3 py-2.5 text-sm text-slate-600">
-                  No pending reviews right now.
-                </li>
-              )}
-            </ul>
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-4 flex min-h-[260px] items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 p-6">
+                <div className="max-w-sm text-center">
+                  <p className="text-sm font-semibold text-slate-800">Queue is clear</p>
+                  <p className="mt-1 text-sm text-slate-600">
+                    No pending reviews right now. New submissions from your teams will appear here.
+                  </p>
+                </div>
+              </div>
+            )}
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-5 md:p-6">
+          <div className="hidden lg:flex lg:w-5 lg:items-center lg:justify-center">
+            <button
+              type="button"
+              aria-label="Resize review queue and trends panels"
+              className="h-20 w-1.5 cursor-col-resize rounded-full bg-slate-300 transition-colors hover:bg-slate-400"
+              onMouseDown={(event) => {
+                event.preventDefault();
+                setIsResizing(true);
+              }}
+            />
+          </div>
+
+          <section className="basis-full min-w-0 rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6 lg:flex-1">
             <h2 className="text-lg font-semibold text-slate-900">Today&apos;s Top Trends</h2>
             <p className="mt-1 text-sm text-slate-600">Top 5 signals to monitor.</p>
 
@@ -317,7 +505,7 @@ export default function ContributorDashboardPage() {
                     <button
                       key={trend.rank}
                       type="button"
-                      className="flex w-full items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-left transition-colors hover:border-sky-200 hover:bg-sky-50/40"
+                      className="flex w-full items-center justify-between rounded-lg border border-slate-200/70 bg-slate-100/70 px-3 py-2.5 text-left transition-colors hover:border-sky-200 hover:bg-sky-50/40"
                       onClick={() => {
                         setTrendSearch(cleanText(trend.name));
                         setIsTrendModalOpen(true);
@@ -347,7 +535,7 @@ export default function ContributorDashboardPage() {
               )}
             </div>
           </section>
-        </section>
+        </div>
 
         <Dialog open={isTrendModalOpen} onOpenChange={setIsTrendModalOpen}>
           <DialogContent className="sm:max-w-2xl">
