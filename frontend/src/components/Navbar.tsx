@@ -112,7 +112,7 @@ export default function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="flex h-10 min-w-34 items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                    className="flex h-9 min-w-26 items-center justify-between gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
                   >
                     <span>
                       {match(navRole)
@@ -130,22 +130,22 @@ export default function Navbar() {
                     </span>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuContent align="end" className="w-40">
                   {user.role === 'ADMIN' && (
                     <DropdownMenuItem asChild>
                       <Link to="/admin/dashboard" className="w-full">
-                        Admin View
+                        Admin
                       </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem asChild>
                     <Link to="/contributor/dashboard" className="w-full">
-                      Contributor View
+                      Contributor
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/learner/dashboard" className="w-full">
-                      Learner View
+                      Learner
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
