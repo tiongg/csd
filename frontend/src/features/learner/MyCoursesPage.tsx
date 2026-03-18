@@ -12,8 +12,8 @@ export default function MyCoursesPage() {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="min-h-full w-full bg-slate-100/70 p-6 md:p-8">
-      <div className="mx-auto flex min-h-full w-full max-w-6xl flex-col gap-5">
+    <div className="flex min-h-0 flex-1 flex-col w-full bg-slate-100/70 p-6 md:p-8">
+      <div className="mx-auto flex min-h-0 flex-1 w-full max-w-6xl flex-col gap-5">
         <section className={glassPanelClass}>
           <div className="flex flex-col gap-4">
             <div>
@@ -47,10 +47,10 @@ export default function MyCoursesPage() {
               </div>
             </div>
 
-            <TabsContent value="enrolled" className="flex-1">
+            <TabsContent value="enrolled" className="flex flex-1">
               <EnrolledCourses searchQuery={searchQuery} />
             </TabsContent>
-            <TabsContent value="all" className="flex-1">
+            <TabsContent value="all" className="flex flex-1">
               <AllCourses searchQuery={searchQuery} />
             </TabsContent>
           </Tabs>

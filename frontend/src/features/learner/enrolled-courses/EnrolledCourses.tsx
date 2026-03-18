@@ -17,7 +17,7 @@ export function EnrolledCourses({ searchQuery }: EnrolledCoursesProps) {
 
   if (filteredCourses.length === 0) {
     return (
-      <div className="flex min-h-[360px] h-full w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
+      <div className="flex min-h-[360px] flex-1 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
         <div className="text-center">
           <p className="text-lg font-semibold text-slate-800">No courses yet</p>
           <p className="mb-4 text-sm text-slate-600">
