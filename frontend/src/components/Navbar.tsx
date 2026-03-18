@@ -26,12 +26,14 @@ function getPrimaryNavItems(
   return match(currentActiveRole)
     .with('ADMIN', () => [
       { label: 'Dashboard', to: '/admin/dashboard' as const },
+      { label: 'Discover', to: '/admin/discover' as const },
       { label: 'User Management', to: '/admin/user-management' as const },
       { label: 'Course Moderation', to: '/admin/course-moderation' as const },
       { label: 'Glossary', to: '/admin/glossary' as const },
     ])
     .with('CONTRIBUTOR', () => [
       { label: 'Dashboard', to: '/contributor/dashboard' as const },
+      { label: 'Discover', to: '/contributor/discover' as const },
       { label: 'Teams', to: '/contributor/teams' as const },
       { label: 'Glossary', to: '/contributor/glossary' as const },
     ])
