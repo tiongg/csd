@@ -274,7 +274,7 @@ export default function ContributorDashboardPage() {
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <section className="rounded-2xl border border-slate-200/70 bg-white/85 p-6 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-8">
+        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent p-6 shadow-sm shadow-slate-900/5 ring-1 ring-slate-300/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] md:p-8">
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center">
             <div>
               <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
@@ -288,7 +288,7 @@ export default function ContributorDashboardPage() {
 
             <div className="rounded-xl border border-sky-200/70 bg-gradient-to-br from-sky-50 via-white to-slate-50 p-3.5 shadow-sm shadow-sky-100/60">
               <div className="flex items-start justify-between gap-3">
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-sky-200 bg-white/90 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-sky-700 uppercase">
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-sky-200 bg-white/58 backdrop-blur-xl px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-sky-700 uppercase">
                   <TrophyIcon className="size-3.5" />
                   Top Performing Course
                 </div>
@@ -316,7 +316,7 @@ export default function ContributorDashboardPage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-200/70 bg-white/85 p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6">
+        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-300/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] md:p-6">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold text-slate-900">Course Uptake</h2>
@@ -324,12 +324,12 @@ export default function ContributorDashboardPage() {
                 Learner adoption across your published catalog.
               </p>
             </div>
-            <div className="inline-flex rounded-lg border border-slate-200 bg-slate-100/70 p-1">
+            <div className="inline-flex rounded-lg border border-slate-300 bg-slate-100/70 p-1">
               <button
                 type="button"
                 className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
                   uptakeWindow === '1D'
-                    ? 'bg-white/85 text-slate-900 shadow-sm'
+                    ? 'bg-white/60 backdrop-blur-xl text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-800'
                 }`}
                 onClick={() => setUptakeWindow('1D')}
@@ -340,7 +340,7 @@ export default function ContributorDashboardPage() {
                 type="button"
                 className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
                   uptakeWindow === '7D'
-                    ? 'bg-white/85 text-slate-900 shadow-sm'
+                    ? 'bg-white/60 backdrop-blur-xl text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-800'
                 }`}
                 onClick={() => setUptakeWindow('7D')}
@@ -351,7 +351,7 @@ export default function ContributorDashboardPage() {
                 type="button"
                 className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
                   uptakeWindow === '30D'
-                    ? 'bg-white/85 text-slate-900 shadow-sm'
+                    ? 'bg-white/60 backdrop-blur-xl text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-800'
                 }`}
                 onClick={() => setUptakeWindow('30D')}
@@ -362,7 +362,7 @@ export default function ContributorDashboardPage() {
                 type="button"
                 className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
                   uptakeWindow === 'ALL'
-                    ? 'bg-white/85 text-slate-900 shadow-sm'
+                    ? 'bg-white/60 backdrop-blur-xl text-slate-900 shadow-sm'
                     : 'text-slate-600 hover:text-slate-800'
                 }`}
                 onClick={() => setUptakeWindow('ALL')}
@@ -374,7 +374,7 @@ export default function ContributorDashboardPage() {
 
           <div className="mt-4 grid gap-3 lg:grid-cols-[360px_minmax(0,1fr)]">
             <div className="grid grid-cols-1 gap-2">
-              <div className="rounded-lg border border-slate-200/70 bg-slate-100/70 p-4">
+              <div className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-4">
                 <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
                   Published Courses
                 </p>
@@ -382,7 +382,7 @@ export default function ContributorDashboardPage() {
                   {uptakeMetrics.publishedCount}
                 </p>
               </div>
-              <div className="rounded-lg border border-slate-200/70 bg-slate-100/70 p-4">
+              <div className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-4">
                 <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
                   Enrolled (ALL)
                 </p>
@@ -390,7 +390,7 @@ export default function ContributorDashboardPage() {
                   {uptakeMetrics.enrollmentsAll}
                 </p>
               </div>
-              <div className="rounded-lg border border-slate-200/70 bg-slate-100/70 p-4">
+              <div className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-4">
                 <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
                   Avg / Course (ALL)
                 </p>
@@ -400,7 +400,7 @@ export default function ContributorDashboardPage() {
               </div>
             </div>
 
-            <div className="rounded-lg border border-slate-200/70 bg-slate-100/70 p-4">
+            <div className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-slate-800">Funnel Analysis</p>
                 <p className="text-xs text-slate-500">3-stage conversion</p>
@@ -441,7 +441,7 @@ export default function ContributorDashboardPage() {
           className="flex flex-col gap-5 lg:flex-row lg:gap-0"
           style={{ '--left-pane': `${leftPaneWidth}%` } as CSSProperties}
         >
-          <section className="basis-full min-w-0 rounded-2xl border border-slate-200/70 bg-white/85 p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6 lg:[flex-basis:var(--left-pane)]">
+          <section className="basis-full min-w-0 relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-300/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] md:p-6 lg:[flex-basis:var(--left-pane)]">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-900">Review Queue</h2>
               <p className="text-sm text-slate-500">{pendingCount} pending</p>
@@ -456,13 +456,13 @@ export default function ContributorDashboardPage() {
                       to="/contributor/editor/$courseId"
                       params={{ courseId: course.id }}
                       search={{ section: undefined }}
-                      className="flex items-center justify-between rounded-lg border border-slate-200/70 bg-slate-100/70 px-3 py-2.5 transition-colors hover:border-sky-200 hover:bg-sky-50/40"
+                      className="flex items-center justify-between rounded-lg border border-slate-300/85 bg-slate-100/70 px-3 py-2.5 transition-colors hover:border-sky-200 hover:bg-sky-50/40"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-slate-900">{course.title}</p>
                         <p className="mt-0.5 text-xs text-slate-500">Updated {dayjs(course.updatedAt).fromNow()}</p>
                       </div>
-                      <span className="ml-3 shrink-0 rounded-full border border-slate-200/70 bg-white/90 px-2 py-0.5 text-xs font-medium text-slate-600">
+                      <span className="ml-3 shrink-0 rounded-full border border-slate-300/85 bg-white/58 backdrop-blur-xl px-2 py-0.5 text-xs font-medium text-slate-600">
                         Pending
                       </span>
                     </Link>
@@ -493,7 +493,7 @@ export default function ContributorDashboardPage() {
             />
           </div>
 
-          <section className="basis-full min-w-0 rounded-2xl border border-slate-200/70 bg-white/85 p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-200/60 md:p-6 lg:flex-1">
+          <section className="basis-full min-w-0 relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent p-5 shadow-sm shadow-slate-900/5 ring-1 ring-slate-300/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] md:p-6 lg:flex-1">
             <h2 className="text-lg font-semibold text-slate-900">Today&apos;s Top Trends</h2>
             <p className="mt-1 text-sm text-slate-600">Top 5 signals to monitor.</p>
 
@@ -505,7 +505,7 @@ export default function ContributorDashboardPage() {
                     <button
                       key={trend.rank}
                       type="button"
-                      className="flex w-full items-center justify-between rounded-lg border border-slate-200/70 bg-slate-100/70 px-3 py-2.5 text-left transition-colors hover:border-sky-200 hover:bg-sky-50/40"
+                      className="flex w-full items-center justify-between rounded-lg border border-slate-300/85 bg-slate-100/70 px-3 py-2.5 text-left transition-colors hover:border-sky-200 hover:bg-sky-50/40"
                       onClick={() => {
                         setTrendSearch(cleanText(trend.name));
                         setIsTrendModalOpen(true);
@@ -563,7 +563,7 @@ export default function ContributorDashboardPage() {
                       params={{ courseId: course.id }}
                       search={{ section: undefined }}
                       onClick={() => setIsTrendModalOpen(false)}
-                      className="block rounded-lg border border-slate-200 bg-white/85 p-3 hover:border-slate-300"
+                      className="block rounded-lg border border-slate-300 bg-white/60 backdrop-blur-xl p-3 hover:border-slate-300"
                     >
                       <p className="text-sm font-semibold text-slate-900">{course.title}</p>
                       <p className="mt-1 text-xs text-slate-500">
@@ -584,4 +584,10 @@ export default function ContributorDashboardPage() {
     </div>
   );
 }
+
+
+
+
+
+
 

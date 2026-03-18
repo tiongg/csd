@@ -143,7 +143,7 @@ export default function LearnerDashboardPage() {
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <section className="rounded-2xl border border-slate-200/70 bg-white/85 p-6 shadow-sm ring-1 shadow-slate-900/5 ring-slate-200/60 md:p-8">
+        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-8">
           <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
             Learner Dashboard
           </div>
@@ -155,7 +155,7 @@ export default function LearnerDashboardPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-slate-200/70 bg-white/85 p-4 shadow-sm ring-1 shadow-slate-900/5 ring-slate-200/60 md:p-5">
+        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-5">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-slate-700">
               Discover Courses
@@ -184,7 +184,7 @@ export default function LearnerDashboardPage() {
                       <Link
                         to="/learner/courses/$courseId"
                         params={{ courseId: course.id }}
-                        className="block h-full overflow-hidden rounded-xl border border-slate-200/70 bg-slate-100/70 transition-colors hover:border-sky-200"
+                        className="block h-full overflow-hidden rounded-xl border border-slate-300/85 bg-slate-100/70 transition-colors hover:border-sky-200"
                       >
                         <div className="h-56 w-full overflow-hidden">
                           <img
@@ -216,7 +216,7 @@ export default function LearnerDashboardPage() {
                     ) : (
                       <Link
                         to="/learner/discover"
-                        className="block h-full overflow-hidden rounded-xl border border-slate-200/70 bg-slate-100/70 transition-colors hover:border-sky-200"
+                        className="block h-full overflow-hidden rounded-xl border border-slate-300/85 bg-slate-100/70 transition-colors hover:border-sky-200"
                       >
                         <div className="h-56 w-full overflow-hidden">
                           <img
@@ -251,7 +251,7 @@ export default function LearnerDashboardPage() {
               </CarouselContent>
             </Carousel>
           ) : (
-            <div className="mt-3 rounded-lg border border-dashed border-slate-300 bg-white/85 p-3 text-sm text-slate-600">
+            <div className="mt-3 rounded-lg border border-dashed border-slate-300 bg-white/60 p-3 text-sm text-slate-600 backdrop-blur-xl">
               No suggested courses yet.
             </div>
           )}
