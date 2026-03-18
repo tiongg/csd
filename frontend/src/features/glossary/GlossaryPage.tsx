@@ -89,7 +89,7 @@ export default function GlossaryPage() {
     <div className="w-full bg-slate-50/60 p-4 md:p-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
-          <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="flex flex-wrap items-end gap-4">
             <div>
               <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
                 Reference
@@ -100,9 +100,6 @@ export default function GlossaryPage() {
               <p className="mt-2 text-sm text-slate-600">
                 Shared reference for current slang, meme terms, and format language.
               </p>
-            </div>
-            <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700">
-              {filteredItems.length} term{filteredItems.length === 1 ? '' : 's'}
             </div>
           </div>
           <div className="mt-4 w-full max-w-md">
