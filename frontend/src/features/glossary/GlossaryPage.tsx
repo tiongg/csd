@@ -209,6 +209,8 @@ const GLOSSARY_ITEMS: GlossaryItem[] = [
 
 const ALL_CATEGORIES = 'All Categories';
 type CategoryFilter = GlossaryCategory | typeof ALL_CATEGORIES;
+const glassPanelClass =
+  'relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6';
 
 export default function GlossaryPage() {
   const [query, setQuery] = useState('');
@@ -241,7 +243,7 @@ export default function GlossaryPage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col w-full bg-slate-100/70 p-4 md:p-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6">
+        <section className={glassPanelClass}>
           <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
             Reference
           </p>
@@ -254,14 +256,14 @@ export default function GlossaryPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-5">
+        <section className={glassPanelClass}>
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="w-full sm:w-64">
               <Select
                 value={category}
                 onValueChange={(value) => setCategory(value as CategoryFilter)}
               >
-                <SelectTrigger className="h-10 w-full bg-white">
+                <SelectTrigger className="h-10 w-full border-slate-300/85 bg-slate-100/70">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent align="start">
@@ -278,13 +280,14 @@ export default function GlossaryPage() {
               <SearchBar
                 placeholder="Search term, meaning, context"
                 onSearch={setQuery}
+                className="h-10 border-slate-300/85 bg-slate-100/70"
               />
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-200">
+          <div className="overflow-x-auto rounded-xl border border-slate-300/85 bg-slate-100/35">
             <table className="w-full min-w-[860px] text-left text-sm">
-              <thead className="bg-slate-50 text-slate-600">
+              <thead className="bg-slate-100/80 text-slate-700">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Term</th>
                   <th className="px-4 py-3 font-semibold">Category</th>
@@ -296,11 +299,11 @@ export default function GlossaryPage() {
                 {filteredItems.map((item) => (
                   <tr
                     key={item.term}
-                    className="border-t border-slate-200 text-slate-800 transition-colors hover:bg-slate-50/70"
+                    className="border-t border-slate-300/70 text-slate-800 transition-colors hover:bg-sky-50/40"
                   >
                     <td className="px-4 py-3.5 font-semibold text-slate-900">{item.term}</td>
                     <td className="px-4 py-3.5">
-                      <span className="inline-flex rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs font-medium text-slate-700">
+                      <span className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-xs font-medium text-sky-700">
                         {item.category}
                       </span>
                     </td>
