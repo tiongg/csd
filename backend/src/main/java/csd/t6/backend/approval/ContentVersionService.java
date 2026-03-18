@@ -17,10 +17,13 @@ import csd.t6.backend.course.CourseReelService;
 import csd.t6.backend.course.CourseRepository;
 import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.backend.notification.NotificationService;
 import csd.t6.backend.team.TeamService;
 import csd.t6.backend.utils.FileService;
 import csd.t6.backend.utils.dto.PresignedUrlResponse;
+import csd.t6.jooq.accounts.enums.Roles;
 import csd.t6.jooq.public_.enums.ContentStatus;
+import csd.t6.jooq.public_.enums.NotificationType;
 import csd.t6.jooq.public_.tables.records.ContentVersionRecord;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 
@@ -31,14 +34,17 @@ public class ContentVersionService {
   private final TeamService teamService;
   private final FileService fileService;
   private final CourseReelService courseReelService;
+  private final NotificationService notificationService;
 
   public ContentVersionService(ContentVersionRepository contentVersionRepository, CourseRepository courseRepository,
-      TeamService teamService, FileService fileService, CourseReelService courseReelService) {
+      TeamService teamService, FileService fileService, CourseReelService courseReelService,
+      NotificationService notificationService) {
     this.contentVersionRepository = contentVersionRepository;
     this.courseRepository = courseRepository;
     this.teamService = teamService;
     this.fileService = fileService;
     this.courseReelService = courseReelService;
+    this.notificationService = notificationService;
   }
 
   public ContentVersionRecord createNewContentVersion(UUID courseId, String description) {
@@ -57,6 +63,9 @@ public class ContentVersionService {
 
     this.contentVersionRepository.rejectAllPendingVersions(courseId);
     ContentVersionRecord newVersion = this.createNewContentVersion(courseId, description);
+
+    notificationService.sendToRole(Roles.ADMIN, NotificationType.COURSE_AWAITING_REVIEW, "Course Review",
+        "Course: " + course.getTitle(), newVersion.getId());
 
     String key = this.getVersionKey(courseId, newVersion.getId());
     return new PresignedUrlResponse(this.fileService.generatePresignedUploadUrl(key, Duration.ofMinutes(5)), key);
@@ -119,6 +128,12 @@ public class ContentVersionService {
 
     // Approve this version (clear rejected reason since it's approved)
     this.contentVersionRepository.updateStatus(contentVersionId, ContentStatus.APPROVED, null);
+
+    CourseRecord course = courseRepository.findById(version.getCourseId())
+        .orElseThrow(() -> new BadRequestException("Course not found"));
+
+    notificationService.sendToTeam(course.getTeamId(), NotificationType.COURSE_APPROVED, "Course Approved",
+        "Your course: " + course.getTitle() + " has been approved", course.getId());
   }
 
   @Transactional

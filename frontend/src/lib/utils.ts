@@ -15,11 +15,27 @@ export function generateColorFromString(str: string) {
   for (let i = 0; i < str.length; i++) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
+  // Generate brighter colors by ensuring each channel has a minimum value
+  // and at least one channel is at maximum brightness
+  const r = Math.min(255, 100 + ((hash >> 24) & 0x7f));
+  const g = Math.min(255, 100 + ((hash >> 16) & 0x7f));
+  const b = Math.min(255, 100 + ((hash >> 8) & 0x7f));
+
+  // Boost the brightest channel to make colors more vibrant
+  const max = Math.max(r, g, b);
+  let brightR = r;
+  let brightG = g;
+  let brightB = b;
+
+  if (max === r) brightR = 255;
+  else if (max === g) brightG = 255;
+  else brightB = 255;
+
   const color =
     '#' +
-    ((hash >> 24) & 0xff).toString(16).padStart(2, '0') +
-    ((hash >> 16) & 0xff).toString(16).padStart(2, '0') +
-    ((hash >> 8) & 0xff).toString(16).padStart(2, '0');
+    brightR.toString(16).padStart(2, '0') +
+    brightG.toString(16).padStart(2, '0') +
+    brightB.toString(16).padStart(2, '0');
   return color;
 }
 
@@ -44,6 +60,7 @@ export type Team = components['schemas']['Team'];
 export type Course = components['schemas']['Course'];
 export type ContentVersion = components['schemas']['ContentVersionResponse'];
 export type EnrolledCourse = components['schemas']['LessonSessionFullResponse'];
+export type Notification = components['schemas']['Notification'];
 export type LearnerCourseMetadata = {
   currentIndex?: number;
 };

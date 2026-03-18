@@ -1,7 +1,29 @@
 package csd.t6.backend.team;
 
+import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import csd.t6.backend.account.AccountRepository;
 import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.backend.notification.NotificationService;
 import csd.t6.backend.team.dto.request.AddMemberRequest;
 import csd.t6.backend.team.dto.request.TeamCreateRequest;
 import csd.t6.backend.team.dto.request.TeamUpdateRequest;
@@ -12,18 +34,6 @@ import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.public_.enums.TeamRole;
 import csd.t6.jooq.public_.tables.records.TeamMemberRecord;
 import csd.t6.jooq.public_.tables.records.TeamRecord;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TeamServiceTest {
@@ -34,6 +44,8 @@ class TeamServiceTest {
     private TeamMemberRepository teamMemberRepository;
     @Mock
     private AccountRepository accountRepository;
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private TeamService teamService;
@@ -104,9 +116,8 @@ class TeamServiceTest {
     void shouldThrowWhenTeamNotFound() {
         when(teamRepository.findById(teamId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> teamService.getTeamById(teamId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Team not found");
+        assertThatThrownBy(() -> teamService.getTeamById(teamId)).isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Team not found");
     }
 
     // --- updateTeam ---
@@ -132,10 +143,8 @@ class TeamServiceTest {
         when(teamRepository.findById(teamId)).thenReturn(Optional.of(mockTeam));
         when(teamMemberRepository.findByTeamAndAccount(teamId, nonMemberId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() ->
-            teamService.updateTeam(teamId, new TeamUpdateRequest("Name", "Desc"), nonMemberId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("not a member");
+        assertThatThrownBy(() -> teamService.updateTeam(teamId, new TeamUpdateRequest("Name", "Desc"), nonMemberId))
+                .isInstanceOf(BadRequestException.class).hasMessageContaining("not a member");
     }
 
     @Test
@@ -146,13 +155,10 @@ class TeamServiceTest {
         when(regularMember.getTeamRole()).thenReturn(TeamRole.MEMBER);
 
         when(teamRepository.findById(teamId)).thenReturn(Optional.of(mockTeam));
-        when(teamMemberRepository.findByTeamAndAccount(teamId, regularMemberId))
-            .thenReturn(Optional.of(regularMember));
+        when(teamMemberRepository.findByTeamAndAccount(teamId, regularMemberId)).thenReturn(Optional.of(regularMember));
 
-        assertThatThrownBy(() ->
-            teamService.updateTeam(teamId, new TeamUpdateRequest("Name", "Desc"), regularMemberId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("owner or admin");
+        assertThatThrownBy(() -> teamService.updateTeam(teamId, new TeamUpdateRequest("Name", "Desc"), regularMemberId))
+                .isInstanceOf(BadRequestException.class).hasMessageContaining("owner or admin");
     }
 
     // --- deleteTeam ---
@@ -172,9 +178,8 @@ class TeamServiceTest {
         UUID nonOwnerId = UUID.randomUUID();
         when(teamRepository.findById(teamId)).thenReturn(Optional.of(mockTeam));
 
-        assertThatThrownBy(() -> teamService.deleteTeam(teamId, nonOwnerId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Only team owner");
+        assertThatThrownBy(() -> teamService.deleteTeam(teamId, nonOwnerId)).isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Only team owner");
     }
 
     // --- addMember ---
@@ -197,6 +202,7 @@ class TeamServiceTest {
         when(teamMemberRepository.findByTeamAndAccount(teamId, ownerId)).thenReturn(Optional.of(ownerMember));
         when(accountRepository.findOneBy(ACCOUNT.USERNAME, "newmember")).thenReturn(Optional.of(newMemberAccount));
         when(teamMemberRepository.findByTeamAndAccount(teamId, memberId)).thenReturn(Optional.empty());
+        when(teamRepository.findById(teamId)).thenReturn(Optional.of(mockTeam));
         when(teamMemberRepository.addMember(teamId, memberId, TeamRole.MEMBER)).thenReturn(newMemberRecord);
 
         TeamMemberResponse result = teamService.addMember(teamId, new AddMemberRequest("newmember"), ownerId);
@@ -214,8 +220,8 @@ class TeamServiceTest {
         when(accountRepository.findOneBy(ACCOUNT.USERNAME, "learneruser")).thenReturn(Optional.of(learnerAccount));
 
         assertThatThrownBy(() -> teamService.addMember(teamId, new AddMemberRequest("learneruser"), ownerId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Only Contributors and Admins can be added to a team");
+                .isInstanceOf(BadRequestException.class)
+                .hasMessageContaining("Only Contributors and Admins can be added to a team");
     }
 
     @Test
@@ -227,11 +233,11 @@ class TeamServiceTest {
 
         when(teamMemberRepository.findByTeamAndAccount(teamId, ownerId)).thenReturn(Optional.of(ownerMember));
         when(accountRepository.findOneBy(ACCOUNT.USERNAME, "existing")).thenReturn(Optional.of(existingMember));
-        when(teamMemberRepository.findByTeamAndAccount(teamId, memberId)).thenReturn(Optional.of(mock(TeamMemberRecord.class)));
+        when(teamMemberRepository.findByTeamAndAccount(teamId, memberId))
+                .thenReturn(Optional.of(mock(TeamMemberRecord.class)));
 
         assertThatThrownBy(() -> teamService.addMember(teamId, new AddMemberRequest("existing"), ownerId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("already a member");
+                .isInstanceOf(BadRequestException.class).hasMessageContaining("already a member");
     }
 
     // --- removeMember ---
@@ -255,8 +261,7 @@ class TeamServiceTest {
         when(teamRepository.findById(teamId)).thenReturn(Optional.of(mockTeam));
 
         assertThatThrownBy(() -> teamService.removeMember(teamId, ownerId, ownerId))
-            .isInstanceOf(BadRequestException.class)
-            .hasMessageContaining("Cannot remove team owner");
+                .isInstanceOf(BadRequestException.class).hasMessageContaining("Cannot remove team owner");
     }
 
     // --- isTeamMember ---
@@ -264,8 +269,7 @@ class TeamServiceTest {
     @Test
     @DisplayName("Should return true when user is team member")
     void shouldReturnTrueWhenTeamMember() {
-        when(teamMemberRepository.findByTeamAndAccount(teamId, ownerId))
-            .thenReturn(Optional.of(ownerMember));
+        when(teamMemberRepository.findByTeamAndAccount(teamId, ownerId)).thenReturn(Optional.of(ownerMember));
 
         assertThat(teamService.isTeamMember(teamId, ownerId)).isTrue();
     }
@@ -273,8 +277,7 @@ class TeamServiceTest {
     @Test
     @DisplayName("Should return false when user is not team member")
     void shouldReturnFalseWhenNotTeamMember() {
-        when(teamMemberRepository.findByTeamAndAccount(teamId, memberId))
-            .thenReturn(Optional.empty());
+        when(teamMemberRepository.findByTeamAndAccount(teamId, memberId)).thenReturn(Optional.empty());
 
         assertThat(teamService.isTeamMember(teamId, memberId)).isFalse();
     }
@@ -298,9 +301,8 @@ class TeamServiceTest {
 
         when(teamRepository.findById(teamId)).thenReturn(Optional.of(mockTeam));
         when(teamMemberRepository.findByTeamAndAccount(teamId, ownerId)).thenReturn(Optional.of(ownerMember));
-        when(teamMemberRepository.findByTeamAndAccount(teamId, memberId))
-            .thenReturn(Optional.of(targetMember))
-            .thenReturn(Optional.of(updatedMember));
+        when(teamMemberRepository.findByTeamAndAccount(teamId, memberId)).thenReturn(Optional.of(targetMember))
+                .thenReturn(Optional.of(updatedMember));
         when(accountRepository.findOneBy(ACCOUNT.ID, memberId)).thenReturn(Optional.of(targetAccount));
 
         TeamMemberResponse result = teamService.updateMemberRole(teamId, memberId, TeamRole.ADMIN, ownerId);

@@ -12,13 +12,17 @@ import type { LinkOptions } from '@tanstack/react-router';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { UserCircle2 } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from './ui/button';
 import { match } from 'ts-pattern';
+import NotificationBell from './notifications/NotificationBell';
+import NotificationsDropdown from './notifications/NotificationsDropdown';
+import { Button } from './ui/button';
 
 type PathType = 'settings' | 'faq';
 type PrimaryNavItem = { label: string; to: LinkOptions['to'] };
 
-function getPrimaryNavItems(currentActiveRole: Account['role']): PrimaryNavItem[] {
+function getPrimaryNavItems(
+  currentActiveRole: Account['role'],
+): PrimaryNavItem[] {
   return match(currentActiveRole)
     .with('ADMIN', () => [
       { label: 'Dashboard', to: '/admin/dashboard' as const },
@@ -147,6 +151,10 @@ export default function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
+
+            <NotificationsDropdown>
+              <NotificationBell />
+            </NotificationsDropdown>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
