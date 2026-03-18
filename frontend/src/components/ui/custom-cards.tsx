@@ -20,17 +20,24 @@ export function CardWithPlusIcon({
   ...rest
 }: { title: string, onInteract: () => void } & ComponentProps<'div'>) {
   return (
-    <button className='w-full' onClick={onInteract}>
+    <button className="h-full w-full" onClick={onInteract}>
       <Card
         className={cn(
-          'h-full cursor-pointer border-2 transition hover:border-slate-500 hover:shadow-lg',
+          'group h-full cursor-pointer rounded-2xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 py-0 text-left shadow-[0_10px_24px_-20px_rgba(15,23,42,0.7)] transition-all hover:-translate-y-1 hover:border-sky-300 hover:shadow-[0_20px_38px_-22px_rgba(14,116,144,0.55)]',
           className,
         )}
         {...rest}
       >
-        <CardContent className="flex h-full flex-col items-center justify-center gap-y-8">
-          <PlusCircleIcon className="size-28" />
-          <Heading3>{title}</Heading3>
+        <CardContent className="flex h-full min-h-56 flex-col items-start justify-between gap-y-6 p-6">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-sky-100 text-sky-700 transition-colors group-hover:bg-sky-600 group-hover:text-white">
+            <PlusCircleIcon className="size-7" />
+          </span>
+          <div className="space-y-1">
+            <Heading3 className="text-slate-900">{title}</Heading3>
+            <p className="text-sm text-slate-600">
+              Create a workspace and invite collaborators.
+            </p>
+          </div>
         </CardContent>
       </Card>
     </button>
@@ -56,25 +63,31 @@ export function CardWithDetails({
   ...rest
 }: CardWithDetailsProps) {
   return (
-    <button className='w-full' onClick={onInteract}>
+    <button className="h-full w-full" onClick={onInteract}>
       <div
         className={cn(
-          'h-full flex cursor-pointer flex-col overflow-hidden rounded-2xl border-2 transition-all hover:border-slate-500 hover:shadow-lg shadow-sm',
+          'group h-full flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_10px_24px_-20px_rgba(15,23,42,0.7)] transition-all hover:-translate-y-1 hover:border-sky-300 hover:shadow-[0_20px_38px_-22px_rgba(14,116,144,0.55)]',
           className,
         )}
         {...rest}
       >
-        <div className="h-40 bg-sky-200" />
-        <Separator />
-        <div className="flex items-end justify-between p-4">
+        <div className="relative h-24 overflow-hidden bg-[linear-gradient(140deg,#eff6ff,#e2e8f0_62%,#cffafe)]">
+          <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full bg-white/45" />
+        </div>
+        <Separator className="bg-slate-200" />
+        <div className="flex items-end justify-between p-5">
           <div className="flex flex-col gap-1">
-            <div className="group relative">
-              {enableTooltip && <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-lg bg-slate-800 px-2 py-1 text-sm whitespace-nowrap text-white opacity-0 shadow-md transition group-hover:opacity-100">
+            <div className="group relative w-full">
+              {enableTooltip && (
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded-lg bg-slate-800 px-2 py-1 text-sm whitespace-nowrap text-white opacity-0 shadow-md transition group-hover:opacity-100">
+                  {title}
+                </div>
+              )}
+              <Heading3 className="max-w-full truncate text-slate-900">
                 {title}
-              </div>}
-              <Heading3 className="max-w-full truncate">{title}</Heading3>
+              </Heading3>
             </div>
-            <p className="text-sm text-slate-600">
+            <p className="text-sm font-medium text-slate-600">
               {descriptor}: {data}
             </p>
           </div>
@@ -83,7 +96,7 @@ export function CardWithDetails({
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="cursor-pointer text-slate-600 hover:text-slate-800 transition-colors"
+                  className="cursor-pointer text-slate-600 transition-colors hover:text-slate-800"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <EllipsisVerticalIcon className="size-6" />

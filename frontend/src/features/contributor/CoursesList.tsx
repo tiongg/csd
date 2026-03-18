@@ -75,14 +75,21 @@ export default function CoursesList({ team }: CourseListProps) {
   );
 
   return (
-    <div className="flex h-full w-full flex-col p-8">
-      <div className="flex justify-between">
-        <div>
-          <Heading1>{team.name}</Heading1>
-          <p className="font-subtitle">Collaborators: {team.members.length}</p>
+    <div className="mx-auto w-full max-w-7xl space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
+            Team Workspace
+          </p>
+          <Heading1 className="bg-none text-4xl leading-tight tracking-tight">
+            {team.name}
+          </Heading1>
+          <p className="font-subtitle text-slate-600">
+            Collaborators: {team.members.length}
+          </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="destructive"
             className="cursor-pointer gap-2 rounded-full"
@@ -101,7 +108,7 @@ export default function CoursesList({ team }: CourseListProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 justify-start gap-4 py-4">
+      <div className="grid auto-rows-fr grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <CardWithPlusIcon
           title="Create New Course"
           onInteract={openCreateCourseDialog}
