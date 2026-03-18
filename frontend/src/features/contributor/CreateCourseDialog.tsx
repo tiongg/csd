@@ -1,5 +1,12 @@
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Field,
   FieldError,
@@ -51,31 +58,25 @@ export default function CreateCourseDialog({
     },
   });
 
-  const { mutateAsync: createCourse } = useApiMutation(
-    'post',
-    '/api/courses/',
-    {
-      onSuccess: async () => {
-        await queryClient.invalidateQueries({
-          queryKey: apiQueryOptions('get', '/api/teams/{teamId}/courses', {
-            params: { path: { teamId: team.id } },
-          }).queryKey,
-        });
+  const { mutateAsync: createCourse } = useApiMutation('post', '/api/courses/', {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: apiQueryOptions('get', '/api/teams/{teamId}/courses', {
+          params: { path: { teamId: team.id } },
+        }).queryKey,
+      });
 
-        reset();
-
-        toast.success('Course created');
-
-        setDialogOpen(false);
-      },
-      onError: (error: any) => {
-        setError('root', {
-          type: 'custom',
-          message: error?.message ?? 'Failed to create course. Please try again.',
-        });
-      },
+      reset();
+      toast.success('Course created');
+      setDialogOpen(false);
     },
-  );
+    onError: (error: any) => {
+      setError('root', {
+        type: 'custom',
+        message: error?.message ?? 'Failed to create course. Please try again.',
+      });
+    },
+  });
 
   async function onSubmit(data: CourseFormValues) {
     try {
@@ -98,15 +99,20 @@ export default function CreateCourseDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <div className="mb-3">
-          <h1 className="text-3xl font-bold">Create New Course</h1>
-          <p className="text-muted-foreground mt-1">
-            Share your knowledge with your team
+      <DialogContent className="sm:max-w-lg rounded-xl border-slate-200 p-5">
+        <DialogHeader>
+          <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
+            Course Setup
           </p>
-        </div>
+          <DialogTitle className="text-2xl font-bold text-slate-900">
+            Create New Course
+          </DialogTitle>
+          <DialogDescription className="text-slate-600">
+            Create a course for this team workspace.
+          </DialogDescription>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <FieldGroup>
             <Controller
               control={control}
@@ -119,6 +125,7 @@ export default function CreateCourseDialog({
                     id="title"
                     aria-invalid={fieldState.invalid}
                     placeholder="e.g., Introduction to Gen-Alpha Culture"
+                    className="h-10 border-slate-300 focus-visible:border-slate-400 focus-visible:ring-0"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -141,7 +148,7 @@ export default function CreateCourseDialog({
                     {...field}
                     id="description"
                     placeholder="What will students learn in this course?"
-                    className="resize-none"
+                    className="min-h-24 resize-none border-slate-300 focus-visible:border-slate-400 focus-visible:ring-0"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -152,23 +159,28 @@ export default function CreateCourseDialog({
           </FieldGroup>
 
           {errors.root && (
-            <div className="bg-destructive/10 border-destructive text-destructive rounded border p-3 text-sm">
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {errors.root.message}
             </div>
           )}
 
-          <div className="flex gap-4">
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting…' : 'Create Course'}
-            </Button>
+          <DialogFooter className="pt-1">
             <Button
               type="button"
               variant="outline"
+              className="h-9 rounded-lg border-slate-300"
               onClick={() => handleOpenChange(false)}
             >
               Cancel
             </Button>
-          </div>
+            <Button
+              type="submit"
+              className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Creating...' : 'Create Course'}
+            </Button>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

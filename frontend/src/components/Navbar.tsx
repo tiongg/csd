@@ -9,9 +9,9 @@ import type { Account } from '@/context/AuthContext';
 import { useAuth } from '@/context/AuthContext';
 import useActiveRole from '@/hooks/useActiveRole';
 import type { LinkOptions } from '@tanstack/react-router';
-import { Link, useNavigate } from '@tanstack/react-router';
-import { UserCircle2 } from 'lucide-react';
-import { useState } from 'react';
+import { Link, useLocation, useNavigate } from '@tanstack/react-router';
+import { ChevronDown, UserCircle2 } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 import NotificationBell from './notifications/NotificationBell';
 import NotificationsDropdown from './notifications/NotificationsDropdown';
@@ -26,12 +26,14 @@ function getPrimaryNavItems(
   return match(currentActiveRole)
     .with('ADMIN', () => [
       { label: 'Dashboard', to: '/admin/dashboard' as const },
+      { label: 'Discover', to: '/admin/discover' as const },
       { label: 'User Management', to: '/admin/user-management' as const },
       { label: 'Course Moderation', to: '/admin/course-moderation' as const },
       { label: 'Glossary', to: '/admin/glossary' as const },
     ])
     .with('CONTRIBUTOR', () => [
       { label: 'Dashboard', to: '/contributor/dashboard' as const },
+      { label: 'Discover', to: '/contributor/discover' as const },
       { label: 'Teams', to: '/contributor/teams' as const },
       { label: 'Glossary', to: '/contributor/glossary' as const },
     ])
@@ -58,17 +60,59 @@ function getRoleUrl(
 export default function Navbar() {
   const { user, logout } = useAuth();
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
+  const [activePill, setActivePill] = useState({
+    left: 0,
+    width: 0,
+    opacity: 0,
+  });
+  const navTrackRef = useRef<HTMLDivElement | null>(null);
   const dir = useActiveRole() ?? '';
   const activeRole: Account['role'] = user?.role ?? 'LEARNER';
   const navRole = (dir || activeRole) as Account['role'];
   const primaryNavItems = getPrimaryNavItems(navRole);
+  const { pathname } = useLocation();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const updateActivePill = () => {
+      const navTrack = navTrackRef.current;
+      if (!navTrack) return;
+
+      const activeLink = navTrack.querySelector(
+        'a.active',
+      ) as HTMLElement | null;
+      if (!activeLink) {
+        setActivePill((prev) => ({ ...prev, opacity: 0 }));
+        return;
+      }
+
+      const navRect = navTrack.getBoundingClientRect();
+      const linkRect = activeLink.getBoundingClientRect();
+
+      setActivePill({
+        left: linkRect.left - navRect.left,
+        width: linkRect.width,
+        opacity: 1,
+      });
+    };
+
+    updateActivePill();
+    window.addEventListener('resize', updateActivePill);
+    return () => window.removeEventListener('resize', updateActivePill);
+  }, [pathname, navRole, primaryNavItems.length]);
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white">
+    <header className="sticky top-0 z-50 w-full border-b-2 border-slate-300/85 bg-slate-100/86 shadow-[0_10px_22px_-16px_rgba(15,23,42,0.28)] backdrop-blur-xl [backdrop-filter:saturate(115%)_blur(10px)]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-300/80 to-transparent"
+      />
       <div className="flex h-16 w-full items-center justify-between gap-4 px-4 md:px-8">
         <div className="flex min-w-0 items-center gap-3">
-          <Link className="flex items-center gap-x-3" to="/">
+          <Link
+            className="flex items-center gap-x-3 rounded-full px-2 py-1 transition-colors hover:bg-white/70"
+            to="/"
+          >
             <img
               src="/assets/logo.jpg"
               alt="six seven logo"
@@ -81,16 +125,30 @@ export default function Navbar() {
         </div>
 
         {user ? (
-          <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">
-            {primaryNavItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.to}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 [&.active]:bg-slate-100 [&.active]:text-slate-900"
-              >
-                {item.label}
-              </Link>
-            ))}
+          <nav className="hidden flex-1 items-center justify-center lg:flex">
+            <div
+              ref={navTrackRef}
+              className="relative inline-flex items-center gap-1 rounded-full border border-transparent bg-white/30 p-1 shadow-none backdrop-blur-xl"
+            >
+              <span
+                aria-hidden
+                className="pointer-events-none absolute top-1 bottom-1 rounded-full border border-stone-400/45 bg-gradient-to-b from-white/92 via-slate-100/75 to-stone-200/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-1px_0_rgba(255,255,255,0.38),0_10px_24px_-12px_rgba(51,65,85,0.42)] backdrop-blur-2xl transition-[left,width,opacity] duration-[700ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+                style={{
+                  width: `${activePill.width}px`,
+                  opacity: activePill.opacity,
+                  left: `${activePill.left}px`,
+                }}
+              />
+              {primaryNavItems.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  className="relative z-10 inline-flex items-center justify-center rounded-full border border-transparent px-3 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-300 hover:text-slate-900 [&.active]:text-slate-900"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </nav>
         ) : (
           <div className="hidden flex-1 lg:block" />
@@ -112,7 +170,7 @@ export default function Navbar() {
                 <DropdownMenuTrigger asChild>
                   <button
                     type="button"
-                    className="flex h-10 min-w-34 items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                    className="flex h-9 min-w-26 items-center justify-between gap-1.5 rounded-full border border-stone-300/55 bg-gradient-to-b from-white/72 via-white/48 to-stone-100/42 px-3 text-sm font-medium text-slate-700 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(255,255,255,0.32),0_8px_18px_-14px_rgba(51,65,85,0.35)] backdrop-blur-xl transition-colors duration-200 hover:border-stone-400/65 hover:from-white/80 hover:to-stone-100/50"
                   >
                     <span>
                       {match(navRole)
@@ -121,31 +179,29 @@ export default function Navbar() {
                         .with('LEARNER', () => 'Learner')
                         .exhaustive()}
                     </span>
-                    <span
-                      className={`text-slate-500 transition-transform ${
+                    <ChevronDown
+                      className={`size-4 text-slate-500 transition-transform ${
                         roleMenuOpen ? 'rotate-180' : ''
                       }`}
-                    >
-                      ▾
-                    </span>
+                    />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuContent align="end" className="w-40">
                   {user.role === 'ADMIN' && (
                     <DropdownMenuItem asChild>
                       <Link to="/admin/dashboard" className="w-full">
-                        Admin View
+                        Admin
                       </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem asChild>
                     <Link to="/contributor/dashboard" className="w-full">
-                      Contributor View
+                      Contributor
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/learner/dashboard" className="w-full">
-                      Learner View
+                      Learner
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -160,7 +216,7 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="inline-flex size-10 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 transition-colors hover:bg-slate-100"
+                  className="inline-flex size-10 items-center justify-center rounded-full border border-stone-300/55 bg-gradient-to-b from-white/72 via-white/48 to-stone-100/42 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(255,255,255,0.32),0_8px_18px_-14px_rgba(51,65,85,0.35)] backdrop-blur-xl transition-colors duration-200 hover:border-stone-400/65 hover:from-white/80 hover:to-stone-100/50"
                   aria-label="Account menu"
                 >
                   <UserCircle2 className="size-6" />

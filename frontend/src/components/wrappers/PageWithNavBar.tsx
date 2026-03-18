@@ -5,6 +5,9 @@ export default function PageWithNavBar({
   children,
   className,
 }: PropsWithChildren<{ className?: string }>) {
-  return <main className={cn('w-full', className)}>{children}</main>;
+  return (
+    <main className={cn('min-h-screen w-full bg-slate-50/80', className)}>
+      {children}
+    </main>
+  );
 }
-

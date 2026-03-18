@@ -28,11 +28,13 @@ import { Route as AuthenticatedContributorTeamsRouteImport } from './routes/_aut
 import { Route as AuthenticatedContributorSettingsRouteImport } from './routes/_authenticated/contributor/settings'
 import { Route as AuthenticatedContributorGlossaryRouteImport } from './routes/_authenticated/contributor/glossary'
 import { Route as AuthenticatedContributorFaqRouteImport } from './routes/_authenticated/contributor/faq'
+import { Route as AuthenticatedContributorDiscoverRouteImport } from './routes/_authenticated/contributor/discover'
 import { Route as AuthenticatedContributorDashboardRouteImport } from './routes/_authenticated/contributor/dashboard'
 import { Route as AuthenticatedAdminUserManagementRouteImport } from './routes/_authenticated/admin/user-management'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminGlossaryRouteImport } from './routes/_authenticated/admin/glossary'
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
+import { Route as AuthenticatedAdminDiscoverRouteImport } from './routes/_authenticated/admin/discover'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminCourseModerationRouteImport } from './routes/_authenticated/admin/course-moderation'
 import { Route as AuthenticatedLearnerCoursesCourseIdRouteImport } from './routes/_authenticated/learner/courses/$courseId'
@@ -143,6 +145,12 @@ const AuthenticatedContributorFaqRoute =
     path: '/contributor/faq',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedContributorDiscoverRoute =
+  AuthenticatedContributorDiscoverRouteImport.update({
+    id: '/contributor/discover',
+    path: '/contributor/discover',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedContributorDashboardRoute =
   AuthenticatedContributorDashboardRouteImport.update({
     id: '/contributor/dashboard',
@@ -172,6 +180,12 @@ const AuthenticatedAdminFaqRoute = AuthenticatedAdminFaqRouteImport.update({
   path: '/admin/faq',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminDiscoverRoute =
+  AuthenticatedAdminDiscoverRouteImport.update({
+    id: '/admin/discover',
+    path: '/admin/discover',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminDashboardRoute =
   AuthenticatedAdminDashboardRouteImport.update({
     id: '/admin/dashboard',
@@ -206,11 +220,13 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginIndexRoute
   '/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/discover': typeof AuthenticatedAdminDiscoverRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
+  '/contributor/discover': typeof AuthenticatedContributorDiscoverRoute
   '/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/contributor/glossary': typeof AuthenticatedContributorGlossaryRoute
   '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
@@ -235,11 +251,13 @@ export interface FileRoutesByTo {
   '/login': typeof LoginIndexRoute
   '/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/discover': typeof AuthenticatedAdminDiscoverRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
+  '/contributor/discover': typeof AuthenticatedContributorDiscoverRoute
   '/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/contributor/glossary': typeof AuthenticatedContributorGlossaryRoute
   '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
@@ -266,11 +284,13 @@ export interface FileRoutesById {
   '/login/': typeof LoginIndexRoute
   '/_authenticated/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/admin/discover': typeof AuthenticatedAdminDiscoverRoute
   '/_authenticated/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/_authenticated/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/_authenticated/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
+  '/_authenticated/contributor/discover': typeof AuthenticatedContributorDiscoverRoute
   '/_authenticated/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/_authenticated/contributor/glossary': typeof AuthenticatedContributorGlossaryRoute
   '/_authenticated/contributor/settings': typeof AuthenticatedContributorSettingsRoute
@@ -297,11 +317,13 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/course-moderation'
     | '/admin/dashboard'
+    | '/admin/discover'
     | '/admin/faq'
     | '/admin/glossary'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
+    | '/contributor/discover'
     | '/contributor/faq'
     | '/contributor/glossary'
     | '/contributor/settings'
@@ -326,11 +348,13 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/course-moderation'
     | '/admin/dashboard'
+    | '/admin/discover'
     | '/admin/faq'
     | '/admin/glossary'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
+    | '/contributor/discover'
     | '/contributor/faq'
     | '/contributor/glossary'
     | '/contributor/settings'
@@ -356,11 +380,13 @@ export interface FileRouteTypes {
     | '/login/'
     | '/_authenticated/admin/course-moderation'
     | '/_authenticated/admin/dashboard'
+    | '/_authenticated/admin/discover'
     | '/_authenticated/admin/faq'
     | '/_authenticated/admin/glossary'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/user-management'
     | '/_authenticated/contributor/dashboard'
+    | '/_authenticated/contributor/discover'
     | '/_authenticated/contributor/faq'
     | '/_authenticated/contributor/glossary'
     | '/_authenticated/contributor/settings'
@@ -523,6 +549,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedContributorFaqRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/contributor/discover': {
+      id: '/_authenticated/contributor/discover'
+      path: '/contributor/discover'
+      fullPath: '/contributor/discover'
+      preLoaderRoute: typeof AuthenticatedContributorDiscoverRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/contributor/dashboard': {
       id: '/_authenticated/contributor/dashboard'
       path: '/contributor/dashboard'
@@ -556,6 +589,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/faq'
       fullPath: '/admin/faq'
       preLoaderRoute: typeof AuthenticatedAdminFaqRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/discover': {
+      id: '/_authenticated/admin/discover'
+      path: '/admin/discover'
+      fullPath: '/admin/discover'
+      preLoaderRoute: typeof AuthenticatedAdminDiscoverRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/admin/dashboard': {
@@ -593,11 +633,13 @@ interface AuthenticatedRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedAdminCourseModerationRoute: typeof AuthenticatedAdminCourseModerationRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedAdminDiscoverRoute: typeof AuthenticatedAdminDiscoverRoute
   AuthenticatedAdminFaqRoute: typeof AuthenticatedAdminFaqRoute
   AuthenticatedAdminGlossaryRoute: typeof AuthenticatedAdminGlossaryRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminUserManagementRoute: typeof AuthenticatedAdminUserManagementRoute
   AuthenticatedContributorDashboardRoute: typeof AuthenticatedContributorDashboardRoute
+  AuthenticatedContributorDiscoverRoute: typeof AuthenticatedContributorDiscoverRoute
   AuthenticatedContributorFaqRoute: typeof AuthenticatedContributorFaqRoute
   AuthenticatedContributorGlossaryRoute: typeof AuthenticatedContributorGlossaryRoute
   AuthenticatedContributorSettingsRoute: typeof AuthenticatedContributorSettingsRoute
@@ -617,12 +659,14 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminCourseModerationRoute:
     AuthenticatedAdminCourseModerationRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+  AuthenticatedAdminDiscoverRoute: AuthenticatedAdminDiscoverRoute,
   AuthenticatedAdminFaqRoute: AuthenticatedAdminFaqRoute,
   AuthenticatedAdminGlossaryRoute: AuthenticatedAdminGlossaryRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminUserManagementRoute: AuthenticatedAdminUserManagementRoute,
   AuthenticatedContributorDashboardRoute:
     AuthenticatedContributorDashboardRoute,
+  AuthenticatedContributorDiscoverRoute: AuthenticatedContributorDiscoverRoute,
   AuthenticatedContributorFaqRoute: AuthenticatedContributorFaqRoute,
   AuthenticatedContributorGlossaryRoute: AuthenticatedContributorGlossaryRoute,
   AuthenticatedContributorSettingsRoute: AuthenticatedContributorSettingsRoute,

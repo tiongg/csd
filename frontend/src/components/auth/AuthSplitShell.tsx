@@ -33,7 +33,7 @@ export default function AuthSplitShell({
   children,
 }: AuthSplitShellProps) {
   return (
-    <div className="relative z-10 grid w-full max-w-6xl overflow-hidden rounded-3xl border border-slate-300 bg-white shadow-2xl shadow-slate-300/35 lg:grid-cols-[1.1fr_1fr]">
+    <div className="relative z-10 grid w-full max-w-6xl overflow-hidden rounded-3xl border border-slate-300 bg-white/85 shadow-2xl shadow-slate-300/35 lg:grid-cols-[1.1fr_1fr]">
       <section className="relative border-b border-slate-300 p-8 lg:border-r lg:border-b-0 lg:p-10">
         <div className="relative space-y-7">
           <div className="space-y-4">
@@ -63,7 +63,7 @@ export default function AuthSplitShell({
               return (
                 <li
                   key={item.title}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+                  className="rounded-2xl border border-slate-200 bg-white/85 px-4 py-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
                 >
                   <div className="flex items-start gap-3">
                     <span className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-600">
@@ -91,3 +91,4 @@ export default function AuthSplitShell({
     </div>
   );
 }
+

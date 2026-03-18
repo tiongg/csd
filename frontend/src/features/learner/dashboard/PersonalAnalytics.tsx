@@ -112,7 +112,7 @@ export default function PersonalAnalytics() {
             initial="initial"
             animate="animate"
             transition={{ delay: 0.1 }}
-            className="rounded-md border border-slate-200 bg-white p-2"
+            className="mt-3 rounded-lg border border-slate-200/70 bg-slate-100/70 p-3"
           >
             <p className="text-[11px] text-slate-500">Active days</p>
             <p className="text-sm font-semibold text-slate-900">
@@ -124,7 +124,7 @@ export default function PersonalAnalytics() {
             initial="initial"
             animate="animate"
             transition={{ delay: 0.15 }}
-            className="rounded-md border border-slate-200 bg-white p-2"
+            className="mt-3 rounded-lg border border-slate-200/70 bg-slate-100/70 p-3"
           >
             <p className="text-[11px] text-slate-500">Current streak</p>
             <p className="text-sm font-semibold text-slate-900">
@@ -136,7 +136,7 @@ export default function PersonalAnalytics() {
             initial="initial"
             animate="animate"
             transition={{ delay: 0.2 }}
-            className="rounded-md border border-slate-200 bg-white p-2"
+            className="mt-3 rounded-lg border border-slate-200/70 bg-slate-100/70 p-3"
           >
             <p className="text-[11px] text-slate-500">Focus score</p>
             <p className="text-sm font-semibold text-slate-900">
@@ -148,7 +148,7 @@ export default function PersonalAnalytics() {
             initial="initial"
             animate="animate"
             transition={{ delay: 0.25 }}
-            className="rounded-md border border-slate-200 bg-white p-2"
+            className="mt-3 rounded-lg border border-slate-200/70 bg-slate-100/70 p-3"
           >
             <p className="text-[11px] text-slate-500">Completed courses</p>
             <p className="text-sm font-semibold text-slate-900">

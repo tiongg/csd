@@ -1,8 +1,9 @@
-import { Badge, type BadgeProps } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -10,9 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { components } from '@/generated/api';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
-import { capitalizeFirst, type Team } from '@/lib/utils';
+import { generateColorFromString, hexToRgb, type Team } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { Trash2 } from 'lucide-react';
+import { Trash2, UserPlus } from 'lucide-react';
 import { type FormEvent, useState } from 'react';
 import { toast } from 'sonner';
 import { match } from 'ts-pattern';
@@ -25,11 +26,31 @@ type TeamCollaboratorsDialogProps = {
   team: Team;
 };
 
-function getRoleBadgeVariant(role: TeamMember['teamRole']) {
+function getRoleBadgeClass(role: TeamMember['teamRole']) {
   return match(role)
-    .with('OWNER', () => 'default')
-    .with('ADMIN', () => 'secondary')
-    .otherwise(() => 'outline') as BadgeProps['variant'];
+    .with('OWNER', () => 'border-amber-300 bg-amber-100 text-amber-800')
+    .with('ADMIN', () => 'border-sky-300 bg-sky-100 text-sky-800')
+    .otherwise(() => 'border-slate-300 bg-slate-100 text-slate-700');
+}
+
+function getRoleDisplay(role: TeamMember['teamRole']) {
+  return match(role)
+    .with('OWNER', () => 'Owner')
+    .with('ADMIN', () => 'Admin')
+    .otherwise(() => 'Member');
+}
+
+function getAvatarStyle(username: string) {
+  const hex = generateColorFromString(username);
+  const { r, g, b } = hexToRgb(hex);
+  const darkR = Math.round(r * 0.55);
+  const darkG = Math.round(g * 0.55);
+  const darkB = Math.round(b * 0.55);
+
+  return {
+    backgroundColor: `rgb(${darkR}, ${darkG}, ${darkB})`,
+    color: '#ffffff',
+  };
 }
 
 export default function TeamCollaboratorsDialog({
@@ -64,7 +85,7 @@ export default function TeamCollaboratorsDialog({
     {
       onSuccess: onMutationSuccess,
       onError: (err) => {
-        setError(err.message || 'An error occurred while adding the member.');
+        setError(err.message || 'Unable to add this team member.');
       },
     },
   );
@@ -75,9 +96,7 @@ export default function TeamCollaboratorsDialog({
     {
       onSuccess: onMutationSuccess,
       onError: (err) => {
-        toast.error(
-          err.message || 'An error occurred while removing the member.',
-        );
+        toast.error(err.message || 'Unable to remove this team member.');
       },
     },
   );
@@ -104,71 +123,91 @@ export default function TeamCollaboratorsDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setDialogOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-xl rounded-xl border-slate-200 p-5">
         <DialogHeader>
-          <DialogTitle>Team Collaborators</DialogTitle>
+          <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
+            Team Management
+          </p>
+          <DialogTitle className="text-2xl font-bold text-slate-900">
+            Team Members
+          </DialogTitle>
+          <DialogDescription className="text-slate-600">
+            Add or remove members from this team workspace.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Add Member Form */}
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <div className="flex-1">
-              <Label htmlFor="username" className="sr-only">
-                Add by username
-              </Label>
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-lg border border-slate-200 bg-slate-50 p-3"
+          >
+            <Label htmlFor="username" className="mb-2 block text-sm font-medium">
+              Add by username
+            </Label>
+            <div className="flex gap-2">
               <Input
                 id="username"
                 type="text"
-                placeholder="Add by username..."
+                placeholder="e.g., alice_lee"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 disabled={isSubmitting}
+                className="h-10 border-slate-300 bg-white focus-visible:border-slate-400 focus-visible:ring-0"
               />
-              {error && (
-                <p className="text-destructive mt-1 text-sm">{error}</p>
-              )}
+              <Button
+                type="submit"
+                disabled={!username.trim() || isSubmitting}
+                className="h-10 shrink-0 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+              >
+                <UserPlus className="size-4" />
+                {isSubmitting ? 'Adding...' : 'Add'}
+              </Button>
             </div>
-            <Button
-              type="submit"
-              disabled={!username.trim() || isSubmitting}
-              className="shrink-0"
-            >
-              Add
-            </Button>
+            {error && (
+              <p className="mt-2 rounded border border-red-200 bg-red-50 px-2 py-1 text-sm text-red-700">
+                {error}
+              </p>
+            )}
           </form>
 
-          {/* Members List */}
           <div className="space-y-2">
-            <Label className="text-muted-foreground text-sm font-medium">
-              Members ({team.members.length})
+            <Label className="text-sm font-medium text-slate-600">
+              Team Members ({team.members.length})
             </Label>
-            <div className="max-h-64 space-y-2 overflow-auto">
+            <div className="max-h-72 space-y-2 overflow-auto pr-1">
               {team.members.length === 0 ? (
-                <p className="text-muted-foreground py-4 text-center text-sm">
+                <p className="py-6 text-center text-sm text-slate-500">
                   No members in this team yet.
                 </p>
               ) : (
                 team.members.map((member) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between rounded-lg border p-3"
+                    className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-3"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="bg-muted flex size-9 items-center justify-center rounded-full">
-                        <span className="text-sm font-medium">
-                          {member.username.charAt(0).toUpperCase()}
-                        </span>
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div
+                        className="flex size-8 items-center justify-center rounded-full text-xs font-semibold text-white"
+                        style={getAvatarStyle(member.username)}
+                      >
+                        {member.username.charAt(0).toUpperCase()}
                       </div>
-                      <div>
-                        <p className="text-sm font-medium">{member.username}</p>
-                        <p className="text-muted-foreground text-xs">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-slate-900">
+                          {member.username}
+                        </p>
+                        <p className="truncate text-xs text-slate-500">
                           {member.email}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={getRoleBadgeVariant(member.teamRole)}>
-                        {capitalizeFirst(member.teamRole)}
+
+                    <div className="ml-2 flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className={getRoleBadgeClass(member.teamRole)}
+                      >
+                        {getRoleDisplay(member.teamRole)}
                       </Badge>
                       {member.teamRole !== 'OWNER' && (
                         <Button
@@ -184,7 +223,7 @@ export default function TeamCollaboratorsDialog({
                               },
                             })
                           }
-                          className="text-muted-foreground hover:text-destructive"
+                          className="text-slate-500 hover:bg-red-50 hover:text-red-600"
                         >
                           <Trash2 className="size-4" />
                         </Button>

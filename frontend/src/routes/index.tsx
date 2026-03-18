@@ -99,7 +99,7 @@ function App() {
   return (
     <main className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_#ffffff,_#f8fafc_40%,_#e2e8f0)]">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8 md:px-8 md:py-12">
-        <section className="relative overflow-hidden rounded-3xl border border-slate-300 bg-white shadow-2xl shadow-slate-300/35">
+        <section className="relative overflow-hidden rounded-3xl border border-slate-300 bg-white/85 shadow-2xl shadow-slate-300/35">
           <div className="pointer-events-none absolute -top-20 -left-16 h-64 w-64 rounded-full bg-sky-100/70 blur-3xl" />
           <div className="pointer-events-none absolute -right-20 -bottom-20 h-72 w-72 rounded-full bg-slate-200/70 blur-3xl" />
 
@@ -145,7 +145,7 @@ function App() {
                 Monitor learning momentum, contributor output, and course quality
                 trends in one place.
               </p>
-              <div className="h-52 w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-3 md:h-60">
+              <div className="h-52 w-full overflow-hidden rounded-xl border border-slate-200 bg-white/85 p-3 md:h-60">
               <svg
                 viewBox={`0 0 ${chartWidth} ${chartHeight}`}
                 className="h-full w-full"
@@ -198,7 +198,7 @@ function App() {
           </div>
         </section>
 
-        <section className="rounded-3xl border border-slate-300 bg-white p-5 shadow-sm md:p-7">
+        <section className="rounded-3xl border border-slate-300 bg-white/85 p-5 shadow-sm md:p-7">
           <div className="mb-5">
             <p className="text-sm font-semibold tracking-[0.1em] text-slate-500 uppercase">
               Course Preview
@@ -221,7 +221,7 @@ function App() {
                 >
                   <Link
                     to="/login"
-                    className="group block h-full overflow-hidden rounded-2xl border border-slate-200 bg-white transition-colors hover:border-sky-300"
+                    className="group block h-full overflow-hidden rounded-2xl border border-slate-200 bg-white/85 transition-colors hover:border-sky-300"
                   >
                     <div className="relative h-64 w-full overflow-hidden">
                       <img
@@ -266,3 +266,4 @@ function App() {
     </main>
   );
 }
+

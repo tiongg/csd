@@ -22,7 +22,6 @@ const updateSchema = z.object({
     .string()
     .min(3, 'Username must be at least 3 characters')
     .optional(),
-  realName: z.string().optional(),
 });
 
 type UpdateFormValues = z.infer<typeof updateSchema>;
@@ -52,7 +51,6 @@ export default function UpdateProfileForm() {
     resolver: zodResolver(updateSchema),
     defaultValues: {
       username: user?.username ?? '',
-      realName: user?.realname ?? '',
     },
   });
 
@@ -61,7 +59,6 @@ export default function UpdateProfileForm() {
     if (!user) return;
     reset({
       username: user.username ?? '',
-      realName: user.realname ?? '',
     });
   }, [user, reset]);
 
@@ -108,7 +105,7 @@ export default function UpdateProfileForm() {
   };
 
   return (
-    <div className="w-full max-w-lg space-y-4">
+    <div className="mx-auto w-full max-w-lg space-y-4">
       {/* Profile Header Card */}
       <div className="bg-card text-card-foreground rounded-lg border p-4 shadow-sm">
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-4">
@@ -120,11 +117,9 @@ export default function UpdateProfileForm() {
             />
           </div>
           <div className="flex flex-1 flex-col gap-1 text-center sm:text-left">
-            <h2 className="text-xl font-semibold">
-              {user?.realname || 'No name set'}
-            </h2>
+            <h2 className="text-xl font-semibold">{user?.username}</h2>
             <p className="text-muted-foreground">
-              @{user?.username} ({capitalizeFirst(user?.role)})
+              {capitalizeFirst(user?.role)}
             </p>
             <p className="text-muted-foreground text-sm">{user?.email}</p>
             {user.role === 'LEARNER' && (
@@ -146,7 +141,7 @@ export default function UpdateProfileForm() {
           rel="noopener noreferrer"
           className="text-primary hover:text-primary/80 inline-flex items-center justify-center text-sm transition-colors"
         >
-          Change profile picture on Gravatar →
+          Change profile picture on Gravatar &rarr;
         </a>
       </div>
 
@@ -179,27 +174,6 @@ export default function UpdateProfileForm() {
             />
           </FieldGroup>
 
-          <FieldGroup>
-            <Controller
-              control={control}
-              name="realName"
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="realName">Real Name</FieldLabel>
-                  <Input
-                    {...field}
-                    id="realName"
-                    aria-invalid={fieldState.invalid}
-                    placeholder="Your real name"
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </FieldGroup>
-
           {errors.root && (
             <div className="text-destructive text-sm">
               {errors.root.message}
@@ -213,7 +187,6 @@ export default function UpdateProfileForm() {
               onClick={() =>
                 reset({
                   username: user.username ?? '',
-                  realName: user.realname ?? '',
                 })
               }
               disabled={isSubmitting}
@@ -221,7 +194,7 @@ export default function UpdateProfileForm() {
               Reset
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving…' : 'Save changes'}
+              {isSubmitting ? 'Saving...' : 'Save changes'}
             </Button>
           </div>
         </form>
