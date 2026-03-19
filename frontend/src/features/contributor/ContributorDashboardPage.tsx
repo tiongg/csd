@@ -10,7 +10,6 @@ import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
 import { useResizableSplit } from '@/features/dashboard/useResizableSplit';
 import { fetchClient, useApiQuery } from '@/lib/fetch-client';
-import { TrophyIcon } from '@heroicons/react/24/outline';
 import { useQueries } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
@@ -105,29 +104,6 @@ export default function ContributorDashboardPage() {
     course.title.toLowerCase().includes(trendSearch.toLowerCase()),
   );
 
-  const topPerformingCourse = useMemo(() => {
-    const publishedCourses = teamCourses.filter(
-      (course) => courseStatusMap.get(course.id) === 'APPROVED',
-    );
-    if (publishedCourses.length === 0) return null;
-
-    const ranked = publishedCourses
-      .map((course, index) => {
-        const seed = course.title.length * 13 + index * 19;
-        const enrollments = 30 + (seed % 180);
-        return { course, enrollments };
-      })
-      .sort((a, b) => b.enrollments - a.enrollments);
-
-    return ranked[0] ?? null;
-  }, [teamCourses]);
-
-  const formatCompactNumber = (value: number) =>
-    new Intl.NumberFormat('en', {
-      notation: 'compact',
-      maximumFractionDigits: 1,
-    }).format(value);
-
   const uptakeMetrics = useMemo(() => {
     const publishedCourses = teamCourses.filter(
       (course) => courseStatusMap.get(course.id) === 'APPROVED',
@@ -196,48 +172,18 @@ export default function ContributorDashboardPage() {
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-8">
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center">
+          <div className="grid gap-5">
             <div>
               <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
                 Contributor Dashboard
               </div>
               <Heading1 className="mt-3 text-slate-900">
-                Creator workspace for {user?.username}
+                Welcome back, {user?.username}.
               </Heading1>
               <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-600">
                 Manage review pipelines, prioritize pending courses, and convert
                 trend signals into publish-ready modules.
               </p>
-            </div>
-
-            <div className="rounded-xl border border-sky-200/70 bg-gradient-to-br from-sky-50 via-white to-slate-50 p-3.5 shadow-sm shadow-sky-100/60">
-              <div className="flex items-start justify-between gap-3">
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-sky-200 bg-white/58 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-sky-700 uppercase backdrop-blur-xl">
-                  <TrophyIcon className="size-3.5" />
-                  Top Performing Course
-                </div>
-                {topPerformingCourse ? (
-                  <div className="inline-flex shrink-0 rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">
-                    {formatCompactNumber(topPerformingCourse.enrollments)}{' '}
-                    enrollments
-                  </div>
-                ) : null}
-              </div>
-              {topPerformingCourse ? (
-                <>
-                  <p className="mt-2 line-clamp-2 text-sm leading-snug font-semibold text-slate-900">
-                    {topPerformingCourse.course.title}
-                  </p>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">
-                    Highest enrollment momentum in your current catalog.
-                  </p>
-                </>
-              ) : (
-                <p className="mt-2 text-xs text-slate-600">
-                  No published course yet. Publish one to start ranking
-                  performance.
-                </p>
-              )}
             </div>
           </div>
         </section>
