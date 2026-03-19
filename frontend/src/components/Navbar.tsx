@@ -212,10 +212,22 @@ export default function Navbar() {
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  className="inline-flex size-10 items-center justify-center rounded-full border border-stone-300/55 bg-gradient-to-b from-white/72 via-white/48 to-stone-100/42 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(255,255,255,0.32),0_8px_18px_-14px_rgba(51,65,85,0.35)] backdrop-blur-xl transition-colors duration-200 hover:border-stone-400/65 hover:from-white/80 hover:to-stone-100/50"
+                  className="inline-flex size-10 items-center justify-center overflow-hidden rounded-full border border-stone-300/55 bg-gradient-to-b from-white/72 via-white/48 to-stone-100/42 text-slate-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(255,255,255,0.32),0_8px_18px_-14px_rgba(51,65,85,0.35)] backdrop-blur-xl transition-colors duration-200 hover:border-stone-400/65 hover:from-white/80 hover:to-stone-100/50"
                   aria-label="Account menu"
                 >
-                  <UserCircle2 className="size-6" />
+                  {(user as Account & { profilePictureUrl?: string })
+                    .profilePictureUrl ? (
+                    <img
+                      src={
+                        (user as Account & { profilePictureUrl?: string })
+                          .profilePictureUrl
+                      }
+                      alt={user.username}
+                      className="size-full object-cover"
+                    />
+                  ) : (
+                    <UserCircle2 className="size-6" />
+                  )}
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">

@@ -16,6 +16,7 @@ import {
 } from 'react';
 
 export type Account = components['schemas']['Account'];
+export type AccountRole = Account['role'];
 
 export type AuthContextType = {
   user: Account | undefined;

@@ -16,18 +16,16 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heading1 } from '@/components/ui/typography';
+import { useAuth, type AccountRole } from '@/context/AuthContext';
 import {
   apiQueryOptions,
   useApiMutation,
   useApiQuery,
 } from '@/lib/fetch-client';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import PendingContributorsForm from './PendingContributorsForm';
-import { useAuth } from '@/context/AuthContext';
-
-type UserRole = 'LEARNER' | 'CONTRIBUTOR' | 'ADMIN';
 
 export default function UserManagementForm() {
   return (
@@ -98,7 +96,7 @@ function AllUsers() {
     },
   );
 
-  const handleRoleChange = (userId: string, newRole: UserRole) => {
+  const handleRoleChange = (userId: string, newRole: AccountRole) => {
     updateRole({
       params: { path: { accountId: userId } },
       body: { role: newRole },
@@ -151,7 +149,7 @@ function AllUsers() {
                     value={user.role}
                     disabled={isUpdatingRole || user.id === currentUser?.id}
                     onValueChange={(value) =>
-                      handleRoleChange(user.id, value as UserRole)
+                      handleRoleChange(user.id, value as AccountRole)
                     }
                   >
                     <SelectTrigger className="w-36">
