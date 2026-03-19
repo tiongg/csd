@@ -126,7 +126,6 @@ export default function PersonalAnalytics() {
   const windowDays = windowDaysFor(timeframe, weeklyCadence.length);
   const windowCadence = buildWindowCadence(weeklyCadence, windowDays);
   const activeDays = windowCadence.reduce((sum, day) => sum + day, 0);
-  const focusScore = Math.round((activeDays / Math.max(1, windowDays)) * 100);
   const completedCoursesCount = analytics?.completedCoursesCount ?? 0;
   const currentStreak = currentStreakFromCadence(windowCadence);
   const rawStreakSeries = buildStreakSeries(windowCadence);
