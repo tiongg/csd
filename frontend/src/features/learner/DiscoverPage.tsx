@@ -1,128 +1,69 @@
-import Autoplay from 'embla-carousel-autoplay';
-import { useInView } from 'react-intersection-observer';
-import { useEffect, useRef, useState } from 'react';
-import type { PropsWithChildren } from 'react';
-import { Heading1, Heading3 } from '@/components/ui/typography';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
+import SearchBar from '@/components/ui/searchbar';
+import { Heading1 } from '@/components/ui/typography';
+import { useApiQuery } from '@/lib/fetch-client';
+import { useMemo, useState } from 'react';
+import { CourseCard } from './course-card/CourseCard';
 
-type ReelOverlayProps = PropsWithChildren<{
-  course: string;
-  description?: string;
-}>;
-
-function ReelOverlay({ course, description, children }: ReelOverlayProps) {
-  const { user } = useAuth();
-
-  return (
-    <div className="relative h-[calc(100vh-16rem)] w-full border-2 border-slate-300">
-      <div className="absolute z-10 h-full w-full">
-        <div className="flex flex-col items-center bg-linear-to-b from-slate-500 to-transparent py-4">
-          <Button className="mb-4" size="lg">
-            View Course
-          </Button>
-          <Heading3>{course}</Heading3>
-          <p className="font-subtitle">{description}</p>
-        </div>
-
-        <div className="absolute right-4 bottom-4 text-slate-300">
-          @{user?.username}
-        </div>
-      </div>
-
-      <div className="absolute h-full w-full">{children}</div>
-    </div>
-  );
-}
-
-function ReelPlayer({ src }: { src: string }) {
-  const { ref, inView } = useInView();
-  const vidRef = useRef<HTMLVideoElement>(null);
-  const [hasError, setHasError] = useState(false);
-
-  useEffect(() => {
-    if (!vidRef.current) {
-      return;
-    }
-    if (inView) {
-      vidRef.current.play();
-    } else {
-      vidRef.current.pause();
-    }
-  }, [inView, vidRef]);
-
-  return (
-    <div className="flex h-full w-full items-center justify-center" ref={ref}>
-      {!hasError ? (
-        <video
-          loop
-          muted
-          className="max-h-full max-w-full"
-          aria-label="Course preview video"
-          ref={vidRef}
-          onError={() => {
-            setHasError(true);
-          }}
-        >
-          <source src={src} type="video/mp4" />
-        </video>
-      ) : (
-        <ReelError />
-      )}
-    </div>
-  );
-}
-
-function ReelError() {
-  return (
-    <div className="text-slate-500 italic">
-      Reel could not be played. Please check your connection.
-    </div>
-  );
-}
+const glassPanelClass =
+  'relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6';
 
 export default function DiscoverPage() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const {
+    data: courses,
+    isLoading,
+    isError,
+  } = useApiQuery('get', '/api/courses/published', {});
+
+  const filteredCourses = useMemo(
+    () =>
+      (courses ?? []).filter((course) =>
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
+    [courses, searchQuery],
+  );
+
   return (
-    <div className="flex h-full w-full flex-col gap-4 p-16">
-      <div>
-        <Heading1>Discover</Heading1>
-        <p className="font-subtitle">Take a look at what our courses offer!</p>
+    <div className="flex min-h-0 flex-1 flex-col w-full bg-slate-100/70 p-6 md:p-8">
+      <div className="mx-auto flex min-h-0 flex-1 w-full max-w-6xl flex-col gap-5">
+        <section className={glassPanelClass}>
+          <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
+            Discover
+          </div>
+          <Heading1 className="mt-3 text-slate-900">Explore Courses</Heading1>
+          <p className="mt-2 text-sm text-slate-600">
+            Browse all existing published courses.
+          </p>
+        </section>
+
+        <section className={`${glassPanelClass} flex flex-1 flex-col`}>
+          <div className="mb-4 flex justify-end">
+            <div className="w-full sm:w-72">
+              <SearchBar placeholder="Search courses" onSearch={setSearchQuery} />
+            </div>
+          </div>
+
+          {isLoading ? (
+            <div className="flex min-h-[360px] flex-1 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
+              <p className="animate-pulse text-sm">Loading courses...</p>
+            </div>
+          ) : isError ? (
+            <div className="flex min-h-[360px] flex-1 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
+              <p className="text-sm">Failed to load courses. Please try again later.</p>
+            </div>
+          ) : filteredCourses.length === 0 ? (
+            <div className="flex min-h-[360px] flex-1 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
+              <p className="text-lg font-semibold">No courses found</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredCourses.map((course) => (
+                <CourseCard key={course.id} course={course} />
+              ))}
+            </div>
+          )}
+        </section>
       </div>
-
-      <Carousel
-        className="h-full w-full"
-        plugins={[
-          Autoplay({
-            delay: 8000,
-            stopOnInteraction: false,
-            stopOnMouseEnter: true,
-          }),
-        ]}
-      >
-        <CarouselContent>
-          <CarouselItem>
-            <ReelOverlay course="skibidi" description="skibidi toilet">
-              <ReelPlayer src="/skibidi_toilet.mp4" />
-            </ReelOverlay>
-          </CarouselItem>
-
-          <CarouselItem>
-            <ReelOverlay course="skibidi" description="skibidi toilet">
-              <ReelPlayer src="/skibidi_toilet.mp4" />
-            </ReelOverlay>
-          </CarouselItem>
-        </CarouselContent>
-
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
     </div>
   );
 }

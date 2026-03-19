@@ -33,8 +33,7 @@ function getPrimaryNavItems(
     ])
     .with('CONTRIBUTOR', () => [
       { label: 'Dashboard', to: '/contributor/dashboard' as const },
-      { label: 'Discover', to: '/contributor/discover' as const },
-      { label: 'Teams', to: '/contributor/teams' as const },
+      { label: 'Workspace', to: '/contributor/teams' as const },
       { label: 'Glossary', to: '/contributor/glossary' as const },
     ])
     .with('LEARNER', () => [

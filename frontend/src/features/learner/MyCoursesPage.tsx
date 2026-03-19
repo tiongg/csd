@@ -1,8 +1,6 @@
 import SearchBar from '@/components/ui/searchbar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heading1 } from '@/components/ui/typography';
 import { useState } from 'react';
-import { AllCourses } from './all-courses/AllCourses';
 import { EnrolledCourses } from './enrolled-courses/EnrolledCourses';
 
 const glassPanelClass =
@@ -22,38 +20,24 @@ export default function MyCoursesPage() {
               </div>
               <Heading1 className="mt-3 text-slate-900">My Courses</Heading1>
               <p className="mt-2 text-sm text-slate-600">
-                Track your enrolled courses and discover new ones.
+                Track your enrolled courses and continue your learning journey.
               </p>
             </div>
           </div>
         </section>
 
         <section className={`${glassPanelClass} flex flex-1 flex-col`}>
-          <Tabs defaultValue="enrolled" className="flex h-full flex-1 flex-col gap-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <TabsList className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-1">
-                <TabsTrigger value="enrolled" className="cursor-pointer px-4">
-                  Enrolled
-                </TabsTrigger>
-                <TabsTrigger value="all" className="cursor-pointer px-4">
-                  All Courses
-                </TabsTrigger>
-              </TabsList>
+          <div className="flex h-full flex-1 flex-col gap-4">
+            <div className="flex justify-end">
               <div className="w-full sm:w-72">
-                <SearchBar
-                  placeholder="Search for courses"
-                  onSearch={setSearchQuery}
-                />
+                <SearchBar placeholder="Search enrolled courses" onSearch={setSearchQuery} />
               </div>
             </div>
 
-            <TabsContent value="enrolled" className="flex flex-1">
+            <div className="flex flex-1">
               <EnrolledCourses searchQuery={searchQuery} />
-            </TabsContent>
-            <TabsContent value="all" className="flex flex-1">
-              <AllCourses searchQuery={searchQuery} />
-            </TabsContent>
-          </Tabs>
+            </div>
+          </div>
         </section>
       </div>
     </div>
