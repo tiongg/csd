@@ -8,25 +8,20 @@ import {
 import { Input } from '@/components/ui/input';
 import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
+import { useResizableSplit } from '@/features/dashboard/useResizableSplit';
 import { fetchClient, useApiQuery } from '@/lib/fetch-client';
-import { TrophyIcon } from '@heroicons/react/24/outline';
 import { useQueries } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import {
-  useEffect,
   useMemo,
-  useRef,
   useState,
-  type CSSProperties,
 } from 'react';
 import { TopTrendsTable } from '../learner/dashboard/TopTrendsTable';
 
 export default function ContributorDashboardPage() {
   const { user } = useAuth();
-  const splitContainerRef = useRef<HTMLDivElement>(null);
-  const [leftPaneWidth, setLeftPaneWidth] = useState(58);
-  const [isResizing, setIsResizing] = useState(false);
+  const { splitContainerRef, splitStyle, startResizing } = useResizableSplit();
   const [uptakeWindow, setUptakeWindow] = useState<'1D' | '7D' | '30D' | 'ALL'>(
     'ALL',
   );
@@ -109,29 +104,6 @@ export default function ContributorDashboardPage() {
     course.title.toLowerCase().includes(trendSearch.toLowerCase()),
   );
 
-  const topPerformingCourse = useMemo(() => {
-    const publishedCourses = teamCourses.filter(
-      (course) => courseStatusMap.get(course.id) === 'APPROVED',
-    );
-    if (publishedCourses.length === 0) return null;
-
-    const ranked = publishedCourses
-      .map((course, index) => {
-        const seed = course.title.length * 13 + index * 19;
-        const enrollments = 30 + (seed % 180);
-        return { course, enrollments };
-      })
-      .sort((a, b) => b.enrollments - a.enrollments);
-
-    return ranked[0] ?? null;
-  }, [teamCourses]);
-
-  const formatCompactNumber = (value: number) =>
-    new Intl.NumberFormat('en', {
-      notation: 'compact',
-      maximumFractionDigits: 1,
-    }).format(value);
-
   const uptakeMetrics = useMemo(() => {
     const publishedCourses = teamCourses.filter(
       (course) => courseStatusMap.get(course.id) === 'APPROVED',
@@ -196,74 +168,22 @@ export default function ContributorDashboardPage() {
     };
   }, [teamCourses, uptakeWindow]);
 
-  useEffect(() => {
-    if (!isResizing) return;
-
-    const onMouseMove = (event: MouseEvent) => {
-      const container = splitContainerRef.current;
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      const pct = ((event.clientX - rect.left) / rect.width) * 100;
-      const clamped = Math.min(68, Math.max(42, pct));
-      setLeftPaneWidth(clamped);
-    };
-
-    const onMouseUp = () => setIsResizing(false);
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-  }, [isResizing]);
-
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
         <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-8">
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_400px] lg:items-center">
+          <div className="grid gap-5">
             <div>
               <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
                 Contributor Dashboard
               </div>
               <Heading1 className="mt-3 text-slate-900">
-                Creator workspace for {user?.username}
+                Welcome back, {user?.username}.
               </Heading1>
               <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-600">
                 Manage review pipelines, prioritize pending courses, and convert
                 trend signals into publish-ready modules.
               </p>
-            </div>
-
-            <div className="rounded-xl border border-sky-200/70 bg-gradient-to-br from-sky-50 via-white to-slate-50 p-3.5 shadow-sm shadow-sky-100/60">
-              <div className="flex items-start justify-between gap-3">
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-sky-200 bg-white/58 px-2.5 py-1 text-[11px] font-semibold tracking-[0.06em] text-sky-700 uppercase backdrop-blur-xl">
-                  <TrophyIcon className="size-3.5" />
-                  Top Performing Course
-                </div>
-                {topPerformingCourse ? (
-                  <div className="inline-flex shrink-0 rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">
-                    {formatCompactNumber(topPerformingCourse.enrollments)}{' '}
-                    enrollments
-                  </div>
-                ) : null}
-              </div>
-              {topPerformingCourse ? (
-                <>
-                  <p className="mt-2 line-clamp-2 text-sm leading-snug font-semibold text-slate-900">
-                    {topPerformingCourse.course.title}
-                  </p>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">
-                    Highest enrollment momentum in your current catalog.
-                  </p>
-                </>
-              ) : (
-                <p className="mt-2 text-xs text-slate-600">
-                  No published course yet. Publish one to start ranking
-                  performance.
-                </p>
-              )}
             </div>
           </div>
         </section>
@@ -407,9 +327,9 @@ export default function ContributorDashboardPage() {
         <div
           ref={splitContainerRef}
           className="flex flex-col gap-5 lg:flex-row lg:gap-0"
-          style={{ '--left-pane': `${leftPaneWidth}%` } as CSSProperties}
+          style={splitStyle}
         >
-          <section className="relative min-w-0 basis-full overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6 lg:[flex-basis:var(--left-pane)]">
+          <section className="relative flex min-w-0 basis-full flex-col overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6 lg:[flex-basis:var(--left-pane)]">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-900">
                 Review Queue
@@ -421,7 +341,7 @@ export default function ContributorDashboardPage() {
             </p>
 
             {pendingCourses.length > 0 ? (
-              <ul className="mt-4 space-y-2">
+              <ul className="mt-4 max-h-[300px] space-y-2 overflow-y-auto pr-1">
                 {pendingCourses.map((course) => (
                   <li key={course.id}>
                     <Link
@@ -465,10 +385,7 @@ export default function ContributorDashboardPage() {
               type="button"
               aria-label="Resize review queue and trends panels"
               className="h-20 w-1.5 cursor-col-resize rounded-full bg-slate-300 transition-colors hover:bg-slate-400"
-              onMouseDown={(event) => {
-                event.preventDefault();
-                setIsResizing(true);
-              }}
+              onMouseDown={startResizing}
             />
           </div>
 

@@ -1,17 +1,23 @@
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
-import { Input } from "./input"
+import { cn } from "@/lib/utils";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { Input } from "./input";
 
 type SearchBarProps = {
   placeholder: string;
   onSearch?: (query: string) => void;
+  className?: string;
 };
 
-export default function SearchBar({ placeholder, onSearch }: SearchBarProps) {
+export default function SearchBar({
+  placeholder,
+  onSearch,
+  className,
+}: SearchBarProps) {
   return (
     <div className="relative">
       <Input
         placeholder={placeholder}
-        className="pl-8 placeholder:text-slate-400"
+        className={cn('pl-8 placeholder:text-slate-400', className)}
         onChange={(e) => onSearch?.(e.target.value)}
       />
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

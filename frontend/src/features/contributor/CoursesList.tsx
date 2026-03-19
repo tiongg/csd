@@ -202,8 +202,9 @@ function CourseCard({ course, teamId }: CourseCardProps) {
 
   return (
     <div className="relative">
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         className="h-full w-full text-left"
         onClick={() =>
           navigate({
@@ -212,6 +213,16 @@ function CourseCard({ course, teamId }: CourseCardProps) {
             search: { section: undefined },
           })
         }
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            navigate({
+              to: '/contributor/editor/$courseId',
+              params: { courseId: course.id },
+              search: { section: undefined },
+            });
+          }
+        }}
       >
         <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
           <div className="space-y-1.5">
@@ -245,7 +256,7 @@ function CourseCard({ course, teamId }: CourseCardProps) {
             </button>
           </div>
         </article>
-      </button>
+      </div>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>

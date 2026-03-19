@@ -1,15 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router';
-import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
-import DiscoverPage from '@/features/learner/DiscoverPage';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_authenticated/admin/discover')({
-  component: RouteComponent,
+  beforeLoad: () => {
+    throw redirect({ to: '/admin/user-management' });
+  },
+  component: () => null,
 });
-
-function RouteComponent() {
-  return (
-    <PageWithNavBar>
-      <DiscoverPage />
-    </PageWithNavBar>
-  );
-}
