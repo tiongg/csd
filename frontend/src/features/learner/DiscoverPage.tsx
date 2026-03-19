@@ -24,8 +24,8 @@ export default function DiscoverPage() {
   );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col w-full bg-slate-100/70 p-6 md:p-8">
-      <div className="mx-auto flex min-h-0 flex-1 w-full max-w-6xl flex-col gap-5">
+    <div className="flex min-h-0 w-full flex-1 flex-col bg-slate-100/70 p-6 md:p-8">
+      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col gap-5">
         <section className={glassPanelClass}>
           <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
             Discover
@@ -39,7 +39,10 @@ export default function DiscoverPage() {
         <section className={`${glassPanelClass} flex flex-1 flex-col`}>
           <div className="mb-4 flex justify-end">
             <div className="w-full sm:w-72">
-              <SearchBar placeholder="Search courses" onSearch={setSearchQuery} />
+              <SearchBar
+                placeholder="Search courses"
+                onSearch={setSearchQuery}
+              />
             </div>
           </div>
 
@@ -49,7 +52,9 @@ export default function DiscoverPage() {
             </div>
           ) : isError ? (
             <div className="flex min-h-[360px] flex-1 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
-              <p className="text-sm">Failed to load courses. Please try again later.</p>
+              <p className="text-sm">
+                Failed to load courses. Please try again later.
+              </p>
             </div>
           ) : filteredCourses.length === 0 ? (
             <div className="flex min-h-[360px] flex-1 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
