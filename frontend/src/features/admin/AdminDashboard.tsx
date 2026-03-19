@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -6,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import SearchBar from '@/components/ui/searchbar';
 import {
   Select,
   SelectContent,
@@ -14,214 +12,93 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { Heading1 } from '@/components/ui/typography';
-import { useApiQuery } from '@/lib/fetch-client';
-import { ArrowUp, ArrowDown, Users, UserCheck, BookOpen, Users2, Check, X, Edit, Archive } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  ArrowDown,
+  ArrowUp,
+  BookOpen,
+  UserCheck,
+  Users,
+  Users2,
+} from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
+
+// Mock data for summary cards with trends
+const summaryCards = [
+  {
+    title: 'Total Users',
+    value: 20,
+    icon: Users,
+    trend: 12,
+    trendDirection: 'up',
+    subtitle: '+12% from last month',
+    color: 'blue',
+  },
+  {
+    title: 'Active Contributors',
+    value: 10,
+    icon: UserCheck,
+    trend: 5,
+    trendDirection: 'up',
+    subtitle: '+5 new this week',
+    color: 'emerald',
+  },
+  {
+    title: 'Total Courses',
+    value: 12,
+    icon: BookOpen,
+    trend: 8,
+    trendDirection: 'up',
+    subtitle: `0 published`,
+    color: 'purple',
+  },
+  {
+    title: 'Total Teams',
+    value: 4,
+    icon: Users2,
+    trend: 1,
+    trendDirection: 'down',
+    subtitle: '-1 from last month',
+    color: 'orange',
+  },
+] as const;
+
+// Mock course completion data
+const courseCompletionData = [
+  { name: 'JavaScript Basics', completion: 85, students: 1200 },
+  { name: 'React Fundamentals', completion: 78, students: 950 },
+  { name: 'Node.js Mastery', completion: 72, students: 780 },
+  { name: 'TypeScript Advanced', completion: 68, students: 650 },
+  { name: 'CSS for Developers', completion: 65, students: 540 },
+];
+
+// Mock weekly activity data
+const weeklyActivityData = [
+  { day: 'Mon', users: 120, contributors: 45 },
+  { day: 'Tue', users: 145, contributors: 52 },
+  { day: 'Wed', users: 130, contributors: 48 },
+  { day: 'Thu', users: 160, contributors: 58 },
+  { day: 'Fri', users: 175, contributors: 62 },
+  { day: 'Sat', users: 90, contributors: 35 },
+  { day: 'Sun', users: 85, contributors: 32 },
+];
+
+const colorClasses = {
+  blue: 'bg-blue-500',
+  emerald: 'bg-emerald-500',
+  purple: 'bg-purple-500',
+  orange: 'bg-orange-500',
+};
 
 export default function AdminDashboard() {
-  const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month'>('week');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortConfig, setSortConfig] = useState<{
-    key: string;
-    direction: 'asc' | 'desc';
-  } | null>(null);
-
-  // API queries
-  const { data: allUsers } = useApiQuery('get', '/api/account/', {});
-  const { data: allCourses } = useApiQuery('get', '/api/courses/', {});
-  const { data: pendingContributors } = useApiQuery(
-    'get',
-    '/api/admins/contributor-applications',
-    {}
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'week' | 'month'>(
+    'week',
   );
-
-  // Mock data for summary cards with trends
-  const summaryCards = [
-    {
-      title: 'Total Users',
-      value: allUsers?.length ?? 0,
-      icon: Users,
-      trend: 12,
-      trendDirection: 'up',
-      subtitle: '+12% from last month',
-      color: 'blue',
-    },
-    {
-      title: 'Active Contributors',
-      value: allUsers?.filter(u => u.role === 'CONTRIBUTOR').length ?? 0,
-      icon: UserCheck,
-      trend: 5,
-      trendDirection: 'up',
-      subtitle: '+5 new this week',
-      color: 'emerald',
-    },
-    {
-      title: 'Total Courses',
-      value: allCourses?.length ?? 0,
-      icon: BookOpen,
-      trend: 8,
-      trendDirection: 'up',
-      subtitle: `${allCourses?.filter(c => c.isPublished).length ?? 0} published`,
-      color: 'purple',
-    },
-    {
-      title: 'Total Teams',
-      value: 4,
-      icon: Users2,
-      trend: 1,
-      trendDirection: 'down',
-      subtitle: '-1 from last month',
-      color: 'orange',
-    },
-  ];
-
-  // Mock contributor data with activity
-  const contributorData = [
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      email: 'sarah@example.com',
-      coursesContributed: 12,
-      lastActive: '2 hours ago',
-      status: 'active',
-      avatar: 'SJ',
-    },
-    {
-      id: 2,
-      name: 'Michael Chen',
-      email: 'michael@example.com',
-      coursesContributed: 8,
-      lastActive: '5 hours ago',
-      status: 'active',
-      avatar: 'MC',
-    },
-    {
-      id: 3,
-      name: 'Emma Williams',
-      email: 'emma@example.com',
-      coursesContributed: 15,
-      lastActive: '1 day ago',
-      status: 'active',
-      avatar: 'EW',
-    },
-    {
-      id: 4,
-      name: 'James Brown',
-      email: 'james@example.com',
-      coursesContributed: 3,
-      lastActive: '3 days ago',
-      status: 'pending',
-      avatar: 'JB',
-    },
-    {
-      id: 5,
-      name: 'Lisa Anderson',
-      email: 'lisa@example.com',
-      coursesContributed: 0,
-      lastActive: '1 week ago',
-      status: 'pending',
-      avatar: 'LA',
-    },
-    {
-      id: 6,
-      name: 'David Wilson',
-      email: 'david@example.com',
-      coursesContributed: 6,
-      lastActive: '4 hours ago',
-      status: 'active',
-      avatar: 'DW',
-    },
-    {
-      id: 7,
-      name: 'Rachel Green',
-      email: 'rachel@example.com',
-      coursesContributed: 10,
-      lastActive: '6 hours ago',
-      status: 'active',
-      avatar: 'RG',
-    },
-  ];
-
-  // Mock course completion data
-  const courseCompletionData = [
-    { name: 'JavaScript Basics', completion: 85, students: 1200 },
-    { name: 'React Fundamentals', completion: 78, students: 950 },
-    { name: 'Node.js Mastery', completion: 72, students: 780 },
-    { name: 'TypeScript Advanced', completion: 68, students: 650 },
-    { name: 'CSS for Developers', completion: 65, students: 540 },
-  ];
-
-  // Mock weekly activity data
-  const weeklyActivityData = [
-    { day: 'Mon', users: 120, contributors: 45 },
-    { day: 'Tue', users: 145, contributors: 52 },
-    { day: 'Wed', users: 130, contributors: 48 },
-    { day: 'Thu', users: 160, contributors: 58 },
-    { day: 'Fri', users: 175, contributors: 62 },
-    { day: 'Sat', users: 90, contributors: 35 },
-    { day: 'Sun', users: 85, contributors: 32 },
-  ];
-
-  // Filtering and sorting logic
-  const filteredContributors = contributorData.filter(contributor =>
-    contributor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    contributor.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const sortedContributors = [...filteredContributors].sort((a, b) => {
-    if (!sortConfig) return 0;
-    const { key, direction } = sortConfig;
-
-    if (key === 'name') {
-      return direction === 'asc'
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name);
-    }
-    if (key === 'courses') {
-      return direction === 'asc'
-        ? a.coursesContributed - b.coursesContributed
-        : b.coursesContributed - a.coursesContributed;
-    }
-    return 0;
-  });
-
-  const handleSort = (key: string) => {
-    let direction: 'asc' | 'desc' = 'asc';
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const handleApprove = (id: number, name: string) => {
-    toast.success(`${name} has been approved as a contributor`);
-  };
-
-  const handleReject = (id: number, name: string) => {
-    toast.success(`${name}'s application has been rejected`);
-  };
-
-  const colorClasses = {
-    blue: 'bg-blue-500',
-    emerald: 'bg-emerald-500',
-    purple: 'bg-purple-500',
-    orange: 'bg-orange-500',
-  };
 
   return (
     <div className="flex h-full w-full flex-col gap-6 p-6 md:p-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <Heading1>Admin Dashboard</Heading1>
           <p className="text-slate-600">Overview and contributor management</p>
@@ -252,16 +129,32 @@ export default function AdminDashboard() {
                 <CardTitle className="text-sm font-medium text-slate-600">
                   {card.title}
                 </CardTitle>
-                <div className={`h-8 w-8 rounded-lg ${colorClasses[card.color]} bg-opacity-10 flex items-center justify-center`}>
-                  <Icon className={`h-4 w-4 ${colorClasses[card.color]}`} />
+                <div
+                  className={cn(
+                    'bg-opacity-10 flex size-8 items-center justify-center rounded-lg',
+                    colorClasses[card.color],
+                  )}
+                >
+                  <Icon
+                    className={cn(
+                      'size-4 text-white',
+                      colorClasses[card.color],
+                    )}
+                  />
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="flex items-baseline justify-between">
-                  <div className="text-2xl font-bold text-slate-900">{card.value}</div>
-                  <div className={`flex items-center gap-1 text-sm ${
-                    card.trendDirection === 'up' ? 'text-emerald-600' : 'text-rose-600'
-                  }`}>
+                  <div className="text-2xl font-bold text-slate-900">
+                    {card.value}
+                  </div>
+                  <div
+                    className={`flex items-center gap-1 text-sm ${
+                      card.trendDirection === 'up'
+                        ? 'text-emerald-600'
+                        : 'text-rose-600'
+                    }`}
+                  >
                     {card.trendDirection === 'up' ? (
                       <ArrowUp className="h-3 w-3" />
                     ) : (
@@ -270,7 +163,7 @@ export default function AdminDashboard() {
                     {card.trend}%
                   </div>
                 </div>
-                <p className="text-xs text-slate-500 mt-1">{card.subtitle}</p>
+                <p className="mt-1 text-xs text-slate-500">{card.subtitle}</p>
               </CardContent>
             </Card>
           );
@@ -291,19 +184,25 @@ export default function AdminDashboard() {
                 <div key={index} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-100 text-sky-700 text-xs font-semibold">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-100 text-xs font-semibold text-sky-700">
                         {index + 1}
                       </div>
-                      <span className="text-sm font-medium text-slate-900">{course.name}</span>
+                      <span className="text-sm font-medium text-slate-900">
+                        {course.name}
+                      </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-sm font-semibold text-slate-900">{course.completion}%</span>
-                      <span className="text-xs text-slate-500 ml-1">({course.students} students)</span>
+                      <span className="text-sm font-semibold text-slate-900">
+                        {course.completion}%
+                      </span>
+                      <span className="ml-1 text-xs text-slate-500">
+                        ({course.students} students)
+                      </span>
                     </div>
                   </div>
                   <div className="h-2 rounded-full bg-slate-200">
                     <div
-                      className="h-full rounded-full bg-linear-to-r from-sky-400 to-sky-600 transition-all duration-500"
+                      className="h-full rounded-full bg-sky-400"
                       style={{ width: `${course.completion}%` }}
                     />
                   </div>
@@ -317,7 +216,9 @@ export default function AdminDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Weekly Activity Trend</CardTitle>
-            <CardDescription>User and contributor activity over time</CardDescription>
+            <CardDescription>
+              User and contributor activity over time
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-48">
@@ -342,7 +243,7 @@ export default function AdminDashboard() {
                     key={i}
                     x={35}
                     y={i * 35 + 19}
-                    className="text-[8px] fill-slate-500 text-right"
+                    className="fill-slate-500 text-right text-[8px]"
                     fontSize="8"
                     textAnchor="end"
                   >
@@ -357,9 +258,11 @@ export default function AdminDashboard() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  points={weeklyActivityData.map((d, i) =>
-                    `${50 + i * 45},${140 - (d.users / 200) * 120}`
-                  ).join(' ')}
+                  points={weeklyActivityData
+                    .map(
+                      (d, i) => `${50 + i * 45},${140 - (d.users / 200) * 120}`,
+                    )
+                    .join(' ')}
                 />
 
                 {/* Contributors line */}
@@ -369,9 +272,12 @@ export default function AdminDashboard() {
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  points={weeklyActivityData.map((d, i) =>
-                    `${50 + i * 45},${140 - (d.contributors / 100) * 120}`
-                  ).join(' ')}
+                  points={weeklyActivityData
+                    .map(
+                      (d, i) =>
+                        `${50 + i * 45},${140 - (d.contributors / 100) * 120}`,
+                    )
+                    .join(' ')}
                 />
 
                 {/* Data points for users */}
@@ -406,7 +312,7 @@ export default function AdminDashboard() {
                     key={i}
                     x={50 + i * 45}
                     y={148}
-                    className="text-[8px] fill-slate-500 text-center"
+                    className="fill-slate-500 text-center text-[8px]"
                     fontSize="8"
                     textAnchor="middle"
                   >
@@ -416,7 +322,7 @@ export default function AdminDashboard() {
               </svg>
 
               {/* Legend */}
-              <div className="flex items-center justify-center gap-6 mt-2">
+              <div className="mt-2 flex items-center justify-center gap-6">
                 <div className="flex items-center gap-1">
                   <div className="h-2 w-2 rounded-full bg-sky-600" />
                   <span className="text-xs text-slate-600">Users</span>

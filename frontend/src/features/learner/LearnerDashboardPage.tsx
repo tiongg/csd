@@ -267,7 +267,10 @@ export default function LearnerDashboardPage() {
               setTrendSearch(trendName);
               setIsTrendModalOpen(true);
             }}
-          />
+          >
+            <h2 className="text-xl font-semibold text-slate-900">Top Trends</h2>
+            <p className="mt-1 text-sm text-slate-600">Top 5 this week</p>
+          </TopTrendsTable>
 
           <div className="hidden lg:flex lg:w-5 lg:items-center lg:justify-center">
             <button

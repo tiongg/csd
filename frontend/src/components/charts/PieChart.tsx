@@ -1,29 +1,36 @@
 import { cn } from '@/lib/utils';
 
-export interface PieData {
+export type PieData = {
   label: string;
   value: number;
   color?: string;
-}
+};
 
-interface PieChartProps {
+type PieChartProps = {
   data: PieData[];
   title?: string;
   className?: string;
   showLegend?: boolean;
   size?: number;
-}
+};
 
 export default function PieChart({
   data,
   title,
   className,
   showLegend = true,
-  size = 200,
 }: PieChartProps) {
   const defaultColors = [
-    '#0284c7', '#38bdf8', '#7dd3fc', '#bae6fd', '#e0f2fe',
-    '#0369a1', '#0ea5e9', '#22d3ee', '#67e8f9', '#a5f3fc',
+    '#0284c7',
+    '#38bdf8',
+    '#7dd3fc',
+    '#bae6fd',
+    '#e0f2fe',
+    '#0369a1',
+    '#0ea5e9',
+    '#22d3ee',
+    '#67e8f9',
+    '#a5f3fc',
   ];
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
@@ -39,10 +46,8 @@ export default function PieChart({
     const startAngle = currentAngle;
     const endAngle = currentAngle + angle;
 
-    const startX =
-      centerX + radius * Math.cos((startAngle * Math.PI) / 180);
-    const startY =
-      centerY + radius * Math.sin((startAngle * Math.PI) / 180);
+    const startX = centerX + radius * Math.cos((startAngle * Math.PI) / 180);
+    const startY = centerY + radius * Math.sin((startAngle * Math.PI) / 180);
     const endX = centerX + radius * Math.cos((endAngle * Math.PI) / 180);
     const endY = centerY + radius * Math.sin((endAngle * Math.PI) / 180);
 

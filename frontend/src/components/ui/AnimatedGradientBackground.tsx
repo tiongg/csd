@@ -1,15 +1,12 @@
-import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-interface AnimatedGradientBackgroundProps {
-  children?: ReactNode;
+type AnimatedGradientBackgroundProps = {
   className?: string;
   intensity?: 'subtle' | 'medium' | 'vibrant';
   speed?: 'slow' | 'medium' | 'fast';
 }
 
 export default function AnimatedGradientBackground({
-  children,
   className,
   intensity = 'medium',
   speed = 'slow',

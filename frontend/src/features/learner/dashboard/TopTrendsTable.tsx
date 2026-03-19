@@ -7,6 +7,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { motion, type Variants } from 'framer-motion';
 import _ from 'lodash';
+import type { PropsWithChildren } from 'react';
 import { SkeletonRow } from './TopTrendsTableSkeletons';
 
 const rowVariants: Variants = {
@@ -77,7 +78,10 @@ function MovementIcon({ movement }: { movement: TrendMovement }) {
   return <SparklesIcon className="size-3.5" />;
 }
 
-export function TopTrendsTable({ onTrendClick }: TopTrendsTableProps) {
+export function TopTrendsTable({
+  onTrendClick,
+  children,
+}: PropsWithChildren<TopTrendsTableProps>) {
   const { data: trendData, isLoading } = useQuery({
     queryKey: ['learnerDashboardTrends'],
     queryFn: async () => {
@@ -95,8 +99,7 @@ export function TopTrendsTable({ onTrendClick }: TopTrendsTableProps) {
   if (isLoading) {
     return (
       <section className="min-w-0 basis-full rounded-2xl border border-slate-200 bg-white p-5 md:p-6 lg:[flex-basis:var(--left-pane)]">
-        <h2 className="text-xl font-semibold text-slate-900">Top Trends</h2>
-        <p className="mt-1 text-sm text-slate-600">Top 5 this week</p>
+        {children}
         <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200">
           <table className="w-full min-w-[420px] text-left text-sm">
             <thead className="bg-slate-50 text-slate-600">

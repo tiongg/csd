@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
-import { cn } from '@/lib/utils';
 import AnimatedGradientBackground from '@/components/ui/AnimatedGradientBackground';
+import { cn } from '@/lib/utils';
+import type { ReactNode } from 'react';
 
 interface InspirationAuthShellProps {
   children?: ReactNode;
@@ -19,13 +19,13 @@ export default function InspirationAuthShell({
     <>
       <AnimatedGradientBackground intensity="medium" speed="slow" />
 
-      <div className="relative z-10 w-full min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8">
+      <div className="relative z-10 flex min-h-screen w-full items-center justify-center p-4 sm:p-6 md:p-8">
         {/* Floating inspirational elements */}
         {showInspiration && (
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="pointer-events-none absolute inset-0 overflow-hidden">
             {/* Top-right corner glow */}
             <div
-              className="absolute -right-20 -top-20 w-64 h-64 rounded-full blur-3xl opacity-40"
+              className="absolute -top-20 -right-20 h-64 w-64 rounded-full opacity-40 blur-3xl"
               style={{
                 background: 'radial-gradient(circle, #818cf8 0%, #3b82f6 100%)',
                 animation: 'pulse 8s ease-in-out infinite',
@@ -33,30 +33,53 @@ export default function InspirationAuthShell({
             />
             {/* Bottom-left corner glow */}
             <div
-              className="absolute -left-10 -bottom-10 w-48 h-48 rounded-full blur-2xl opacity-30"
+              className="absolute -bottom-10 -left-10 h-48 w-48 rounded-full opacity-30 blur-2xl"
               style={{
                 background: 'radial-gradient(circle, #c084fc 0%, #6366f1 100%)',
                 animation: 'pulse 10s ease-in-out infinite reverse',
               }}
             />
             {/* Animated stars/sparkles */}
-            <div className="absolute top-1/4 left-1/4 w-2 h-2 rounded-full bg-white/60 blur-sm animate-pulse" style={{ animationDelay: '2s' }} />
-            <div className="absolute top-1/3 left-2/3 w-1.5 h-1.5 rounded-full bg-white/50 blur-sm animate-pulse" style={{ animationDelay: '4s' }} />
-            <div className="absolute top-2/3 right-1/4 w-2.5 h-2.5 rounded-full bg-white/40 blur-sm animate-pulse" style={{ animationDelay: '1s' }} />
-            <div className="absolute top-1/2 right-1/3 w-1 h-1 rounded-full bg-white/30 blur-sm animate-pulse" style={{ animationDelay: '6s' }} />
-            <div className="absolute bottom-1/4 right-1/3 w-1.5 h-1.5 rounded-full bg-white/50 blur-sm animate-pulse" style={{ animationDelay: '3s' }} />
-            <div className="absolute bottom-1/3 left-1/4 w-2 h-2 rounded-full bg-white/40 blur-sm animate-pulse" style={{ animationDelay: '5s' }} />
+            <div
+              className="absolute top-1/4 left-1/4 h-2 w-2 animate-pulse rounded-full bg-white/60 blur-sm"
+              style={{ animationDelay: '2s' }}
+            />
+            <div
+              className="absolute top-1/3 left-2/3 h-1.5 w-1.5 animate-pulse rounded-full bg-white/50 blur-sm"
+              style={{ animationDelay: '4s' }}
+            />
+            <div
+              className="absolute top-2/3 right-1/4 h-2.5 w-2.5 animate-pulse rounded-full bg-white/40 blur-sm"
+              style={{ animationDelay: '1s' }}
+            />
+            <div
+              className="absolute top-1/2 right-1/3 h-1 w-1 animate-pulse rounded-full bg-white/30 blur-sm"
+              style={{ animationDelay: '6s' }}
+            />
+            <div
+              className="absolute right-1/3 bottom-1/4 h-1.5 w-1.5 animate-pulse rounded-full bg-white/50 blur-sm"
+              style={{ animationDelay: '3s' }}
+            />
+            <div
+              className="absolute bottom-1/3 left-1/4 h-2 w-2 animate-pulse rounded-full bg-white/40 blur-sm"
+              style={{ animationDelay: '5s' }}
+            />
           </div>
         )}
 
         {/* Main content card */}
-        <div className={cn('flex min-h-screen items-center justify-center p-4 sm:p-6 md:p-8', className)}>
+        <div
+          className={cn(
+            'flex min-h-screen items-center justify-center p-4 sm:p-6 md:p-8',
+            className,
+          )}
+        >
           <div className="relative w-full max-w-4xl">
             {/* Glassmorphism card */}
             <div
               className={cn(
-                'relative overflow-hidden rounded-3xl border border-white/20 bg-white/90 backdrop-blur-xl shadow-2xl',
-                className
+                'relative overflow-hidden rounded-3xl border border-white/20 bg-white/90 shadow-2xl backdrop-blur-xl',
+                className,
               )}
               style={{
                 boxShadow: `
@@ -71,16 +94,16 @@ export default function InspirationAuthShell({
               }}
             >
               {/* Top gradient bar */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-sky-400/50 to-transparent" />
+              <div className="absolute top-0 right-0 left-0 h-1 bg-linear-to-r from-transparent via-sky-400/50 to-transparent" />
 
               {/* Subtle inner glow */}
-              <div className="absolute -inset-1 rounded-3xl opacity-20 bg-linear-to-br from-sky-400/10 to-purple-400/10 blur-xl" />
+              <div className="absolute -inset-1 rounded-3xl bg-linear-to-br from-sky-400/10 to-purple-400/10 opacity-20 blur-xl" />
 
               {/* Content */}
               <div className="relative z-10 p-8 sm:p-10 md:p-12">
                 {title && (
                   <div className="mb-8 text-center">
-                    <h2 className="text-3xl md:text-4xl font-bold bg-linear-to-r from-sky-600 to-purple-600 bg-clip-text text-transparent">
+                    <h2 className="bg-linear-to-r from-sky-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent md:text-4xl">
                       {title}
                     </h2>
                     <p className="mt-2 text-sm text-slate-600">
@@ -92,10 +115,10 @@ export default function InspirationAuthShell({
               </div>
 
               {/* Bottom accent dots */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-sky-400/60" />
-                <div className="w-1 h-1 rounded-full bg-sky-400/40" />
-                <div className="w-1.5 h-1.5 rounded-full bg-sky-400/60" />
+              <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5">
+                <div className="h-1.5 w-1.5 rounded-full bg-sky-400/60" />
+                <div className="h-1 w-1 rounded-full bg-sky-400/40" />
+                <div className="h-1.5 w-1.5 rounded-full bg-sky-400/60" />
               </div>
             </div>
           </div>
@@ -115,6 +138,6 @@ export default function InspirationAuthShell({
           }
         `}</style>
       </div>
-    </AnimatedGradientBackground>
+    </>
   );
 }
