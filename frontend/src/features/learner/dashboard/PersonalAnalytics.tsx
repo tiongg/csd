@@ -119,48 +119,15 @@ export default function PersonalAnalytics() {
   const inProgressCount = (enrolledCourses ?? []).filter(
     (enrollment) => enrollment.status === 'ENROLLED',
   ).length;
-
-  if (isLoading || !analytics) {
-    return (
-      <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6">
-        <h2 className="text-xl font-semibold text-slate-900">
-          Personal Analytics
-        </h2>
-        <p className="mt-1 text-sm text-slate-600">
-          High-impact metrics that show consistency, output, and momentum.
-        </p>
-
-        <div className="mt-4 grid gap-3 lg:grid-cols-[320px_minmax(0,1fr)]">
-          <div className="grid grid-cols-1 gap-2">
-            {Array.from({ length: 3 }).map((_, idx) => (
-              <div
-                key={idx}
-                className="h-[98px] animate-pulse rounded-lg border border-slate-300/85 bg-slate-100/70 p-4"
-              >
-                <div className="h-3 w-24 rounded bg-slate-200" />
-                <div className="mt-3 h-7 w-20 rounded bg-slate-200" />
-                <div className="mt-3 h-3 w-40 rounded bg-slate-200" />
-              </div>
-            ))}
-          </div>
-
-          <div className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-4">
-            <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
-            <div className="mt-3 h-[220px] animate-pulse rounded-md bg-slate-200/70" />
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  const weeklyCadence = normalizeWeeklyCadence(analytics.weeklyCadence);
+  const isPending = isLoading || !analytics;
+  const weeklyCadence = normalizeWeeklyCadence(analytics?.weeklyCadence);
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const now = new Date();
   const windowDays = windowDaysFor(timeframe, weeklyCadence.length);
   const windowCadence = buildWindowCadence(weeklyCadence, windowDays);
   const activeDays = windowCadence.reduce((sum, day) => sum + day, 0);
   const focusScore = Math.round((activeDays / Math.max(1, windowDays)) * 100);
-  const completedCoursesCount = analytics.completedCoursesCount ?? 0;
+  const completedCoursesCount = analytics?.completedCoursesCount ?? 0;
   const currentStreak = currentStreakFromCadence(windowCadence);
   const rawStreakSeries = buildStreakSeries(windowCadence);
   const streakSeries = useMemo(
@@ -281,6 +248,39 @@ export default function PersonalAnalytics() {
       icon: FireIcon,
     },
   ];
+
+  if (isPending) {
+    return (
+      <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6">
+        <h2 className="text-xl font-semibold text-slate-900">
+          Personal Analytics
+        </h2>
+        <p className="mt-1 text-sm text-slate-600">
+          High-impact metrics that show consistency, output, and momentum.
+        </p>
+
+        <div className="mt-4 grid gap-3 lg:grid-cols-[320px_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-2">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="h-[98px] animate-pulse rounded-lg border border-slate-300/85 bg-slate-100/70 p-4"
+              >
+                <div className="h-3 w-24 rounded bg-slate-200" />
+                <div className="mt-3 h-7 w-20 rounded bg-slate-200" />
+                <div className="mt-3 h-3 w-40 rounded bg-slate-200" />
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-4">
+            <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
+            <div className="mt-3 h-[220px] animate-pulse rounded-md bg-slate-200/70" />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6">
