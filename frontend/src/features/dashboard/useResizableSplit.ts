@@ -10,7 +10,7 @@ type UseResizableSplitOptions = {
 export function useResizableSplit({
   initialWidth = 58,
   minWidth = 45,
-  maxWidth = 63,
+  maxWidth = 58,
 }: UseResizableSplitOptions = {}) {
   const splitContainerRef = useRef<HTMLDivElement>(null);
   const [leftPaneWidth, setLeftPaneWidth] = useState(initialWidth);
