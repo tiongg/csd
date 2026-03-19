@@ -329,7 +329,7 @@ export default function ContributorDashboardPage() {
           className="flex flex-col gap-5 lg:flex-row lg:gap-0"
           style={splitStyle}
         >
-          <section className="relative min-w-0 basis-full overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6 lg:[flex-basis:var(--left-pane)]">
+          <section className="relative flex min-w-0 basis-full flex-col overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6 lg:[flex-basis:var(--left-pane)]">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-900">
                 Review Queue
@@ -341,7 +341,7 @@ export default function ContributorDashboardPage() {
             </p>
 
             {pendingCourses.length > 0 ? (
-              <ul className="mt-4 space-y-2">
+              <ul className="mt-4 max-h-[300px] space-y-2 overflow-y-auto pr-1">
                 {pendingCourses.map((course) => (
                   <li key={course.id}>
                     <Link
