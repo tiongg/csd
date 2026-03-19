@@ -1,15 +1,8 @@
-import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
-import GlossaryPage from '@/features/glossary/GlossaryPage';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_authenticated/admin/glossary')({
-  component: RouteComponent,
+  beforeLoad: () => {
+    throw redirect({ to: '/admin/user-management' });
+  },
+  component: () => null,
 });
-
-function RouteComponent() {
-  return (
-    <PageWithNavBar>
-      <GlossaryPage />
-    </PageWithNavBar>
-  );
-}

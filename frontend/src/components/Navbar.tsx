@@ -25,11 +25,8 @@ function getPrimaryNavItems(
 ): PrimaryNavItem[] {
   return match(currentActiveRole)
     .with('ADMIN', () => [
-      { label: 'Dashboard', to: '/admin/dashboard' as const },
-      { label: 'Discover', to: '/admin/discover' as const },
       { label: 'User Management', to: '/admin/user-management' as const },
       { label: 'Course Moderation', to: '/admin/course-moderation' as const },
-      { label: 'Glossary', to: '/admin/glossary' as const },
     ])
     .with('CONTRIBUTOR', () => [
       { label: 'Dashboard', to: '/contributor/dashboard' as const },
@@ -188,7 +185,7 @@ export default function Navbar() {
                 <DropdownMenuContent align="end" className="w-40">
                   {user.role === 'ADMIN' && (
                     <DropdownMenuItem asChild>
-                      <Link to="/admin/dashboard" className="w-full">
+                      <Link to="/admin/user-management" className="w-full">
                         Admin
                       </Link>
                     </DropdownMenuItem>
