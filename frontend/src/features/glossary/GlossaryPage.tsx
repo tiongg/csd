@@ -247,7 +247,7 @@ export default function GlossaryPage() {
           <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
             Reference
           </p>
-          <Heading1 className="mt-1 bg-none text-4xl leading-tight tracking-tight">
+          <Heading1 className="mt-1 text-4xl leading-tight tracking-tight">
             Gen-Alpha Glossary
           </Heading1>
           <p className="mt-2 max-w-4xl text-sm text-slate-600">
