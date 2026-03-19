@@ -98,15 +98,20 @@ export function TopTrendsTable({
 
   if (isLoading) {
     return (
-      <section className="min-w-0 basis-full rounded-2xl border border-slate-200 bg-white p-5 md:p-6 lg:[flex-basis:var(--left-pane)]">
+      <section className="min-w-0 basis-full rounded-2xl border border-slate-200 bg-white p-5 md:p-6 lg:flex-1">
         {children}
-        <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200">
-          <table className="w-full min-w-[420px] text-left text-sm">
+        <div className="mt-4 overflow-hidden rounded-xl border border-slate-200">
+          <table className="w-full table-fixed text-left text-sm">
+            <colgroup>
+              <col className="w-[86px]" />
+              <col />
+              <col className="w-[130px]" />
+            </colgroup>
             <thead className="bg-slate-50 text-slate-600">
               <tr>
                 <th className="px-4 py-3 font-semibold">Rank</th>
                 <th className="px-4 py-3 font-semibold">Trend</th>
-                <th className="px-4 py-3 font-semibold">Movement</th>
+                <th className="px-4 py-3 text-right font-semibold">Movement</th>
               </tr>
             </thead>
             <tbody>
@@ -121,20 +126,25 @@ export function TopTrendsTable({
   }
 
   return (
-    <section className="min-w-0 basis-full rounded-2xl border border-slate-200 bg-white p-5 md:p-6 lg:[flex-basis:var(--left-pane)]">
+    <section className="min-w-0 basis-full rounded-2xl border border-slate-200 bg-white p-5 md:p-6 lg:flex-1">
       {children ?? (
         <>
           <h2 className="text-xl font-semibold text-slate-900">Top Trends</h2>
           <p className="mt-1 text-sm text-slate-600">Top 5 this week</p>
         </>
       )}
-      <div className="mt-4 overflow-x-auto rounded-xl border border-slate-200">
-        <table className="w-full min-w-[420px] text-left text-sm">
+      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200">
+        <table className="w-full table-fixed text-left text-sm">
+          <colgroup>
+            <col className="w-[86px]" />
+            <col />
+            <col className="w-[130px]" />
+          </colgroup>
           <thead className="bg-slate-50 text-slate-600">
             <tr>
               <th className="px-4 py-3 font-semibold">Rank</th>
               <th className="px-4 py-3 font-semibold">Trend</th>
-              <th className="px-4 py-3 font-semibold">Movement</th>
+              <th className="px-4 py-3 text-right font-semibold">Movement</th>
             </tr>
           </thead>
           <tbody>
@@ -152,14 +162,16 @@ export function TopTrendsTable({
                 >
                   <td className="px-4 py-3 font-semibold">#{trend.rank}</td>
                   <td className="px-4 py-3 font-medium">
-                    {cleanText(trend.name)}
+                    <p className="truncate" title={cleanText(trend.name)}>
+                      {cleanText(trend.name)}
+                    </p>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-right">
                     <span
-                      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold ${movementClass(movement)}`}
+                      className={`inline-flex max-w-full items-center gap-1 rounded-full border px-2 py-1 text-xs font-semibold ${movementClass(movement)}`}
                     >
                       <MovementIcon movement={movement} />
-                      {movement}
+                      <span className="truncate">{movement}</span>
                     </span>
                   </td>
                 </motion.tr>

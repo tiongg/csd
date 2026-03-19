@@ -1,14 +1,12 @@
 import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
 import useEnrolledCourse from '@/context/EnrolledCourseContext';
+import { useResizableSplit } from '@/features/dashboard/useResizableSplit';
 import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import {
-  useEffect,
   useMemo,
-  useRef,
   useState,
-  type CSSProperties,
 } from 'react';
 import PersonalAnalytics from './dashboard/PersonalAnalytics';
 import { TopTrendsTable } from './dashboard/TopTrendsTable';
@@ -17,9 +15,7 @@ import { TrendCourseSearchDialog } from './dashboard/TrendCourseSearchDialog';
 export default function LearnerDashboardPage() {
   const { user } = useAuth();
   const { enrolledCourses } = useEnrolledCourse();
-  const splitContainerRef = useRef<HTMLDivElement>(null);
-  const [leftPaneWidth, setLeftPaneWidth] = useState(58);
-  const [isResizing, setIsResizing] = useState(false);
+  const { splitContainerRef, splitStyle, startResizing } = useResizableSplit();
   const [isTrendModalOpen, setIsTrendModalOpen] = useState(false);
   const [trendSearch, setTrendSearch] = useState('');
 
@@ -35,28 +31,6 @@ export default function LearnerDashboardPage() {
         .slice(0, 5),
     [enrolledCourses],
   );
-
-  useEffect(() => {
-    if (!isResizing) return;
-
-    const onMouseMove = (event: MouseEvent) => {
-      const container = splitContainerRef.current;
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      const pct = ((event.clientX - rect.left) / rect.width) * 100;
-      const clamped = Math.min(63, Math.max(45, pct));
-      setLeftPaneWidth(clamped);
-    };
-
-    const onMouseUp = () => setIsResizing(false);
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-  }, [isResizing]);
 
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
@@ -78,9 +52,9 @@ export default function LearnerDashboardPage() {
         <div
           ref={splitContainerRef}
           className="flex flex-col gap-5 lg:flex-row lg:gap-0"
-          style={{ '--left-pane': `${leftPaneWidth}%` } as CSSProperties}
+          style={splitStyle}
         >
-          <section className="relative min-w-0 basis-full overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6 lg:[flex-basis:var(--left-pane)]">
+          <section className="relative flex min-w-0 basis-full flex-col overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6 lg:[flex-basis:var(--left-pane)]">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-900">
                 Courses In Progress
@@ -94,13 +68,13 @@ export default function LearnerDashboardPage() {
             </p>
 
             {inProgressCourses.length > 0 ? (
-              <ul className="mt-4 space-y-2">
+              <ul className="mt-4 grid flex-1 auto-rows-fr gap-2">
                 {inProgressCourses.map((enrollment) => (
                   <li key={enrollment.lessonSessionId}>
                     <Link
                       to="/learner/courses/$courseId"
                       params={{ courseId: enrollment.course.id }}
-                      className="flex items-center justify-between rounded-lg border border-slate-300/85 bg-slate-100/70 px-3 py-2.5 transition-colors hover:border-sky-200 hover:bg-sky-50/40"
+                      className="flex h-full items-center justify-between rounded-lg border border-slate-300/85 bg-slate-100/70 px-3 py-2.5 transition-colors hover:border-sky-200 hover:bg-sky-50/40"
                     >
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-slate-900">
@@ -118,7 +92,7 @@ export default function LearnerDashboardPage() {
                 ))}
               </ul>
             ) : (
-              <div className="mt-4 flex min-h-[260px] items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 p-6">
+              <div className="mt-4 flex min-h-[260px] flex-1 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 p-6">
                 <div className="max-w-sm text-center">
                   <p className="text-sm font-semibold text-slate-800">
                     No active course
@@ -136,10 +110,7 @@ export default function LearnerDashboardPage() {
               type="button"
               aria-label="Resize dashboard panels"
               className="h-20 w-1.5 cursor-col-resize rounded-full bg-slate-300 transition-colors hover:bg-slate-400"
-              onMouseDown={(event) => {
-                event.preventDefault();
-                setIsResizing(true);
-              }}
+              onMouseDown={startResizing}
             />
           </div>
 

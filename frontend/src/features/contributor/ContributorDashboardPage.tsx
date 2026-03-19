@@ -8,25 +8,21 @@ import {
 import { Input } from '@/components/ui/input';
 import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
+import { useResizableSplit } from '@/features/dashboard/useResizableSplit';
 import { fetchClient, useApiQuery } from '@/lib/fetch-client';
 import { TrophyIcon } from '@heroicons/react/24/outline';
 import { useQueries } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import {
-  useEffect,
   useMemo,
-  useRef,
   useState,
-  type CSSProperties,
 } from 'react';
 import { TopTrendsTable } from '../learner/dashboard/TopTrendsTable';
 
 export default function ContributorDashboardPage() {
   const { user } = useAuth();
-  const splitContainerRef = useRef<HTMLDivElement>(null);
-  const [leftPaneWidth, setLeftPaneWidth] = useState(58);
-  const [isResizing, setIsResizing] = useState(false);
+  const { splitContainerRef, splitStyle, startResizing } = useResizableSplit();
   const [uptakeWindow, setUptakeWindow] = useState<'1D' | '7D' | '30D' | 'ALL'>(
     'ALL',
   );
@@ -195,28 +191,6 @@ export default function ContributorDashboardPage() {
       enrollmentsAll,
     };
   }, [teamCourses, uptakeWindow]);
-
-  useEffect(() => {
-    if (!isResizing) return;
-
-    const onMouseMove = (event: MouseEvent) => {
-      const container = splitContainerRef.current;
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      const pct = ((event.clientX - rect.left) / rect.width) * 100;
-      const clamped = Math.min(68, Math.max(42, pct));
-      setLeftPaneWidth(clamped);
-    };
-
-    const onMouseUp = () => setIsResizing(false);
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    };
-  }, [isResizing]);
 
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
@@ -407,7 +381,7 @@ export default function ContributorDashboardPage() {
         <div
           ref={splitContainerRef}
           className="flex flex-col gap-5 lg:flex-row lg:gap-0"
-          style={{ '--left-pane': `${leftPaneWidth}%` } as CSSProperties}
+          style={splitStyle}
         >
           <section className="relative min-w-0 basis-full overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6 lg:[flex-basis:var(--left-pane)]">
             <div className="flex items-center justify-between">
@@ -465,10 +439,7 @@ export default function ContributorDashboardPage() {
               type="button"
               aria-label="Resize review queue and trends panels"
               className="h-20 w-1.5 cursor-col-resize rounded-full bg-slate-300 transition-colors hover:bg-slate-400"
-              onMouseDown={(event) => {
-                event.preventDefault();
-                setIsResizing(true);
-              }}
+              onMouseDown={startResizing}
             />
           </div>
 
