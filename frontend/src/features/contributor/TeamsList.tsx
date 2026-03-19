@@ -1,10 +1,13 @@
+import { Button } from '@/components/ui/button';
 import { Heading1 } from '@/components/ui/typography';
+import { useAuth } from '@/context/AuthContext';
 import { useApiQuery } from '@/lib/fetch-client';
 import { generateColorFromString, hexToRgb, type Team } from '@/lib/utils';
 import { useNavigate } from '@tanstack/react-router';
-import { ArrowUpRight, Plus } from 'lucide-react';
+import { ArrowUpRight, Plus, Settings } from 'lucide-react';
 import { useBoolean } from 'usehooks-ts';
 import CreateNewTeamDialog from './CreateNewTeamDialog';
+import EditTeamDialog from './EditTeamDialog';
 
 export default function TeamsList() {
   const { data: teams, isLoading } = useApiQuery('get', '/api/teams/');
@@ -36,13 +39,11 @@ export default function TeamsList() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <CreateTeamCard onInteract={openCreateTeamDialog} />
 
-        {isLoading ? (
-          Array.from({ length: 3 }).map((_, idx) => (
-            <LoadingTeamCard key={idx} />
-          ))
-        ) : (
-          (teams ?? []).map((team) => <TeamCard team={team} key={team.id} />)
-        )}
+        {isLoading
+          ? Array.from({ length: 3 }).map((_, idx) => (
+              <LoadingTeamCard key={idx} />
+            ))
+          : (teams ?? []).map((team) => <TeamCard team={team} key={team.id} />)}
       </div>
 
       <CreateNewTeamDialog
@@ -59,65 +60,105 @@ type TeamCardProps = {
 
 function TeamCard({ team }: TeamCardProps) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const {
+    value: isEditDialogOpen,
+    setTrue: openEditDialog,
+    setValue: setEditDialogOpen,
+  } = useBoolean(false);
 
   const collaboratorCount = team.members.length;
   const displayedMembers = team.members.slice(0, 3);
   const extraMembers = Math.max(collaboratorCount - displayedMembers.length, 0);
 
+  const currentUserRole = team.members.find(
+    (member) => member.accountId === user?.id,
+  )?.teamRole;
+  const canManage = currentUserRole === 'OWNER' || currentUserRole === 'ADMIN';
+
+  function handleCardClick() {
+    navigate({
+      to: '/contributor/$teamId/courses',
+      params: { teamId: team.id },
+    });
+  }
+
+  function handleManageClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    openEditDialog();
+  }
+
   return (
-    <button
-      type="button"
-      className="h-full w-full text-left"
-      onClick={() => {
-        navigate({
-          to: '/contributor/$teamId/courses',
-          params: { teamId: team.id },
-        });
-      }}
-    >
-      <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
-        <div className="space-y-1.5">
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
-              {team.name}
-            </h3>
-            <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition-colors group-hover:text-sky-600" />
+    <>
+      <div
+        className="h-full w-full cursor-pointer text-left"
+        onClick={handleCardClick}
+      >
+        <article className="group relative flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
+          <div className="space-y-1.5">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
+                {team.name}
+              </h3>
+              <div className="flex items-center gap-2">
+                {canManage && (
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={handleManageClick}
+                    className="h-7 w-7 text-slate-400 hover:bg-sky-50 hover:text-sky-600"
+                  >
+                    <Settings className="size-4" />
+                  </Button>
+                )}
+                <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition-colors group-hover:text-sky-600" />
+              </div>
+            </div>
+            <p className="line-clamp-2 text-sm leading-5 text-slate-600">
+              {team.description?.trim() || 'No description yet.'}
+            </p>
           </div>
-          <p className="line-clamp-2 text-sm leading-5 text-slate-600">
-            {team.description?.trim() || 'No description yet.'}
-          </p>
-        </div>
-        <div className="flex items-center justify-between pt-4">
-          <div className="flex -space-x-2">
-            {displayedMembers.map((member) => (
-              <span
-                key={member.id}
-                className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white text-[10px] font-semibold"
-                style={getAvatarStyle(member.username)}
-                title={member.username}
-              >
-                {getInitials(member.username)}
-              </span>
-            ))}
-            {extraMembers > 0 && (
-              <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-slate-700 text-[10px] font-semibold text-white">
-                +{extraMembers}
-              </span>
-            )}
+          <div className="flex items-center justify-between pt-4">
+            <div className="flex -space-x-2">
+              {displayedMembers.map((member) => (
+                <span
+                  key={member.id}
+                  className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white text-[10px] font-semibold"
+                  style={getAvatarStyle(member.username)}
+                  title={member.username}
+                >
+                  {getInitials(member.username)}
+                </span>
+              ))}
+              {extraMembers > 0 && (
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-slate-700 text-[10px] font-semibold text-white">
+                  +{extraMembers}
+                </span>
+              )}
+            </div>
+            <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+              {collaboratorCount} collaborator
+              {collaboratorCount === 1 ? '' : 's'}
+            </span>
           </div>
-          <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-            {collaboratorCount} collaborator
-            {collaboratorCount === 1 ? '' : 's'}
-          </span>
-        </div>
-      </article>
-    </button>
+        </article>
+      </div>
+      <EditTeamDialog
+        isOpen={isEditDialogOpen}
+        setDialogOpen={setEditDialogOpen}
+        team={team}
+      />
+    </>
   );
 }
 
 function CreateTeamCard({ onInteract }: { onInteract: () => void }) {
   return (
-    <button type="button" className="h-full w-full text-left" onClick={onInteract}>
+    <button
+      type="button"
+      className="h-full w-full text-left"
+      onClick={onInteract}
+    >
       <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-dashed border-slate-300 bg-white p-4 transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
         <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition-colors group-hover:bg-sky-100 group-hover:text-sky-700">
           <Plus className="size-4" />

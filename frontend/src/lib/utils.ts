@@ -62,6 +62,7 @@ export function cleanText(text: string) {
 }
 
 export type Team = components['schemas']['Team'];
+export type TeamMember = components['schemas']['TeamMember'];
 export type Course = components['schemas']['Course'];
 export type ContentVersion = components['schemas']['ContentVersionResponse'];
 export type EnrolledCourse = components['schemas']['LessonSessionFullResponse'];
