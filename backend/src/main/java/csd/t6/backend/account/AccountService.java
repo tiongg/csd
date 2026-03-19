@@ -9,10 +9,12 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
+import csd.t6.backend.account.dto.response.ProfilePictureUploadResponse;
 import csd.t6.backend.auth.oauth.OAuth2ProviderRepository;
 import csd.t6.backend.contributor.PendingContributorRepository;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.exceptions.ForbiddenException;
+import csd.t6.backend.utils.FileService;
 import csd.t6.jooq.accounts.enums.OauthProvider;
 import csd.t6.jooq.accounts.enums.Roles;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
@@ -23,12 +25,14 @@ public class AccountService {
   private final AccountRepository accountRepository;
   private final OAuth2ProviderRepository oAuthProviderRepository;
   private final PendingContributorRepository pendingContributorRepository;
+  private final FileService fileService;
 
   public AccountService(AccountRepository accountRepository, OAuth2ProviderRepository oAuthProviderRepository,
-      PendingContributorRepository pendingContributorRepository) {
+      PendingContributorRepository pendingContributorRepository, FileService fileService) {
     this.accountRepository = accountRepository;
     this.oAuthProviderRepository = oAuthProviderRepository;
     this.pendingContributorRepository = pendingContributorRepository;
+    this.fileService = fileService;
   }
 
   public List<AccountRecord> getAllAccounts() {
@@ -46,7 +50,7 @@ public class AccountService {
   }
 
   public OauthConnectionRecord createWithOAuthLogin(String email, String realname, OauthProvider provider,
-      String providerId) {
+      String providerId, String profilePictureUrl) {
     AccountRecord account = this.accountRepository.findOneBy(ACCOUNT.EMAIL, email).orElseGet(() -> {
       String usernameBase = email.split("@")[0];
       String username = usernameBase;
@@ -55,7 +59,11 @@ public class AccountService {
         username = usernameBase + "_" + suffix;
         suffix++;
       }
-      return this.accountRepository.insert(email, username, null, realname);
+      AccountRecord newAccount = this.accountRepository.insert(email, username, null, realname);
+      if (profilePictureUrl != null) {
+        newAccount.setProfilePictureUrl(profilePictureUrl);
+      }
+      return this.accountRepository.save(newAccount);
     });
     return this.oAuthProviderRepository.insert(account.getId(), provider, providerId, email);
   }
@@ -75,6 +83,10 @@ public class AccountService {
 
     if (updateDTO.realName() != null) {
       existingAccount.setRealName(updateDTO.realName());
+    }
+
+    if (updateDTO.profilePictureUrl() != null) {
+      existingAccount.setProfilePictureUrl(updateDTO.profilePictureUrl());
     }
 
     return this.accountRepository.save(existingAccount);
@@ -124,5 +136,16 @@ public class AccountService {
         .orElseThrow(() -> new BadRequestException("Account does not exist"));
     existingAccount.setUserRole(role);
     return this.accountRepository.save(existingAccount);
+  }
+
+  public ProfilePictureUploadResponse getProfilePictureUploadUrl(UUID accountId, String extension) {
+    if (!extension.equals("png") && !extension.equals("jpg") && !extension.equals("jpeg")) {
+      throw new BadRequestException("Invalid file type! Only png, jpg, jpeg are allowed.");
+    }
+
+    String key = String.format("profile-pictures/%s.%s", accountId, extension);
+    String url = this.fileService.generatePresignedUploadUrl(key);
+    String publicUrl = this.fileService.getPublicUrl(key);
+    return new ProfilePictureUploadResponse(url, key, publicUrl);
   }
 }
