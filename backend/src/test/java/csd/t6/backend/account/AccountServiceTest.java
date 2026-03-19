@@ -200,6 +200,7 @@ class AccountServiceTest {
         when(accountRepository.findOneBy(ACCOUNT.EMAIL, "oauth@example.com")).thenReturn(Optional.empty());
         when(accountRepository.exists(ACCOUNT.USERNAME, "oauth")).thenReturn(false);
         when(accountRepository.insert("oauth@example.com", "oauth", null, "OAuth User")).thenReturn(mockAccount);
+        when(accountRepository.save(any(AccountRecord.class))).thenReturn(mockAccount);
 
         OauthConnectionRecord oauthRecord = mock(OauthConnectionRecord.class);
         when(oAuthProviderRepository.insert(any(), eq(OauthProvider.GOOGLE), eq("google123"), eq("oauth@example.com")))
