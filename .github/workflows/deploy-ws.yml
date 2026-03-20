@@ -3,7 +3,7 @@ name: Deploy Y Websocket to fly
 on:
   push:
     branches:
-      - prod
+      - dev
       - ci/*
 
 jobs:

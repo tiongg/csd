@@ -9,10 +9,12 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
-import { capitalizeFirst } from '@/lib/utils';
+import { uploadProfilePicture } from '@/lib/file-upload';
+import { capitalizeFirst, cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { User } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -26,20 +28,15 @@ const updateSchema = z.object({
 
 type UpdateFormValues = z.infer<typeof updateSchema>;
 
-async function getGravatarUrl(email: string, size = 120) {
-  const msgBuffer = new TextEncoder().encode(email.trim().toLowerCase());
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashedEmail = hashArray
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
-  return `https://www.gravatar.com/avatar/${hashedEmail}?s=${size}&d=identicon`;
-}
-
 export default function UpdateProfileForm() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [gravatarUrl, setGravatarUrl] = useState('');
+  const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(
+    null,
+  );
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     handleSubmit,
@@ -60,6 +57,7 @@ export default function UpdateProfileForm() {
     reset({
       username: user.username ?? '',
     });
+    setProfilePictureUrl(user.profilePictureUrl ?? null);
   }, [user, reset]);
 
   const { mutateAsync: updateAccount } = useApiMutation(
@@ -93,16 +91,77 @@ export default function UpdateProfileForm() {
     },
   );
 
-  useEffect(() => {
-    if (!user?.email) return;
-    getGravatarUrl(user.email).then((url) => setGravatarUrl(url));
-  }, [user]);
-
   if (!user) return null;
 
   const onSubmit = async (data: UpdateFormValues) => {
     await updateAccount({ body: data });
   };
+
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Please select a PNG or JPEG image');
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('File size must be less than 2MB');
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload file
+    setIsUploading(true);
+    try {
+      const publicUrl = await uploadProfilePicture(file);
+
+      // Update account with new profile picture URL
+      await updateAccount({
+        body: { profilePictureUrl: publicUrl },
+      });
+
+      setProfilePictureUrl(publicUrl);
+      setPreviewUrl(null);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to upload image',
+      );
+      setPreviewUrl(null);
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemovePicture = async () => {
+    try {
+      await updateAccount({
+        body: { profilePictureUrl: undefined },
+      });
+      setProfilePictureUrl(null);
+      toast.success('Profile picture removed!');
+    } catch (error) {
+      toast.error('Failed to remove profile picture');
+    }
+  };
+
+  const displayImageUrl = previewUrl ?? profilePictureUrl;
 
   return (
     <div className="mx-auto w-full max-w-lg space-y-4">
@@ -110,18 +169,32 @@ export default function UpdateProfileForm() {
       <div className="bg-card text-card-foreground rounded-lg border p-4 shadow-sm">
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-4">
           <div className="relative">
-            <img
-              src={gravatarUrl}
-              alt="Profile avatar"
-              className="border-muted bg-muted h-20 w-20 rounded-full border-2"
-            />
+            {displayImageUrl ? (
+              <img
+                src={displayImageUrl}
+                alt="Profile avatar"
+                className={cn(
+                  'border-muted bg-muted h-20 w-20 rounded-full border-2 object-cover',
+                  isUploading && 'opacity-50',
+                )}
+              />
+            ) : (
+              <div className="border-muted bg-muted flex h-20 w-20 items-center justify-center rounded-full border-2">
+                <User className="text-muted-foreground h-10 w-10" />
+              </div>
+            )}
+            {isUploading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="border-primary h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
+              </div>
+            )}
           </div>
           <div className="flex flex-1 flex-col gap-1 text-center sm:text-left">
-            <h2 className="text-xl font-semibold">{user?.username}</h2>
+            <h2 className="text-xl font-semibold">{user.username}</h2>
             <p className="text-muted-foreground">
-              {capitalizeFirst(user?.role)}
+              {capitalizeFirst(user.role)}
             </p>
-            <p className="text-muted-foreground text-sm">{user?.email}</p>
+            <p className="text-muted-foreground text-sm">{user.email}</p>
             {user.role === 'LEARNER' && (
               <p
                 className="cursor-pointer text-sm underline"
@@ -135,14 +208,40 @@ export default function UpdateProfileForm() {
 
         <Separator className="my-4" />
 
-        <a
-          href="https://www.gravatar.com/profile/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary hover:text-primary/80 inline-flex items-center justify-center text-sm transition-colors"
-        >
-          Change profile picture on Gravatar &rarr;
-        </a>
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:justify-start">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/jpg"
+            onChange={handleFileSelect}
+            className="hidden"
+            disabled={isUploading}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            {isUploading
+              ? 'Uploading...'
+              : profilePictureUrl
+                ? 'Change profile picture'
+                : 'Add profile picture'}
+          </Button>
+          {profilePictureUrl && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleRemovePicture}
+              disabled={isUploading}
+            >
+              Remove picture
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Edit Profile Form */}

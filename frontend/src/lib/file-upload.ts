@@ -36,6 +36,39 @@ export async function uploadFile(file: File, courseId: string) {
   return publicUrl;
 }
 
+export async function uploadProfilePicture(file: File) {
+  const { data: presignedUrlData } = await fetchClient.GET(
+    '/api/account/profile-picture-upload-url',
+    {
+      params: {
+        query: {
+          extension: file.name.split('.').pop() || '',
+        },
+      },
+    },
+  );
+
+  if (!presignedUrlData || !presignedUrlData.url || !presignedUrlData.publicUrl) {
+    throw new Error('Failed to get presigned URL');
+  }
+
+  const { url: presignedUrl, publicUrl } = presignedUrlData;
+
+  const response = await fetch(presignedUrl, {
+    method: 'PUT',
+    body: file,
+    headers: {
+      'Content-Type': file.type,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to upload file: ${response.statusText}`);
+  }
+
+  return publicUrl;
+}
+
 export async function uploadJson(json: unknown, presignedUrl: string) {
   const response = await fetch(presignedUrl, {
     method: 'PUT',

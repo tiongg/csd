@@ -3,7 +3,7 @@ name: Deploy Backend to fly
 on:
   push:
     branches:
-      - prod
+      - dev
       - ci/*
 
 jobs:

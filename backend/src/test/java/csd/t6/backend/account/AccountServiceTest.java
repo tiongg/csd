@@ -31,6 +31,7 @@ import csd.t6.backend.auth.oauth.OAuth2ProviderRepository;
 import csd.t6.backend.contributor.PendingContributorRepository;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.exceptions.ForbiddenException;
+import csd.t6.backend.utils.FileService;
 import csd.t6.jooq.accounts.enums.OauthProvider;
 import csd.t6.jooq.accounts.enums.Roles;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
@@ -47,6 +48,9 @@ class AccountServiceTest {
 
     @Mock
     private PendingContributorRepository pendingContributorRepository;
+
+    @Mock
+    private FileService fileService;
 
     @InjectMocks
     private AccountService accountService;
@@ -140,7 +144,7 @@ class AccountServiceTest {
         when(accountRepository.exists(ACCOUNT.USERNAME, "newuser")).thenReturn(false);
         when(accountRepository.save(existing)).thenReturn(existing);
 
-        AccountUpdateRequest request = new AccountUpdateRequest("newuser", null);
+        AccountUpdateRequest request = new AccountUpdateRequest("newuser", null, null);
         accountService.updateAccount(id, request);
 
         verify(existing).setUsername("newuser");
@@ -156,7 +160,7 @@ class AccountServiceTest {
         when(accountRepository.findOneBy(ACCOUNT.ID, id)).thenReturn(Optional.of(existing));
         when(accountRepository.exists(ACCOUNT.USERNAME, "takenuser")).thenReturn(true);
 
-        AccountUpdateRequest request = new AccountUpdateRequest("takenuser", null);
+        AccountUpdateRequest request = new AccountUpdateRequest("takenuser", null, null);
 
         assertThatThrownBy(() -> accountService.updateAccount(id, request)).isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Username already exists");
@@ -171,7 +175,7 @@ class AccountServiceTest {
         when(accountRepository.findOneBy(ACCOUNT.ID, id)).thenReturn(Optional.of(existing));
         when(accountRepository.save(existing)).thenReturn(existing);
 
-        AccountUpdateRequest request = new AccountUpdateRequest(null, "John Doe");
+        AccountUpdateRequest request = new AccountUpdateRequest(null, "John Doe", null);
         accountService.updateAccount(id, request);
 
         verify(existing).setRealName("John Doe");
@@ -184,7 +188,7 @@ class AccountServiceTest {
         UUID id = UUID.randomUUID();
         when(accountRepository.findOneBy(ACCOUNT.ID, id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> accountService.updateAccount(id, new AccountUpdateRequest("newuser", null)))
+        assertThatThrownBy(() -> accountService.updateAccount(id, new AccountUpdateRequest("newuser", null, null)))
                 .isInstanceOf(BadRequestException.class).hasMessageContaining("Account does not exist");
     }
 
@@ -196,13 +200,14 @@ class AccountServiceTest {
         when(accountRepository.findOneBy(ACCOUNT.EMAIL, "oauth@example.com")).thenReturn(Optional.empty());
         when(accountRepository.exists(ACCOUNT.USERNAME, "oauth")).thenReturn(false);
         when(accountRepository.insert("oauth@example.com", "oauth", null, "OAuth User")).thenReturn(mockAccount);
+        when(accountRepository.save(any(AccountRecord.class))).thenReturn(mockAccount);
 
         OauthConnectionRecord oauthRecord = mock(OauthConnectionRecord.class);
         when(oAuthProviderRepository.insert(any(), eq(OauthProvider.GOOGLE), eq("google123"), eq("oauth@example.com")))
                 .thenReturn(oauthRecord);
 
         OauthConnectionRecord result = accountService.createWithOAuthLogin("oauth@example.com", "OAuth User",
-                OauthProvider.GOOGLE, "google123");
+                OauthProvider.GOOGLE, "google123", null);
 
         assertThat(result).isNotNull();
     }
@@ -217,7 +222,7 @@ class AccountServiceTest {
                 eq("existing@example.com"))).thenReturn(oauthRecord);
 
         OauthConnectionRecord result = accountService.createWithOAuthLogin("existing@example.com", "Existing User",
-                OauthProvider.GOOGLE, "google456");
+                OauthProvider.GOOGLE, "google456", null);
 
         assertThat(result).isNotNull();
         verify(accountRepository, never()).insert(anyString(), anyString(), isNull(), anyString());

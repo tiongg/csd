@@ -16,7 +16,7 @@ import csd.t6.jooq.accounts.tables.records.OauthConnectionRecord;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-record OAuth2UserInfo(String providerId, String name, String email) {}
+record OAuth2UserInfo(String providerId, String name, String email, String pictureUrl) {}
 
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -47,7 +47,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     OauthConnectionRecord account = this.oauth2ProviderRepository
         .findByProviderAndProviderId(provider, userInfo.providerId()).orElseGet(() -> this.accountService
-            .createWithOAuthLogin(userInfo.email(), userInfo.name(), provider, userInfo.providerId()));
+            .createWithOAuthLogin(userInfo.email(), userInfo.name(), provider, userInfo.providerId(),
+                userInfo.pictureUrl()));
 
     String code = oauthCodeService.createCode(account.getAccountId());
     String redirectUrl = String.format("%s/login/callback?code=%s", frontendUrl, code);
@@ -61,7 +62,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
       String providerId = oAuth2User.getAttribute("sub");
       String name = oAuth2User.getAttribute("name");
       String email = oAuth2User.getAttribute("email");
-      return new OAuth2UserInfo(providerId, name, email);
+      String pictureUrl = oAuth2User.getAttribute("picture");
+      return new OAuth2UserInfo(providerId, name, email, pictureUrl);
     }
     }
 

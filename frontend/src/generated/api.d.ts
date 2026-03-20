@@ -736,6 +736,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/account/profile-picture-upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getProfilePictureUploadUrl"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -940,6 +956,7 @@ export interface components {
             email: string;
             username: string;
             realname?: string;
+            profilePictureUrl?: string;
             /** @enum {string} */
             role: "LEARNER" | "CONTRIBUTOR" | "ADMIN";
         };
@@ -972,6 +989,7 @@ export interface components {
         AccountUpdateRequest: {
             username?: string;
             realName?: string;
+            profilePictureUrl?: string;
         };
         CheckMembershipResponse: {
             isMember: boolean;
@@ -1050,6 +1068,11 @@ export interface components {
         SelfResponse: {
             account: components["schemas"]["Account"];
             preferences: string[];
+        };
+        ProfilePictureUpload: {
+            url?: string;
+            key?: string;
+            publicUrl?: string;
         };
     };
     responses: never;
@@ -2367,6 +2390,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["Account"][];
+                };
+            };
+        };
+    };
+    getProfilePictureUploadUrl: {
+        parameters: {
+            query: {
+                extension: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProfilePictureUpload"];
                 };
             };
         };

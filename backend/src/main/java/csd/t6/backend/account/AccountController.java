@@ -12,12 +12,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.account.dto.request.AccountCreateRequest;
 import csd.t6.backend.account.dto.request.AccountRoleUpdateRequest;
 import csd.t6.backend.account.dto.request.AccountUpdateRequest;
 import csd.t6.backend.account.dto.response.AccountResponse;
+import csd.t6.backend.account.dto.response.ProfilePictureUploadResponse;
 import csd.t6.backend.auth.AuthUserDetails;
 import csd.t6.backend.decorators.auth.PublicDecorator;
 import csd.t6.backend.exceptions.ForbiddenException;
@@ -70,6 +72,12 @@ public class AccountController {
     return new AccountResponse(accountService.updateAccount(user.getAccount().getId(), updateDTO));
   }
 
+  @GetMapping("/profile-picture-upload-url")
+  public ProfilePictureUploadResponse getProfilePictureUploadUrl(@RequestParam String extension,
+      @AuthenticationPrincipal AuthUserDetails user) {
+    return accountService.getProfilePictureUploadUrl(user.getAccount().getId(), extension);
+  }
+
   @PatchMapping("/{accountId}/role")
   @BadRequestResponse()
   @OkResponse()
@@ -79,10 +87,10 @@ public class AccountController {
       @AuthenticationPrincipal AuthUserDetails requesterDetails) {
     // Only admins can update roles
     if (requesterDetails.getAccount().getUserRole() != Roles.ADMIN) {
-if (requesterDetails.getAccount().getUserRole() != Roles.ADMIN) {
-  throw new ForbiddenException("Only admins can update user roles");
-}    }
+      throw new ForbiddenException("Only admins can update user roles");
+    }
 
-    return new AccountResponse(accountService.updateAccountRole(UUID.fromString(accountId), roleUpdateDTO.role(), requesterDetails.getAccount().getId()));
+    return new AccountResponse(accountService.updateAccountRole(UUID.fromString(accountId), roleUpdateDTO.role(),
+        requesterDetails.getAccount().getId()));
   }
 }
