@@ -17,11 +17,12 @@ import type { Course, Team } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { ArrowUpRight, Plus, Trash2, Users } from 'lucide-react';
+import { ArrowUpRight, Plus, Settings, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useBoolean } from 'usehooks-ts';
 import CreateCourseDialog from './CreateCourseDialog';
+import EditCourseDialog from './EditCourseDialog';
 import TeamCollaboratorsDialog from './TeamCollaboratorsDialog';
 
 type CourseListProps = {
@@ -174,6 +175,11 @@ function CourseCard({ course, teamId }: CourseCardProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const {
+    value: isEditDialogOpen,
+    setTrue: openEditDialog,
+    setValue: setEditDialogOpen,
+  } = useBoolean(false);
 
   const { mutate: deleteCourse, isPending: isDeleting } = useApiMutation(
     'delete',
@@ -200,29 +206,34 @@ function CourseCard({ course, teamId }: CourseCardProps) {
     });
   };
 
+  function handleCardClick() {
+    navigate({
+      to: '/contributor/editor/$courseId',
+      params: { courseId: course.id },
+      search: { section: undefined },
+    });
+  }
+
+  function handleManageClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    openEditDialog();
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      handleCardClick();
+    }
+  }
+
   return (
     <div className="relative">
       <div
         role="button"
         tabIndex={0}
         className="h-full w-full text-left"
-        onClick={() =>
-          navigate({
-            to: '/contributor/editor/$courseId',
-            params: { courseId: course.id },
-            search: { section: undefined },
-          })
-        }
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            navigate({
-              to: '/contributor/editor/$courseId',
-              params: { courseId: course.id },
-              search: { section: undefined },
-            });
-          }
-        }}
+        onClick={handleCardClick}
+        onKeyDown={handleKeyDown}
       >
         <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
           <div className="space-y-1.5">
@@ -230,7 +241,17 @@ function CourseCard({ course, teamId }: CourseCardProps) {
               <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
                 {course.title}
               </h3>
-              <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition-colors group-hover:text-sky-600" />
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={handleManageClick}
+                  className="h-7 w-7 text-slate-400 hover:bg-sky-50 hover:text-sky-600"
+                >
+                  <Settings className="size-4" />
+                </Button>
+                <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition-colors group-hover:text-sky-600" />
+              </div>
             </div>
             <p className="line-clamp-2 text-sm leading-5 text-slate-600">
               {course.description?.trim() || 'No description yet.'}
@@ -284,6 +305,13 @@ function CourseCard({ course, teamId }: CourseCardProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <EditCourseDialog
+        isOpen={isEditDialogOpen}
+        setDialogOpen={setEditDialogOpen}
+        course={course}
+        teamId={teamId}
+      />
     </div>
   );
 }
