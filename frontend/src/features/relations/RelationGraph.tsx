@@ -53,7 +53,6 @@ export default function RelationGraph({
     text: string;
     visible: boolean;
   }>({ x: 0, y: 0, text: '', visible: false });
-  const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
   useEffect(() => {
     const { nodes, links } = buildGraph();
@@ -155,7 +154,6 @@ export default function RelationGraph({
 
     // Hover effects
     nodeGroups.on('mouseenter', function (event, d) {
-      setHoveredNode(d.id);
       const connected = connections.get(d.id) ?? new Set();
 
       // Dim all nodes and links first
@@ -199,7 +197,6 @@ export default function RelationGraph({
     });
 
     nodeGroups.on('mouseleave', function () {
-      setHoveredNode(null);
       // Reset all styles
       nodeGroups.style('opacity', 1).select('circle').attr('fill', '#3b82f6');
       link
