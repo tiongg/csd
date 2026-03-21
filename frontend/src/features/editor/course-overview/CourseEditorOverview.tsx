@@ -1,4 +1,7 @@
 import {
+  Badge,
+} from '@/components/ui/badge';
+import {
   Card,
   CardContent,
   CardDescription,
@@ -8,7 +11,7 @@ import {
 import { useContentEditor } from '@/context/ContentEditorContext';
 import type { EditableSectionType } from '@/lib/content.type';
 import type { Course } from '@/lib/utils';
-import { FileText, HelpCircle } from 'lucide-react';
+import { FileText, HelpCircle, Tag } from 'lucide-react';
 import PublishCourse from './PublishCourse';
 
 type CourseEditorOverviewProps = {
@@ -26,6 +29,8 @@ export default function CourseEditorOverview({
     (section) => section.get('type') === 'quiz',
   ).length;
 
+  const tags = (course as { tags?: string[] }).tags ?? [];
+
   return (
     <Card>
       <CardHeader>
@@ -35,6 +40,16 @@ export default function CourseEditorOverview({
             <CardDescription className="text-base">
               {course.description || 'No description provided.'}
             </CardDescription>
+
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <Badge key={tag} variant="secondary" className="text-xs">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
 
             <PublishCourse course={course} />
           </div>
@@ -60,6 +75,17 @@ export default function CourseEditorOverview({
               <p className="font-semibold">{quizCount}</p>
             </div>
           </div>
+          {tags.length > 0 && (
+            <div className="flex items-center gap-3 rounded-lg border p-3">
+              <div className="bg-primary/10 flex size-10 items-center justify-center rounded-full">
+                <Tag className="text-primary size-5" />
+              </div>
+              <div>
+                <p className="text-muted-foreground text-sm">Tags</p>
+                <p className="font-semibold">{tags.length}</p>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

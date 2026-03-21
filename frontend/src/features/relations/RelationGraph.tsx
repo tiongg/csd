@@ -83,11 +83,8 @@ export default function RelationGraph({
     for (const node of nodes) {
       nodeDegrees.set(
         node.id,
-        links.filter(
-          (l) =>
-            (l.source as string) === node.id ||
-            (l.target as string) === node.id,
-        ).length,
+        links.filter((l) => l.source === node.id || l.target === node.id)
+          .length,
       );
     }
 
@@ -127,9 +124,7 @@ export default function RelationGraph({
     nodeGroups
       .append('circle')
       .attr('r', (d) => 4 + nodeDegrees.get(d.id)! * 0.5)
-      .attr('fill', '#3b82f6')
-      .attr('stroke', '#1d4ed8')
-      .attr('stroke-width', 1.5);
+      .attr('fill', '#3b82f6');
 
     // Add labels below nodes
     nodeGroups
@@ -215,7 +210,7 @@ export default function RelationGraph({
     });
 
     // Click handler
-    nodeGroups.on('click', function (event, d) {
+    nodeGroups.on('click', function (_e, d) {
       const connected = Array.from(connections.get(d.id) ?? []);
       onNodeClick?.(d.id, connected);
     });

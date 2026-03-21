@@ -2,6 +2,8 @@ package csd.t6.backend.approval;
 
 import static csd.t6.jooq.public_.tables.ContentVersion.CONTENT_VERSION;
 import static csd.t6.jooq.public_.tables.Course.COURSE;
+import static csd.t6.jooq.public_.tables.CourseTags.COURSE_TAGS;
+import static csd.t6.jooq.public_.tables.Tags.TAGS;
 
 import java.util.List;
 import java.util.Optional;
@@ -69,7 +71,21 @@ public class ContentVersionRepository extends BaseRepository<ContentVersionRecor
     Course c = COURSE;
 
     return this.dsl.select(cv, c).from(cv).join(c).on(cv.COURSE_ID.eq(c.ID)).where(cv.STATUS.eq(status)).fetch()
-        .map(record -> new ContentVersionWithCourseRecord(record.value1(), record.value2()));
+        .map(record -> {
+          ContentVersionRecord contentVersion = record.value1();
+          CourseRecord course = record.value2();
+          List<String> tags = getTagTitlesByCourseId(course.getId());
+          return new ContentVersionWithCourseRecord(contentVersion, course, tags);
+        });
+  }
+
+  private List<String> getTagTitlesByCourseId(UUID courseId) {
+    return dsl
+        .select(TAGS.TITLE)
+        .from(TAGS)
+        .join(COURSE_TAGS).on(TAGS.ID.eq(COURSE_TAGS.TAG_ID))
+        .where(COURSE_TAGS.COURSE_ID.eq(courseId))
+        .fetch(TAGS.TITLE);
   }
 
   public void updateStatus(UUID contentVersionId, ContentStatus status, String rejectedReason) {

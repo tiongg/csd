@@ -14,6 +14,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { TagInput } from '@/components/ui/tag-input';
 import { Textarea } from '@/components/ui/textarea';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import type { Course } from '@/lib/utils';
@@ -34,6 +35,7 @@ type EditCourseDialogProps = {
 const courseSchema = z.object({
   title: z.string().min(3, 'Course title must be at least 3 characters'),
   description: z.string().optional(),
+  tags: z.array(z.string().max(50, 'Tag must not exceed 50 characters')).max(5, 'Maximum 5 tags allowed').optional(),
 });
 
 type CourseFormValues = z.infer<typeof courseSchema>;
@@ -57,6 +59,7 @@ export default function EditCourseDialog({
     defaultValues: {
       title: course.title,
       description: course.description ?? '',
+      tags: (course as { tags?: string[] }).tags ?? [],
     },
   });
 
@@ -65,6 +68,7 @@ export default function EditCourseDialog({
       reset({
         title: course.title,
         description: course.description ?? '',
+        tags: (course as { tags?: string[] }).tags ?? [],
       });
     }
   }, [isOpen, course, reset]);
@@ -99,6 +103,7 @@ export default function EditCourseDialog({
         body: {
           title: data.title,
           description: data.description,
+          tags: data.tags ?? [],
         },
       });
     } catch {
@@ -117,7 +122,7 @@ export default function EditCourseDialog({
             Edit Course
           </DialogTitle>
           <DialogDescription className="text-slate-600">
-            Update your course title and description.
+            Update your course title, description, and tags.
           </DialogDescription>
         </DialogHeader>
 
@@ -158,6 +163,29 @@ export default function EditCourseDialog({
                     id="description"
                     placeholder="What will students learn in this course?"
                     className="min-h-24 resize-none border-slate-300 focus-visible:border-slate-400 focus-visible:ring-0"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+
+          <FieldGroup>
+            <Controller
+              control={control}
+              name="tags"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="tags">
+                    Tags (Optional)
+                  </FieldLabel>
+                  <TagInput
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Add tags... (max 5)"
+                    className="border-slate-300"
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

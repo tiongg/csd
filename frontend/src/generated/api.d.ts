@@ -488,6 +488,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tags/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search tags
+         * @description Search tags by title pattern
+         */
+        get: operations["searchTags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/tags/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all tags
+         * @description Retrieves all available tags
+         */
+        get: operations["getAllTags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/notifications/unread-count": {
         parameters: {
             query?: never;
@@ -911,6 +951,7 @@ export interface components {
         CourseUpdateRequest: {
             title?: string;
             description?: string;
+            tags?: string[];
         };
         Course: {
             /** Format: uuid */
@@ -926,6 +967,7 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             reelUrl?: string;
+            tags?: string[];
         };
         AddMemberRequest: {
             username: string;
@@ -939,6 +981,7 @@ export interface components {
             description?: string;
             /** Format: uuid */
             teamId: string;
+            tags?: string[];
         };
         UploadCourseRequest: {
             description: string;
@@ -994,6 +1037,12 @@ export interface components {
         CheckMembershipResponse: {
             isMember: boolean;
             role: string;
+        };
+        Tag: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            description?: string;
         };
         UnreadCount: {
             /** Format: int64 */
@@ -2059,6 +2108,48 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CheckMembershipResponse"];
+                };
+            };
+        };
+    };
+    searchTags: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Tag"][];
+                };
+            };
+        };
+    };
+    getAllTags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Tag"][];
                 };
             };
         };
