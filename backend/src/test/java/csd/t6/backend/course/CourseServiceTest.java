@@ -85,7 +85,7 @@ class CourseServiceTest {
   void shouldCreateCourseSuccessfully() {
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
     when(courseRepository.create("Test Course", "Desc", creatorId, teamId)).thenReturn(mockCourse);
-    when(tagService.updateCourseTags(courseId, null)).thenReturn(List.of());
+    when(tagService.updateCourseTags(courseId, Collections.emptyList())).thenReturn(List.of());
 
     CourseResponse result = courseService
         .createCourse(new CourseCreateRequest("Test Course", "Desc", teamId, Collections.emptyList()), creatorId);
@@ -97,7 +97,7 @@ class CourseServiceTest {
   @Test
   @DisplayName("Should create course with tags")
   void shouldCreateCourseWithTags() {
-    List<String> tags = List.of("Python", "Programming");
+    List<String> tags = List.of("Skibidi", "Chungus", "Rizz");
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
     when(courseRepository.create("Test Course", "Desc", creatorId, teamId)).thenReturn(mockCourse);
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
@@ -163,7 +163,7 @@ class CourseServiceTest {
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
     when(courseRepository.update(eq(courseId), anyString(), isNull(), eq(teamId))).thenReturn(mockCourse);
-    when(tagService.updateCourseTags(courseId, null)).thenReturn(List.of());
+    when(tagService.updateCourseTags(courseId, Collections.emptyList())).thenReturn(List.of());
 
     CourseResponse result = courseService.updateCourse(courseId,
         new CourseUpdateRequest("New Title", null, Collections.emptyList()), creatorId);
