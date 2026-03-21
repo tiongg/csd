@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Heading1 } from '@/components/ui/typography';
+import { formatChartDay } from '@/lib/chart-date';
 import { cn } from '@/lib/utils';
 import {
   ArrowDown,
@@ -74,15 +75,26 @@ const courseCompletionData = [
 ];
 
 // Mock weekly activity data
-const weeklyActivityData = [
-  { day: 'Mon', users: 120, contributors: 45 },
-  { day: 'Tue', users: 145, contributors: 52 },
-  { day: 'Wed', users: 130, contributors: 48 },
-  { day: 'Thu', users: 160, contributors: 58 },
-  { day: 'Fri', users: 175, contributors: 62 },
-  { day: 'Sat', users: 90, contributors: 35 },
-  { day: 'Sun', users: 85, contributors: 32 },
+const weeklyActivitySeed = [
+  { users: 120, contributors: 45 },
+  { users: 145, contributors: 52 },
+  { users: 130, contributors: 48 },
+  { users: 160, contributors: 58 },
+  { users: 175, contributors: 62 },
+  { users: 90, contributors: 35 },
+  { users: 85, contributors: 32 },
 ];
+
+const weeklyActivityData = weeklyActivitySeed.map((entry, index) => {
+  const daysAgo = weeklyActivitySeed.length - 1 - index;
+  const date = new Date();
+  date.setDate(date.getDate() - daysAgo);
+  return {
+    day: formatChartDay(date),
+    users: entry.users,
+    contributors: entry.contributors,
+  };
+});
 
 const colorClasses = {
   blue: 'bg-blue-500',

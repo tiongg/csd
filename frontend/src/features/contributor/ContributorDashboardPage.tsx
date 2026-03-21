@@ -8,6 +8,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
+import ContributorAnalytics from '@/features/contributor/ContributorAnalytics';
 import { useResizableSplit } from '@/features/dashboard/useResizableSplit';
 import { fetchClient, useApiQuery } from '@/lib/fetch-client';
 import { useQueries } from '@tanstack/react-query';
@@ -22,9 +23,6 @@ import { TopTrendsTable } from '../learner/dashboard/TopTrendsTable';
 export default function ContributorDashboardPage() {
   const { user } = useAuth();
   const { splitContainerRef, splitStyle, startResizing } = useResizableSplit();
-  const [uptakeWindow, setUptakeWindow] = useState<'1D' | '7D' | '30D' | 'ALL'>(
-    'ALL',
-  );
   const [isTrendModalOpen, setIsTrendModalOpen] = useState(false);
   const [trendSearch, setTrendSearch] = useState('');
 
@@ -103,70 +101,8 @@ export default function ContributorDashboardPage() {
   const filteredCourses = teamCourses.filter((course) =>
     course.title.toLowerCase().includes(trendSearch.toLowerCase()),
   );
-
-  const uptakeMetrics = useMemo(() => {
-    const publishedCourses = teamCourses.filter(
-      (course) => courseStatusMap.get(course.id) === 'APPROVED',
-    );
-    const publishedCount = publishedCourses.length;
-    const totalEnrollments = publishedCourses.reduce((sum, course, index) => {
-      const seed = course.title.length * 13 + index * 19;
-      return sum + 30 + (seed % 180);
-    }, 0);
-    const totalActiveLearners = Math.round(totalEnrollments * 0.46);
-    const totalCompletedProxy = Math.round(totalActiveLearners * 0.58);
-
-    const getEnrollmentsByWindow = (window: '1D' | '7D' | '30D' | 'ALL') =>
-      window === '1D'
-        ? Math.max(0, Math.round(totalEnrollments * 0.05))
-        : window === '7D'
-          ? Math.max(0, Math.round(totalEnrollments * 0.28))
-          : window === '30D'
-            ? totalEnrollments
-            : Math.max(0, Math.round(totalEnrollments * 1.22));
-
-    const getActiveByWindow = (window: '1D' | '7D' | '30D' | 'ALL') =>
-      window === '1D'
-        ? Math.max(0, Math.round(totalActiveLearners * 0.08))
-        : window === '7D'
-          ? Math.max(0, Math.round(totalActiveLearners * 0.32))
-          : window === '30D'
-            ? totalActiveLearners
-            : Math.max(0, Math.round(totalActiveLearners * 1.18));
-
-    const getCompletedByWindow = (window: '1D' | '7D' | '30D' | 'ALL') =>
-      window === '1D'
-        ? Math.max(0, Math.round(totalCompletedProxy * 0.1))
-        : window === '7D'
-          ? Math.max(0, Math.round(totalCompletedProxy * 0.34))
-          : window === '30D'
-            ? totalCompletedProxy
-            : Math.max(0, Math.round(totalCompletedProxy * 1.15));
-
-    const periodEnrollments = getEnrollmentsByWindow(uptakeWindow);
-    const activeLearners = getActiveByWindow(uptakeWindow);
-    const completedProxy = getCompletedByWindow(uptakeWindow);
-    const enrollmentsAll = getEnrollmentsByWindow('ALL');
-
-    const funnelRows = [
-      { label: 'Enrolled', value: periodEnrollments, color: 'bg-sky-500' },
-      { label: 'Active', value: activeLearners, color: 'bg-sky-400' },
-      { label: 'Completed', value: completedProxy, color: 'bg-sky-300' },
-    ];
-    const maxFunnelValue = Math.max(...funnelRows.map((row) => row.value), 1);
-
-    return {
-      publishedCount,
-      enrollments: periodEnrollments,
-      activeLearners,
-      completedProxy,
-      funnelRows,
-      maxFunnelValue,
-      avgPerCourseAll:
-        publishedCount > 0 ? Math.round(enrollmentsAll / publishedCount) : 0,
-      enrollmentsAll,
-    };
-  }, [teamCourses, uptakeWindow]);
+  const isAnalyticsLoading =
+    !teams || teamCourseQueries.some((query) => query.isLoading);
 
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
@@ -188,141 +124,10 @@ export default function ContributorDashboardPage() {
           </div>
         </section>
 
-        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="text-xl font-semibold text-slate-900">
-                Course Uptake
-              </h2>
-              <p className="mt-1 text-sm text-slate-600">
-                Learner adoption across your published catalog.
-              </p>
-            </div>
-            <div className="inline-flex rounded-lg border border-slate-300 bg-slate-100/70 p-1">
-              <button
-                type="button"
-                className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
-                  uptakeWindow === '1D'
-                    ? 'bg-white/60 text-slate-900 shadow-sm backdrop-blur-xl'
-                    : 'text-slate-600 hover:text-slate-800'
-                }`}
-                onClick={() => setUptakeWindow('1D')}
-              >
-                1D
-              </button>
-              <button
-                type="button"
-                className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
-                  uptakeWindow === '7D'
-                    ? 'bg-white/60 text-slate-900 shadow-sm backdrop-blur-xl'
-                    : 'text-slate-600 hover:text-slate-800'
-                }`}
-                onClick={() => setUptakeWindow('7D')}
-              >
-                7D
-              </button>
-              <button
-                type="button"
-                className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
-                  uptakeWindow === '30D'
-                    ? 'bg-white/60 text-slate-900 shadow-sm backdrop-blur-xl'
-                    : 'text-slate-600 hover:text-slate-800'
-                }`}
-                onClick={() => setUptakeWindow('30D')}
-              >
-                30D
-              </button>
-              <button
-                type="button"
-                className={`rounded-md px-3 py-1 text-xs font-semibold transition-colors ${
-                  uptakeWindow === 'ALL'
-                    ? 'bg-white/60 text-slate-900 shadow-sm backdrop-blur-xl'
-                    : 'text-slate-600 hover:text-slate-800'
-                }`}
-                onClick={() => setUptakeWindow('ALL')}
-              >
-                ALL
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-3 lg:grid-cols-[360px_minmax(0,1fr)]">
-            <div className="grid grid-cols-1 gap-2">
-              <div className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-4">
-                <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
-                  Published Courses
-                </p>
-                <p className="mt-1 text-2xl font-semibold text-slate-900">
-                  {uptakeMetrics.publishedCount}
-                </p>
-              </div>
-              <div className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-4">
-                <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
-                  Enrolled (ALL)
-                </p>
-                <p className="mt-1 text-2xl font-semibold text-slate-900">
-                  {uptakeMetrics.enrollmentsAll}
-                </p>
-              </div>
-              <div className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-4">
-                <p className="text-[11px] font-medium tracking-wide text-slate-500 uppercase">
-                  Avg / Course (ALL)
-                </p>
-                <p className="mt-1 text-2xl font-semibold text-slate-900">
-                  {uptakeMetrics.avgPerCourseAll}
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-slate-300/85 bg-slate-100/70 p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-slate-800">
-                  Funnel Analysis
-                </p>
-                <p className="text-xs text-slate-500">3-stage conversion</p>
-              </div>
-              <div className="mt-4 flex min-h-[220px] flex-col justify-between">
-                {uptakeMetrics.funnelRows.map((row, idx) => {
-                  const width = Math.max(
-                    34,
-                    Math.round(
-                      (row.value / uptakeMetrics.maxFunnelValue) * 100,
-                    ),
-                  );
-                  const conversion = Math.round(
-                    (row.value / uptakeMetrics.maxFunnelValue) * 100,
-                  );
-                  return (
-                    <div key={row.label}>
-                      <div
-                        className="mx-auto grid h-14 grid-cols-[1fr_auto_1fr] items-center rounded-md px-3 text-[11px] font-semibold text-white shadow-sm transition-all"
-                        style={{
-                          width: `${width}%`,
-                          backgroundColor:
-                            idx === 0
-                              ? '#0ea5e9'
-                              : idx === 1
-                                ? '#38bdf8'
-                                : '#7dd3fc',
-                        }}
-                      >
-                        <span className="min-w-0 truncate text-left">
-                          {row.label}
-                        </span>
-                        <span className="justify-self-center px-2 text-center">
-                          {row.value}
-                        </span>
-                        <span className="justify-self-end text-right">
-                          {conversion}%
-                        </span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </section>
+        <ContributorAnalytics
+          courses={teamCourses}
+          isLoading={isAnalyticsLoading}
+        />
 
         <div
           ref={splitContainerRef}
