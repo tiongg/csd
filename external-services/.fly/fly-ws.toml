@@ -10,12 +10,17 @@ primary_region = 'sin'
   dockerfile = "../yws.Dockerfile"
   
 [http_service]
-  internal_port = 8080
+  internal_port = 3000
   force_https = true
   auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 1
   processes = ['app']
+
+[env]
+  PORT = "3000"
+  HOST = "0.0.0.0"
+  YPERSISTENCE = "/persistence"
 
 [[vm]]
   memory = '256mb'
