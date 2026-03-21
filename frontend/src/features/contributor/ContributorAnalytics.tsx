@@ -12,7 +12,7 @@ import {
   type AnalyticsMetricCard,
 } from '../dashboard/AnalyticsSection';
 
-type Timeframe = '1W' | '1M' | '1Y' | 'ALL';
+type Timeframe = '1W' | '1M' | '3M' | '1Y';
 type MetricKey =
   | 'courseEngagement'
   | 'publishedOutput'
@@ -58,6 +58,7 @@ function hashString(value: string) {
 function timeframeFactor(timeframe: Timeframe) {
   if (timeframe === '1W') return 0.32;
   if (timeframe === '1M') return 0.7;
+  if (timeframe === '3M') return 0.82;
   if (timeframe === '1Y') return 0.9;
   return 1;
 }
@@ -65,8 +66,9 @@ function timeframeFactor(timeframe: Timeframe) {
 function releaseBucketCount(timeframe: Timeframe) {
   if (timeframe === '1W') return 7;
   if (timeframe === '1M') return 5;
+  if (timeframe === '3M') return 12;
   if (timeframe === '1Y') return 12;
-  return 12;
+  return 7;
 }
 
 function releaseBucketLabel(
@@ -87,14 +89,17 @@ function releaseBucketLabel(
     const end = new Date(now.getTime() - weeksAgo * 7 * dayMs);
     return formatChartDay(end);
   }
+  if (timeframe === '3M') {
+    const weeksAgo = count - 1 - index;
+    const end = new Date(now.getTime() - weeksAgo * 7 * dayMs);
+    return formatChartDay(end);
+  }
   if (timeframe === '1Y') {
     const monthsAgo = count - 1 - index;
     const date = new Date(now.getTime() - monthsAgo * 30 * dayMs);
     return formatChartMonthYear(date);
   }
-  const quartersAgo = count - 1 - index;
-  const date = new Date(now.getTime() - quartersAgo * 90 * dayMs);
-  return formatChartMonthYear(date);
+  return formatChartMonthYear(now);
 }
 
 function rankCourses(courses: Course[], timeframe: Timeframe): RankedCourse[] {
@@ -152,9 +157,11 @@ function buildCourseCountBuckets(
       ? 24 * 60 * 60 * 1000
       : timeframe === '1M'
         ? 7 * 24 * 60 * 60 * 1000
+        : timeframe === '3M'
+          ? 7 * 24 * 60 * 60 * 1000
         : timeframe === '1Y'
           ? 30 * 24 * 60 * 60 * 1000
-          : 90 * 24 * 60 * 60 * 1000;
+          : 24 * 60 * 60 * 1000;
   const totalWindowMs = bucketDurationMs * bucketCount;
 
   courses.forEach((course) => {
@@ -168,14 +175,6 @@ function buildCourseCountBuckets(
       buckets[bucketIndex]!.value += 1;
     }
   });
-
-  if (timeframe === 'ALL' && buckets.every((bucket) => bucket.value === 0)) {
-    return courses.reduce((acc, _, index) => {
-      const bucketIndex = index % bucketCount;
-      acc[bucketIndex]!.value += 1;
-      return acc;
-    }, buckets);
-  }
 
   return buckets;
 }
@@ -367,7 +366,7 @@ export default function ContributorAnalytics({
       title="Contributor Analytics"
       description="Course metrics that spotlight engagement, output, and leaderboard performance."
       timeframe={timeframe}
-      timeframeOptions={['1W', '1M', '1Y', 'ALL'] as const}
+      timeframeOptions={['1W', '1M', '3M', '1Y'] as const}
       onTimeframeChange={setTimeframe}
       metricCards={metricCards}
       selectedMetric={selectedMetric}

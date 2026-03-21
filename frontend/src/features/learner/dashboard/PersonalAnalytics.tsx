@@ -50,11 +50,12 @@ function currentStreakFromCadence(cadence: number[]) {
   return streak;
 }
 
-function windowDaysFor(timeframe: Timeframe, availableDays: number) {
+function windowDaysFor(timeframe: Timeframe) {
   if (timeframe === '1W') return 7;
   if (timeframe === '1M') return 30;
+  if (timeframe === '3M') return 90;
   if (timeframe === '1Y') return 365;
-  return Math.max(availableDays, 7);
+  return 7;
 }
 
 function buildWindowCadence(cadence: number[], days: number) {
@@ -70,12 +71,21 @@ function buildWindowCadence(cadence: number[], days: number) {
 function chunkSizeFor(timeframe: Timeframe, totalDays: number) {
   if (timeframe === '1W') return 1;
   if (timeframe === '1M') return 5;
+  if (timeframe === '3M') return 7;
   if (timeframe === '1Y') return 30;
   return Math.max(30, Math.ceil(totalDays / 12));
 }
 
 function compressSeries(series: number[], timeframe: Timeframe) {
-  const maxPoints = timeframe === '1W' ? 7 : timeframe === '1M' ? 15 : timeframe === '1Y' ? 12 : 24;
+  const maxPoints = timeframe === '1W'
+    ? 7
+    : timeframe === '1M'
+      ? 15
+      : timeframe === '3M'
+        ? 13
+        : timeframe === '1Y'
+          ? 12
+          : 24;
   if (series.length <= maxPoints) return series;
 
   const step = Math.ceil(series.length / maxPoints);
@@ -110,7 +120,7 @@ function buildSmoothPath(points: Array<{ x: number; y: number }>) {
   return path;
 }
 
-type Timeframe = '1W' | '1M' | '1Y' | 'ALL';
+type Timeframe = '1W' | '1M' | '3M' | '1Y';
 type MetricKey = 'focusScore' | 'completionRate' | 'currentStreak';
 
 export default function PersonalAnalytics() {
@@ -129,7 +139,7 @@ export default function PersonalAnalytics() {
   const weeklyCadence = normalizeWeeklyCadence(analytics?.weeklyCadence);
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const now = new Date();
-  const windowDays = windowDaysFor(timeframe, weeklyCadence.length);
+  const windowDays = windowDaysFor(timeframe);
   const windowCadence = buildWindowCadence(weeklyCadence, windowDays);
   const activeDays = windowCadence.reduce((sum, day) => sum + day, 0);
   const completedCoursesCount = analytics?.completedCoursesCount ?? 0;
@@ -198,7 +208,7 @@ export default function PersonalAnalytics() {
     }));
   }, [now, timeframe, timezone, windowCadence]);
 
-  const timeframeLabel = timeframe === 'ALL' ? 'All time' : timeframe;
+  const timeframeLabel = timeframe;
   const rangeLabel = `${formatChartDay(rangeStartDate, timezone)} - ${formatChartDay(now, timezone)} (${timezone})`;
   const momentumAxisLabels = useMemo(() => {
     const midDate = new Date(rangeStartDate);
@@ -248,7 +258,7 @@ export default function PersonalAnalytics() {
       title="Personal Analytics"
       description="High-impact metrics that show consistency, output, and momentum."
       timeframe={timeframe}
-      timeframeOptions={['1W', '1M', '1Y', 'ALL'] as const}
+      timeframeOptions={['1W', '1M', '3M', '1Y'] as const}
       onTimeframeChange={setTimeframe}
       metricCards={metricCards}
       selectedMetric={selectedMetric}
