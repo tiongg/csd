@@ -32,6 +32,7 @@ import { Route as AuthenticatedContributorDiscoverRouteImport } from './routes/_
 import { Route as AuthenticatedContributorDashboardRouteImport } from './routes/_authenticated/contributor/dashboard'
 import { Route as AuthenticatedAdminUserManagementRouteImport } from './routes/_authenticated/admin/user-management'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
+import { Route as AuthenticatedAdminGraphRouteImport } from './routes/_authenticated/admin/graph'
 import { Route as AuthenticatedAdminGlossaryRouteImport } from './routes/_authenticated/admin/glossary'
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
 import { Route as AuthenticatedAdminDiscoverRouteImport } from './routes/_authenticated/admin/discover'
@@ -169,6 +170,11 @@ const AuthenticatedAdminSettingsRoute =
     path: '/admin/settings',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminGraphRoute = AuthenticatedAdminGraphRouteImport.update({
+  id: '/admin/graph',
+  path: '/admin/graph',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAdminGlossaryRoute =
   AuthenticatedAdminGlossaryRouteImport.update({
     id: '/admin/glossary',
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/admin/discover': typeof AuthenticatedAdminDiscoverRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
+  '/admin/graph': typeof AuthenticatedAdminGraphRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
@@ -254,6 +261,7 @@ export interface FileRoutesByTo {
   '/admin/discover': typeof AuthenticatedAdminDiscoverRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
+  '/admin/graph': typeof AuthenticatedAdminGraphRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
@@ -287,6 +295,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/discover': typeof AuthenticatedAdminDiscoverRoute
   '/_authenticated/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/_authenticated/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
+  '/_authenticated/admin/graph': typeof AuthenticatedAdminGraphRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/_authenticated/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/admin/discover'
     | '/admin/faq'
     | '/admin/glossary'
+    | '/admin/graph'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
     | '/admin/discover'
     | '/admin/faq'
     | '/admin/glossary'
+    | '/admin/graph'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
@@ -383,6 +394,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/discover'
     | '/_authenticated/admin/faq'
     | '/_authenticated/admin/glossary'
+    | '/_authenticated/admin/graph'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/user-management'
     | '/_authenticated/contributor/dashboard'
@@ -577,6 +589,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/graph': {
+      id: '/_authenticated/admin/graph'
+      path: '/admin/graph'
+      fullPath: '/admin/graph'
+      preLoaderRoute: typeof AuthenticatedAdminGraphRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/admin/glossary': {
       id: '/_authenticated/admin/glossary'
       path: '/admin/glossary'
@@ -636,6 +655,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAdminDiscoverRoute: typeof AuthenticatedAdminDiscoverRoute
   AuthenticatedAdminFaqRoute: typeof AuthenticatedAdminFaqRoute
   AuthenticatedAdminGlossaryRoute: typeof AuthenticatedAdminGlossaryRoute
+  AuthenticatedAdminGraphRoute: typeof AuthenticatedAdminGraphRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminUserManagementRoute: typeof AuthenticatedAdminUserManagementRoute
   AuthenticatedContributorDashboardRoute: typeof AuthenticatedContributorDashboardRoute
@@ -662,6 +682,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminDiscoverRoute: AuthenticatedAdminDiscoverRoute,
   AuthenticatedAdminFaqRoute: AuthenticatedAdminFaqRoute,
   AuthenticatedAdminGlossaryRoute: AuthenticatedAdminGlossaryRoute,
+  AuthenticatedAdminGraphRoute: AuthenticatedAdminGraphRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminUserManagementRoute: AuthenticatedAdminUserManagementRoute,
   AuthenticatedContributorDashboardRoute:
