@@ -1,5 +1,11 @@
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import type { SectionType } from '@/lib/content.type';
 import { capitalizeFirst, type Course, type EnrolledCourse } from '@/lib/utils';
 import { BookOpen, Clock, FileText } from 'lucide-react';
@@ -41,6 +47,16 @@ export default function CourseOverview({
               Course
             </Badge>
           </div>
+          <CardDescription>
+            <div>{course.description || 'No description provided'}</div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(course.tags ?? []).map((tag) => (
+                <Badge key={tag} variant="outline">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </CardDescription>
         </CardHeader>
       </Card>
 
