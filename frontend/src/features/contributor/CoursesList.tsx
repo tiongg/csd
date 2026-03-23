@@ -256,6 +256,24 @@ function CourseCard({ course, teamId }: CourseCardProps) {
             <p className="line-clamp-2 text-sm leading-5 text-slate-600">
               {course.description?.trim() || 'No description yet.'}
             </p>
+            <div>
+              {(course.tags ?? []).length > 0 ? (
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {(course.tags ?? []).map((tag) => (
+                    <span
+                      key={tag}
+                      className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <span className="mt-2 inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-500">
+                  No tags
+                </span>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center justify-between pt-4">

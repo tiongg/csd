@@ -76,13 +76,24 @@ export default function CourseReview() {
       {currentSection === -1 || !currentSectionData ? (
         <div className="min-h-0 flex-1 overflow-y-auto p-6">
           <div className="mx-auto w-full max-w-4xl space-y-4">
-            {/* Course Info Card */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-xl">{course.title}</CardTitle>
-                {course.description && (
-                  <CardDescription>{course.description}</CardDescription>
-                )}
+                <CardDescription>
+                  {course.description || 'No description'}
+                </CardDescription>
+                <CardDescription className="flex flex-wrap items-center gap-2">
+                  {(course.tags ?? []).length > 0
+                    ? (course.tags ?? []).map((tag) => (
+                        <span
+                          key={tag}
+                          className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+                        >
+                          {tag}
+                        </span>
+                      ))
+                    : 'No tags'}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap items-center gap-4 text-sm">

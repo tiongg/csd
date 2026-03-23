@@ -1,8 +1,8 @@
 import type { Course, EnrolledCourse } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { ClockIcon } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { cn } from '@/lib/utils';
 
 type CourseCardProps = {
   course: Course;
@@ -10,7 +10,7 @@ type CourseCardProps = {
 };
 
 export function CourseCard({ course, enrollment }: CourseCardProps) {
-  const { title, description, updatedAt, id } = course;
+  const { title, description, updatedAt, id, tags } = course;
   return (
     <Link
       to="/learner/courses/$courseId"
@@ -39,6 +39,18 @@ export function CourseCard({ course, enrollment }: CourseCardProps) {
           <p className="line-clamp-2 text-sm text-slate-600">
             {description || 'No description'}
           </p>
+          <div className="flex flex-wrap gap-1">
+            {tags?.map((tag) => (
+              <span
+                key={tag}
+                className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="mt-4 flex items-center justify-end">
           <div className="flex items-center gap-1 text-xs text-slate-500">
             <ClockIcon className="size-4" />
             <span>Updated {dayjs(updatedAt).fromNow()}</span>

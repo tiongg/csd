@@ -14,6 +14,7 @@ import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.backend.tag.TagService;
 import csd.t6.backend.team.TeamService;
 import csd.t6.backend.utils.FileService;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
@@ -25,14 +26,16 @@ public class CourseService {
   private final FileService fileService;
   private final ContentVersionRepository contentVersionRepository;
   private final CourseReelService courseReelService;
+  private final TagService tagService;
 
   public CourseService(CourseRepository courseRepository, TeamService teamService, FileService fileService,
-      ContentVersionRepository contentVersionRepository, CourseReelService courseReelService) {
+      ContentVersionRepository contentVersionRepository, CourseReelService courseReelService, TagService tagService) {
     this.courseRepository = courseRepository;
     this.teamService = teamService;
     this.fileService = fileService;
     this.contentVersionRepository = contentVersionRepository;
     this.courseReelService = courseReelService;
+    this.tagService = tagService;
   }
 
   @Transactional
@@ -42,23 +45,34 @@ public class CourseService {
     }
 
     CourseRecord course = courseRepository.create(request.title(), request.description(), creatorId, request.teamId());
-    return new CourseResponse(course, this.courseReelService.getReelUrlForCourse(course));
+
+    // Handle tags
+    List<String> tags = tagService.updateCourseTags(course.getId(), request.tags());
+
+    return new CourseResponse(course, this.courseReelService.getReelUrlForCourse(course), tags);
   }
 
   public CourseResponse getCourseById(UUID id) {
     CourseRecord course = courseRepository.findById(id).orElseThrow(() -> new BadRequestException("Course not found"));
-    return new CourseResponse(course, this.courseReelService.getReelUrlForCourse(course));
+    List<String> tags = tagService.getTagsForCourse(id);
+    return new CourseResponse(course, this.courseReelService.getReelUrlForCourse(course), tags);
   }
 
   public List<CourseResponse> getAllCourses() {
     return courseRepository.findAll().stream()
-        .map(record -> new CourseResponse(record, this.courseReelService.getReelUrlForCourse(record)))
+        .map(record -> {
+          List<String> tags = tagService.getTagsForCourse(record.getId());
+          return new CourseResponse(record, this.courseReelService.getReelUrlForCourse(record), tags);
+        })
         .collect(Collectors.toList());
   }
 
   public List<CourseResponse> getCoursesWithApprovedVersion() {
     return contentVersionRepository.findCoursesWithApprovedVersion().stream()
-        .map(record -> new CourseResponse(record, this.courseReelService.getReelUrlForCourse(record)))
+        .map(record -> {
+          List<String> tags = tagService.getTagsForCourse(record.getId());
+          return new CourseResponse(record, this.courseReelService.getReelUrlForCourse(record), tags);
+        })
         .collect(Collectors.toList());
   }
 
@@ -68,7 +82,10 @@ public class CourseService {
     }
 
     return this.courseRepository.findBy(COURSE.TEAM_ID, teamId).stream()
-        .map(record -> new CourseResponse(record, this.courseReelService.getReelUrlForCourse(record)))
+        .map(record -> {
+          List<String> tags = tagService.getTagsForCourse(record.getId());
+          return new CourseResponse(record, this.courseReelService.getReelUrlForCourse(record), tags);
+        })
         .collect(Collectors.toList());
   }
 
@@ -89,7 +106,11 @@ public class CourseService {
     }
 
     CourseRecord updated = courseRepository.update(id, request.title(), request.description(), existing.getTeamId());
-    return new CourseResponse(updated, this.courseReelService.getReelUrlForCourse(updated));
+
+    // Handle tags
+    List<String> tags = tagService.updateCourseTags(id, request.tags());
+
+    return new CourseResponse(updated, this.courseReelService.getReelUrlForCourse(updated), tags);
   }
 
   @Transactional

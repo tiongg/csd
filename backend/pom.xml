@@ -183,6 +183,13 @@
 									<inputSchema>courses</inputSchema>
 								</schema>
 							</schemata>
+
+							<forcedTypes>
+								<forcedType>
+									<userType>java.lang.String</userType>
+									<includeTypes>(?i:citext)</includeTypes>
+								</forcedType>
+							</forcedTypes>
 						</database>
 						<generate>
 							<pojos>true</pojos>

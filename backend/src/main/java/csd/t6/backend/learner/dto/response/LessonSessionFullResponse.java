@@ -1,5 +1,6 @@
 package csd.t6.backend.learner.dto.response;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ public record LessonSessionFullResponse(@NotNull UUID lessonSessionId, @NotNull 
   public LessonSessionFullResponse(LessonCourseRecord lessonCourseRecord) {
     this(lessonCourseRecord.learnerCourseRecord().getId(), lessonCourseRecord.learnerCourseRecord().getStatus(),
         extractMetadata(lessonCourseRecord.learnerCourseRecord().getMetadata()),
-        new CourseResponse(lessonCourseRecord.courseRecord(), null));
+        new CourseResponse(lessonCourseRecord.courseRecord(), null, Collections.emptyList()));
   }
 
   @SuppressWarnings("unchecked")
