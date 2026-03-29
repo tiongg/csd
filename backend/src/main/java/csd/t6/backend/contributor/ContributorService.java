@@ -19,7 +19,8 @@ public class ContributorService {
   private final FileService fileService;
   private final NotificationService notificationService;
 
-  public ContributorService(PendingContributorRepository pendingContributorRepository, FileService fileService, NotificationService notificationService) {
+  public ContributorService(PendingContributorRepository pendingContributorRepository, FileService fileService,
+      NotificationService notificationService) {
     this.pendingContributorRepository = pendingContributorRepository;
     this.fileService = fileService;
     this.notificationService = notificationService;
@@ -32,18 +33,11 @@ public class ContributorService {
 
     this.pendingContributorRepository.insertPendingContributor(learnerUUID);
 
-    notificationService.sendToRole(
-        Roles.ADMIN,
-        NotificationType.CONTRIBUTOR_APPLIED,
-        "Contributor Application",
-        "A new contributor application awaits review",
-        learnerUUID
-    );
+    notificationService.sendToRole(Roles.ADMIN, NotificationType.CONTRIBUTOR_APPLIED, "Contributor Application",
+        "A new contributor application awaits review", learnerUUID);
   }
 
   public ImageUploadResponse getFileUploadUrl(UUID courseId, String extension) {
-    // FIX: use null-safe equals so null extension throws BadRequestException
-    // instead of NullPointerException
     if (!"png".equals(extension) && !"jpg".equals(extension) && !"jpeg".equals(extension)) {
       throw new BadRequestException("Invalid file type!");
     }
