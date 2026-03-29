@@ -1,13 +1,27 @@
-import type { GlossaryItem } from '@/lib/utils';
+import { cn, type GlossaryItem } from '@/lib/utils';
+import { Edit2Icon } from 'lucide-react';
 
-type GlossaryCardProps = {
+export type GlossaryCardProps = {
   item: GlossaryItem;
+  onEdit?: (item: GlossaryItem) => void;
 };
 
-export default function GlossaryCard({ item }: GlossaryCardProps) {
+export default function GlossaryCard({ item, onEdit }: GlossaryCardProps) {
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-4 md:p-5">
-      <div className="flex flex-wrap items-center gap-2.5">
+    <article className="group relative rounded-xl border border-slate-200 bg-white p-4 md:p-5">
+      {onEdit && (
+        <button
+          onClick={() => onEdit(item)}
+          className="absolute top-3 right-3 rounded-md p-1.5 text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-slate-100 hover:text-slate-700"
+          aria-label="Edit"
+        >
+          <Edit2Icon className="h-4 w-4" />
+        </button>
+      )}
+
+      <div
+        className={cn('flex flex-wrap items-center gap-2.5', onEdit && 'pr-8')}
+      >
         <h3 className="text-base font-semibold text-slate-900">{item.title}</h3>
       </div>
 

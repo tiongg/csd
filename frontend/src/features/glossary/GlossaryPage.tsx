@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/select';
 import { Heading1 } from '@/components/ui/typography';
 import { useApiQuery } from '@/lib/fetch-client';
+import type { GlossaryItem } from '@/lib/utils';
 import { useMemo, useState } from 'react';
 import GlossaryCard from './components/GlossaryCard';
 
@@ -23,7 +24,11 @@ type SortOrder = typeof SORT_A_TO_Z | typeof SORT_Z_TO_A;
 const glassPanelClass =
   'relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6';
 
-export default function GlossaryPage() {
+type GlossaryPageProps = {
+  onEditClick?: (item: GlossaryItem) => void;
+};
+
+export default function GlossaryPage({ onEditClick }: GlossaryPageProps) {
   const [query, setQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_A_TO_Z);
 
@@ -54,7 +59,7 @@ export default function GlossaryPage() {
       });
       return sortOrder === SORT_A_TO_Z ? compare : -compare;
     });
-  }, [query, sortOrder]);
+  }, [query, sortOrder, glossaryItems]);
 
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col bg-slate-100/70 p-4 md:p-6">
@@ -112,7 +117,11 @@ export default function GlossaryPage() {
           {filteredItems.length > 0 ? (
             <div className="grid gap-3">
               {filteredItems.map((item) => (
-                <GlossaryCard key={item.title} item={item} />
+                <GlossaryCard
+                  key={item.title}
+                  item={item}
+                  onEdit={onEditClick}
+                />
               ))}
             </div>
           ) : (

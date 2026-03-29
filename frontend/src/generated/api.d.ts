@@ -68,6 +68,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/glossary/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getGlossaryTerms"];
+        put: operations["updateGlossaryTerm"];
+        post: operations["autogenRelationships"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/courses/{id}": {
         parameters: {
             query?: never;
@@ -202,22 +218,6 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["enrollToCourse"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/glossary/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getGlossaryTerms"];
-        put?: never;
-        post: operations["autogenRelationships"];
         delete?: never;
         options?: never;
         head?: never;
@@ -980,6 +980,13 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        GlossaryUpdateRequest: {
+            name: string;
+            description: string;
+            usedInConversationExample: string;
+            usedInContext: string;
+            relationships: string[];
+        };
         CourseUpdateRequest: {
             title?: string;
             description?: string;
@@ -1157,13 +1164,6 @@ export interface components {
             account: components["schemas"]["Account"];
             preferences: string[];
         };
-        GlossaryUpdateRequest: {
-            name: string;
-            description: string;
-            usedInConversationExample: string;
-            usedInContext: string;
-            relationships: string[];
-        };
         ProfilePictureUpload: {
             url?: string;
             key?: string;
@@ -1332,6 +1332,66 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["LessonSessionResponse"];
                 };
+            };
+        };
+    };
+    getGlossaryTerms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GlossaryItem"][];
+                };
+            };
+        };
+    };
+    updateGlossaryTerm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GlossaryUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    autogenRelationships: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1641,44 +1701,6 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["LessonSessionResponse"];
                 };
-            };
-        };
-    };
-    getGlossaryTerms: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["GlossaryItem"][];
-                };
-            };
-        };
-    };
-    autogenRelationships: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
