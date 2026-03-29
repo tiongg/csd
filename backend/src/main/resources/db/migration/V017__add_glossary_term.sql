@@ -12,7 +12,7 @@ CREATE TABLE glossary_term_relationship (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   glossary_term_id UUID NOT NULL,
   related_term_id UUID NOT NULL,
-  FOREIGN KEY (glossary_term_id) REFERENCES glossary_terms(id) ON DELETE CASCADE,
-  FOREIGN KEY (related_term_id) REFERENCES glossary_terms(id) ON DELETE CASCADE,
+  FOREIGN KEY (glossary_term_id) REFERENCES glossary_term(id) ON DELETE CASCADE,
+  FOREIGN KEY (related_term_id) REFERENCES glossary_term(id) ON DELETE CASCADE,
   UNIQUE (glossary_term_id, related_term_id)
 );
