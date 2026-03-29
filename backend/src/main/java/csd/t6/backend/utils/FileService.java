@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -102,7 +101,7 @@ public class FileService {
   public void deleteObject(String key) {
     DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder().bucket(bucketName).key(key).build();
 
-    DeleteObjectResponse deleteObjectResponse = this.s3Client.deleteObject(deleteObjectRequest);
+    this.s3Client.deleteObject(deleteObjectRequest);
   }
 
   public boolean exists(String key) {

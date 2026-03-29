@@ -42,6 +42,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     OAuth2AuthenticationToken oauthToken = (OAuth2AuthenticationToken) authentication;
 
     OauthProvider provider = OauthProvider.lookupLiteral(oauthToken.getAuthorizedClientRegistrationId().toUpperCase());
+    if (provider == null) {
+      throw new BadRequestException("Unsupported OAuth2 provider");
+    }
 
     OAuth2UserInfo userInfo = extractUserInfo(provider, oAuth2User);
 
