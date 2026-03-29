@@ -2,8 +2,8 @@ package csd.t6.backend.glossary;
 
 import java.util.List;
 
-import csd.t6.backend.glossary.request.GlossaryUpdateRequest;
-import csd.t6.backend.glossary.response.GlossaryResponse;
+import csd.t6.backend.glossary.dto.request.GlossaryUpdateRequest;
+import csd.t6.backend.glossary.dto.response.GlossaryResponse;
 
 public interface GlossaryService {
   public void generateGlossary();

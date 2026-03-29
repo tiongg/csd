@@ -1117,7 +1117,8 @@ export interface components {
             /** Format: int32 */
             currentStreak: number;
         };
-        GlossaryResponse: {
+        /** @description Response object for a glossary term */
+        GlossaryItem: {
             title: string;
             description: string;
             context: string;
@@ -1658,7 +1659,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["GlossaryResponse"][];
+                    "*/*": components["schemas"]["GlossaryItem"][];
                 };
             };
         };

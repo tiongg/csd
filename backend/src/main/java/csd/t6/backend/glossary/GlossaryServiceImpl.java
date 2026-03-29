@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import csd.t6.backend.ai.AIService;
 import csd.t6.backend.exceptions.BadRequestException;
-import csd.t6.backend.glossary.request.GlossaryUpdateRequest;
-import csd.t6.backend.glossary.response.GlossaryResponse;
+import csd.t6.backend.glossary.dto.request.GlossaryUpdateRequest;
+import csd.t6.backend.glossary.dto.response.GlossaryResponse;
 import csd.t6.backend.tag.TagService;
 import csd.t6.jooq.public_.tables.records.GlossaryTermRecord;
 

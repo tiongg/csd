@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
-import csd.t6.backend.glossary.request.GlossaryUpdateRequest;
+import csd.t6.backend.glossary.dto.request.GlossaryUpdateRequest;
 import csd.t6.backend.utils.BaseRepository;
 import csd.t6.jooq.public_.tables.GlossaryTerm;
 import csd.t6.jooq.public_.tables.records.GlossaryTermRecord;

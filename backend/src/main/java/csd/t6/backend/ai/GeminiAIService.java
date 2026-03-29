@@ -14,7 +14,7 @@ import com.google.genai.types.ThinkingConfig;
 import com.google.genai.types.ThinkingLevel;
 
 import csd.t6.backend.ai.dto.response.GeminiRelationshipResponse;
-import csd.t6.backend.glossary.request.GlossaryUpdateRequest;
+import csd.t6.backend.glossary.dto.request.GlossaryUpdateRequest;
 
 @Service
 public class GeminiAIService implements AIService {

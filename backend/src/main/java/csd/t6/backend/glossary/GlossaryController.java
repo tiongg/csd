@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import csd.t6.backend.glossary.response.GlossaryResponse;
+import csd.t6.backend.glossary.dto.response.GlossaryResponse;
 
 @RestController
 @RequestMapping("/api/glossary")
@@ -27,5 +27,4 @@ public class GlossaryController {
   public List<GlossaryResponse> getGlossaryTerms() {
     return this.glossaryService.getAllGlossaryTerms();
   }
-
 }

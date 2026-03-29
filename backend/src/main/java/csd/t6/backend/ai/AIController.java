@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import csd.t6.backend.glossary.request.GlossaryUpdateRequest;
+import csd.t6.backend.glossary.dto.request.GlossaryUpdateRequest;
 import io.jsonwebtoken.lang.Collections;
 
 @RestController

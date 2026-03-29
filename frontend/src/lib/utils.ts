@@ -67,6 +67,7 @@ export type Course = components['schemas']['Course'];
 export type ContentVersion = components['schemas']['ContentVersionResponse'];
 export type EnrolledCourse = components['schemas']['LessonSessionFullResponse'];
 export type Notification = components['schemas']['Notification'];
+export type GlossaryItem = components['schemas']['GlossaryItem'];
 export type LearnerCourseMetadata = {
   currentIndex?: number;
 };
