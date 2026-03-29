@@ -2,7 +2,6 @@ package csd.t6.backend.approval;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 
 import java.util.UUID;
 
@@ -12,8 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import csd.t6.jooq.public_.tables.records.ContentVersionRecord;
 
 @ExtendWith(MockitoExtension.class)
 class ContentVersionRepositoryTest {
