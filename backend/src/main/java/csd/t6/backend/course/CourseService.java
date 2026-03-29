@@ -16,23 +16,20 @@ import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.tag.TagService;
 import csd.t6.backend.team.TeamService;
-import csd.t6.backend.utils.FileService;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Service
 public class CourseService {
   private final CourseRepository courseRepository;
   private final TeamService teamService;
-  private final FileService fileService;
   private final ContentVersionRepository contentVersionRepository;
   private final CourseReelService courseReelService;
   private final TagService tagService;
 
-  public CourseService(CourseRepository courseRepository, TeamService teamService, FileService fileService,
+  public CourseService(CourseRepository courseRepository, TeamService teamService,
       ContentVersionRepository contentVersionRepository, CourseReelService courseReelService, TagService tagService) {
     this.courseRepository = courseRepository;
     this.teamService = teamService;
-    this.fileService = fileService;
     this.contentVersionRepository = contentVersionRepository;
     this.courseReelService = courseReelService;
     this.tagService = tagService;

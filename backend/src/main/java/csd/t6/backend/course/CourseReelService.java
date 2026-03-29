@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import csd.t6.backend.approval.ContentVersionRepository;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.team.TeamService;
 import csd.t6.backend.utils.FileService;
@@ -17,14 +16,11 @@ public class CourseReelService {
   private final CourseRepository courseRepository;
   private final TeamService teamService;
   private final FileService fileService;
-  private final ContentVersionRepository contentVersionRepository;
 
-  public CourseReelService(CourseRepository courseRepository, TeamService teamService, FileService fileService,
-      ContentVersionRepository contentVersionRepository) {
+  public CourseReelService(CourseRepository courseRepository, TeamService teamService, FileService fileService) {
     this.courseRepository = courseRepository;
     this.teamService = teamService;
     this.fileService = fileService;
-    this.contentVersionRepository = contentVersionRepository;
   }
 
   public void deleteReel(UUID courseId, UUID requesterId) {

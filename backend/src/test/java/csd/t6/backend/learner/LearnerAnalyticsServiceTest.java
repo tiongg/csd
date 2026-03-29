@@ -1,8 +1,6 @@
 package csd.t6.backend.learner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import csd.t6.backend.learner.dto.response.LearnerAnalyticsResponse;
 import csd.t6.jooq.public_.enums.LearnerActivityType;
-import csd.t6.jooq.public_.tables.records.LearnerActivityRecord;
 
 @ExtendWith(MockitoExtension.class)
 class LearnerAnalyticsServiceTest {
@@ -44,9 +41,6 @@ class LearnerAnalyticsServiceTest {
   @Test
   @DisplayName("Should log learner activity")
   void shouldLogLearnerActivity() {
-    when(learnerActivityRepository.insert(userId, courseId, LearnerActivityType.COURSE_ENROLLED))
-        .thenReturn(mock(LearnerActivityRecord.class));
-
     learnerAnalyticsService.logActivity(userId, courseId, LearnerActivityType.COURSE_ENROLLED);
 
     verify(learnerActivityRepository).insert(userId, courseId, LearnerActivityType.COURSE_ENROLLED);

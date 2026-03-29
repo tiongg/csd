@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.jooq.DSLContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +24,6 @@ class AccountRepositoryTest {
 
     @Autowired
     private AccountRepository accountRepository;
-
-    @Autowired
-    private DSLContext dsl;
 
     private static final String TEST_EMAIL = "test@example.com";
     private static final String TEST_USERNAME = "testuser";

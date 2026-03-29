@@ -3,14 +3,12 @@ package csd.t6.backend.learner;
 import static csd.t6.jooq.public_.tables.LearnerCourse.LEARNER_COURSE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,11 +21,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.exceptions.ForbiddenException;
-import csd.t6.backend.learner.dto.response.LessonSessionFullResponse;
 import csd.t6.backend.learner.dto.response.UserEnrolledLessonsResponse;
 import csd.t6.backend.learner.util.LessonCourseRecord;
 import csd.t6.jooq.public_.enums.LearnerActivityType;
@@ -61,7 +56,6 @@ class LearnerLessonServiceTest {
     lenient().when(mockLearnerCourse.getId()).thenReturn(lessonSessionId);
     lenient().when(mockLearnerCourse.getUserId()).thenReturn(userId);
     lenient().when(mockLearnerCourse.getCourseId()).thenReturn(courseId);
-    lenient().when(mockLearnerCourse.getStatus()).thenReturn(LearnerCourseStatus.IN_PROGRESS);
   }
 
   // --- enrollToCourse ---
