@@ -41,5 +41,7 @@ jobs:
             -outOfOrder=true
 
       - name: Run tests
+        env:
+          GOOGLE_API_KEY: dummy_key
         run: mvn verify -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
         working-directory: ./backend
