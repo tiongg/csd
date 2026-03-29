@@ -87,6 +87,6 @@ public class TagService {
    * Convert a TagsRecord to TagResponse.
    */
   private TagResponse toTagResponse(TagsRecord record) {
-    return new TagResponse(record.getId(), record.getTitle(), record.getDescription());
+    return new TagResponse(record.getId(), record.getTitle());
   }
 }

@@ -208,6 +208,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/glossary/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getGlossaryTerms"];
+        put?: never;
+        post: operations["autogenRelationships"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/courses/": {
         parameters: {
             query?: never;
@@ -744,6 +760,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ai/relations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getTagRelations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admins/contributor-applications": {
         parameters: {
             query?: never;
@@ -1042,7 +1074,6 @@ export interface components {
             /** Format: uuid */
             id: string;
             title: string;
-            description?: string;
         };
         UnreadCount: {
             /** Format: int64 */
@@ -1086,6 +1117,13 @@ export interface components {
             /** Format: int32 */
             currentStreak: number;
         };
+        GlossaryResponse: {
+            title: string;
+            description: string;
+            context: string;
+            example: string;
+            relationships: string[];
+        };
         ImageUploadResponse: {
             url: string;
             key: string;
@@ -1117,6 +1155,13 @@ export interface components {
         SelfResponse: {
             account: components["schemas"]["Account"];
             preferences: string[];
+        };
+        GlossaryUpdateRequest: {
+            name: string;
+            description: string;
+            usedInConversationExample: string;
+            usedInContext: string;
+            relationships: string[];
         };
         ProfilePictureUpload: {
             url?: string;
@@ -1595,6 +1640,44 @@ export interface operations {
                 content: {
                     "*/*": components["schemas"]["LessonSessionResponse"];
                 };
+            };
+        };
+    };
+    getGlossaryTerms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GlossaryResponse"][];
+                };
+            };
+        };
+    };
+    autogenRelationships: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -2435,6 +2518,30 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    getTagRelations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string[];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["GlossaryUpdateRequest"][];
                 };
             };
         };
