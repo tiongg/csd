@@ -93,12 +93,6 @@ class ContributorServiceTest {
     assertThat(result.publicUrl()).isEqualTo(expectedPublicUrl);
   }
 
-/*************  ✨ Windsurf Command ⭐  *************/
-  /**
-   * Verifies that the getFileUploadUrl method returns a valid presigned URL for a jpg file.
-   * The method should return an ImageUploadResponse containing the presigned URL, the S3 object key, and the public URL.
-   */
-/*******  bc6fb103-a33f-4a2b-9d9e-964276e564aa  *******/
   @Test
   @DisplayName("Should generate file upload URL for jpg")
   void shouldGenerateFileUploadUrlForJpg() {
