@@ -12,7 +12,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import csd.t6.backend.account.AccountRepository;
 import csd.t6.jooq.accounts.enums.OauthProvider;
+import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.accounts.tables.records.OauthConnectionRecord;
 
 @SpringBootTest
@@ -23,10 +25,14 @@ class OAuth2ProviderRepositoryTest {
   @Autowired
   private OAuth2ProviderRepository oAuth2ProviderRepository;
 
+  @Autowired
+  private AccountRepository accountRepository;
+
   @Test
   @DisplayName("Should insert oauth connection")
   void shouldInsertOAuthConnection() {
-    UUID accountId = UUID.randomUUID();
+    AccountRecord account = accountRepository.insert("test@example.com", "testuser", "hashedpass");
+    UUID accountId = account.getId();
     String providerId = "google-12345";
     String email = "test@example.com";
 
@@ -42,7 +48,8 @@ class OAuth2ProviderRepositoryTest {
   @Test
   @DisplayName("Should find by provider and provider id")
   void shouldFindByProviderAndProviderId() {
-    UUID accountId = UUID.randomUUID();
+    AccountRecord account = accountRepository.insert("user@gmail.com", "user", "hashedpass");
+    UUID accountId = account.getId();
     String providerId = "google-67890";
     String email = "user@gmail.com";
 
@@ -56,7 +63,8 @@ class OAuth2ProviderRepositoryTest {
   @Test
   @DisplayName("Should find by account id")
   void shouldFindByAccountId() {
-    UUID accountId = UUID.randomUUID();
+    AccountRecord account = accountRepository.insert("test2@gmail.com", "testuser2", "hashedpass");
+    UUID accountId = account.getId();
     String providerId = "google-11111";
 
     oAuth2ProviderRepository.insert(accountId, OauthProvider.GOOGLE, providerId, "test@gmail.com");

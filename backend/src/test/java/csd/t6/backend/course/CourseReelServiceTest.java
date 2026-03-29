@@ -79,7 +79,7 @@ class CourseReelServiceTest {
 
     assertThatThrownBy(() -> courseReelService.deleteReel(courseId, requesterId))
         .isInstanceOf(BadRequestException.class)
-        .hasMessageContaining("must be a member of team");
+        .hasMessageContaining("member of the team");
     verify(fileService, never()).deleteObject(any());
   }
 
@@ -119,7 +119,7 @@ class CourseReelServiceTest {
 
     assertThatThrownBy(() -> courseReelService.generateReelUploadUrl(courseId, requesterId))
         .isInstanceOf(BadRequestException.class)
-        .hasMessageContaining("must be a member of team");
+        .hasMessageContaining("member of the team");
     verify(fileService, never()).generatePresignedUploadUrl(any(), any());
   }
 

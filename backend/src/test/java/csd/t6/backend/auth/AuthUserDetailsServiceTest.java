@@ -3,7 +3,6 @@ package csd.t6.backend.auth;
 import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -55,7 +54,6 @@ class AuthUserDetailsServiceTest {
   @DisplayName("Should load user by username")
   void shouldLoadUserByUsername() {
     when(accountRepository.findOneBy(ACCOUNT.USERNAME, username)).thenReturn(Optional.of(accountRecord));
-    when(accountRepository.findOneBy(ACCOUNT.EMAIL, username)).thenReturn(Optional.empty());
 
     AuthUserDetails result = authUserDetailsService.loadUserByUsername(username);
 
@@ -81,8 +79,8 @@ class AuthUserDetailsServiceTest {
   @Test
   @DisplayName("Should throw when user not found")
   void shouldThrowWhenUserNotFound() {
-    when(accountRepository.findOneBy(any(), any())).thenReturn(Optional.empty());
-    when(accountRepository.findOneBy(ACCOUNT.EMAIL, username)).thenReturn(Optional.empty());
+    when(accountRepository.findOneBy(ACCOUNT.USERNAME, "nonexistent")).thenReturn(Optional.empty());
+    when(accountRepository.findOneBy(ACCOUNT.EMAIL, "nonexistent")).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> authUserDetailsService.loadUserByUsername("nonexistent"))
         .isInstanceOf(BadRequestException.class)
@@ -106,7 +104,6 @@ class AuthUserDetailsServiceTest {
   void shouldReturnCorrectAuthoritiesForAdmin() {
     accountRecord.setUserRole(Roles.ADMIN);
     when(accountRepository.findOneBy(ACCOUNT.USERNAME, username)).thenReturn(Optional.of(accountRecord));
-    when(accountRepository.findOneBy(ACCOUNT.EMAIL, username)).thenReturn(Optional.empty());
 
     AuthUserDetails result = authUserDetailsService.loadUserByUsername(username);
 
@@ -119,7 +116,6 @@ class AuthUserDetailsServiceTest {
   void shouldReturnCorrectAuthoritiesForContributor() {
     accountRecord.setUserRole(Roles.CONTRIBUTOR);
     when(accountRepository.findOneBy(ACCOUNT.USERNAME, username)).thenReturn(Optional.of(accountRecord));
-    when(accountRepository.findOneBy(ACCOUNT.EMAIL, username)).thenReturn(Optional.empty());
 
     AuthUserDetails result = authUserDetailsService.loadUserByUsername(username);
 

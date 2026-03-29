@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -130,7 +129,7 @@ class FileServiceTest {
   @DisplayName("Should return true when object exists")
   void shouldReturnTrueWhenObjectExists() {
     HeadObjectResponse response = mock(HeadObjectResponse.class);
-    when(s3Client.headObject(any(HeadObjectRequest.class))).thenReturn(response);
+    when(s3Client.headObject((java.util.function.Consumer<software.amazon.awssdk.services.s3.model.HeadObjectRequest.Builder>) any())).thenReturn(response);
 
     boolean result = fileService.exists(testKey);
 
@@ -141,7 +140,7 @@ class FileServiceTest {
   @DisplayName("Should return false when object does not exist")
   void shouldReturnFalseWhenObjectDoesNotExist() {
     SdkException exception = mock(SdkException.class);
-    when(s3Client.headObject(any(HeadObjectRequest.class))).thenThrow(exception);
+    when(s3Client.headObject((java.util.function.Consumer<software.amazon.awssdk.services.s3.model.HeadObjectRequest.Builder>) any())).thenThrow(exception);
 
     boolean result = fileService.exists(testKey);
 
@@ -152,7 +151,7 @@ class FileServiceTest {
   @DisplayName("Should handle S3 exception when checking existence")
   void shouldHandleS3ExceptionWhenCheckingExistence() {
     SdkException exception = mock(SdkException.class);
-    when(s3Client.headObject(any(HeadObjectRequest.class))).thenThrow(exception);
+    when(s3Client.headObject((java.util.function.Consumer<software.amazon.awssdk.services.s3.model.HeadObjectRequest.Builder>) any())).thenThrow(exception);
 
     boolean result = fileService.exists(testKey);
 

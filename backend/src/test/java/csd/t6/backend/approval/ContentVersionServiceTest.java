@@ -88,6 +88,7 @@ class ContentVersionServiceTest {
     lenient().when(mockVersion.getVersion()).thenReturn(1);
     lenient().when(mockVersion.getStatus()).thenReturn(ContentStatus.PENDING);
     lenient().when(mockVersion.getDescription()).thenReturn("Test version");
+    lenient().when(mockVersion.getPublishedAt()).thenReturn(java.time.LocalDateTime.now());
     lenient().when(mockCourse.getId()).thenReturn(courseId);
     lenient().when(mockCourse.getTeamId()).thenReturn(teamId);
     lenient().when(mockCourse.getTitle()).thenReturn("Test Course");
@@ -98,7 +99,9 @@ class ContentVersionServiceTest {
   @Test
   @DisplayName("Should create new content version with incrementing version number")
   void shouldCreateNewContentVersionWithIncrementingVersion() {
+    ContentVersionRecord mockRecord = mock(ContentVersionRecord.class);
     when(contentVersionRepository.getLatestVersionNumberForCourse(courseId)).thenReturn(3);
+    when(contentVersionRepository.create(eq(courseId), eq(4), eq("New description"))).thenReturn(mockRecord);
 
     ContentVersionRecord result = contentVersionService.createNewContentVersion(courseId, "New description");
 
@@ -110,7 +113,9 @@ class ContentVersionServiceTest {
   @Test
   @DisplayName("Should create version 1 when no versions exist")
   void shouldCreateVersionOneWhenNoVersionsExist() {
+    ContentVersionRecord mockRecord = mock(ContentVersionRecord.class);
     when(contentVersionRepository.getLatestVersionNumberForCourse(courseId)).thenReturn(0);
+    when(contentVersionRepository.create(eq(courseId), eq(1), eq("First version"))).thenReturn(mockRecord);
 
     ContentVersionRecord result = contentVersionService.createNewContentVersion(courseId, "First version");
 
@@ -126,7 +131,7 @@ class ContentVersionServiceTest {
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
     when(teamService.isTeamMember(teamId, requesterId)).thenReturn(true);
     lenient().when(mockVersion.getId()).thenReturn(contentVersionId);
-    when(contentVersionRepository.create(courseId, 1, any())).thenReturn(mockVersion);
+    when(contentVersionRepository.create(eq(courseId), eq(1), any())).thenReturn(mockVersion);
     String expectedKey = String.format("course-materials/%s/%s.json", courseId, contentVersionId);
     String expectedUrl = "presigned-url";
     when(fileService.generatePresignedUploadUrl(expectedKey, Duration.ofMinutes(5))).thenReturn(expectedUrl);
@@ -148,7 +153,7 @@ class ContentVersionServiceTest {
 
     assertThatThrownBy(() -> contentVersionService.generateCourseMaterialUploadUrl(courseId, requesterId, "Test"))
         .isInstanceOf(BadRequestException.class)
-        .hasMessageContaining("must be a member of team");
+        .hasMessageContaining("member of the team");
     verify(contentVersionRepository, never()).rejectAllPendingVersions(any());
     verify(contentVersionRepository, never()).create(any(), any(), any());
   }
@@ -339,7 +344,7 @@ class ContentVersionServiceTest {
     assertThatThrownBy(() -> contentVersionService.approveVersion(contentVersionId))
         .isInstanceOf(BadRequestException.class)
         .hasMessageContaining("Can only approve pending versions");
-    verify(contentVersionRepository, never()).updateStatus(any(), any(), any());
+    verify(contentVersionRepository, never()).updateStatus();
   }
 
   @Test

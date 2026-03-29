@@ -79,6 +79,15 @@ class OAuth2SuccessHandlerTest {
     oauthConnectionRecord.setAccountId(accountId);
     oauthConnectionRecord.setProviderId("google-provider-id");
     oauthConnectionRecord.setProvider(OauthProvider.GOOGLE);
+
+    // Manually set frontendUrl since @Value annotation doesn't work in tests
+    try {
+      var field = OAuth2SuccessHandler.class.getDeclaredField("frontendUrl");
+      field.setAccessible(true);
+      field.set(oauth2SuccessHandler, "http://localhost:3000");
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to set frontendUrl", e);
+    }
   }
 
   @Test

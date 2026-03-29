@@ -16,7 +16,7 @@ public class OAuthCodeService {
   @Value("${oauth.code.expiration-minutes:5}")
   private int codeExpirationMinutes;
 
-  private static final int CODE_LENGTH = 32;
+  private static final int CODE_LENGTH = 24;
   private final SecureRandom secureRandom = new SecureRandom();
 
   private final OAuthCodeRepository oauthCodeRepository;

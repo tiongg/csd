@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import csd.t6.backend.account.AccountRepository;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
 
 @SpringBootTest
@@ -22,10 +23,14 @@ class PendingContributorRepositoryTest {
   @Autowired
   private PendingContributorRepository pendingContributorRepository;
 
+  @Autowired
+  private AccountRepository accountRepository;
+
   @Test
   @DisplayName("Should insert pending contributor")
   void shouldInsertPendingContributor() {
-    UUID learnerId = UUID.randomUUID();
+    AccountRecord account = accountRepository.insert("learner@example.com", "learner", "hashedpass");
+    UUID learnerId = account.getId();
 
     var result = pendingContributorRepository.insertPendingContributor(learnerId);
 
@@ -36,7 +41,8 @@ class PendingContributorRepositoryTest {
   @Test
   @DisplayName("Should get pending contributor accounts")
   void shouldGetPendingContributorAccounts() {
-    UUID learnerId = UUID.randomUUID();
+    AccountRecord account = accountRepository.insert("learner2@example.com", "learner2", "hashedpass");
+    UUID learnerId = account.getId();
     pendingContributorRepository.insertPendingContributor(learnerId);
 
     List<AccountRecord> result = pendingContributorRepository.getPendingContributorAccounts(10, 0);
@@ -47,8 +53,10 @@ class PendingContributorRepositoryTest {
   @Test
   @DisplayName("Should delete pending contributors")
   void shouldDeletePendingContributors() {
-    UUID learnerId1 = UUID.randomUUID();
-    UUID learnerId2 = UUID.randomUUID();
+    AccountRecord account1 = accountRepository.insert("learner3@example.com", "learner3", "hashedpass");
+    AccountRecord account2 = accountRepository.insert("learner4@example.com", "learner4", "hashedpass");
+    UUID learnerId1 = account1.getId();
+    UUID learnerId2 = account2.getId();
 
     pendingContributorRepository.insertPendingContributor(learnerId1);
     pendingContributorRepository.insertPendingContributor(learnerId2);
