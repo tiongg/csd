@@ -3,6 +3,7 @@ package csd.t6.backend.approval;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -154,8 +155,8 @@ class ContentVersionServiceTest {
     assertThatThrownBy(() -> contentVersionService.generateCourseMaterialUploadUrl(courseId, requesterId, "Test"))
         .isInstanceOf(BadRequestException.class)
         .hasMessageContaining("member of the team");
-    verify(contentVersionRepository, never()).rejectAllPendingVersions(any());
-    verify(contentVersionRepository, never()).create(any(), any(), any());
+    verify(contentVersionRepository, never()).rejectAllPendingVersions(any(UUID.class));
+    verify(contentVersionRepository, never()).create(any(UUID.class), anyInt(), any(String.class));
   }
 
   @Test
@@ -344,7 +345,7 @@ class ContentVersionServiceTest {
     assertThatThrownBy(() -> contentVersionService.approveVersion(contentVersionId))
         .isInstanceOf(BadRequestException.class)
         .hasMessageContaining("Can only approve pending versions");
-    verify(contentVersionRepository, never()).updateStatus();
+    verify(contentVersionRepository, never()).updateStatus(any(UUID.class), any(ContentStatus.class), any(String.class));
   }
 
   @Test
@@ -381,7 +382,7 @@ class ContentVersionServiceTest {
     assertThatThrownBy(() -> contentVersionService.rejectVersion(contentVersionId, "reason"))
         .isInstanceOf(BadRequestException.class)
         .hasMessageContaining("Can only reject pending versions");
-    verify(contentVersionRepository, never()).updateStatus(any(), any(), any());
+    verify(contentVersionRepository, never()).updateStatus(any(UUID.class), any(ContentStatus.class), any(String.class));
   }
 
   @Test

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -88,6 +89,9 @@ class OAuth2SuccessHandlerTest {
     } catch (Exception e) {
       throw new RuntimeException("Failed to set frontendUrl", e);
     }
+
+    // Set default redirect strategy to avoid NPE
+    oauth2SuccessHandler.setRedirectStrategy(new org.springframework.security.web.DefaultRedirectStrategy());
   }
 
   @Test
@@ -102,7 +106,7 @@ class OAuth2SuccessHandlerTest {
     assertThat(response.getRedirectedUrl()).contains("http://localhost:3000/login/callback?code=auth-code");
     verify(oauth2ProviderRepository).findByProviderAndProviderId(OauthProvider.GOOGLE, "google-provider-id");
     verify(oauthCodeService).createCode(accountId);
-    verify(accountService, org.mockito.Mockito.never()).createWithOAuthLogin(anyString(), anyString(), any(),
+    verify(accountService, never()).createWithOAuthLogin(anyString(), anyString(), any(),
         anyString(), anyString());
   }
 
