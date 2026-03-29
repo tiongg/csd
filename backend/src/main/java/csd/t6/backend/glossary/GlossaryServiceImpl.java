@@ -11,7 +11,6 @@ import csd.t6.backend.ai.AIService;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.glossary.dto.request.GlossaryUpdateRequest;
 import csd.t6.backend.glossary.dto.response.GlossaryResponse;
-import csd.t6.backend.tag.TagService;
 import csd.t6.jooq.public_.tables.records.GlossaryTermRecord;
 
 @Service
@@ -20,12 +19,10 @@ public class GlossaryServiceImpl implements GlossaryService {
   private final GlossaryRelationRepository glossaryRelationRepository;
 
   private final AIService aiService;
-  private final TagService tagService;
 
-  public GlossaryServiceImpl(AIService aiService, TagService tagService, GlossaryRepository glossaryRepository,
+  public GlossaryServiceImpl(AIService aiService, GlossaryRepository glossaryRepository,
       GlossaryRelationRepository glossaryRelationRepository) {
     this.aiService = aiService;
-    this.tagService = tagService;
     this.glossaryRepository = glossaryRepository;
     this.glossaryRelationRepository = glossaryRelationRepository;
   }
