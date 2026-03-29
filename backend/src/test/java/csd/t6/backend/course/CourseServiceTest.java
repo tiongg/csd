@@ -1,5 +1,6 @@
 package csd.t6.backend.course;
 
+import static csd.t6.jooq.public_.tables.Course.COURSE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -155,6 +156,64 @@ class CourseServiceTest {
     assertThat(result).hasSize(1);
   }
 
+  @Test
+  @DisplayName("Should return empty list when no courses exist")
+  void shouldReturnEmptyListWhenNoCoursesExist() {
+    when(courseRepository.findAll()).thenReturn(List.of());
+
+    List<CourseResponse> result = courseService.getAllCourses();
+
+    assertThat(result).isEmpty();
+  }
+
+  // --- getCoursesWithApprovedVersion ---
+
+  @Test
+  @DisplayName("Should return courses with approved version")
+  void shouldReturnCoursesWithApprovedVersion() {
+    when(contentVersionRepository.findCoursesWithApprovedVersion()).thenReturn(List.of(mockCourse));
+    when(tagService.getTagsForCourse(courseId)).thenReturn(List.of("Java", "Backend"));
+
+    List<CourseResponse> result = courseService.getCoursesWithApprovedVersion();
+
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).tags()).isEqualTo(List.of("Java", "Backend"));
+  }
+
+  @Test
+  @DisplayName("Should return empty list when no courses have approved version")
+  void shouldReturnEmptyListWhenNoApprovedVersions() {
+    when(contentVersionRepository.findCoursesWithApprovedVersion()).thenReturn(List.of());
+
+    List<CourseResponse> result = courseService.getCoursesWithApprovedVersion();
+
+    assertThat(result).isEmpty();
+  }
+
+  // --- getCoursesByTeamId ---
+
+  @Test
+  @DisplayName("Should return courses by team id for team member")
+  void shouldReturnCoursesByTeamIdForTeamMember() {
+    when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
+    when(courseRepository.findBy(eq(COURSE.TEAM_ID), eq(teamId))).thenReturn(List.of(mockCourse));
+    when(tagService.getTagsForCourse(courseId)).thenReturn(List.of("tag1"));
+
+    List<CourseResponse> result = courseService.getCoursesByTeamId(teamId, creatorId);
+
+    assertThat(result).hasSize(1);
+  }
+
+  @Test
+  @DisplayName("Should throw when non-team member tries to get team courses")
+  void shouldThrowWhenNonTeamMemberGetsTeamCourses() {
+    UUID otherId = UUID.randomUUID();
+    when(teamService.isTeamMember(teamId, otherId)).thenReturn(false);
+
+    assertThatThrownBy(() -> courseService.getCoursesByTeamId(teamId, otherId))
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("member of the team");
+  }
+
   // --- updateCourse ---
 
   @Test
@@ -199,6 +258,32 @@ class CourseServiceTest {
             .isInstanceOf(BadRequestException.class);
   }
 
+  @Test
+  @DisplayName("Should update course when requester is team member but not creator")
+  void shouldUpdateCourseAsTeamMember() {
+    UUID otherTeamMemberId = UUID.randomUUID();
+    when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
+    when(teamService.isTeamMember(teamId, otherTeamMemberId)).thenReturn(true);
+    when(courseRepository.update(eq(courseId), anyString(), isNull(), eq(teamId))).thenReturn(mockCourse);
+    when(tagService.updateCourseTags(courseId, Collections.emptyList())).thenReturn(List.of());
+
+    CourseResponse result = courseService.updateCourse(courseId,
+        new CourseUpdateRequest("New Title", null, Collections.emptyList()), otherTeamMemberId);
+
+    assertThat(result).isNotNull();
+  }
+
+  @Test
+  @DisplayName("Should throw when course not found for update")
+  void shouldThrowWhenCourseNotFoundForUpdate() {
+    UUID otherId = UUID.randomUUID();
+    when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> courseService.updateCourse(courseId,
+        new CourseUpdateRequest("Title", null, Collections.emptyList()), otherId))
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("Course not found");
+  }
+
   // --- deleteCourse ---
 
   @Test
@@ -218,5 +303,14 @@ class CourseServiceTest {
 
     assertThatThrownBy(() -> courseService.deleteCourse(courseId, nonCreatorId)).isInstanceOf(BadRequestException.class)
         .hasMessageContaining("Only course creator");
+  }
+
+  @Test
+  @DisplayName("Should throw when course not found for delete")
+  void shouldThrowWhenCourseNotFoundForDelete() {
+    when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> courseService.deleteCourse(courseId, creatorId))
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("Course not found");
   }
 }

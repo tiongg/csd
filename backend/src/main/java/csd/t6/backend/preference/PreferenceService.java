@@ -1,6 +1,5 @@
 package csd.t6.backend.preference;
 
-import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
 import static csd.t6.jooq.accounts.tables.Preference.PREFERENCE;
 
 import java.util.List;
@@ -26,7 +25,7 @@ public class PreferenceService {
 
   @Transactional
   public List<PreferenceRecord> createNewPreference(UUID accountId, List<String> preferenceList) {
-    if (preferenceList.size() == 0) {
+    if (preferenceList == null || preferenceList.isEmpty()) {
       throw new BadRequestException("No preference selected");
     }
     this.preferenceRepository.delete(PREFERENCE.ACCOUNT_ID,accountId );
