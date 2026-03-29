@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui';
 import SearchBar from '@/components/ui/searchbar';
 import {
   Select,
@@ -7,8 +8,13 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Heading1 } from '@/components/ui/typography';
-import { useApiQuery } from '@/lib/fetch-client';
+import {
+  apiQueryOptions,
+  useApiMutation,
+  useApiQuery,
+} from '@/lib/fetch-client';
 import type { GlossaryItem } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import GlossaryCard from './components/GlossaryCard';
 
@@ -26,13 +32,27 @@ const glassPanelClass =
 
 type GlossaryPageProps = {
   onEditClick?: (item: GlossaryItem) => void;
+  showGenerateButton?: boolean;
 };
 
-export default function GlossaryPage({ onEditClick }: GlossaryPageProps) {
+export default function GlossaryPage({
+  onEditClick,
+  showGenerateButton = false,
+}: GlossaryPageProps) {
+  const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_A_TO_Z);
 
   const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
+  const { mutateAsync: generateGlossary } = useApiMutation(
+    'post',
+    '/api/glossary/',
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(apiQueryOptions('get', '/api/glossary/'));
+      },
+    },
+  );
 
   const filteredItems = useMemo(() => {
     if (!glossaryItems) {
@@ -78,8 +98,8 @@ export default function GlossaryPage({ onEditClick }: GlossaryPageProps) {
         </section>
 
         <section className={glassPanelClass}>
-          <div className="mb-4 flex flex-col gap-3 xl:flex-row">
-            <div className="flex w-full flex-col gap-3 xl:w-auto xl:flex-row">
+          <div className="mb-4 flex w-full flex-col gap-3 xl:flex-row">
+            <div className="flex flex-col items-center gap-3 xl:w-auto xl:flex-row">
               <div className="w-full xl:w-64">
                 <p className="mb-1 text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
                   Sorting
@@ -112,6 +132,17 @@ export default function GlossaryPage({ onEditClick }: GlossaryPageProps) {
                 />
               </div>
             </div>
+            {showGenerateButton && (
+              <div className="ml-auto self-end">
+                <Button
+                  onClick={() => {
+                    generateGlossary({});
+                  }}
+                >
+                  Regenerate Glossary
+                </Button>
+              </div>
+            )}
           </div>
 
           {filteredItems.length > 0 ? (

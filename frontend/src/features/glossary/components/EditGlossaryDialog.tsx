@@ -15,8 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useApiMutation } from '@/lib/fetch-client';
+import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import type { GlossaryItem } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
 import { Loader2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -34,7 +35,6 @@ type EditGlossaryDialogProps = {
   onOpenChange: (open: boolean) => void;
   item: GlossaryItem | null;
   allTitles: string[];
-  onSuccess?: () => void;
 };
 
 export default function EditGlossaryDialog({
@@ -42,8 +42,8 @@ export default function EditGlossaryDialog({
   onOpenChange,
   item,
   allTitles,
-  onSuccess,
 }: EditGlossaryDialogProps) {
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState<EditFormData>({
     title: '',
     description: '',
@@ -55,6 +55,11 @@ export default function EditGlossaryDialog({
   const { mutateAsync: updateGlossary, isPending } = useApiMutation(
     'put',
     '/api/glossary/',
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(apiQueryOptions('get', '/api/glossary/'));
+      },
+    },
   );
 
   // Update form data when item changes
@@ -87,7 +92,6 @@ export default function EditGlossaryDialog({
       });
       toast.success('Glossary term updated successfully');
       onOpenChange(false);
-      onSuccess?.();
     } catch {
       toast.error('Failed to update glossary term');
     }
