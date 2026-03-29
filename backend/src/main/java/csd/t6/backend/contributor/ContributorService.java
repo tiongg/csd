@@ -42,7 +42,9 @@ public class ContributorService {
   }
 
   public ImageUploadResponse getFileUploadUrl(UUID courseId, String extension) {
-    if (!extension.equals("png") && !extension.equals("jpg") && !extension.equals("jpeg")) {
+    // FIX: use null-safe equals so null extension throws BadRequestException
+    // instead of NullPointerException
+    if (!"png".equals(extension) && !"jpg".equals(extension) && !"jpeg".equals(extension)) {
       throw new BadRequestException("Invalid file type!");
     }
 

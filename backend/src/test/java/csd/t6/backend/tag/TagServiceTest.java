@@ -11,6 +11,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -126,11 +127,18 @@ class TagServiceTest {
   @DisplayName("Should update course tags successfully")
   void shouldUpdateCourseTags() {
     List<String> tagTitles = List.of("Java", "Backend");
-    when(tagRepository.findByTitle("Java")).thenReturn(Optional.of(mockTag));
+
+    // "Java" exists — findOrCreateByTitle returns it directly
+    when(tagRepository.findOrCreateByTitle("Java")).thenReturn(mockTag);
+
+    // "Backend" does NOT exist yet — findOrCreateByTitle creates and returns it
     TagsRecord mockTag2 = mock(TagsRecord.class);
     UUID tagId2 = UUID.randomUUID();
-    lenient().when(mockTag2.getId()).thenReturn(tagId2);
-    when(tagRepository.findByTitle("Backend")).thenReturn(Optional.empty());
+    when(mockTag2.getId()).thenReturn(tagId2);
+    // FIX: TagService calls tagRepository.findOrCreateByTitle(), NOT findByTitle()+insert().
+    when(tagRepository.findOrCreateByTitle("Backend")).thenReturn(mockTag2);
+
+    when(tagRepository.getTagTitlesByCourseId(courseId)).thenReturn(tagTitles);
 
     List<String> result = tagService.updateCourseTags(courseId, tagTitles);
 
@@ -158,7 +166,10 @@ class TagServiceTest {
   @Test
   @DisplayName("Should throw when tag title is null")
   void shouldThrowWhenTagTitleIsNull() {
-    List<String> tagsWithNull = List.of("Java", null);
+    // FIX: List.of("Java", null) throws NullPointerException at construction time
+    // because List.of() rejects null elements. Use Arrays.asList() instead,
+    // which permits null elements so the null reaches the service validation.
+    List<String> tagsWithNull = Arrays.asList("Java", null);
 
     assertThatThrownBy(() -> tagService.updateCourseTags(courseId, tagsWithNull))
         .isInstanceOf(BadRequestException.class).hasMessageContaining("Tag title cannot be empty");
@@ -196,25 +207,39 @@ class TagServiceTest {
   @DisplayName("Should trim whitespace from tag titles")
   void shouldTrimWhitespaceFromTagTitles() {
     List<String> tagsWithWhitespace = List.of("  Java  ", "Backend  ");
-    when(tagRepository.findByTitle("Java")).thenReturn(Optional.of(mockTag));
-    when(tagRepository.findByTitle("Backend")).thenReturn(Optional.empty());
+
+    // FIX: TagService trims titles before calling findOrCreateByTitle(),
+    // so stubs must use the trimmed values.
+    when(tagRepository.findOrCreateByTitle("Java")).thenReturn(mockTag);
+
+    TagsRecord mockTag2 = mock(TagsRecord.class);
+    when(mockTag2.getId()).thenReturn(UUID.randomUUID());
+    when(tagRepository.findOrCreateByTitle("Backend")).thenReturn(mockTag2);
+
+    when(tagRepository.getTagTitlesByCourseId(courseId)).thenReturn(List.of("Java", "Backend"));
 
     tagService.updateCourseTags(courseId, tagsWithWhitespace);
 
-    verify(tagRepository).findByTitle("Java");
-    verify(tagRepository).findByTitle("Backend");
+    // Service must look up by trimmed title
+    verify(tagRepository).findOrCreateByTitle("Java");
+    verify(tagRepository).findOrCreateByTitle("Backend");
   }
 
   @Test
   @DisplayName("Should reuse existing tags (case-insensitive)")
   void shouldReuseExistingTags() {
     List<String> tags = List.of("Java", "Backend");
-    when(tagRepository.findByTitle("Java")).thenReturn(Optional.of(mockTag));
-    when(tagRepository.findByTitle("Backend")).thenReturn(Optional.of(mockTag));
+
+    // Both tags already exist — findOrCreateByTitle finds them without inserting
+    when(tagRepository.findOrCreateByTitle("Java")).thenReturn(mockTag);
+    when(tagRepository.findOrCreateByTitle("Backend")).thenReturn(mockTag);
+
+    when(tagRepository.getTagTitlesByCourseId(courseId)).thenReturn(tags);
 
     tagService.updateCourseTags(courseId, tags);
 
-    verify(tagRepository, never()).findByTitle("java");
-    verify(tagRepository).findByTitle("Java");
+    // The service must use the original (trimmed) title, not lowercase
+    verify(tagRepository, never()).findOrCreateByTitle("java");
+    verify(tagRepository).findOrCreateByTitle("Java");
   }
 }

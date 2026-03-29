@@ -4,6 +4,7 @@ import static csd.t6.jooq.public_.tables.PendingContributors.PENDING_CONTRIBUTOR
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -75,56 +76,58 @@ class ContributorServiceTest {
   }
 
   // --- getFileUploadUrl ---
+  //
+  // FIX: The service generates its own UUID internally when building the S3 key,
+  // so we cannot predict the exact key string at test-setup time. The old tests
+  // stubbed a hardcoded UUID that never matched the service-generated one, causing
+  // PotentialStubbingProblem. We now use argThat() to match on key prefix + extension.
 
   @Test
   @DisplayName("Should generate file upload URL for png")
   void shouldGenerateFileUploadUrlForPng() {
-    String expectedKey = String.format("editor/%s/%s.png", courseId, UUID.randomUUID());
-    String expectedUrl = "presigned-url";
-    String expectedPublicUrl = "public-url";
-
-    when(fileService.generatePresignedUploadUrl(expectedKey)).thenReturn(expectedUrl);
-    when(fileService.getPublicUrl(expectedKey)).thenReturn(expectedPublicUrl);
+    String prefix = "editor/" + courseId + "/";
+    when(fileService.generatePresignedUploadUrl(argThat(k -> k.startsWith(prefix) && k.endsWith(".png"))))
+        .thenReturn("presigned-url");
+    when(fileService.getPublicUrl(argThat(k -> k.startsWith(prefix) && k.endsWith(".png"))))
+        .thenReturn("public-url");
 
     ImageUploadResponse result = contributorService.getFileUploadUrl(courseId, "png");
 
-    assertThat(result.url()).isEqualTo(expectedUrl);
-    assertThat(result.key()).isEqualTo(expectedKey);
-    assertThat(result.publicUrl()).isEqualTo(expectedPublicUrl);
+    assertThat(result.url()).isEqualTo("presigned-url");
+    assertThat(result.publicUrl()).isEqualTo("public-url");
+    assertThat(result.key()).matches("editor/" + courseId + "/[a-f0-9\\-]+\\.png");
   }
 
   @Test
   @DisplayName("Should generate file upload URL for jpg")
   void shouldGenerateFileUploadUrlForJpg() {
-    String expectedKey = String.format("editor/%s/%s.jpg", courseId, UUID.randomUUID());
-    String expectedUrl = "presigned-url";
-    String expectedPublicUrl = "public-url";
-
-    when(fileService.generatePresignedUploadUrl(expectedKey)).thenReturn(expectedUrl);
-    when(fileService.getPublicUrl(expectedKey)).thenReturn(expectedPublicUrl);
+    String prefix = "editor/" + courseId + "/";
+    when(fileService.generatePresignedUploadUrl(argThat(k -> k.startsWith(prefix) && k.endsWith(".jpg"))))
+        .thenReturn("presigned-url");
+    when(fileService.getPublicUrl(argThat(k -> k.startsWith(prefix) && k.endsWith(".jpg"))))
+        .thenReturn("public-url");
 
     ImageUploadResponse result = contributorService.getFileUploadUrl(courseId, "jpg");
 
-    assertThat(result.url()).isEqualTo(expectedUrl);
-    assertThat(result.key()).isEqualTo(expectedKey);
-    assertThat(result.publicUrl()).isEqualTo(expectedPublicUrl);
+    assertThat(result.url()).isEqualTo("presigned-url");
+    assertThat(result.publicUrl()).isEqualTo("public-url");
+    assertThat(result.key()).matches("editor/" + courseId + "/[a-f0-9\\-]+\\.jpg");
   }
 
   @Test
   @DisplayName("Should generate file upload URL for jpeg")
   void shouldGenerateFileUploadUrlForJpeg() {
-    String expectedKey = String.format("editor/%s/%s.jpeg", courseId, UUID.randomUUID());
-    String expectedUrl = "presigned-url";
-    String expectedPublicUrl = "public-url";
-
-    when(fileService.generatePresignedUploadUrl(expectedKey)).thenReturn(expectedUrl);
-    when(fileService.getPublicUrl(expectedKey)).thenReturn(expectedPublicUrl);
+    String prefix = "editor/" + courseId + "/";
+    when(fileService.generatePresignedUploadUrl(argThat(k -> k.startsWith(prefix) && k.endsWith(".jpeg"))))
+        .thenReturn("presigned-url");
+    when(fileService.getPublicUrl(argThat(k -> k.startsWith(prefix) && k.endsWith(".jpeg"))))
+        .thenReturn("public-url");
 
     ImageUploadResponse result = contributorService.getFileUploadUrl(courseId, "jpeg");
 
-    assertThat(result.url()).isEqualTo(expectedUrl);
-    assertThat(result.key()).isEqualTo(expectedKey);
-    assertThat(result.publicUrl()).isEqualTo(expectedPublicUrl);
+    assertThat(result.url()).isEqualTo("presigned-url");
+    assertThat(result.publicUrl()).isEqualTo("public-url");
+    assertThat(result.key()).matches("editor/" + courseId + "/[a-f0-9\\-]+\\.jpeg");
   }
 
   @Test
@@ -137,6 +140,8 @@ class ContributorServiceTest {
   @Test
   @DisplayName("Should throw when file type is null")
   void shouldThrowWhenFileTypeIsNull() {
+    // FIX: requires ContributorService to use null-safe check (!"png".equals(ext))
+    // so null throws BadRequestException instead of NullPointerException.
     assertThatThrownBy(() -> contributorService.getFileUploadUrl(courseId, null))
         .isInstanceOf(BadRequestException.class).hasMessageContaining("Invalid file type");
   }

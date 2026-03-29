@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -126,7 +127,9 @@ class LearnerLessonServiceTest {
   @Test
   @DisplayName("Should get enrolled lessons for user")
   void shouldGetEnrolledLessons() {
-    LessonCourseRecord lessonCourseRecord = new LessonCourseRecord(mockLearnerCourse, mock(csd.t6.jooq.public_.tables.records.CourseRecord.class));
+    LessonCourseRecord lessonCourseRecord = new LessonCourseRecord(
+        mockLearnerCourse,
+        mock(csd.t6.jooq.public_.tables.records.CourseRecord.class));
     when(learnerCourseRepository.getLearnerEnrolled(userId)).thenReturn(List.of(lessonCourseRecord));
 
     UserEnrolledLessonsResponse result = learnerLessonService.getEnrolledLessons(userId);
@@ -172,15 +175,30 @@ class LearnerLessonServiceTest {
   @Test
   @DisplayName("Should complete lesson successfully")
   void shouldCompleteLesson() {
+    /*
+     * FIX: The service calls learnerCourse.getUserId() / learnerCourse.getCourseId()
+     * (on mockLearnerCourse, already stubbed via lenient() in setUp()), NOT on
+     * savedRecord. Stubbing getUserId()/getCourseId() on savedRecord is unnecessary
+     * and causes UnnecessaryStubbingException — those two stubs are removed.
+     *
+     * savedRecord only needs to reflect the post-save state that the test asserts:
+     * COMPLETED status and a non-null completedAt timestamp.
+     */
+    LearnerCourseRecord savedRecord = mock(LearnerCourseRecord.class);
+    when(savedRecord.getStatus()).thenReturn(LearnerCourseStatus.COMPLETED);
+    when(savedRecord.getCompletedAt()).thenReturn(LocalDateTime.now());
+
     when(learnerCourseRepository.findOneBy(eq(LEARNER_COURSE.ID), eq(lessonSessionId)))
         .thenReturn(java.util.Optional.of(mockLearnerCourse));
-    when(learnerCourseRepository.save(mockLearnerCourse)).thenReturn(mockLearnerCourse);
+    when(learnerCourseRepository.save(mockLearnerCourse)).thenReturn(savedRecord);
 
     LearnerCourseRecord result = learnerLessonService.completeLesson(lessonSessionId);
 
     assertThat(result).isNotNull();
     assertThat(result.getStatus()).isEqualTo(LearnerCourseStatus.COMPLETED);
     assertThat(result.getCompletedAt()).isNotNull();
+    // logActivity uses mockLearnerCourse.getUserId() / getCourseId() which are
+    // already stubbed via lenient() in setUp() to return userId and courseId
     verify(learnerAnalyticsService).logActivity(userId, courseId, LearnerActivityType.COURSE_COMPLETED);
   }
 

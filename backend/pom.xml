@@ -155,6 +155,9 @@
 						<goals>
 							<goal>report</goal>
 						</goals>
+						<configuration>
+							<sourceEncoding>UTF-8</sourceEncoding>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
