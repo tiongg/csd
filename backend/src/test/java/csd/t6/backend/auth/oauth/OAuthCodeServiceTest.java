@@ -49,13 +49,12 @@ class OAuthCodeServiceTest {
   @DisplayName("Should create code successfully")
   void shouldCreateCodeSuccessfully() {
     OauthCodeRecord mockRecord = mock(OauthCodeRecord.class);
-    when(oauthCodeRepository.insert(any(), eq(accountId), any(OffsetDateTime.class)))
-        .thenReturn(mockRecord);
+    when(oauthCodeRepository.insert(any(), eq(accountId), any(OffsetDateTime.class))).thenReturn(mockRecord);
 
     String result = oauthCodeService.createCode(accountId);
 
     assertThat(result).isNotNull();
-    assertThat(result.length()).isEqualTo(32); // Base64 encoded 24 bytes = 32 chars
+    assertThat(result.length()).isEqualTo(43); // Base64 encoded 32 bytes = 40 + 3 chars without padding
     verify(oauthCodeRepository).insert(any(), eq(accountId), any(OffsetDateTime.class));
   }
 
@@ -110,8 +109,7 @@ class OAuthCodeServiceTest {
   void shouldThrowWhenCodeIsInvalid() {
     when(oauthCodeRepository.findValidByCode("invalid-code")).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> oauthCodeService.consumeCode("invalid-code"))
-        .isInstanceOf(BadRequestException.class)
+    assertThatThrownBy(() -> oauthCodeService.consumeCode("invalid-code")).isInstanceOf(BadRequestException.class)
         .hasMessageContaining("Invalid or expired code");
     verify(oauthCodeRepository).findValidByCode("invalid-code");
     verify(oauthCodeRepository, never()).deleteByCode(any());
@@ -122,8 +120,7 @@ class OAuthCodeServiceTest {
   void shouldThrowWhenCodeIsExpired() {
     when(oauthCodeRepository.findValidByCode(validCode)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> oauthCodeService.consumeCode(validCode))
-        .isInstanceOf(BadRequestException.class)
+    assertThatThrownBy(() -> oauthCodeService.consumeCode(validCode)).isInstanceOf(BadRequestException.class)
         .hasMessageContaining("Invalid or expired code");
     verify(oauthCodeRepository).findValidByCode(validCode);
     verify(oauthCodeRepository, never()).deleteByCode(any());
@@ -154,8 +151,7 @@ class OAuthCodeServiceTest {
 
     // Second consumption fails because code is deleted
     when(oauthCodeRepository.findValidByCode(validCode)).thenReturn(Optional.empty());
-    assertThatThrownBy(() -> oauthCodeService.consumeCode(validCode))
-        .isInstanceOf(BadRequestException.class)
+    assertThatThrownBy(() -> oauthCodeService.consumeCode(validCode)).isInstanceOf(BadRequestException.class)
         .hasMessageContaining("Invalid or expired code");
 
     verify(oauthCodeRepository, times(2)).findValidByCode(validCode);
