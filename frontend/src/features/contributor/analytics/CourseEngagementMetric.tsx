@@ -1,13 +1,13 @@
-import { EngagementFunnel } from './EngagementFunnel';
-import { EmptyMetricState } from './EmptyMetricState';
 import type { EngagementSummary, Timeframe } from '../contributor-utils';
+import EmptyMetricState from './EmptyMetricState';
+import EngagementFunnel from './EngagementFunnel';
 
 type CourseEngagementMetricProps = {
   engagementSummary: EngagementSummary;
   timeframe: Timeframe;
 };
 
-export function CourseEngagementMetric({
+export default function CourseEngagementMetric({
   engagementSummary,
   timeframe,
 }: CourseEngagementMetricProps) {

@@ -4,7 +4,7 @@ type BarMetricChartProps = {
   points: BarMetricPoint[];
 };
 
-export function BarMetricChart({ points }: BarMetricChartProps) {
+export default function BarMetricChart({ points }: BarMetricChartProps) {
   const maxValue = Math.max(1, ...points.map((point) => point.value));
 
   return (

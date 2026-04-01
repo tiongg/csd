@@ -1,12 +1,12 @@
-import { BarMetricChart } from './BarMetricChart';
-import { EmptyMetricState } from './EmptyMetricState';
 import type { BarMetricPoint } from '../contributor-utils';
+import BarMetricChart from './BarMetricChart';
+import EmptyMetricState from './EmptyMetricState';
 
 type PublishedOutputMetricProps = {
   publishedOutputPoints: BarMetricPoint[];
 };
 
-export function PublishedOutputMetric({
+export default function PublishedOutputMetric({
   publishedOutputPoints,
 }: PublishedOutputMetricProps) {
   const hasData = publishedOutputPoints.some((p) => p.value > 0);

@@ -1,12 +1,12 @@
-import { BarMetricChart } from './BarMetricChart';
-import { EmptyMetricState } from './EmptyMetricState';
 import type { BarMetricPoint } from '../contributor-utils';
+import BarMetricChart from './BarMetricChart';
+import EmptyMetricState from './EmptyMetricState';
 
 type EnrollmentTrendMetricProps = {
   enrollmentTrendPoints: BarMetricPoint[];
 };
 
-export function EnrollmentTrendMetric({
+export default function EnrollmentTrendMetric({
   enrollmentTrendPoints,
 }: EnrollmentTrendMetricProps) {
   const hasData = enrollmentTrendPoints.some((p) => p.value > 0);

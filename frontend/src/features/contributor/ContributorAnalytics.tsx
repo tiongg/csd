@@ -11,11 +11,9 @@ import {
   DashboardAnalyticsSkeleton,
   type AnalyticsMetricCard,
 } from '../dashboard/AnalyticsSection';
-import {
-  CourseEngagementMetric,
-  EnrollmentTrendMetric,
-  PublishedOutputMetric,
-} from './analytics';
+import CourseEngagementMetric from './analytics/CourseEngagementMetric';
+import EnrollmentTrendMetric from './analytics/EnrollmentTrendMetric';
+import PublishedOutputMetric from './analytics/PublishedOutputMetric';
 import type {
   BarMetricPoint,
   FunnelRow,
