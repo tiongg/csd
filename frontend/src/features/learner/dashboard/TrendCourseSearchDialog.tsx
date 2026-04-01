@@ -26,8 +26,13 @@ export function TrendCourseSearchDialog({
 
   const { data: courses } = useApiQuery('get', '/api/courses/published');
   const publishedCourses = courses ?? [];
-  const filteredCourses = publishedCourses.filter((course) =>
-    course.title.toLowerCase().includes(search.toLowerCase()),
+  const filteredCourses = publishedCourses.filter(
+    (course) =>
+      course.title.toLowerCase().includes(search.toLowerCase()) ||
+      (course.description ?? '').toLowerCase().includes(search.toLowerCase()) ||
+      (course.tags ?? []).some((tag) =>
+        tag.toLowerCase().includes(search.toLowerCase()),
+      ),
   );
 
   // Reset search when initial value changes and dialog opens
