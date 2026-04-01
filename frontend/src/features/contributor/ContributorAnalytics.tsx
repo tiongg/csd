@@ -16,6 +16,7 @@ import EnrollmentTrendMetric from './analytics/EnrollmentTrendMetric';
 import PublishedOutputMetric from './analytics/PublishedOutputMetric';
 import type {
   BarMetricPoint,
+  EngagementSummary,
   FunnelRow,
   MetricKey,
   Timeframe,
@@ -26,69 +27,63 @@ export default function ContributorAnalytics() {
   const [selectedMetric, setSelectedMetric] =
     useState<MetricKey>('courseEngagement');
 
-  const { data: analytics, isLoading } = useApiQuery(
-    'get',
-    '/api/contributor/analytics',
-    {
-      params: {
-        query: { timeframe },
-      },
+  const { data: analytics } = useApiQuery('get', '/api/contributor/analytics', {
+    params: {
+      query: { timeframe },
     },
-  );
+  });
 
-  // Build funnel rows with colors (frontend computes colors)
-  const funnelRows: FunnelRow[] = analytics
-    ? [
-        {
-          label: 'Enrolled',
-          value: analytics.engagementSummary.enrolled,
-          color: '#0ea5e9',
-        },
-        {
-          label: 'Active',
-          value: analytics.engagementSummary.active,
-          color: '#38bdf8',
-        },
-        {
-          label: 'Completed',
-          value: analytics.engagementSummary.completed,
-          color: '#7dd3fc',
-        },
-      ]
-    : [];
+  if (!analytics) {
+    return (
+      <DashboardAnalyticsSkeleton
+        title="Contributor Analytics"
+        description="Course metrics that spotlight engagement, output, and enrollment trends."
+      />
+    );
+  }
+
+  const funnelRows: FunnelRow[] = [
+    {
+      label: 'Enrolled',
+      value: analytics.engagementSummary.enrolled,
+      color: '#0ea5e9',
+    },
+    {
+      label: 'Active',
+      value: analytics.engagementSummary.active,
+      color: '#38bdf8',
+    },
+    {
+      label: 'Completed',
+      value: analytics.engagementSummary.completed,
+      color: '#7dd3fc',
+    },
+  ];
 
   const maxFunnelValue = Math.max(1, ...funnelRows.map((row) => row.value));
 
-  const engagementSummary = analytics
-    ? {
-        totalEnrollments: analytics.engagementSummary.enrolled,
-        activeLearners: analytics.engagementSummary.active,
-        totalCompletions: analytics.engagementSummary.completed,
-        funnelRows,
-        maxFunnelValue,
-      }
-    : {
-        totalEnrollments: 0,
-        activeLearners: 0,
-        totalCompletions: 0,
-        funnelRows: [],
-        maxFunnelValue: 1,
-      };
+  const engagementSummary: EngagementSummary = {
+    totalEnrollments: analytics.engagementSummary.enrolled,
+    activeLearners: analytics.engagementSummary.active,
+    totalCompletions: analytics.engagementSummary.completed,
+    funnelRows,
+    maxFunnelValue,
+  };
 
-  const enrollmentTrendPoints: BarMetricPoint[] = (
-    analytics?.enrollmentTrend ?? []
-  ).map((bucket) => ({
-    label: bucket.label,
-    value: bucket.value,
-    title: `${bucket.label}: ${bucket.value} enrollments`,
-  }));
+  const enrollmentTrendPoints: BarMetricPoint[] = analytics.enrollmentTrend.map(
+    (bucket) => ({
+      label: bucket.label,
+      value: bucket.value,
+      title: `${bucket.label}: ${bucket.value} enrollments`,
+    }),
+  );
 
-  const publishedOutputPoints: BarMetricPoint[] = (
-    analytics?.publishedSeries ?? []
-  ).map((bucket) => ({
-    label: bucket.label,
-    value: bucket.value,
-  }));
+  const publishedOutputPoints: BarMetricPoint[] = analytics.publishedSeries.map(
+    (bucket) => ({
+      label: bucket.label,
+      value: bucket.value,
+    }),
+  );
 
   const metricCards: AnalyticsMetricCard<MetricKey>[] = [
     {
@@ -101,27 +96,18 @@ export default function ContributorAnalytics() {
     {
       key: 'publishedOutput',
       title: 'Published Output',
-      value: (analytics?.publishedTotal ?? 0).toString(),
-      description: `${(analytics?.publishedDelta ?? 0 > 0) ? '+' : ''}${analytics?.publishedDelta ?? 0} vs prior window`,
+      value: analytics.publishedTotal.toString(),
+      description: `${analytics.publishedDelta > 0 ? '+' : ''}${analytics.publishedDelta} vs prior window`,
       icon: RocketLaunchIcon,
     },
     {
       key: 'coursePipeline',
       title: 'Enrollment Trend',
-      value: (analytics?.latestEnrollmentCount ?? 0).toString(),
-      description: `${analytics?.totalEnrollmentCount ?? 0} enrollments across ${timeframe}`,
+      value: analytics.latestEnrollmentCount.toString(),
+      description: `${analytics.totalEnrollmentCount} enrollments across ${timeframe}`,
       icon: ChartBarIcon,
     },
   ];
-
-  if (isLoading) {
-    return (
-      <DashboardAnalyticsSkeleton
-        title="Contributor Analytics"
-        description="Course metrics that spotlight engagement, output, and enrollment trends."
-      />
-    );
-  }
 
   return (
     <DashboardAnalyticsSection
