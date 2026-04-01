@@ -14,10 +14,7 @@ import { fetchClient, useApiQuery } from '@/lib/fetch-client';
 import { useQueries } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import {
-  useMemo,
-  useState,
-} from 'react';
+import { useMemo, useState } from 'react';
 import { TopTrendsTable } from '../learner/dashboard/TopTrendsTable';
 
 export default function ContributorDashboardPage() {
