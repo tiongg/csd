@@ -1,8 +1,6 @@
 import type { Course, EnrolledCourse } from '@/lib/utils';
 import { cn } from '@/lib/utils';
-import { ClockIcon } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
-import dayjs from 'dayjs';
 
 type CourseCardProps = {
   course: Course;
@@ -10,22 +8,22 @@ type CourseCardProps = {
 };
 
 export function CourseCard({ course, enrollment }: CourseCardProps) {
-  const { title, description, updatedAt, id, tags, imageUrl } = course;
+  const { title, description, id, tags, imageUrl } = course;
   return (
     <Link
       to="/learner/courses/$courseId"
       params={{ courseId: id }}
-      className="group relative cursor-pointer overflow-hidden rounded-xl border border-slate-300/85 bg-slate-100/70 shadow-sm transition-all hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-md"
+      className="group relative cursor-pointer overflow-hidden rounded-xl border border-slate-300/85 bg-slate-100/70 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30"
     >
-      {imageUrl && (
-        <div className="aspect-video w-full overflow-hidden bg-slate-200">
+      <div className="aspect-video w-full overflow-hidden bg-slate-200">
+        {imageUrl && (
           <img
             src={imageUrl}
             alt={title}
             className="h-full w-full object-cover"
           />
-        </div>
-      )}
+        )}
+      </div>
       <div className="flex h-full flex-col justify-between p-5">
         <div className="flex flex-col gap-2">
           <div className="flex items-start justify-between gap-2">
@@ -57,12 +55,6 @@ export function CourseCard({ course, enrollment }: CourseCardProps) {
                 {tag}
               </span>
             ))}
-          </div>
-        </div>
-        <div className="mt-4 flex items-center justify-end">
-          <div className="flex items-center gap-1 text-xs text-slate-500">
-            <ClockIcon className="size-4" />
-            <span>Updated {dayjs(updatedAt).fromNow()}</span>
           </div>
         </div>
       </div>
