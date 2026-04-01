@@ -3,16 +3,16 @@ import { EmptyMetricState } from './EmptyMetricState';
 import type { EngagementSummary, Timeframe } from '../contributor-utils';
 
 type CourseEngagementMetricProps = {
-  courses: unknown[];
   engagementSummary: EngagementSummary;
   timeframe: Timeframe;
 };
 
 export function CourseEngagementMetric({
-  courses,
   engagementSummary,
   timeframe,
 }: CourseEngagementMetricProps) {
+  const hasData = engagementSummary.totalEnrollments > 0;
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -21,7 +21,7 @@ export function CourseEngagementMetric({
         </p>
         <p className="text-xs text-slate-500">{timeframe} view</p>
       </div>
-      {courses.length === 0 ? (
+      {!hasData ? (
         <EmptyMetricState message="Create contributor courses to unlock funnel analytics here." />
       ) : (
         <EngagementFunnel engagementSummary={engagementSummary} />

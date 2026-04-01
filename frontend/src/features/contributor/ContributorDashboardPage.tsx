@@ -98,8 +98,6 @@ export default function ContributorDashboardPage() {
   const filteredCourses = teamCourses.filter((course) =>
     course.title.toLowerCase().includes(trendSearch.toLowerCase()),
   );
-  const isAnalyticsLoading =
-    !teams || teamCourseQueries.some((query) => query.isLoading);
 
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
@@ -121,10 +119,7 @@ export default function ContributorDashboardPage() {
           </div>
         </section>
 
-        <ContributorAnalytics
-          courses={teamCourses}
-          isLoading={isAnalyticsLoading}
-        />
+        <ContributorAnalytics />
 
         <div
           ref={splitContainerRef}

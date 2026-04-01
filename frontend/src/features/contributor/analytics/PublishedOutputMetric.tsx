@@ -3,14 +3,14 @@ import { EmptyMetricState } from './EmptyMetricState';
 import type { BarMetricPoint } from '../contributor-utils';
 
 type PublishedOutputMetricProps = {
-  courses: unknown[];
   publishedOutputPoints: BarMetricPoint[];
 };
 
 export function PublishedOutputMetric({
-  courses,
   publishedOutputPoints,
 }: PublishedOutputMetricProps) {
+  const hasData = publishedOutputPoints.some((p) => p.value > 0);
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -21,7 +21,7 @@ export function PublishedOutputMetric({
           Courses/releases shipped in this period
         </p>
       </div>
-      {courses.length === 0 ? (
+      {!hasData ? (
         <EmptyMetricState message="Publish-ready contributor courses will show output trends here." />
       ) : (
         <BarMetricChart points={publishedOutputPoints} />
