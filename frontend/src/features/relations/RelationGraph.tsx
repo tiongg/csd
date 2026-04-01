@@ -1,6 +1,6 @@
 import { useApiQuery } from '@/lib/fetch-client';
-import { cn } from '@/lib/utils';
 import type { GlossaryItem } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import type { SimulationLinkDatum, SimulationNodeDatum } from 'd3';
 import * as d3 from 'd3';
 import { useEffect, useRef, useState } from 'react';
@@ -17,9 +17,10 @@ type RelationGraphProps = {
 };
 
 // Convert relations data to D3-compatible format
-function buildGraph(
-  glossaryItems: GlossaryItem[],
-): { nodes: NodeType[]; links: LinkType[] } {
+function buildGraph(glossaryItems: GlossaryItem[]): {
+  nodes: NodeType[];
+  links: LinkType[];
+} {
   const nodes = new Map<string, NodeType>();
   const links: LinkType[] = [];
   const addedLinks = new Set<string>();
@@ -37,7 +38,8 @@ function buildGraph(
       }
 
       // Create link (avoid duplicates)
-      const linkKey = source < target ? `${source}-${target}` : `${target}-${source}`;
+      const linkKey =
+        source < target ? `${source}-${target}` : `${target}-${source}`;
       if (!addedLinks.has(linkKey)) {
         addedLinks.add(linkKey);
         links.push({ source, target });
@@ -107,9 +109,9 @@ export default function RelationGraph({
         'link',
         d3.forceLink<NodeType, LinkType>(links).id((d) => d.id),
       )
-      .force('charge', d3.forceManyBody().strength(-300))
+      .force('charge', d3.forceManyBody().strength(-100))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(30));
+      .force('collision', d3.forceCollide().radius(15));
 
     // Create links
     const link = g
@@ -148,7 +150,7 @@ export default function RelationGraph({
       .attr('fill', '#334155')
       .attr('font-size', '10px')
       .attr('font-weight', '500')
-      .attr('pointer-events', 'none');
+      .style('cursor', 'pointer');
 
     // Store connected nodes for each node and create glossary lookup
     const connections = new Map<string, Set<string>>();
@@ -196,8 +198,8 @@ export default function RelationGraph({
 
       // Show tooltip
       setTooltip({
-        x: event.pageX + 10,
-        y: event.pageY - 10,
+        x: event.clientX + 10,
+        y: event.clientY - 10,
         item: glossaryMap.get(d.id) ?? null,
         connections: Array.from(connected).sort(),
         visible: true,
@@ -207,8 +209,8 @@ export default function RelationGraph({
     nodeGroups.on('mousemove', function (event) {
       setTooltip((prev) => ({
         ...prev,
-        x: event.pageX + 10,
-        y: event.pageY - 10,
+        x: event.clientX + 10,
+        y: event.clientY - 10,
       }));
     });
 
@@ -258,7 +260,7 @@ export default function RelationGraph({
     >
       <svg
         ref={svgRef}
-        className="h-full w-full flex-1 bg-slate-50"
+        className="h-full w-full flex-1"
         style={{ cursor: 'grab' }}
       />
       {tooltip.visible && tooltip.item && (
@@ -284,14 +286,14 @@ export default function RelationGraph({
           {tooltip.item.example && (
             <div className="mb-2">
               <span className="font-medium text-slate-400">Example: </span>
-              <span className="italic text-slate-300">{tooltip.item.example}</span>
+              <span className="text-slate-300 italic">
+                {tooltip.item.example}
+              </span>
             </div>
           )}
           {tooltip.connections.length > 0 && (
             <div className="mt-2 border-t border-slate-700 pt-2">
-              <span className="font-medium text-slate-400">
-                Related to:{' '}
-              </span>
+              <span className="font-medium text-slate-400">Related to: </span>
               <span className="text-slate-200">
                 {tooltip.connections.join(', ')}
               </span>

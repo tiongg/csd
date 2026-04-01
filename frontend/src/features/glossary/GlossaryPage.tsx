@@ -16,6 +16,7 @@ import {
 import type { GlossaryItem } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
+import RelationGraph from '../relations/RelationGraph';
 import GlossaryCard from './components/GlossaryCard';
 
 const SORT_A_TO_Z = 'asc';
@@ -95,6 +96,13 @@ export default function GlossaryPage({
             Expanded slang and meme vocabulary with practical conversation
             examples for writing, moderation, and learner context.
           </p>
+        </section>
+
+        <section className="relative h-120 rounded-2xl border border-white/75 bg-white/45 p-5 shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 md:p-6">
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Relationships
+          </p>
+          <RelationGraph />
         </section>
 
         <section className={glassPanelClass}>
