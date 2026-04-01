@@ -632,14 +632,18 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/courses/{courseId}/upload-reel-url": {
+    "/api/courses/{courseId}/image-upload-url": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getUploadReelUrl"];
+        /**
+         * Get course image upload URL
+         * @description Generates a presigned URL for uploading a course thumbnail image. Only team members can upload.
+         */
+        get: operations["getImageUploadUrl"];
         put?: never;
         post?: never;
         delete?: never;
@@ -896,7 +900,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/courses/{courseId}/reel": {
+    "/api/courses/{courseId}/image": {
         parameters: {
             query?: never;
             header?: never;
@@ -907,10 +911,10 @@ export interface paths {
         put?: never;
         post?: never;
         /**
-         * Delete reel
-         * @description Deletes a reel. Only team members can delete.
+         * Delete course image
+         * @description Deletes the course thumbnail image. Only team members can delete.
          */
-        delete: operations["deleteReel"];
+        delete: operations["deleteImage"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1021,7 +1025,7 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
-            reelUrl?: string;
+            imageUrl?: string;
             tags?: string[];
         };
         AddMemberRequest: {
@@ -2408,9 +2412,11 @@ export interface operations {
             };
         };
     };
-    getUploadReelUrl: {
+    getImageUploadUrl: {
         parameters: {
-            query?: never;
+            query: {
+                extension: string;
+            };
             header?: never;
             path: {
                 courseId: string;
@@ -2425,7 +2431,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["PresignedUrlResponse"];
+                    "*/*": components["schemas"]["ImageUploadResponse"];
+                };
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
                 };
             };
         };
@@ -2782,7 +2797,7 @@ export interface operations {
             };
         };
     };
-    deleteReel: {
+    deleteImage: {
         parameters: {
             query?: never;
             header?: never;

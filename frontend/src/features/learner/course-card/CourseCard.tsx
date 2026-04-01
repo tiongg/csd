@@ -10,13 +10,22 @@ type CourseCardProps = {
 };
 
 export function CourseCard({ course, enrollment }: CourseCardProps) {
-  const { title, description, updatedAt, id, tags } = course;
+  const { title, description, updatedAt, id, tags, imageUrl } = course;
   return (
     <Link
       to="/learner/courses/$courseId"
       params={{ courseId: id }}
       className="group relative cursor-pointer overflow-hidden rounded-xl border border-slate-300/85 bg-slate-100/70 shadow-sm transition-all hover:border-sky-200 hover:bg-sky-50/40 hover:shadow-md"
     >
+      {imageUrl && (
+        <div className="aspect-video w-full overflow-hidden bg-slate-200">
+          <img
+            src={imageUrl}
+            alt={title}
+            className="h-full w-full object-cover"
+          />
+        </div>
+      )}
       <div className="flex h-full flex-col justify-between p-5">
         <div className="flex flex-col gap-2">
           <div className="flex items-start justify-between gap-2">

@@ -235,8 +235,18 @@ function CourseCard({ course, teamId }: CourseCardProps) {
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
       >
-        <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
-          <div className="space-y-1.5">
+        <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
+          {course.imageUrl && (
+            <div className="aspect-video w-full overflow-hidden rounded-t-xl bg-slate-200">
+              <img
+                src={course.imageUrl}
+                alt={course.title}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          )}
+          <div className="p-4">
+            <div className="space-y-1.5">
             <div className="flex items-start justify-between gap-3">
               <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
                 {course.title}
@@ -293,6 +303,7 @@ function CourseCard({ course, teamId }: CourseCardProps) {
             >
               <Trash2 className="size-4" />
             </button>
+          </div>
           </div>
         </article>
       </div>

@@ -126,13 +126,16 @@ export async function uploadCourseContent(
   return await uploadJson(courseContent, data.url);
 }
 
-export async function uploadReel(videoFile: File, courseId: string) {
+export async function uploadCourseImage(imageFile: File, courseId: string) {
   const { data } = await fetchClient.GET(
-    '/api/courses/{courseId}/upload-reel-url',
+    '/api/courses/{courseId}/image-upload-url',
     {
       params: {
         path: {
           courseId,
+        },
+        query: {
+          extension: imageFile.name.split('.').pop() || '',
         },
       },
     },
@@ -142,12 +145,26 @@ export async function uploadReel(videoFile: File, courseId: string) {
     throw new Error('Failed to get upload URL');
   }
 
-  return await uploadVideoFile(videoFile, data.url);
+  const { url: presignedUrl, publicUrl } = data;
+
+  const response = await fetch(presignedUrl, {
+    method: 'PUT',
+    body: imageFile,
+    headers: {
+      'Content-Type': imageFile.type,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to upload image: ${response.statusText}`);
+  }
+
+  return publicUrl;
 }
 
-export async function deleteReel(courseId: string) {
+export async function deleteCourseImage(courseId: string) {
   await fetchClient.DELETE(
-    '/api/courses/{courseId}/reel',
+    '/api/courses/{courseId}/image',
     {
       params: {
         path: {
