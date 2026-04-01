@@ -228,6 +228,7 @@ export default function RelationGraph({
     nodeGroups.on('click', function (_e, d) {
       const connected = Array.from(connections.get(d.id) ?? []);
       onNodeClick?.(d.id, connected);
+      setTooltip((prev) => ({ ...prev, visible: false }));
     });
 
     // Update positions on tick

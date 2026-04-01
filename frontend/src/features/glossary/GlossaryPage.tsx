@@ -15,7 +15,8 @@ import {
 } from '@/lib/fetch-client';
 import type { GlossaryItem } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { TrendCourseSearchDialog } from '../learner/dashboard/TrendCourseSearchDialog';
 import RelationGraph from '../relations/RelationGraph';
 import GlossaryCard from './components/GlossaryCard';
 
@@ -43,6 +44,8 @@ export default function GlossaryPage({
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_A_TO_Z);
+  const [isTrendModalOpen, setIsTrendModalOpen] = useState(false);
+  const [trendSearch, setTrendSearch] = useState('');
 
   const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
   const { mutateAsync: generateGlossary } = useApiMutation(
@@ -82,6 +85,11 @@ export default function GlossaryPage({
     });
   }, [query, sortOrder, glossaryItems]);
 
+  const onNodeClick = useCallback((nodeId: string) => {
+    setTrendSearch(nodeId);
+    setIsTrendModalOpen(true);
+  }, []);
+
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col bg-slate-100/70 p-4 md:p-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
@@ -102,7 +110,7 @@ export default function GlossaryPage({
           <p className="mb-1 text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
             Relationships
           </p>
-          <RelationGraph />
+          <RelationGraph onNodeClick={onNodeClick} />
         </section>
 
         <section className={glassPanelClass}>
@@ -170,6 +178,12 @@ export default function GlossaryPage({
           )}
         </section>
       </div>
+
+      <TrendCourseSearchDialog
+        initialSearchValue={trendSearch}
+        open={isTrendModalOpen}
+        onOpenChange={setIsTrendModalOpen}
+      />
     </div>
   );
 }
