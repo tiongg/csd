@@ -1,4 +1,4 @@
-import { cleanText } from '@/lib/utils';
+import { cleanText, cn } from '@/lib/utils';
 import {
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
@@ -29,9 +29,11 @@ type Trend = {
   metric: string;
 };
 
-type TopTrendsTableProps = {
-  onTrendClick: (trendName: string) => void;
-};
+type TopTrendsTableProps = PropsWithChildren<{
+  onTrendClick?: (trendName: string) => void;
+  title?: string;
+  description?: string;
+}>;
 
 function getMovement(trend: Trend, index: number) {
   const signal = `${trend.name} ${trend.metric}`.toLowerCase();
@@ -80,8 +82,10 @@ function MovementIcon({ movement }: { movement: TrendMovement }) {
 
 export function TopTrendsTable({
   onTrendClick,
+  title = 'Top Trends',
+  description = 'Top 5 this week',
   children,
-}: PropsWithChildren<TopTrendsTableProps>) {
+}: TopTrendsTableProps) {
   const { data: trendData, isLoading } = useQuery({
     queryKey: ['learnerDashboardTrends'],
     queryFn: async () => {
@@ -129,8 +133,8 @@ export function TopTrendsTable({
     <section className="min-w-0 basis-full rounded-2xl border border-slate-200 bg-white p-5 md:p-6 lg:flex-1">
       {children ?? (
         <>
-          <h2 className="text-xl font-semibold text-slate-900">Top Trends</h2>
-          <p className="mt-1 text-sm text-slate-600">Top 5 this week</p>
+          <h2 className="text-xl font-semibold text-slate-900">{title}</h2>
+          <p className="mt-1 text-sm text-slate-600">{description}</p>
         </>
       )}
       <div className="mt-4 overflow-hidden rounded-xl border border-slate-200">
@@ -157,8 +161,15 @@ export function TopTrendsTable({
                   initial="initial"
                   animate="animate"
                   transition={{ delay: index * 0.05 }}
-                  className="cursor-pointer border-t border-slate-200 text-slate-800 hover:bg-slate-50"
-                  onClick={() => onTrendClick(cleanText(trend.name))}
+                  className={cn(
+                    'border-t border-slate-200 text-slate-800',
+                    onTrendClick && 'cursor-pointer hover:bg-slate-50',
+                  )}
+                  onClick={
+                    onTrendClick
+                      ? () => onTrendClick(cleanText(trend.name))
+                      : undefined
+                  }
                 >
                   <td className="px-4 py-3 font-semibold">#{trend.rank}</td>
                   <td className="px-4 py-3 font-medium">

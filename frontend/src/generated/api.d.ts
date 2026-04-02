@@ -680,6 +680,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/contributor/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getAnalytics_1"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/content-versions/{courseId}": {
         parameters: {
             query?: never;
@@ -1136,6 +1152,34 @@ export interface components {
             url: string;
             key: string;
             publicUrl: string;
+        };
+        ContributorAnalyticsResponse: {
+            engagementSummary: components["schemas"]["CourseEngagementData"];
+            enrollmentTrend: components["schemas"]["EnrollmentTrendBucket"][];
+            publishedSeries: components["schemas"]["EnrollmentTrendBucket"][];
+            /** Format: int32 */
+            publishedTotal: number;
+            /** Format: int32 */
+            publishedDelta: number;
+            /** Format: int32 */
+            latestEnrollmentCount: number;
+            /** Format: int32 */
+            totalEnrollmentCount: number;
+        };
+        CourseEngagementData: {
+            /** Format: int32 */
+            enrolled: number;
+            /** Format: int32 */
+            active: number;
+            /** Format: int32 */
+            completed: number;
+        };
+        EnrollmentTrendBucket: {
+            label: string;
+            /** Format: int32 */
+            value: number;
+            /** Format: int32 */
+            attempts: number;
         };
         ContentVersionResponse: {
             id: string;
@@ -2426,6 +2470,28 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ImageUploadResponse"];
+                };
+            };
+        };
+    };
+    getAnalytics_1: {
+        parameters: {
+            query?: {
+                timeframe?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ContributorAnalyticsResponse"];
                 };
             };
         };

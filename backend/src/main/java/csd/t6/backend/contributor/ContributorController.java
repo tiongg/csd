@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.auth.AuthUserDetails;
+import csd.t6.backend.contributor.dto.response.ContributorAnalyticsResponse;
 import csd.t6.backend.contributor.dto.response.ImageUploadResponse;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -19,9 +20,12 @@ import csd.t6.backend.decorators.responses.NoContentResponse;
 @RequestMapping("/api/contributor")
 public class ContributorController {
   private final ContributorService contributorService;
+  private final ContributorAnalyticsService analyticsService;
 
-  public ContributorController(ContributorService contributorService) {
+  public ContributorController(ContributorService contributorService,
+      ContributorAnalyticsService analyticsService) {
     this.contributorService = contributorService;
+    this.analyticsService = analyticsService;
   }
 
   @PostMapping("/apply")
@@ -34,5 +38,12 @@ public class ContributorController {
   @GetMapping("/{courseId}/image-upload-url")
   public ImageUploadResponse getEditorImageUpload(@PathVariable UUID courseId, @RequestParam String extension) {
     return this.contributorService.getFileUploadUrl(courseId, extension);
+  }
+
+  @GetMapping("/analytics")
+  public ContributorAnalyticsResponse getAnalytics(
+      @AuthenticationPrincipal AuthUserDetails user,
+      @RequestParam(defaultValue = "1M") String timeframe) {
+    return this.analyticsService.getAnalytics(user.getAccount().getId(), timeframe);
   }
 }
