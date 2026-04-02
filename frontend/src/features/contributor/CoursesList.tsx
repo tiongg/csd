@@ -108,8 +108,6 @@ export default function CoursesList({ team }: CourseListProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <CreateCourseCard onInteract={openCreateCourseDialog} />
-
         {isCoursesLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
               <LoadingCourseCard key={idx} />
@@ -117,6 +115,8 @@ export default function CoursesList({ team }: CourseListProps) {
           : (courses ?? []).map((course) => (
               <CourseCard course={course} teamId={team.id} key={course.id} />
             ))}
+
+        <CreateCourseCard onInteract={openCreateCourseDialog} />
       </div>
 
       <CreateCourseDialog
@@ -235,64 +235,75 @@ function CourseCard({ course, teamId }: CourseCardProps) {
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
       >
-        <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
-          <div className="space-y-1.5">
-            <div className="flex items-start justify-between gap-3">
-              <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
-                {course.title}
-              </h3>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={handleManageClick}
-                  className="h-7 w-7 text-slate-400 hover:bg-sky-50 hover:text-sky-600"
-                >
-                  <Settings className="size-4" />
-                </Button>
-                <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition-colors group-hover:text-sky-600" />
+        <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
+          <div className="aspect-video w-full overflow-hidden rounded-t-xl bg-slate-200">
+            {course.imageUrl && (
+              <img
+                src={course.imageUrl}
+                alt={course.title}
+                className="h-full w-full object-cover"
+              />
+            )}
+          </div>
+          <div className="p-4">
+            <div className="space-y-1.5">
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
+                  {course.title}
+                </h3>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={handleManageClick}
+                    className="h-7 w-7 text-slate-400 hover:bg-sky-50 hover:text-sky-600"
+                  >
+                    <Settings className="size-4" />
+                  </Button>
+                  <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition-colors group-hover:text-sky-600" />
+                </div>
+              </div>
+              <p className="line-clamp-2 text-sm leading-5 text-slate-600">
+                {course.description?.trim() || 'No description yet.'}
+              </p>
+              <div>
+                {(course.tags ?? []).length > 0 ? (
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    {(course.tags ?? []).map((tag) => (
+                      <span
+                        key={tag}
+                        className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="mt-2 inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-500">
+                    No tags
+                  </span>
+                )}
               </div>
             </div>
-            <p className="line-clamp-2 text-sm leading-5 text-slate-600">
-              {course.description?.trim() || 'No description yet.'}
-            </p>
-            <div>
-              {(course.tags ?? []).length > 0 ? (
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  {(course.tags ?? []).map((tag) => (
-                    <span
-                      key={tag}
-                      className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <span className="mt-2 inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-500">
-                  No tags
-                </span>
-              )}
-            </div>
-          </div>
 
-          <div className="flex items-center justify-between pt-4">
-            <div className="flex items-center gap-2">
-              <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                {dayjs(course.updatedAt).fromNow()}
-              </span>
+            <div className="flex items-center justify-between pt-4">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                  {dayjs(course.updatedAt).fromNow()}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDeleteDialogOpen(true);
+                }}
+                aria-label={`Delete ${course.title}`}
+              >
+                <Trash2 className="size-4" />
+              </button>
             </div>
-            <button
-              type="button"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsDeleteDialogOpen(true);
-              }}
-              aria-label={`Delete ${course.title}`}
-            >
-              <Trash2 className="size-4" />
-            </button>
           </div>
         </article>
       </div>
@@ -342,8 +353,8 @@ function CreateCourseCard({ onInteract }: { onInteract: () => void }) {
       onClick={onInteract}
     >
       <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-dashed border-slate-300 bg-white p-4 transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
-        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition-colors group-hover:bg-sky-100 group-hover:text-sky-700">
-          <Plus className="size-4" />
+        <span className="m-auto inline-flex size-16 items-center justify-center rounded-lg text-slate-700 transition-colors group-hover:text-sky-700">
+          <Plus className="size-8" />
         </span>
         <div className="space-y-0.5">
           <h3 className="text-lg font-bold text-slate-900">

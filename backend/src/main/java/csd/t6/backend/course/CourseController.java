@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.auth.AuthUserDetails;
+import csd.t6.backend.contributor.dto.response.ImageUploadResponse;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
@@ -21,7 +23,6 @@ import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
 import csd.t6.backend.decorators.responses.OkResponse;
-import csd.t6.backend.utils.dto.PresignedUrlResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,11 +34,9 @@ import jakarta.validation.Valid;
 @SecurityRequirement(name = "bearerAuth")
 public class CourseController {
   private final CourseService courseService;
-  private final CourseReelService courseReelService;
 
-  public CourseController(CourseService courseService, CourseReelService courseReelService) {
+  public CourseController(CourseService courseService) {
     this.courseService = courseService;
-    this.courseReelService = courseReelService;
   }
 
   @PostMapping("/")
@@ -86,17 +85,20 @@ public class CourseController {
     courseService.deleteCourse(id, userDetails.getId());
   }
 
-  @GetMapping("/{courseId}/upload-reel-url")
-  public PresignedUrlResponse getUploadReelUrl(@PathVariable UUID courseId,
+  @GetMapping("/{courseId}/image-upload-url")
+  @OkResponse
+  @BadRequestResponse
+  @Operation(summary = "Get course image upload URL", description = "Generates a presigned URL for uploading a course thumbnail image. Only team members can upload.")
+  public ImageUploadResponse getImageUploadUrl(@PathVariable UUID courseId, @RequestParam String extension,
       @AuthenticationPrincipal AuthUserDetails userDetails) {
-    return this.courseReelService.generateReelUploadUrl(courseId, userDetails.getId());
+    return this.courseService.generateImageUploadUrl(courseId, userDetails.getId(), extension);
   }
 
-  @DeleteMapping("/{courseId}/reel")
+  @DeleteMapping("/{courseId}/image")
   @NoContentResponse
   @BadRequestResponse
-  @Operation(summary = "Delete reel", description = "Deletes a reel. Only team members can delete.")
-  public void deleteReel(@PathVariable UUID courseId, @AuthenticationPrincipal AuthUserDetails userDetails) {
-    this.courseReelService.deleteReel(courseId, userDetails.getId());
+  @Operation(summary = "Delete course image", description = "Deletes the course thumbnail image. Only team members can delete.")
+  public void deleteImage(@PathVariable UUID courseId, @AuthenticationPrincipal AuthUserDetails userDetails) {
+    this.courseService.deleteImage(courseId, userDetails.getId());
   }
 }

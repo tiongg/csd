@@ -27,8 +27,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import csd.t6.backend.approval.dto.response.LatestContentVersionResponse;
 import csd.t6.backend.approval.dto.response.ReviewVersionResponse;
 import csd.t6.backend.approval.util.ContentVersionWithCourseRecord;
-import csd.t6.backend.course.CourseReelService;
 import csd.t6.backend.course.CourseRepository;
+import csd.t6.backend.course.CourseService;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.notification.NotificationService;
 import csd.t6.backend.tag.TagService;
@@ -57,13 +57,13 @@ class ContentVersionServiceTest {
   private FileService fileService;
 
   @Mock
-  private CourseReelService courseReelService;
-
-  @Mock
   private NotificationService notificationService;
 
   @Mock
   private TagService tagService;
+
+  @Mock
+  private CourseService courseService;
 
   @InjectMocks
   private ContentVersionService contentVersionService;
@@ -137,13 +137,14 @@ class ContentVersionServiceTest {
     String expectedUrl = "presigned-url";
     when(fileService.generatePresignedUploadUrl(expectedKey, Duration.ofMinutes(5))).thenReturn(expectedUrl);
 
-    PresignedUrlResponse result = contentVersionService.generateCourseMaterialUploadUrl(courseId, requesterId, "Test upload");
+    PresignedUrlResponse result = contentVersionService.generateCourseMaterialUploadUrl(courseId, requesterId,
+        "Test upload");
 
     assertThat(result.url()).isEqualTo(expectedUrl);
     assertThat(result.key()).isEqualTo(expectedKey);
     verify(contentVersionRepository).rejectAllPendingVersions(courseId);
-    verify(notificationService).sendToRole(Roles.ADMIN, NotificationType.COURSE_AWAITING_REVIEW,
-        "Course Review", "Course: Test Course", contentVersionId);
+    verify(notificationService).sendToRole(Roles.ADMIN, NotificationType.COURSE_AWAITING_REVIEW, "Course Review",
+        "Course: Test Course", contentVersionId);
   }
 
   @Test
@@ -153,8 +154,7 @@ class ContentVersionServiceTest {
     when(teamService.isTeamMember(teamId, requesterId)).thenReturn(false);
 
     assertThatThrownBy(() -> contentVersionService.generateCourseMaterialUploadUrl(courseId, requesterId, "Test"))
-        .isInstanceOf(BadRequestException.class)
-        .hasMessageContaining("member of the team");
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("member of the team");
     verify(contentVersionRepository, never()).rejectAllPendingVersions(any(UUID.class));
     verify(contentVersionRepository, never()).create(any(UUID.class), anyInt(), any(String.class));
   }
@@ -165,8 +165,7 @@ class ContentVersionServiceTest {
     when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> contentVersionService.generateCourseMaterialUploadUrl(courseId, requesterId, "Test"))
-        .isInstanceOf(BadRequestException.class)
-        .hasMessageContaining("Course not found");
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("Course not found");
   }
 
   // --- getPastVersions ---
@@ -181,8 +180,7 @@ class ContentVersionServiceTest {
     lenient().when(version2.getVersion()).thenReturn(2);
     lenient().when(version3.getVersion()).thenReturn(3);
 
-    when(contentVersionRepository.findBy(any(), eq(courseId)))
-        .thenReturn(List.of(version1, version2, version3));
+    when(contentVersionRepository.findBy(any(), eq(courseId))).thenReturn(List.of(version1, version2, version3));
 
     List<ContentVersionRecord> result = contentVersionService.getPastVersions(courseId);
 
@@ -216,14 +214,12 @@ class ContentVersionServiceTest {
     lenient().when(pendingVersion.getVersion()).thenReturn(3);
     lenient().when(pendingVersion.getStatus()).thenReturn(ContentStatus.PENDING);
 
-    when(contentVersionRepository.findBy(any(), eq(courseId)))
-        .thenReturn(List.of(approvedVersion, pendingVersion));
+    when(contentVersionRepository.findBy(any(), eq(courseId))).thenReturn(List.of(approvedVersion, pendingVersion));
     String expectedKey = String.format("course-materials/%s/%s.json", courseId, approvedVersion.getId());
     String expectedUrl = "download-url";
     when(fileService.generatePresignedDownloadUrl(expectedKey, Duration.ofMinutes(5))).thenReturn(expectedUrl);
 
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
-    when(courseReelService.getReelUrlForCourse(mockCourse)).thenReturn("reel-url");
     when(tagService.getTagsForCourse(courseId)).thenReturn(List.of("tag1", "tag2"));
 
     LatestContentVersionResponse result = contentVersionService.getLatestApprovedVersion(courseId);
@@ -244,8 +240,7 @@ class ContentVersionServiceTest {
     when(contentVersionRepository.findBy(any(), eq(courseId))).thenReturn(List.of(pendingVersion));
 
     assertThatThrownBy(() -> contentVersionService.getLatestApprovedVersion(courseId))
-        .isInstanceOf(BadRequestException.class)
-        .hasMessageContaining("No content version found");
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("No content version found");
   }
 
   // --- getReviewVersion ---
@@ -260,7 +255,6 @@ class ContentVersionServiceTest {
     when(contentVersionRepository.findOneBy(any(), eq(contentVersionId))).thenReturn(Optional.of(mockVersion));
 
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
-    when(courseReelService.getReelUrlForCourse(mockCourse)).thenReturn("reel-url");
     when(tagService.getTagsForCourse(courseId)).thenReturn(List.of("tag1"));
 
     ReviewVersionResponse result = contentVersionService.getReviewVersion(contentVersionId);
@@ -279,8 +273,7 @@ class ContentVersionServiceTest {
     when(contentVersionRepository.findOneBy(any(), eq(contentVersionId))).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> contentVersionService.getReviewVersion(contentVersionId))
-        .isInstanceOf(BadRequestException.class)
-        .hasMessageContaining("Content version not found");
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("Content version not found");
   }
 
   // --- getAllPendingVersions ---
@@ -301,8 +294,7 @@ class ContentVersionServiceTest {
     ContentVersionWithCourseRecord record1 = new ContentVersionWithCourseRecord(version1, course1, List.of());
     ContentVersionWithCourseRecord record2 = new ContentVersionWithCourseRecord(version2, course2, List.of());
 
-    when(contentVersionRepository.findByStatusWithCourse(ContentStatus.PENDING))
-        .thenReturn(List.of(record1, record2));
+    when(contentVersionRepository.findByStatusWithCourse(ContentStatus.PENDING)).thenReturn(List.of(record1, record2));
 
     List<ContentVersionWithCourseRecord> result = contentVersionService.getAllPendingVersions();
 
@@ -332,8 +324,8 @@ class ContentVersionServiceTest {
 
     verify(contentVersionRepository).rejectAllPendingVersions(courseId);
     verify(contentVersionRepository).updateStatus(contentVersionId, ContentStatus.APPROVED, null);
-    verify(notificationService).sendToTeam(teamId, NotificationType.COURSE_APPROVED,
-        "Course Approved", "Your course: Test Course has been approved", courseId);
+    verify(notificationService).sendToTeam(teamId, NotificationType.COURSE_APPROVED, "Course Approved",
+        "Your course: Test Course has been approved", courseId);
   }
 
   @Test
@@ -343,9 +335,9 @@ class ContentVersionServiceTest {
     when(contentVersionRepository.findOneBy(any(), eq(contentVersionId))).thenReturn(Optional.of(mockVersion));
 
     assertThatThrownBy(() -> contentVersionService.approveVersion(contentVersionId))
-        .isInstanceOf(BadRequestException.class)
-        .hasMessageContaining("Can only approve pending versions");
-    verify(contentVersionRepository, never()).updateStatus(any(UUID.class), any(ContentStatus.class), any(String.class));
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("Can only approve pending versions");
+    verify(contentVersionRepository, never()).updateStatus(any(UUID.class), any(ContentStatus.class),
+        any(String.class));
   }
 
   @Test
@@ -380,9 +372,9 @@ class ContentVersionServiceTest {
     when(contentVersionRepository.findOneBy(any(), eq(contentVersionId))).thenReturn(Optional.of(mockVersion));
 
     assertThatThrownBy(() -> contentVersionService.rejectVersion(contentVersionId, "reason"))
-        .isInstanceOf(BadRequestException.class)
-        .hasMessageContaining("Can only reject pending versions");
-    verify(contentVersionRepository, never()).updateStatus(any(UUID.class), any(ContentStatus.class), any(String.class));
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("Can only reject pending versions");
+    verify(contentVersionRepository, never()).updateStatus(any(UUID.class), any(ContentStatus.class),
+        any(String.class));
   }
 
   @Test

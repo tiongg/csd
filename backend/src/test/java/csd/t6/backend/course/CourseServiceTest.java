@@ -51,9 +51,6 @@ class CourseServiceTest {
   private ContentVersionRepository contentVersionRepository;
 
   @Mock
-  private CourseReelService courseReelService;
-
-  @Mock
   private TagService tagService;
 
   @InjectMocks
@@ -210,8 +207,8 @@ class CourseServiceTest {
     UUID otherId = UUID.randomUUID();
     when(teamService.isTeamMember(teamId, otherId)).thenReturn(false);
 
-    assertThatThrownBy(() -> courseService.getCoursesByTeamId(teamId, otherId))
-        .isInstanceOf(BadRequestException.class).hasMessageContaining("member of the team");
+    assertThatThrownBy(() -> courseService.getCoursesByTeamId(teamId, otherId)).isInstanceOf(BadRequestException.class)
+        .hasMessageContaining("member of the team");
   }
 
   // --- updateCourse ---
@@ -281,7 +278,7 @@ class CourseServiceTest {
 
     assertThatThrownBy(() -> courseService.updateCourse(courseId,
         new CourseUpdateRequest("Title", null, Collections.emptyList()), otherId))
-        .isInstanceOf(BadRequestException.class).hasMessageContaining("Course not found");
+            .isInstanceOf(BadRequestException.class).hasMessageContaining("Course not found");
   }
 
   // --- deleteCourse ---
@@ -310,7 +307,7 @@ class CourseServiceTest {
   void shouldThrowWhenCourseNotFoundForDelete() {
     when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> courseService.deleteCourse(courseId, creatorId))
-        .isInstanceOf(BadRequestException.class).hasMessageContaining("Course not found");
+    assertThatThrownBy(() -> courseService.deleteCourse(courseId, creatorId)).isInstanceOf(BadRequestException.class)
+        .hasMessageContaining("Course not found");
   }
 }

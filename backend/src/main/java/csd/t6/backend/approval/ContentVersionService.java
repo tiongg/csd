@@ -13,8 +13,8 @@ import csd.t6.backend.approval.dto.response.ContentVersionResponse;
 import csd.t6.backend.approval.dto.response.LatestContentVersionResponse;
 import csd.t6.backend.approval.dto.response.ReviewVersionResponse;
 import csd.t6.backend.approval.util.ContentVersionWithCourseRecord;
-import csd.t6.backend.course.CourseReelService;
 import csd.t6.backend.course.CourseRepository;
+import csd.t6.backend.course.CourseService;
 import csd.t6.backend.course.dto.response.CourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.notification.NotificationService;
@@ -34,18 +34,18 @@ public class ContentVersionService {
   private final CourseRepository courseRepository;
   private final TeamService teamService;
   private final FileService fileService;
-  private final CourseReelService courseReelService;
+  private final CourseService courseService;
   private final NotificationService notificationService;
   private final TagService tagService;
 
   public ContentVersionService(ContentVersionRepository contentVersionRepository, CourseRepository courseRepository,
-      TeamService teamService, FileService fileService, CourseReelService courseReelService,
+      TeamService teamService, FileService fileService, CourseService courseService,
       NotificationService notificationService, TagService tagService) {
     this.contentVersionRepository = contentVersionRepository;
     this.courseRepository = courseRepository;
     this.teamService = teamService;
     this.fileService = fileService;
-    this.courseReelService = courseReelService;
+    this.courseService = courseService;
     this.notificationService = notificationService;
     this.tagService = tagService;
   }
@@ -93,7 +93,7 @@ public class ContentVersionService {
     String url = this.fileService.generatePresignedDownloadUrl(key, Duration.ofMinutes(5));
 
     CourseResponse course = courseRepository.findById(courseId)
-        .map((record) -> new CourseResponse(record, courseReelService.getReelUrlForCourse(record),
+        .map((record) -> new CourseResponse(record, courseService.getImageUrlForCourse(record),
             tagService.getTagsForCourse(record.getId())))
         .orElseThrow(() -> new BadRequestException("Course not found"));
 
@@ -108,7 +108,7 @@ public class ContentVersionService {
     String url = this.fileService.generatePresignedDownloadUrl(key, Duration.ofMinutes(10));
 
     CourseResponse course = courseRepository.findById(version.getCourseId())
-        .map((record) -> new CourseResponse(record, courseReelService.getReelUrlForCourse(record),
+        .map((record) -> new CourseResponse(record, courseService.getImageUrlForCourse(record),
             tagService.getTagsForCourse(record.getId())))
         .orElseThrow(() -> new BadRequestException("Course not found"));
 
