@@ -1,8 +1,5 @@
-import { useMemo, useState } from 'react';
-import GlossaryCard from './components/GlossaryCard';
-import { GLOSSARY_ITEMS } from './data/glossaryItems';
-import type { GlossaryCategory } from './types';
-import { Heading1 } from '@/components/ui/typography';
+import { Button } from '@/components/ui';
+import SearchBar from '@/components/ui/searchbar';
 import {
   Select,
   SelectContent,
@@ -10,9 +7,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import SearchBar from '@/components/ui/searchbar';
+import { Heading1 } from '@/components/ui/typography';
+import {
+  apiQueryOptions,
+  useApiMutation,
+  useApiQuery,
+} from '@/lib/fetch-client';
+import type { GlossaryItem } from '@/lib/utils';
+import { useQueryClient } from '@tanstack/react-query';
+import { useCallback, useMemo, useState } from 'react';
+import { TrendCourseSearchDialog } from '../learner/dashboard/TrendCourseSearchDialog';
+import RelationGraph from '../relations/RelationGraph';
+import GlossaryCard from './components/GlossaryCard';
 
-const ALL_CATEGORIES = 'All Categories';
 const SORT_A_TO_Z = 'asc';
 const SORT_Z_TO_A = 'desc';
 const SORT_OPTIONS = [
@@ -20,54 +27,68 @@ const SORT_OPTIONS = [
   { value: SORT_Z_TO_A, label: 'Alphabetic Order: Z-A' },
 ] as const;
 
-type CategoryFilter = GlossaryCategory | typeof ALL_CATEGORIES;
 type SortOrder = typeof SORT_A_TO_Z | typeof SORT_Z_TO_A;
 
 const glassPanelClass =
   'relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6';
 
-export default function GlossaryPage() {
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState<CategoryFilter>(ALL_CATEGORIES);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_A_TO_Z);
+type GlossaryPageProps = {
+  onEditClick?: (item: GlossaryItem) => void;
+  showGenerateButton?: boolean;
+};
 
-  const categories = useMemo<Array<GlossaryCategory>>(() => {
-    const unique = new Set<GlossaryCategory>(
-      GLOSSARY_ITEMS.map((item) => item.category),
-    );
-    return Array.from(unique);
-  }, []);
+export default function GlossaryPage({
+  onEditClick,
+  showGenerateButton = false,
+}: GlossaryPageProps) {
+  const queryClient = useQueryClient();
+  const [query, setQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_A_TO_Z);
+  const [isTrendModalOpen, setIsTrendModalOpen] = useState(false);
+  const [trendSearch, setTrendSearch] = useState('');
+
+  const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
+  const { mutateAsync: generateGlossary } = useApiMutation(
+    'post',
+    '/api/glossary/',
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(apiQueryOptions('get', '/api/glossary/'));
+      },
+    },
+  );
 
   const filteredItems = useMemo(() => {
+    if (!glossaryItems) {
+      return [];
+    }
     const q = query.trim().toLowerCase();
 
-    const matches = GLOSSARY_ITEMS.filter((item) => {
-      const categoryMatch =
-        category === ALL_CATEGORIES ? true : item.category === category;
-      if (!categoryMatch) {
-        return false;
-      }
-
+    const matches = glossaryItems.filter((item) => {
       if (!q) {
         return true;
       }
 
       return (
-        item.term.toLowerCase().includes(q) ||
-        item.meaning.toLowerCase().includes(q) ||
+        item.title.toLowerCase().includes(q) ||
+        item.description.toLowerCase().includes(q) ||
         item.context.toLowerCase().includes(q) ||
-        item.example.toLowerCase().includes(q) ||
-        item.category.toLowerCase().includes(q)
+        item.example.toLowerCase().includes(q)
       );
     });
 
     return matches.sort((a, b) => {
-      const compare = a.term.localeCompare(b.term, undefined, {
+      const compare = a.title.localeCompare(b.title, undefined, {
         sensitivity: 'base',
       });
       return sortOrder === SORT_A_TO_Z ? compare : -compare;
     });
-  }, [category, query, sortOrder]);
+  }, [query, sortOrder, glossaryItems]);
+
+  const onNodeClick = useCallback((nodeId: string) => {
+    setTrendSearch(nodeId);
+    setIsTrendModalOpen(true);
+  }, []);
 
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col bg-slate-100/70 p-4 md:p-6">
@@ -85,31 +106,16 @@ export default function GlossaryPage() {
           </p>
         </section>
 
-        <section className={glassPanelClass}>
-          <div className="mb-4 flex flex-col gap-3 xl:flex-row xl:items-end">
-            <div className="w-full xl:w-64">
-              <p className="mb-1 text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
-                Category
-              </p>
-              <Select
-                value={category}
-                onValueChange={(value) => setCategory(value as CategoryFilter)}
-              >
-                <SelectTrigger className="h-10 w-full border-slate-300/85 bg-slate-100/70">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent align="start">
-                  <SelectItem value={ALL_CATEGORIES}>{ALL_CATEGORIES}</SelectItem>
-                  {categories.map((itemCategory) => (
-                    <SelectItem key={itemCategory} value={itemCategory}>
-                      {itemCategory}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        <section className="relative h-120 rounded-2xl border border-white/75 bg-white/45 p-5 shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 md:p-6">
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
+            Relationships
+          </p>
+          <RelationGraph onNodeClick={onNodeClick} />
+        </section>
 
-            <div className="flex w-full flex-col gap-3 xl:ml-auto xl:w-auto xl:flex-row xl:items-end">
+        <section className={glassPanelClass}>
+          <div className="mb-4 flex w-full flex-col gap-3 xl:flex-row">
+            <div className="flex flex-col items-center gap-3 xl:w-auto xl:flex-row">
               <div className="w-full xl:w-64">
                 <p className="mb-1 text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
                   Sorting
@@ -142,23 +148,42 @@ export default function GlossaryPage() {
                 />
               </div>
             </div>
+            {showGenerateButton && (
+              <div className="ml-auto self-end">
+                <Button
+                  onClick={() => {
+                    generateGlossary({});
+                  }}
+                >
+                  Regenerate Glossary
+                </Button>
+              </div>
+            )}
           </div>
 
-          {filteredItems.length > 0 && (
+          {filteredItems.length > 0 ? (
             <div className="grid gap-3">
               {filteredItems.map((item) => (
-                <GlossaryCard key={item.term} item={item} />
+                <GlossaryCard
+                  key={item.title}
+                  item={item}
+                  onEdit={onEditClick}
+                />
               ))}
             </div>
-          )}
-
-          {filteredItems.length === 0 && (
+          ) : (
             <div className="mt-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
               No glossary terms matched your search/category filter.
             </div>
           )}
         </section>
       </div>
+
+      <TrendCourseSearchDialog
+        initialSearchValue={trendSearch}
+        open={isTrendModalOpen}
+        onOpenChange={setIsTrendModalOpen}
+      />
     </div>
   );
 }

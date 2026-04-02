@@ -111,6 +111,13 @@
 			<version>2.29.0</version>
 		</dependency>
 
+		<!-- Gemini -->
+		<dependency>
+			<groupId>com.google.genai</groupId>
+			<artifactId>google-genai</artifactId>
+			<version>1.44.0</version>
+		</dependency>
+
 		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -225,6 +232,7 @@
 						<generate>
 							<pojos>true</pojos>
 							<daos>true</daos>
+							<routines>false</routines>
 						</generate>
 						<target>
 							<packageName>csd.t6.jooq</packageName>

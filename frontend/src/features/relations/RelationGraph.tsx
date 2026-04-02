@@ -1,8 +1,9 @@
+import { useApiQuery } from '@/lib/fetch-client';
+import type { GlossaryItem } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import type { SimulationLinkDatum, SimulationNodeDatum } from 'd3';
 import * as d3 from 'd3';
 import { useEffect, useRef, useState } from 'react';
-import { RELATIONS } from './relations';
 
 type NodeType = SimulationNodeDatum & { id: string; x?: number; y?: number };
 type LinkType = SimulationLinkDatum<NodeType> & {
@@ -16,21 +17,31 @@ type RelationGraphProps = {
 };
 
 // Convert relations data to D3-compatible format
-function buildGraph(): { nodes: NodeType[]; links: LinkType[] } {
+function buildGraph(glossaryItems: GlossaryItem[]): {
+  nodes: NodeType[];
+  links: LinkType[];
+} {
   const nodes = new Map<string, NodeType>();
   const links: LinkType[] = [];
+  const addedLinks = new Set<string>();
 
-  // Create nodes
-  for (const [source, targets] of Object.entries(RELATIONS)) {
+  for (const item of glossaryItems) {
+    const source = item.title;
+
     if (!nodes.has(source)) {
       nodes.set(source, { id: source });
     }
-    for (const target of targets) {
+
+    for (const target of item.relationships ?? []) {
       if (!nodes.has(target)) {
         nodes.set(target, { id: target });
       }
-      // Create link (avoid duplicates by only adding if source < target)
-      if (source < target) {
+
+      // Create link (avoid duplicates)
+      const linkKey =
+        source < target ? `${source}-${target}` : `${target}-${source}`;
+      if (!addedLinks.has(linkKey)) {
+        addedLinks.add(linkKey);
         links.push({ source, target });
       }
     }
@@ -50,12 +61,16 @@ export default function RelationGraph({
   const [tooltip, setTooltip] = useState<{
     x: number;
     y: number;
-    text: string;
+    item: GlossaryItem | null;
+    connections: string[];
     visible: boolean;
-  }>({ x: 0, y: 0, text: '', visible: false });
+  }>({ x: 0, y: 0, item: null, connections: [], visible: false });
+  const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
 
   useEffect(() => {
-    const { nodes, links } = buildGraph();
+    if (!glossaryItems) return;
+
+    const { nodes, links } = buildGraph(glossaryItems);
 
     // Clear previous content
     d3.select(svgRef.current).selectAll('*').remove();
@@ -94,9 +109,9 @@ export default function RelationGraph({
         'link',
         d3.forceLink<NodeType, LinkType>(links).id((d) => d.id),
       )
-      .force('charge', d3.forceManyBody().strength(-300))
+      .force('charge', d3.forceManyBody().strength(-100))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(30));
+      .force('collision', d3.forceCollide().radius(15));
 
     // Create links
     const link = g
@@ -135,15 +150,18 @@ export default function RelationGraph({
       .attr('fill', '#334155')
       .attr('font-size', '10px')
       .attr('font-weight', '500')
-      .attr('pointer-events', 'none');
+      .style('cursor', 'pointer');
 
-    // Store connected nodes for each node
+    // Store connected nodes for each node and create glossary lookup
     const connections = new Map<string, Set<string>>();
-    for (const [source, targets] of Object.entries(RELATIONS)) {
+    const glossaryMap = new Map<string, GlossaryItem>();
+    for (const item of glossaryItems) {
+      glossaryMap.set(item.title, item);
+      const source = item.title;
       if (!connections.has(source)) {
         connections.set(source, new Set());
       }
-      for (const target of targets) {
+      for (const target of item.relationships ?? []) {
         connections.get(source)!.add(target);
         if (!connections.has(target)) {
           connections.set(target, new Set());
@@ -179,11 +197,11 @@ export default function RelationGraph({
         .attr('stroke-width', 2);
 
       // Show tooltip
-      const connectionList = Array.from(connected).sort().join(', ');
       setTooltip({
-        x: event.pageX + 10,
-        y: event.pageY - 10,
-        text: `${d.id}\nConnected to: ${connectionList}`,
+        x: event.clientX + 10,
+        y: event.clientY - 10,
+        item: glossaryMap.get(d.id) ?? null,
+        connections: Array.from(connected).sort(),
         visible: true,
       });
     });
@@ -191,8 +209,8 @@ export default function RelationGraph({
     nodeGroups.on('mousemove', function (event) {
       setTooltip((prev) => ({
         ...prev,
-        x: event.pageX + 10,
-        y: event.pageY - 10,
+        x: event.clientX + 10,
+        y: event.clientY - 10,
       }));
     });
 
@@ -210,6 +228,7 @@ export default function RelationGraph({
     nodeGroups.on('click', function (_e, d) {
       const connected = Array.from(connections.get(d.id) ?? []);
       onNodeClick?.(d.id, connected);
+      setTooltip((prev) => ({ ...prev, visible: false }));
     });
 
     // Update positions on tick
@@ -231,7 +250,7 @@ export default function RelationGraph({
     return () => {
       simulation.stop();
     };
-  }, [onNodeClick]);
+  }, [onNodeClick, glossaryItems]);
 
   return (
     <div
@@ -242,20 +261,45 @@ export default function RelationGraph({
     >
       <svg
         ref={svgRef}
-        className="h-full w-full flex-1 bg-slate-50"
+        className="h-full w-full flex-1"
         style={{ cursor: 'grab' }}
       />
-      {tooltip.visible && (
+      {tooltip.visible && tooltip.item && (
         <div
-          className="pointer-events-none fixed z-50 rounded-md bg-slate-900 px-3 py-2 text-xs text-white shadow-lg"
+          className="pointer-events-none fixed z-50 w-72 rounded-md bg-slate-900 px-4 py-3 text-xs text-white shadow-lg"
           style={{
             left: `${tooltip.x}px`,
             top: `${tooltip.y}px`,
-            whiteSpace: 'pre-wrap',
-            maxWidth: '200px',
           }}
         >
-          {tooltip.text}
+          <h3 className="mb-2 border-b border-slate-700 pb-1 text-sm font-semibold">
+            {tooltip.item.title}
+          </h3>
+          {tooltip.item.description && (
+            <p className="mb-2 text-slate-200">{tooltip.item.description}</p>
+          )}
+          {tooltip.item.context && (
+            <div className="mb-2">
+              <span className="font-medium text-slate-400">Context: </span>
+              <span className="text-slate-200">{tooltip.item.context}</span>
+            </div>
+          )}
+          {tooltip.item.example && (
+            <div className="mb-2">
+              <span className="font-medium text-slate-400">Example: </span>
+              <span className="text-slate-300 italic">
+                {tooltip.item.example}
+              </span>
+            </div>
+          )}
+          {tooltip.connections.length > 0 && (
+            <div className="mt-2 border-t border-slate-700 pt-2">
+              <span className="font-medium text-slate-400">Related to: </span>
+              <span className="text-slate-200">
+                {tooltip.connections.join(', ')}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>

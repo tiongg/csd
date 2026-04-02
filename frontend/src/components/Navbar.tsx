@@ -27,6 +27,7 @@ function getPrimaryNavItems(
     .with('ADMIN', () => [
       { label: 'User Management', to: '/admin/user-management' as const },
       { label: 'Course Moderation', to: '/admin/course-moderation' as const },
+      { label: 'Glossary', to: '/admin/glossary' as const },
     ])
     .with('CONTRIBUTOR', () => [
       { label: 'Dashboard', to: '/contributor/dashboard' as const },

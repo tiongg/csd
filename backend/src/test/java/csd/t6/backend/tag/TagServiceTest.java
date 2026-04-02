@@ -47,7 +47,6 @@ class TagServiceTest {
     mockTag = mock(TagsRecord.class);
     lenient().when(mockTag.getId()).thenReturn(tagId);
     lenient().when(mockTag.getTitle()).thenReturn("Java");
-    lenient().when(mockTag.getDescription()).thenReturn("Java programming");
   }
 
   // --- getAllTags ---
@@ -127,14 +126,11 @@ class TagServiceTest {
   void shouldUpdateCourseTags() {
     List<String> tagTitles = List.of("Java", "Backend");
 
-    // "Java" exists — findOrCreateByTitle returns it directly
     when(tagRepository.findOrCreateByTitle("Java")).thenReturn(mockTag);
 
-    // "Backend" does NOT exist yet — findOrCreateByTitle creates and returns it
     TagsRecord mockTag2 = mock(TagsRecord.class);
     UUID tagId2 = UUID.randomUUID();
     when(mockTag2.getId()).thenReturn(tagId2);
-    // FIX: TagService calls tagRepository.findOrCreateByTitle(), NOT findByTitle()+insert().
     when(tagRepository.findOrCreateByTitle("Backend")).thenReturn(mockTag2);
 
     when(tagRepository.getTagTitlesByCourseId(courseId)).thenReturn(tagTitles);
@@ -149,8 +145,8 @@ class TagServiceTest {
   @Test
   @DisplayName("Should throw when tag titles is null")
   void shouldThrowWhenTagTitlesIsNull() {
-    assertThatThrownBy(() -> tagService.updateCourseTags(courseId, null))
-        .isInstanceOf(BadRequestException.class).hasMessageContaining("Tag titles cannot be null");
+    assertThatThrownBy(() -> tagService.updateCourseTags(courseId, null)).isInstanceOf(BadRequestException.class)
+        .hasMessageContaining("Tag titles cannot be null");
   }
 
   @Test
@@ -158,16 +154,13 @@ class TagServiceTest {
   void shouldThrowWhenTagCountExceedsMaximum() {
     List<String> tooManyTags = List.of("Tag1", "Tag2", "Tag3", "Tag4", "Tag5", "Tag6");
 
-    assertThatThrownBy(() -> tagService.updateCourseTags(courseId, tooManyTags))
-        .isInstanceOf(BadRequestException.class).hasMessageContaining("Maximum 5 tags");
+    assertThatThrownBy(() -> tagService.updateCourseTags(courseId, tooManyTags)).isInstanceOf(BadRequestException.class)
+        .hasMessageContaining("Maximum 5 tags");
   }
 
   @Test
   @DisplayName("Should throw when tag title is null")
   void shouldThrowWhenTagTitleIsNull() {
-    // FIX: List.of("Java", null) throws NullPointerException at construction time
-    // because List.of() rejects null elements. Use Arrays.asList() instead,
-    // which permits null elements so the null reaches the service validation.
     List<String> tagsWithNull = Arrays.asList("Java", null);
 
     assertThatThrownBy(() -> tagService.updateCourseTags(courseId, tagsWithNull))
@@ -207,8 +200,6 @@ class TagServiceTest {
   void shouldTrimWhitespaceFromTagTitles() {
     List<String> tagsWithWhitespace = List.of("  Java  ", "Backend  ");
 
-    // FIX: TagService trims titles before calling findOrCreateByTitle(),
-    // so stubs must use the trimmed values.
     when(tagRepository.findOrCreateByTitle("Java")).thenReturn(mockTag);
 
     TagsRecord mockTag2 = mock(TagsRecord.class);
@@ -219,7 +210,6 @@ class TagServiceTest {
 
     tagService.updateCourseTags(courseId, tagsWithWhitespace);
 
-    // Service must look up by trimmed title
     verify(tagRepository).findOrCreateByTitle("Java");
     verify(tagRepository).findOrCreateByTitle("Backend");
   }
@@ -229,7 +219,6 @@ class TagServiceTest {
   void shouldReuseExistingTags() {
     List<String> tags = List.of("Java", "Backend");
 
-    // Both tags already exist — findOrCreateByTitle finds them without inserting
     when(tagRepository.findOrCreateByTitle("Java")).thenReturn(mockTag);
     when(tagRepository.findOrCreateByTitle("Backend")).thenReturn(mockTag);
 
@@ -237,7 +226,6 @@ class TagServiceTest {
 
     tagService.updateCourseTags(courseId, tags);
 
-    // The service must use the original (trimmed) title, not lowercase
     verify(tagRepository, never()).findOrCreateByTitle("java");
     verify(tagRepository).findOrCreateByTitle("Java");
   }

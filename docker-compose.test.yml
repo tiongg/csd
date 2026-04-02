@@ -43,6 +43,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: test
       FRONTEND_URL: http://localhost:3000
+      GOOGLE_API_KEY: dummy_key
 
 volumes:
   maven-repo:
