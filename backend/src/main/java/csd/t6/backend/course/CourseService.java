@@ -176,7 +176,7 @@ public class CourseService {
     return String.format("thumbnails/%s.%s", courseId, extension);
   }
 
-  private String getCreatorUsername(UUID creatorId) {
+  public String getCreatorUsername(UUID creatorId) {
     return this.accountRepository.findUsernameById(creatorId).orElse(null);
   }
 

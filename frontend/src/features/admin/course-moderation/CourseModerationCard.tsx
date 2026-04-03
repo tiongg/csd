@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { ArrowUpRight } from 'lucide-react';
 
 type CourseModerationCardProps = {
   title: string;
@@ -31,24 +32,35 @@ export function CourseModerationCard({
 
   return (
     <Card
-      className="group cursor-pointer overflow-hidden border-slate-200/80 bg-white/75 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md"
+      className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition-colors hover:border-slate-300"
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
     >
-      <div className="relative aspect-video w-full overflow-hidden border-b border-slate-200/80 bg-slate-100">
+      <div className="relative h-52 w-full overflow-hidden border-b border-slate-200 bg-slate-100">
         {imageUrl ? (
           <img
             src={imageUrl}
             alt={title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+            className="h-full w-full object-cover"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-xs font-medium tracking-wide text-slate-500 uppercase">
             No thumbnail
           </div>
         )}
+        <Badge className="absolute top-3 left-3 border-slate-300 bg-white text-slate-700">
+          Version {versionNumber}
+        </Badge>
       </div>
-      <CardHeader className="space-y-2 pb-3">
-        <CardTitle className="line-clamp-2 text-base text-slate-900">
+      <CardHeader className="space-y-2 pb-2">
+        <CardTitle className="line-clamp-2 text-lg leading-snug text-slate-900">
           {title}
         </CardTitle>
         {creatorUsername && (
@@ -56,18 +68,10 @@ export function CourseModerationCard({
             By {creatorUsername}
           </p>
         )}
-        <div className="flex items-center justify-between gap-2">
-          <Badge
-            variant="outline"
-            className="rounded-full border-sky-200 bg-sky-50 text-sky-700"
-          >
-            Version {versionNumber}
-          </Badge>
-          <p className="text-xs text-slate-500">{dateLabel}</p>
-        </div>
+        <p className="text-xs font-medium text-slate-500">{dateLabel}</p>
       </CardHeader>
       <CardContent className="pt-0">
-        <p className="line-clamp-3 text-sm text-slate-600">
+        <p className="line-clamp-3 text-sm leading-relaxed text-slate-600">
           {description || 'No description provided'}
         </p>
         {shouldRenderTags && (
@@ -77,7 +81,7 @@ export function CourseModerationCard({
                 <Badge
                   key={tag}
                   variant="outline"
-                  className="rounded-full border-slate-300 bg-slate-100/70 text-slate-700"
+                  className="rounded-full border-slate-300 bg-slate-100/80 text-slate-700"
                 >
                   {tag}
                 </Badge>
@@ -97,6 +101,10 @@ export function CourseModerationCard({
             {footerText}
           </p>
         )}
+        <div className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-slate-700">
+          Review details
+          <ArrowUpRight className="size-4" />
+        </div>
       </CardContent>
     </Card>
   );
