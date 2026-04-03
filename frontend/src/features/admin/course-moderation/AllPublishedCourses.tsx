@@ -65,6 +65,7 @@ export function AllPublishedCourses({ searchQuery }: AllPublishedCoursesProps) {
             <CourseModerationCard
               key={course.id}
               title={course.title}
+              creatorUsername={course.creatorUsername}
               versionNumber={contentVersion.versionNumber}
               dateLabel={`Updated ${dayjs(course.updatedAt).format('MMM D, YYYY')}`}
               description={course.description}

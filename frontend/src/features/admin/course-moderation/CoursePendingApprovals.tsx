@@ -32,6 +32,7 @@ export function CoursePendingApprovals() {
             <CourseModerationCard
               key={course.id}
               title={course.title}
+              creatorUsername={course.creatorUsername}
               versionNumber={contentVersion.versionNumber}
               dateLabel={`Submitted ${dayjs(contentVersion.publishedAt).format('MMM D, YYYY')}`}
               description={course.description}

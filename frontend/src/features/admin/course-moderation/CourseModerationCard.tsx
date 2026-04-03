@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 
 type CourseModerationCardProps = {
   title: string;
+  creatorUsername?: string;
   versionNumber: number;
   dateLabel: string;
   description?: string | null;
@@ -15,6 +16,7 @@ type CourseModerationCardProps = {
 
 export function CourseModerationCard({
   title,
+  creatorUsername,
   versionNumber,
   dateLabel,
   description,
@@ -49,6 +51,11 @@ export function CourseModerationCard({
         <CardTitle className="line-clamp-2 text-base text-slate-900">
           {title}
         </CardTitle>
+        {creatorUsername && (
+          <p className="text-sm font-medium text-slate-600">
+            By {creatorUsername}
+          </p>
+        )}
         <div className="flex items-center justify-between gap-2">
           <Badge
             variant="outline"
