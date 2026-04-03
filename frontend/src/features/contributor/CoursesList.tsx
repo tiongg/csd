@@ -17,7 +17,7 @@ import type { Course, Team } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { Plus, Settings, Trash2, Users } from 'lucide-react';
+import { Plus, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useBoolean } from 'usehooks-ts';
@@ -90,18 +90,16 @@ export default function CoursesList({ team }: CourseListProps) {
         <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
-            className="h-9 cursor-pointer gap-2 rounded-lg border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            className="h-9 cursor-pointer rounded-lg border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
             onClick={openTeamCollaboratorsDialog}
           >
-            <Users className="size-4" />
             Team Members
           </Button>
           <Button
             variant="outline"
-            className="h-9 cursor-pointer gap-2 rounded-lg border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100"
+            className="h-9 cursor-pointer rounded-lg border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100"
             onClick={() => setIsDeleteTeamDialogOpen(true)}
           >
-            <Trash2 className="size-4" />
             Delete Team
           </Button>
         </div>
