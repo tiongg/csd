@@ -26,13 +26,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import csd.t6.backend.approval.ContentVersionRepository;
+import csd.t6.backend.approval.util.ContentVersionWithCourseRecord;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
+import csd.t6.backend.course.dto.response.PublishedCourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.tag.TagService;
 import csd.t6.backend.team.TeamService;
 import csd.t6.backend.utils.FileService;
+import csd.t6.jooq.public_.tables.records.ContentVersionRecord;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
 import io.jsonwebtoken.lang.Collections;
 
@@ -168,13 +171,24 @@ class CourseServiceTest {
   @Test
   @DisplayName("Should return courses with approved version")
   void shouldReturnCoursesWithApprovedVersion() {
-    when(contentVersionRepository.findCoursesWithApprovedVersion()).thenReturn(List.of(mockCourse));
-    when(tagService.getTagsForCourse(courseId)).thenReturn(List.of("Java", "Backend"));
+    ContentVersionRecord contentVersionRecord = mock(ContentVersionRecord.class);
+    when(contentVersionRecord.getId()).thenReturn(UUID.randomUUID());
+    when(contentVersionRecord.getVersion()).thenReturn(1);
+    when(contentVersionRecord.getDescription()).thenReturn("Version description");
+    when(contentVersionRecord.getPublishedAt()).thenReturn(OffsetDateTime.now());
+    when(contentVersionRecord.getStatus()).thenReturn(csd.t6.jooq.public_.enums.ContentStatus.APPROVED);
 
-    List<CourseResponse> result = courseService.getCoursesWithApprovedVersion();
+    ContentVersionWithCourseRecord approvedRecord = new ContentVersionWithCourseRecord(
+        contentVersionRecord,
+        mockCourse,
+        List.of("Java", "Backend"));
+
+    when(contentVersionRepository.findCoursesWithApprovedVersion()).thenReturn(List.of(approvedRecord));
+
+    List<PublishedCourseResponse> result = courseService.getCoursesWithApprovedVersion();
 
     assertThat(result).hasSize(1);
-    assertThat(result.get(0).tags()).isEqualTo(List.of("Java", "Backend"));
+    assertThat(result.get(0).course().tags()).isEqualTo(List.of("Java", "Backend"));
   }
 
   @Test
@@ -182,7 +196,7 @@ class CourseServiceTest {
   void shouldReturnEmptyListWhenNoApprovedVersions() {
     when(contentVersionRepository.findCoursesWithApprovedVersion()).thenReturn(List.of());
 
-    List<CourseResponse> result = courseService.getCoursesWithApprovedVersion();
+    List<PublishedCourseResponse> result = courseService.getCoursesWithApprovedVersion();
 
     assertThat(result).isEmpty();
   }
