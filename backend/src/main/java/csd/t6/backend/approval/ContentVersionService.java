@@ -145,12 +145,21 @@ public class ContentVersionService {
   public void rejectVersion(UUID contentVersionId, String rejectedReason) {
     ContentVersionRecord version = this.contentVersionRepository.findOneBy(CONTENT_VERSION.ID, contentVersionId)
         .orElseThrow(() -> new BadRequestException("Content version not found"));
+    boolean wasApproved = version.getStatus().equals(ContentStatus.APPROVED);
 
-    if (!version.getStatus().equals(ContentStatus.PENDING)) {
-      throw new BadRequestException("Can only reject pending versions");
+    if (!(version.getStatus().equals(ContentStatus.PENDING) || wasApproved)) {
+      throw new BadRequestException("Can only reject pending or approved versions");
     }
 
     this.contentVersionRepository.updateStatus(contentVersionId, ContentStatus.REJECTED, rejectedReason);
+
+    if (wasApproved) {
+      CourseRecord course = courseRepository.findById(version.getCourseId())
+          .orElseThrow(() -> new BadRequestException("Course not found"));
+
+      notificationService.sendToTeam(course.getTeamId(), NotificationType.COURSE_APPROVED, "Course Taken Down",
+          "Your course: " + course.getTitle() + " has been taken down by an admin", course.getId());
+    }
   }
 
   private String getVersionKey(UUID courseId, UUID versionId) {

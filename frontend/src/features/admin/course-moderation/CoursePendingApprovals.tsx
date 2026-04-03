@@ -33,6 +33,7 @@ export function CoursePendingApprovals() {
               versionNumber={contentVersion.versionNumber}
               dateLabel={`Submitted ${dayjs(contentVersion.publishedAt).format('MMM D, YYYY')}`}
               description={course.description}
+              imageUrl={course.imageUrl}
               tags={course.tags ?? []}
               onClick={() =>
                 navigate({

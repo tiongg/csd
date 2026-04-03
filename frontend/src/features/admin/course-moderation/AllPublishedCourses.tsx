@@ -68,6 +68,7 @@ export function AllPublishedCourses({ searchQuery }: AllPublishedCoursesProps) {
               versionNumber={contentVersion.versionNumber}
               dateLabel={`Updated ${dayjs(course.updatedAt).format('MMM D, YYYY')}`}
               description={course.description}
+              imageUrl={course.imageUrl}
               tags={course.tags ?? []}
               onClick={() =>
                 navigate({

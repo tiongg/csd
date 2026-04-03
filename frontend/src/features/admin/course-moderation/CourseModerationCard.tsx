@@ -7,6 +7,7 @@ type CourseModerationCardProps = {
   versionNumber: number;
   dateLabel: string;
   description?: string | null;
+  imageUrl?: string | null;
   tags?: string[];
   footerText?: string;
   onClick: () => void;
@@ -17,6 +18,7 @@ export function CourseModerationCard({
   versionNumber,
   dateLabel,
   description,
+  imageUrl,
   tags,
   footerText,
   onClick,
@@ -27,9 +29,22 @@ export function CourseModerationCard({
 
   return (
     <Card
-      className="cursor-pointer overflow-hidden border-slate-200/80 bg-white/75 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md"
+      className="group cursor-pointer overflow-hidden border-slate-200/80 bg-white/75 shadow-sm transition-all hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-md"
       onClick={onClick}
     >
+      <div className="relative aspect-video w-full overflow-hidden border-b border-slate-200/80 bg-slate-100">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={title}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-xs font-medium tracking-wide text-slate-500 uppercase">
+            No thumbnail
+          </div>
+        )}
+      </div>
       <CardHeader className="space-y-2 pb-3">
         <CardTitle className="line-clamp-2 text-base text-slate-900">
           {title}
