@@ -56,14 +56,14 @@ export function CourseModerationCard({
         )}
         <Badge
           variant="outline"
-          className="pointer-events-none absolute top-3 right-3 border-slate-300 bg-white/95 text-slate-700"
+          className="pointer-events-none absolute top-3 left-3 border-slate-300 bg-white/95 text-slate-700"
         >
           Version {versionNumber}
         </Badge>
         {creatorUsername && (
           <Badge
             variant="outline"
-            className="pointer-events-none absolute bottom-3 left-3 border-slate-300 bg-white/95 text-slate-700"
+            className="pointer-events-none absolute right-3 bottom-3 border-slate-300 bg-white/95 text-slate-700"
           >
             By {creatorUsername}
           </Badge>
