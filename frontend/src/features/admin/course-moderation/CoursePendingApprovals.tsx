@@ -20,7 +20,7 @@ export function CoursePendingApprovals() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
         {pendingCourses.length === 0 ? (
           <div className="col-span-full flex min-h-[28rem] w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/55 p-8 text-center text-slate-500">
             <p className="text-base font-semibold text-slate-700">

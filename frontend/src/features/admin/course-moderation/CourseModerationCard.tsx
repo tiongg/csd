@@ -1,7 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { ArrowUpRight } from 'lucide-react';
 
 type CourseModerationCardProps = {
   title: string;
@@ -32,7 +31,7 @@ export function CourseModerationCard({
 
   return (
     <Card
-      className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition-colors hover:border-slate-300"
+      className="group flex h-full min-h-40 flex-col gap-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md"
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -43,7 +42,7 @@ export function CourseModerationCard({
         }
       }}
     >
-      <div className="relative h-52 w-full overflow-hidden border-b border-slate-200 bg-slate-100">
+      <div className="relative aspect-video w-full overflow-hidden rounded-t-xl bg-slate-200">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -51,59 +50,66 @@ export function CourseModerationCard({
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-xs font-medium tracking-wide text-slate-500 uppercase">
+          <div className="flex h-full w-full items-center justify-center bg-slate-200 text-xs font-medium tracking-wide text-slate-500 uppercase">
             No thumbnail
           </div>
         )}
-        <Badge className="absolute top-3 left-3 border-slate-300 bg-white text-slate-700">
+        <Badge
+          variant="outline"
+          className="pointer-events-none absolute top-3 left-3 border-slate-300 bg-white/95 text-slate-700"
+        >
           Version {versionNumber}
         </Badge>
+        {creatorUsername && (
+          <Badge
+            variant="outline"
+            className="pointer-events-none absolute top-3 right-3 border-slate-300 bg-white/95 text-slate-700"
+          >
+            By {creatorUsername}
+          </Badge>
+        )}
       </div>
-      <CardHeader className="space-y-2 pb-2">
-        <CardTitle className="line-clamp-2 text-lg leading-snug text-slate-900">
+      <CardHeader className="space-y-1.5 p-4 pb-1">
+        <CardTitle className="line-clamp-1 text-lg font-bold text-slate-900">
           {title}
         </CardTitle>
-        {creatorUsername && (
-          <p className="text-sm font-medium text-slate-600">
-            By {creatorUsername}
-          </p>
-        )}
-        <p className="text-xs font-medium text-slate-500">{dateLabel}</p>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <p className="line-clamp-3 text-sm leading-relaxed text-slate-600">
+        <p className="line-clamp-2 text-sm leading-relaxed text-slate-600">
           {description || 'No description provided'}
         </p>
-        {shouldRenderTags && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {hasTags ? (
-              tagsList.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="outline"
-                  className="rounded-full border-slate-300 bg-slate-100/80 text-slate-700"
-                >
-                  {tag}
-                </Badge>
-              ))
-            ) : (
-              <span className="text-xs text-slate-500">No tags</span>
-            )}
+      </CardHeader>
+      <CardContent className="flex flex-col p-4 pt-2">
+        <div className="space-y-3">
+          {shouldRenderTags && (
+            <div className="-mx-1 flex min-w-0 gap-2 overflow-x-auto px-1">
+              {hasTags ? (
+                tagsList.map((tag) => (
+                  <span
+                    key={tag}
+                    className="bg-primary/10 text-primary inline-flex shrink-0 items-center rounded-full px-2 py-1 text-xs font-medium"
+                  >
+                    {tag}
+                  </span>
+                ))
+              ) : (
+                <span className="text-xs text-slate-500">No tags</span>
+              )}
+            </div>
+          )}
+          <div className="flex items-center justify-end">
+            <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+              {dateLabel}
+            </span>
           </div>
-        )}
-        {footerText && (
-          <p
-            className={cn(
-              'text-xs font-medium text-slate-500',
-              shouldRenderTags ? 'mt-3' : 'mt-2',
-            )}
-          >
-            {footerText}
-          </p>
-        )}
-        <div className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-slate-700">
-          Review details
-          <ArrowUpRight className="size-4" />
+          {footerText && (
+            <p
+              className={cn(
+                'text-xs font-medium text-slate-500',
+                shouldRenderTags ? 'mt-1' : 'mt-0',
+              )}
+            >
+              {footerText}
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>
