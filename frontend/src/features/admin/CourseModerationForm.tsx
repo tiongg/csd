@@ -96,7 +96,7 @@ export default function CourseModerationForm() {
           </p>
         </section>
 
-        <section className={cn(glassPanelClass, 'min-h-0 flex-1')}>
+        <section className={cn(glassPanelClass, 'min-h-0 flex flex-1 flex-col')}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="rounded-lg border border-slate-300/80 bg-white/65 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_6px_20px_-16px_rgba(15,23,42,0.35)] backdrop-blur-xl">
               <div
@@ -160,11 +160,19 @@ export default function CourseModerationForm() {
             </div>
           </div>
 
-          <div className="pt-4">
-            <div className={cn(activeTab === 'pending' ? 'block' : 'hidden')}>
+          <div className="min-h-0 flex-1 pt-4">
+            <div
+              className={cn(
+                activeTab === 'pending' ? 'block h-full overflow-y-auto pr-1' : 'hidden',
+              )}
+            >
               <CoursePendingApprovals searchQuery={allCoursesSearchQuery} />
             </div>
-            <div className={cn(activeTab === 'courses' ? 'block' : 'hidden')}>
+            <div
+              className={cn(
+                activeTab === 'courses' ? 'block h-full overflow-y-auto pr-1' : 'hidden',
+              )}
+            >
               <AllPublishedCourses searchQuery={allCoursesSearchQuery} />
             </div>
           </div>
