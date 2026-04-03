@@ -237,12 +237,16 @@ function CourseCard({ course, teamId }: CourseCardProps) {
       >
         <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
           <div className="aspect-video w-full overflow-hidden rounded-t-xl bg-slate-200">
-            {course.imageUrl && (
+            {course.imageUrl ? (
               <img
                 src={course.imageUrl}
                 alt={course.title}
                 className="h-full w-full object-cover"
               />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-xs font-medium tracking-wide text-slate-500 uppercase">
+                No thumbnail
+              </div>
             )}
           </div>
           <div className="p-4">
