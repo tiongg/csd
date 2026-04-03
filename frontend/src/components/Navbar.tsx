@@ -12,7 +12,7 @@ import useActiveRole from '@/hooks/useActiveRole';
 import type { LinkOptions } from '@tanstack/react-router';
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
 import { ChevronDown, UserCircle2 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 import NotificationBell from './notifications/NotificationBell';
 import NotificationsDropdown from './notifications/NotificationsDropdown';
@@ -108,13 +108,13 @@ export default function Navbar() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateActivePill = () => {
       const navTrack = navTrackRef.current;
       if (!navTrack) return;
 
       const activeLink = navTrack.querySelector(
-        'a.active',
+        'a[data-nav-active="true"]',
       ) as HTMLElement | null;
       if (!activeLink) {
         setActivePill((prev) => ({ ...prev, opacity: 0 }));
@@ -132,8 +132,19 @@ export default function Navbar() {
     };
 
     updateActivePill();
+    const rafId = window.requestAnimationFrame(updateActivePill);
     window.addEventListener('resize', updateActivePill);
-    return () => window.removeEventListener('resize', updateActivePill);
+
+    const resizeObserver = new ResizeObserver(updateActivePill);
+    if (navTrackRef.current) {
+      resizeObserver.observe(navTrackRef.current);
+    }
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', updateActivePill);
+      resizeObserver.disconnect();
+    };
   }, [pathname, navRole, primaryNavItems.length]);
 
   return (
@@ -174,19 +185,22 @@ export default function Navbar() {
                   left: `${activePill.left}px`,
                 }}
               />
-              {primaryNavItems.map((item) => (
-                <Link
-                  key={item.label}
-                  to={item.to}
-                  className={cn(
-                    'relative z-10 inline-flex items-center justify-center rounded-full border border-transparent px-3 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-300 hover:text-slate-900 [&.active]:text-slate-900',
-                    isPrimaryNavItemActive(item, pathname, navRole) &&
-                      'active text-slate-900',
-                  )}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {primaryNavItems.map((item) => {
+                const isActive = isPrimaryNavItemActive(item, pathname, navRole);
+                return (
+                  <Link
+                    key={item.label}
+                    to={item.to}
+                    data-nav-active={isActive ? 'true' : 'false'}
+                    className={cn(
+                      'relative z-10 inline-flex items-center justify-center rounded-full border border-transparent px-3 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-300 hover:text-slate-900 [&.active]:text-slate-900',
+                      isActive && 'active text-slate-900',
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
             </div>
           </nav>
         ) : (
