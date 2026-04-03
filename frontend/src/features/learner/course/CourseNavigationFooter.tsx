@@ -27,7 +27,7 @@ export default function CourseNavigationFooter() {
             variant="outline"
             size="sm"
             onClick={goPreviousSection}
-            disabled={currentSectionIndex === -1 || isDisabled}
+            disabled={currentSectionIndex === -1}
             className="gap-2 transition duration-300 active:scale-95"
           >
             <ChevronLeft className="size-4" />
