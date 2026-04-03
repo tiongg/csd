@@ -2,6 +2,8 @@ import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
 import useEnrolledCourse from '@/context/EnrolledCourseContext';
 import { useResizableSplit } from '@/features/dashboard/useResizableSplit';
+import { useApiQuery } from '@/lib/fetch-client';
+import { cn } from '@/lib/utils';
 import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import {
@@ -16,9 +18,25 @@ export default function LearnerDashboardPage() {
   const { user } = useAuth();
   const displayName = user?.realname?.trim() || user?.username;
   const { enrolledCourses } = useEnrolledCourse();
+  const { data: publishedCourses } = useApiQuery('get', '/api/courses/published');
   const { splitContainerRef, splitStyle, startResizing } = useResizableSplit();
   const [isTrendModalOpen, setIsTrendModalOpen] = useState(false);
   const [trendSearch, setTrendSearch] = useState('');
+
+  const publishedCourseMetaById = useMemo(() => {
+    const map = new Map<
+      string,
+      { imageUrl?: string; tags?: string[]; creatorUsername?: string }
+    >();
+    (publishedCourses ?? []).forEach(({ course }) => {
+      map.set(course.id, {
+        imageUrl: course.imageUrl,
+        tags: course.tags,
+        creatorUsername: course.creatorUsername,
+      });
+    });
+    return map;
+  }, [publishedCourses]);
 
   const inProgressCourses = useMemo(
     () =>
@@ -69,29 +87,92 @@ export default function LearnerDashboardPage() {
             </p>
 
             {inProgressCourses.length > 0 ? (
-              <ul className="mt-4 grid flex-1 auto-rows-fr gap-2">
+              <div className="mt-4 flex min-h-0 flex-1 flex-col">
+                <ul className="flex min-h-0 flex-1 snap-x snap-mandatory gap-0 overflow-x-auto pb-2 scroll-smooth">
                 {inProgressCourses.map((enrollment) => (
-                  <li key={enrollment.lessonSessionId}>
+                    <li
+                      key={enrollment.lessonSessionId}
+                      className={cn('w-full shrink-0 snap-start pr-0')}
+                    >
                     <Link
                       to="/learner/courses/$courseId"
                       params={{ courseId: enrollment.course.id }}
-                      className="flex h-full items-center justify-between rounded-lg border border-slate-300/85 bg-slate-100/70 px-3 py-2.5 transition-colors hover:border-sky-200 hover:bg-sky-50/40"
+                        className="group block h-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-colors hover:border-sky-300"
                     >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-slate-900">
+                        {(() => {
+                          const publishedMeta = publishedCourseMetaById.get(
+                            enrollment.course.id,
+                          );
+                          const enrollmentTags = enrollment.course.tags ?? [];
+                          const tags =
+                            enrollmentTags.length > 0
+                              ? enrollmentTags
+                              : (publishedMeta?.tags ?? []);
+                          const imageUrl =
+                            enrollment.course.imageUrl ?? publishedMeta?.imageUrl;
+                          const creatorName =
+                            enrollment.course.creatorUsername ??
+                            publishedMeta?.creatorUsername ??
+                            'Course creator';
+                          const statusLabel =
+                            enrollment.status === 'COMPLETED'
+                              ? 'Completed'
+                              : enrollment.status === 'ENROLLED'
+                                ? 'In Progress'
+                                : 'Enrolled';
+
+                          return (
+                            <>
+                        <div className="relative h-44 w-full overflow-hidden bg-slate-200">
+                              {imageUrl ? (
+                            <img
+                                  src={imageUrl}
+                              alt={enrollment.course.title}
+                              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-xs font-medium tracking-wide text-slate-500 uppercase">
+                              No thumbnail
+                            </div>
+                          )}
+                          <span className="pointer-events-none absolute top-3 left-3 inline-flex items-center rounded-full border border-slate-300 bg-white/95 px-2.5 py-1 text-xs font-medium text-slate-700">
+                                {statusLabel}
+                          </span>
+                              <span className="pointer-events-none absolute right-3 bottom-3 inline-flex items-center rounded-full border border-slate-300 bg-white/95 px-2.5 py-1 text-xs font-medium text-slate-700">
+                                By {creatorName}
+                              </span>
+                        </div>
+                        <div className="p-4">
+                          <p className="line-clamp-2 text-base leading-snug font-semibold text-slate-900">
                           {enrollment.course.title}
-                        </p>
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          Updated {dayjs(enrollment.course.updatedAt).fromNow()}
-                        </p>
-                      </div>
-                      <span className="ml-3 shrink-0 rounded-full border border-slate-300/85 bg-white/58 px-2 py-0.5 text-xs font-medium text-slate-600 backdrop-blur-xl">
-                        In Progress
-                      </span>
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            Updated {dayjs(enrollment.course.updatedAt).fromNow()}
+                          </p>
+                              <div className="mt-3 flex items-end justify-between gap-3">
+                                <div className="flex min-w-0 flex-wrap gap-1.5">
+                                  {tags.map((tag) => (
+                                    <span
+                                      key={tag}
+                                      className="inline-flex items-center rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                                <p className="shrink-0 text-sm font-semibold text-sky-700 underline-offset-4 group-hover:underline">
+                                  View course
+                                </p>
+                              </div>
+                        </div>
+                            </>
+                          );
+                        })()}
                     </Link>
                   </li>
                 ))}
-              </ul>
+                </ul>
+              </div>
             ) : (
               <div className="mt-4 flex min-h-[260px] flex-1 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 p-6">
                 <div className="max-w-sm text-center">
