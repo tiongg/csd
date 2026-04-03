@@ -6,6 +6,10 @@ import jakarta.validation.constraints.NotNull;
 
 public record PendingVersionResponse(@NotNull ContentVersionResponse contentVersion, @NotNull CourseResponse course) {
   public PendingVersionResponse(ContentVersionWithCourseRecord record) {
-    this(new ContentVersionResponse(record.contentVersion()), new CourseResponse(record.course(), null, record.tags()));
+    this(record, null);
+  }
+
+  public PendingVersionResponse(ContentVersionWithCourseRecord record, String imageUrl) {
+    this(new ContentVersionResponse(record.contentVersion()), new CourseResponse(record.course(), imageUrl, record.tags()));
   }
 }

@@ -120,6 +120,10 @@ public class ContentVersionService {
     return this.contentVersionRepository.findByStatusWithCourse(ContentStatus.PENDING);
   }
 
+  public String getCourseImageUrl(CourseRecord course) {
+    return this.courseService.getImageUrlForCourse(course);
+  }
+
   @Transactional
   public void approveVersion(UUID contentVersionId) {
     ContentVersionRecord version = this.contentVersionRepository.findOneBy(CONTENT_VERSION.ID, contentVersionId)
