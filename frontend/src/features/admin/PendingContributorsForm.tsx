@@ -1,37 +1,25 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { useApiQuery } from '@/lib/fetch-client';
-import { AdminTable, AdminTableMessageRow } from './AdminTable';
+import { AdminTable } from './AdminTable';
 
 type PendingContributorsFormProps = {
   selectedUuids: Set<string>;
   setSelected: (uuid: string, checked: boolean) => void;
 };
 
+type PendingContributor = {
+  id: string;
+  username: string;
+  email: string;
+  realname?: string | null;
+};
+
 function PendingApplicationRows({
+  applications,
   selectedUuids,
   setSelected,
-}: PendingContributorsFormProps) {
-  const { data: applications, isLoading: isLoadingApplications } = useApiQuery(
-    'get',
-    '/api/admins/contributor-applications',
-    {
-      params: {
-        query: {},
-      },
-    },
-  );
-
-  if (isLoadingApplications) {
-    return <AdminTableMessageRow colSpan={4} message="Loading..." />;
-  }
-
-  if (!applications || applications.length === 0) {
-    return (
-      <AdminTableMessageRow colSpan={4} message="No pending applications." />
-    );
-  }
-
+}: PendingContributorsFormProps & { applications: PendingContributor[] }) {
   return applications.map(({ username, email, realname, id }) => (
     <TableRow key={id} className="bg-transparent">
       <TableCell className="px-4 py-3">
@@ -56,6 +44,34 @@ export default function PendingContributorsForm({
   selectedUuids,
   setSelected,
 }: PendingContributorsFormProps) {
+  const { data: applications, isLoading: isLoadingApplications } = useApiQuery(
+    'get',
+    '/api/admins/contributor-applications',
+    {
+      params: {
+        query: {},
+      },
+    },
+  );
+
+  if (isLoadingApplications) {
+    return (
+      <div className="rounded-xl border border-slate-200/80 bg-white/70 py-10 text-center text-slate-500">
+        Loading applications...
+      </div>
+    );
+  }
+
+  if (!applications || applications.length === 0) {
+    return (
+      <div className="flex min-h-[28rem] w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/55 p-8 text-center text-slate-500">
+        <p className="text-base font-semibold text-slate-700">
+          No pending applications
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <AdminTable
@@ -67,6 +83,7 @@ export default function PendingContributorsForm({
         ]}
       >
         <PendingApplicationRows
+          applications={applications}
           selectedUuids={selectedUuids}
           setSelected={setSelected}
         />
