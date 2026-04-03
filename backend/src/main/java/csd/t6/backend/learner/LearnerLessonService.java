@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import csd.t6.backend.account.AccountRepository;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.exceptions.ForbiddenException;
 import csd.t6.backend.learner.dto.response.LessonSessionFullResponse;
@@ -23,11 +24,13 @@ import csd.t6.jooq.public_.tables.records.LearnerCourseRecord;
 public class LearnerLessonService {
   private final LearnerCourseRepository learnerCourseRepository;
   private final LearnerAnalyticsService learnerAnalyticsService;
+  private final AccountRepository accountRepository;
 
   public LearnerLessonService(LearnerCourseRepository learnerCourseRepository,
-      LearnerAnalyticsService learnerAnalyticsService) {
+      LearnerAnalyticsService learnerAnalyticsService, AccountRepository accountRepository) {
     this.learnerCourseRepository = learnerCourseRepository;
     this.learnerAnalyticsService = learnerAnalyticsService;
+    this.accountRepository = accountRepository;
   }
 
   public LearnerCourseRecord enrollToCourse(UUID courseId, UUID userId) {
@@ -59,8 +62,10 @@ public class LearnerLessonService {
   }
 
   public UserEnrolledLessonsResponse getEnrolledLessons(UUID userId) {
-    return new UserEnrolledLessonsResponse(
-        this.learnerCourseRepository.getLearnerEnrolled(userId).stream().map(LessonSessionFullResponse::new).toList());
+    return new UserEnrolledLessonsResponse(this.learnerCourseRepository.getLearnerEnrolled(userId).stream().map(record -> {
+      String creatorUsername = this.accountRepository.findUsernameById(record.courseRecord().getCreatorId()).orElse(null);
+      return new LessonSessionFullResponse(record, creatorUsername);
+    }).toList());
   }
 
   public void dropCourse(UUID lessonSessionId) {

@@ -22,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import csd.t6.backend.account.AccountRepository;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.exceptions.ForbiddenException;
 import csd.t6.backend.learner.dto.response.UserEnrolledLessonsResponse;
@@ -38,6 +39,9 @@ class LearnerLessonServiceTest {
 
   @Mock
   private LearnerAnalyticsService learnerAnalyticsService;
+
+  @Mock
+  private AccountRepository accountRepository;
 
   @InjectMocks
   private LearnerLessonService learnerLessonService;
@@ -127,15 +131,20 @@ class LearnerLessonServiceTest {
   @Test
   @DisplayName("Should get enrolled lessons for user")
   void shouldGetEnrolledLessons() {
+    var courseRecord = mock(csd.t6.jooq.public_.tables.records.CourseRecord.class);
+    when(courseRecord.getCreatorId()).thenReturn(courseId);
+    when(accountRepository.findUsernameById(courseId)).thenReturn(java.util.Optional.of("creator_user"));
+
     LessonCourseRecord lessonCourseRecord = new LessonCourseRecord(
         mockLearnerCourse,
-        mock(csd.t6.jooq.public_.tables.records.CourseRecord.class));
+        courseRecord);
     when(learnerCourseRepository.getLearnerEnrolled(userId)).thenReturn(List.of(lessonCourseRecord));
 
     UserEnrolledLessonsResponse result = learnerLessonService.getEnrolledLessons(userId);
 
     assertThat(result).isNotNull();
     assertThat(result.enrolledLessons()).hasSize(1);
+    assertThat(result.enrolledLessons().get(0).course().creatorUsername()).isEqualTo("creator_user");
   }
 
   @Test

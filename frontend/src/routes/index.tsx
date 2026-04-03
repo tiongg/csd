@@ -224,14 +224,20 @@ function App() {
                     className="group block h-full overflow-hidden rounded-2xl border border-slate-200 bg-white/85 transition-colors hover:border-sky-300"
                   >
                     <div className="relative h-64 w-full overflow-hidden">
-                      <img
-                        src={course.image}
-                        alt={course.title}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        style={{ objectPosition: course.imagePosition }}
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                      />
+                      {course.image ? (
+                        <img
+                          src={course.image}
+                          alt={course.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          style={{ objectPosition: course.imagePosition }}
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-xs font-medium tracking-wide text-slate-500 uppercase">
+                          No image
+                        </div>
+                      )}
                     </div>
                     <div className="p-5">
                       <h3 className="text-xl leading-snug font-semibold text-slate-900">
@@ -266,4 +272,3 @@ function App() {
     </main>
   );
 }
-

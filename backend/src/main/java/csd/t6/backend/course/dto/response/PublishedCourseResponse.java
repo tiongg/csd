@@ -6,7 +6,11 @@ import jakarta.validation.constraints.NotNull;
 
 public record PublishedCourseResponse(@NotNull ContentVersionResponse contentVersion, @NotNull CourseResponse course) {
   public PublishedCourseResponse(ContentVersionWithCourseRecord record, String imageUrl) {
-    this(new ContentVersionResponse(record.contentVersion()), new CourseResponse(record.course(), imageUrl, record.tags()));
+    this(record, imageUrl, null);
+  }
+
+  public PublishedCourseResponse(ContentVersionWithCourseRecord record, String imageUrl, String creatorUsername) {
+    this(new ContentVersionResponse(record.contentVersion()),
+        new CourseResponse(record.course(), imageUrl, record.tags(), creatorUsername));
   }
 }
-
