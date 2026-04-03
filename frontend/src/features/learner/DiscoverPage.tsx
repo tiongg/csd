@@ -61,9 +61,9 @@ export default function DiscoverPage() {
               <p className="text-lg font-semibold">No courses found</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {filteredCourses.map(({ course }) => (
-                <CourseCard key={course.id} course={course} />
+                <CourseCard key={course.id} course={course} variant="discover" />
               ))}
             </div>
           )}

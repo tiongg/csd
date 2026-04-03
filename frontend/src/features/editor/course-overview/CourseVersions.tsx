@@ -25,14 +25,18 @@ type CourseVersionProps = {
 };
 
 const statusVariants = {
-  APPROVED: 'default',
+  APPROVED: 'success',
   PENDING: 'secondary',
   REJECTED: 'destructive',
 } as const;
 
 function StatusChip({ version, isShown }: CourseVersionProps) {
   if (isShown) {
-    return <Badge variant="success">Currently Shown</Badge>;
+    return (
+      <Badge className="border-transparent bg-sky-600 text-white hover:bg-sky-700">
+        Currently Shown
+      </Badge>
+    );
   }
 
   if (version.status === 'REJECTED') {
@@ -115,7 +119,7 @@ export default function CourseVersions({ course }: CourseVersionsProps) {
         </p>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="h-96 space-y-3 overflow-y-auto pr-1">
           {versions.map((version) => (
             <CourseVersion
               key={version.id}

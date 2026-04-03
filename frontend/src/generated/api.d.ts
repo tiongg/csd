@@ -1019,6 +1019,7 @@ export interface components {
             description?: string;
             /** Format: uuid */
             creatorId: string;
+            creatorUsername?: string;
             /** Format: uuid */
             teamId: string;
             /** Format: date-time */

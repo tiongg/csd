@@ -6,6 +6,7 @@ import { AdminTable } from './AdminTable';
 type PendingContributorsFormProps = {
   selectedUuids: Set<string>;
   setSelected: (uuid: string, checked: boolean) => void;
+  searchQuery?: string;
 };
 
 type PendingContributor = {
@@ -43,6 +44,7 @@ function PendingApplicationRows({
 export default function PendingContributorsForm({
   selectedUuids,
   setSelected,
+  searchQuery = '',
 }: PendingContributorsFormProps) {
   const { data: applications, isLoading: isLoadingApplications } = useApiQuery(
     'get',
@@ -52,6 +54,14 @@ export default function PendingContributorsForm({
         query: {},
       },
     },
+  );
+  const query = searchQuery.trim().toLowerCase();
+  const filteredApplications = (applications ?? []).filter(
+    ({ username, email, realname }) =>
+      !query ||
+      username.toLowerCase().includes(query) ||
+      email.toLowerCase().includes(query) ||
+      (realname ?? '').toLowerCase().includes(query),
   );
 
   if (isLoadingApplications) {
@@ -74,6 +84,13 @@ export default function PendingContributorsForm({
 
   return (
     <div className="flex flex-col gap-4">
+      {filteredApplications.length === 0 ? (
+        <div className="flex min-h-[28rem] w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/55 p-8 text-center text-slate-500">
+          <p className="text-base font-semibold text-slate-700">
+            No pending applications match your search.
+          </p>
+        </div>
+      ) : (
       <AdminTable
         columns={[
           { label: '', className: 'w-[12%]' },
@@ -83,11 +100,12 @@ export default function PendingContributorsForm({
         ]}
       >
         <PendingApplicationRows
-          applications={applications}
+          applications={filteredApplications}
           selectedUuids={selectedUuids}
           setSelected={setSelected}
         />
       </AdminTable>
+      )}
     </div>
   );
 }

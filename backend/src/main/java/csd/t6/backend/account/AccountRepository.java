@@ -3,6 +3,7 @@ package csd.t6.backend.account;
 import static csd.t6.jooq.accounts.tables.Account.ACCOUNT;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
@@ -45,5 +46,9 @@ public class AccountRepository extends BaseRepository<AccountRecord> {
   public List<AccountRecord> getNonAdmins(int limit, int offset) {
     return dsl.select().from(ACCOUNT).where(ACCOUNT.USER_ROLE.ne(Roles.ADMIN)).limit(limit).offset(offset)
         .fetchInto(ACCOUNT);
+  }
+
+  public Optional<String> findUsernameById(UUID accountId) {
+    return this.findOneBy(ACCOUNT.ID, accountId).map(AccountRecord::getUsername);
   }
 }

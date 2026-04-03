@@ -17,7 +17,7 @@ import {
 } from '@/lib/fetch-client';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import ConfirmActionDialog from './ConfirmActionDialog';
 import { AdminTable, AdminTableMessageRow } from './AdminTable';
@@ -48,8 +48,19 @@ export default function UserManagementForm() {
     width: 0,
     opacity: 0,
   });
+  const [tabPillReady, setTabPillReady] = useState(false);
 
   const queryClient = useQueryClient();
+  const { data: pendingApplications } = useApiQuery(
+    'get',
+    '/api/admins/contributor-applications',
+    {
+      params: {
+        query: {},
+      },
+    },
+  );
+  const { data: allUsers } = useApiQuery('get', '/api/account/', {});
 
   const { mutateAsync: approveContributorsAsync, isPending: isApproving } =
     useApiMutation('post', '/api/admins/contributor-applications/approve', {
@@ -85,7 +96,7 @@ export default function UserManagementForm() {
       },
     });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateTabPill = () => {
       const track = tabTrackRef.current;
       if (!track) return;
@@ -107,12 +118,31 @@ export default function UserManagementForm() {
         width: activeRect.width,
         opacity: 1,
       });
+      setTabPillReady(true);
     };
 
     updateTabPill();
+    const rafId = window.requestAnimationFrame(updateTabPill);
     window.addEventListener('resize', updateTabPill);
-    return () => window.removeEventListener('resize', updateTabPill);
+    const resizeObserver = new ResizeObserver(updateTabPill);
+    if (tabTrackRef.current) {
+      resizeObserver.observe(tabTrackRef.current);
+    }
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', updateTabPill);
+      resizeObserver.disconnect();
+    };
   }, [activeTab]);
+
+  useEffect(() => {
+    // Warm course-moderation data to avoid first-switch jitter between admin pages.
+    void queryClient.prefetchQuery(
+      apiQueryOptions('get', '/api/content-versions/pending'),
+    );
+    void queryClient.prefetchQuery(apiQueryOptions('get', '/api/courses/published'));
+  }, [queryClient]);
 
   function setSelected(uuid: string, checked: boolean) {
     setSelectedUuids((prev) =>
@@ -153,6 +183,9 @@ export default function UserManagementForm() {
   const isPendingAction = isApproving || isRejecting;
   const selectedCount = selectedUuids.size;
   const actionLabel = pendingAction === 'approve' ? 'Approve' : 'Reject';
+  const pendingCountLabel =
+    pendingApplications == null ? '...' : String(pendingApplications.length);
+  const usersCountLabel = allUsers == null ? '...' : String(allUsers.length);
 
   return (
     <div className="flex min-h-0 w-full flex-1 bg-slate-100/70 p-6 md:p-8">
@@ -177,7 +210,12 @@ export default function UserManagementForm() {
               >
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute top-1 bottom-1 rounded-md border border-stone-400/45 bg-gradient-to-b from-white/92 via-slate-100/75 to-stone-200/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-1px_0_rgba(255,255,255,0.38),0_10px_24px_-12px_rgba(51,65,85,0.42)] backdrop-blur-2xl transition-[left,width,opacity] duration-[520ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  className={cn(
+                    'pointer-events-none absolute top-1 bottom-1 rounded-md border border-stone-400/45 bg-gradient-to-b from-white/92 via-slate-100/75 to-stone-200/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-1px_0_rgba(255,255,255,0.38),0_10px_24px_-12px_rgba(51,65,85,0.42)] backdrop-blur-2xl',
+                    tabPillReady
+                      ? 'transition-[left,width,opacity] duration-[520ms] ease-[cubic-bezier(0.22,1,0.36,1)]'
+                      : 'transition-none',
+                  )}
                   style={{
                     width: `${tabPill.width}px`,
                     opacity: tabPill.opacity,
@@ -197,34 +235,53 @@ export default function UserManagementForm() {
                     )}
                     onClick={() => setActiveTab(tab)}
                   >
-                    {tab === 'pending' ? 'Pending Approvals' : 'All Users'}
+                    <span className="inline-flex items-center gap-2">
+                      <span>{tab === 'pending' ? 'Pending Approvals' : 'All Users'}</span>
+                      <span
+                        className={cn(
+                          'inline-flex h-5 min-w-5 items-center justify-center rounded-full border px-1 text-[11px] font-bold',
+                          activeTab === tab
+                            ? 'border-sky-600 bg-sky-600 text-white'
+                            : 'border-slate-300 bg-slate-100 text-slate-600',
+                        )}
+                      >
+                        {tab === 'pending' ? pendingCountLabel : usersCountLabel}
+                      </span>
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {activeTab === 'pending' && (
-              <div className="flex items-center gap-x-2">
-                <Button
-                  variant="default"
-                  className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
-                  disabled={selectedCount === 0 || isPendingAction}
-                  onClick={() => setPendingAction('approve')}
-                >
-                  Approve
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="h-9 rounded-lg"
-                  disabled={selectedCount === 0 || isPendingAction}
-                  onClick={() => setPendingAction('reject')}
-                >
-                  Reject
-                </Button>
+            {activeTab === 'pending' ? (
+              <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-nowrap">
+                <div className="w-full sm:w-80">
+                  <SearchBar
+                    placeholder="Search users by name or email"
+                    className="h-9 rounded-lg border-slate-300 bg-white/85"
+                    onSearch={setUserSearchQuery}
+                  />
+                </div>
+                <div className="flex items-center gap-x-2">
+                  <Button
+                    variant="default"
+                    className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+                    disabled={selectedCount === 0 || isPendingAction}
+                    onClick={() => setPendingAction('approve')}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="h-9 rounded-lg"
+                    disabled={selectedCount === 0 || isPendingAction}
+                    onClick={() => setPendingAction('reject')}
+                  >
+                    Reject
+                  </Button>
+                </div>
               </div>
-            )}
-
-            {activeTab === 'users' && (
+            ) : (
               <div className="w-full sm:w-80">
                 <SearchBar
                   placeholder="Search users by name or email"
@@ -236,14 +293,16 @@ export default function UserManagementForm() {
           </div>
 
           <div className="pt-4">
-            {activeTab === 'pending' ? (
+            <div className={cn(activeTab === 'pending' ? 'block' : 'hidden')}>
               <PendingContributorsForm
                 selectedUuids={selectedUuids}
                 setSelected={setSelected}
+                searchQuery={userSearchQuery}
               />
-            ) : (
+            </div>
+            <div className={cn(activeTab === 'users' ? 'block' : 'hidden')}>
               <AllUsers searchQuery={userSearchQuery} />
-            )}
+            </div>
           </div>
         </section>
       </div>

@@ -7,6 +7,7 @@ import { TopTrendsTable } from '../learner/dashboard/TopTrendsTable';
 
 export default function ContributorDashboardPage() {
   const { user } = useAuth();
+  const displayName = user?.realname?.trim() || user?.username;
   const { splitContainerRef, splitStyle, startResizing } = useResizableSplit();
 
   return (
@@ -19,7 +20,7 @@ export default function ContributorDashboardPage() {
                 Contributor Dashboard
               </div>
               <Heading1 className="mt-3 text-slate-900">
-                Welcome back, {user?.username}.
+                Welcome back, {displayName}.
               </Heading1>
               <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-600">
                 Manage review pipelines, prioritize pending courses, and convert

@@ -25,6 +25,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import csd.t6.backend.account.AccountRepository;
 import csd.t6.backend.approval.ContentVersionRepository;
 import csd.t6.backend.approval.util.ContentVersionWithCourseRecord;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
@@ -46,6 +47,9 @@ class CourseServiceTest {
 
   @Mock
   private TeamService teamService;
+
+  @Mock
+  private AccountRepository accountRepository;
 
   @Mock
   private FileService fileService;
@@ -77,6 +81,7 @@ class CourseServiceTest {
     lenient().when(mockCourse.getTeamId()).thenReturn(teamId);
     lenient().when(mockCourse.getCreatedAt()).thenReturn(OffsetDateTime.now());
     lenient().when(mockCourse.getUpdatedAt()).thenReturn(OffsetDateTime.now());
+    lenient().when(accountRepository.findUsernameById(creatorId)).thenReturn(Optional.of("creator_user"));
   }
 
   // --- createCourse ---
@@ -93,6 +98,7 @@ class CourseServiceTest {
 
     assertThat(result).isNotNull();
     assertThat(result.title()).isEqualTo("Test Course");
+    assertThat(result.creatorUsername()).isEqualTo("creator_user");
   }
 
   @Test
@@ -189,6 +195,7 @@ class CourseServiceTest {
 
     assertThat(result).hasSize(1);
     assertThat(result.get(0).course().tags()).isEqualTo(List.of("Java", "Backend"));
+    assertThat(result.get(0).course().creatorUsername()).isEqualTo("creator_user");
   }
 
   @Test

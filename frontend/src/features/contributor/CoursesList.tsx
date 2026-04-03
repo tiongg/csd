@@ -17,7 +17,7 @@ import type { Course, Team } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { ArrowUpRight, Plus, Settings, Trash2, Users } from 'lucide-react';
+import { Plus, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useBoolean } from 'usehooks-ts';
@@ -90,18 +90,16 @@ export default function CoursesList({ team }: CourseListProps) {
         <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
-            className="h-9 cursor-pointer gap-2 rounded-lg border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            className="h-9 cursor-pointer rounded-lg border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
             onClick={openTeamCollaboratorsDialog}
           >
-            <Users className="size-4" />
             Team Members
           </Button>
           <Button
             variant="outline"
-            className="h-9 cursor-pointer gap-2 rounded-lg border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100"
+            className="h-9 cursor-pointer rounded-lg border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100"
             onClick={() => setIsDeleteTeamDialogOpen(true)}
           >
-            <Trash2 className="size-4" />
             Delete Team
           </Button>
         </div>
@@ -237,12 +235,16 @@ function CourseCard({ course, teamId }: CourseCardProps) {
       >
         <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
           <div className="aspect-video w-full overflow-hidden rounded-t-xl bg-slate-200">
-            {course.imageUrl && (
+            {course.imageUrl ? (
               <img
                 src={course.imageUrl}
                 alt={course.title}
                 className="h-full w-full object-cover"
               />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-xs font-medium tracking-wide text-slate-500 uppercase">
+                No thumbnail
+              </div>
             )}
           </div>
           <div className="p-4">
@@ -260,7 +262,6 @@ function CourseCard({ course, teamId }: CourseCardProps) {
                   >
                     <Settings className="size-4" />
                   </Button>
-                  <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition-colors group-hover:text-sky-600" />
                 </div>
               </div>
               <p className="line-clamp-2 text-sm leading-5 text-slate-600">
@@ -272,7 +273,7 @@ function CourseCard({ course, teamId }: CourseCardProps) {
                     {(course.tags ?? []).map((tag) => (
                       <span
                         key={tag}
-                        className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+                        className="inline-flex items-center rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
                       >
                         {tag}
                       </span>
@@ -352,15 +353,15 @@ function CreateCourseCard({ onInteract }: { onInteract: () => void }) {
       className="h-full w-full text-left"
       onClick={onInteract}
     >
-      <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-dashed border-slate-300 bg-white p-4 transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
-        <span className="m-auto inline-flex size-16 items-center justify-center rounded-lg text-slate-700 transition-colors group-hover:text-sky-700">
+      <article className="group flex h-full min-h-40 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
+        <span className="inline-flex size-16 items-center justify-center rounded-lg text-slate-700 transition-colors group-hover:text-sky-700">
           <Plus className="size-8" />
         </span>
-        <div className="space-y-0.5">
+        <div className="space-y-1">
           <h3 className="text-lg font-bold text-slate-900">
             Create New Course
           </h3>
-          <p className="text-xs text-slate-600">Add a new course</p>
+          <p className="text-sm text-slate-600">Add a new course</p>
         </div>
       </article>
     </button>

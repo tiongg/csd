@@ -54,7 +54,7 @@ export default function CourseView() {
                 <CourseMarkdownDisplay content={section.content} />
               ))
               .with({ type: 'quiz' }, (section) => (
-                <CourseQuiz quiz={section.content} />
+                <CourseQuiz quiz={section.content} key={currentSectionIndex} />
               ))
               .exhaustive()}
           </div>

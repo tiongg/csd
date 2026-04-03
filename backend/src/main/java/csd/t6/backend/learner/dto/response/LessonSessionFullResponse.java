@@ -22,9 +22,13 @@ public record LessonSessionFullResponse(@NotNull UUID lessonSessionId, @NotNull 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   public LessonSessionFullResponse(LessonCourseRecord lessonCourseRecord) {
+    this(lessonCourseRecord, null);
+  }
+
+  public LessonSessionFullResponse(LessonCourseRecord lessonCourseRecord, String creatorUsername) {
     this(lessonCourseRecord.learnerCourseRecord().getId(), lessonCourseRecord.learnerCourseRecord().getStatus(),
         extractMetadata(lessonCourseRecord.learnerCourseRecord().getMetadata()),
-        new CourseResponse(lessonCourseRecord.courseRecord(), null, Collections.emptyList()));
+        new CourseResponse(lessonCourseRecord.courseRecord(), null, Collections.emptyList(), creatorUsername));
   }
 
   @SuppressWarnings("unchecked")

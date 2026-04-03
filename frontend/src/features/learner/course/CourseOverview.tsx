@@ -35,9 +35,6 @@ export default function CourseOverview({
               <CardTitle className="text-2xl font-bold">
                 {course.title}
               </CardTitle>
-              <p className="text-muted-foreground">
-                {course.description ?? 'No description provided'}
-              </p>
             </div>
             {enrollment?.status === 'COMPLETED' && (
               <Badge variant="success">Complete</Badge>

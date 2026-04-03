@@ -56,7 +56,12 @@ public class ContentVersionController {
 
   @GetMapping("/pending")
   public List<PendingVersionResponse> getPendingCourses() {
-    return this.contentVersionService.getAllPendingVersions().stream().map(PendingVersionResponse::new).toList();
+    return this.contentVersionService.getAllPendingVersions().stream()
+        .map((record) -> new PendingVersionResponse(
+            record,
+            this.contentVersionService.getCourseImageUrl(record.course()),
+            this.contentVersionService.getCourseCreatorUsername(record.course())))
+        .toList();
   }
 
   @PostMapping("/{contentVersionId}/approve")

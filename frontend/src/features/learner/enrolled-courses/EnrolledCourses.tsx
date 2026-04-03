@@ -1,7 +1,9 @@
 import { Button } from '@/components/ui/button';
 import useEnrolledCourse from '@/context/EnrolledCourseContext';
+import { useApiQuery } from '@/lib/fetch-client';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
+import { useMemo } from 'react';
 import { CourseCard } from '../course-card/CourseCard';
 
 type EnrolledCoursesProps = {
@@ -10,6 +12,18 @@ type EnrolledCoursesProps = {
 
 export function EnrolledCourses({ searchQuery }: EnrolledCoursesProps) {
   const { enrolledCourses } = useEnrolledCourse();
+  const { data: publishedCourses } = useApiQuery('get', '/api/courses/published');
+
+  const publishedCourseMetaById = useMemo(() => {
+    const map = new Map<string, { imageUrl?: string; tags?: string[] }>();
+    (publishedCourses ?? []).forEach(({ course }) => {
+      map.set(course.id, {
+        imageUrl: course.imageUrl,
+        tags: course.tags,
+      });
+    });
+    return map;
+  }, [publishedCourses]);
 
   const filteredCourses = enrolledCourses.filter((enrollment) =>
     enrollment.course.title.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -38,13 +52,28 @@ export function EnrolledCourses({ searchQuery }: EnrolledCoursesProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="w-full grid grid-cols-1 gap-4 sm:grid-cols-2">
       {filteredCourses.map((enrollment) => (
-        <CourseCard
-          key={enrollment.lessonSessionId}
-          course={enrollment.course}
-          enrollment={enrollment}
-        />
+        (() => {
+          const publishedMeta = publishedCourseMetaById.get(enrollment.course.id);
+          const enrollmentTags = enrollment.course.tags ?? [];
+          const resolvedTags =
+            enrollmentTags.length > 0
+              ? enrollmentTags
+              : (publishedMeta?.tags ?? []);
+
+          return (
+            <CourseCard
+              key={enrollment.lessonSessionId}
+              course={{
+                ...enrollment.course,
+                imageUrl: enrollment.course.imageUrl ?? publishedMeta?.imageUrl,
+                tags: resolvedTags,
+              }}
+              enrollment={enrollment}
+            />
+          );
+        })()
       ))}
     </div>
   );

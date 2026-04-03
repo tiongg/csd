@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import csd.t6.backend.account.AccountRepository;
 import csd.t6.backend.approval.ContentVersionRepository;
 import csd.t6.backend.contributor.dto.response.ImageUploadResponse;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
@@ -26,14 +27,16 @@ import csd.t6.jooq.public_.tables.records.CourseRecord;
 public class CourseService {
   private final CourseRepository courseRepository;
   private final TeamService teamService;
+  private final AccountRepository accountRepository;
   private final ContentVersionRepository contentVersionRepository;
   private final FileService fileService;
   private final TagService tagService;
 
-  public CourseService(CourseRepository courseRepository, TeamService teamService,
+  public CourseService(CourseRepository courseRepository, TeamService teamService, AccountRepository accountRepository,
       ContentVersionRepository contentVersionRepository, FileService fileService, TagService tagService) {
     this.courseRepository = courseRepository;
     this.teamService = teamService;
+    this.accountRepository = accountRepository;
     this.contentVersionRepository = contentVersionRepository;
     this.fileService = fileService;
     this.tagService = tagService;
@@ -50,26 +53,29 @@ public class CourseService {
     // Handle tags
     List<String> tags = tagService.updateCourseTags(course.getId(), request.tags());
 
-    return new CourseResponse(course, this.getImageUrlForCourse(course), tags);
+    return new CourseResponse(course, this.getImageUrlForCourse(course), tags,
+        this.getCreatorUsername(course.getCreatorId()));
   }
 
   public CourseResponse getCourseById(UUID id) {
     CourseRecord course = courseRepository.findById(id).orElseThrow(() -> new BadRequestException("Course not found"));
     List<String> tags = tagService.getTagsForCourse(id);
-    return new CourseResponse(course, this.getImageUrlForCourse(course), tags);
+    return new CourseResponse(course, this.getImageUrlForCourse(course), tags,
+        this.getCreatorUsername(course.getCreatorId()));
   }
 
   public List<CourseResponse> getAllCourses() {
     return courseRepository.findAll().stream().map(record -> {
       List<String> tags = tagService.getTagsForCourse(record.getId());
-      return new CourseResponse(record, this.getImageUrlForCourse(record), tags);
+      return new CourseResponse(record, this.getImageUrlForCourse(record), tags,
+          this.getCreatorUsername(record.getCreatorId()));
     }).collect(Collectors.toList());
   }
 
   public List<PublishedCourseResponse> getCoursesWithApprovedVersion() {
     return contentVersionRepository.findCoursesWithApprovedVersion().stream().map(record -> {
       String imageUrl = this.getImageUrlForCourse(record.course());
-      return new PublishedCourseResponse(record, imageUrl);
+      return new PublishedCourseResponse(record, imageUrl, this.getCreatorUsername(record.course().getCreatorId()));
     }).collect(Collectors.toList());
   }
 
@@ -80,7 +86,8 @@ public class CourseService {
 
     return this.courseRepository.findBy(COURSE.TEAM_ID, teamId).stream().map(record -> {
       List<String> tags = tagService.getTagsForCourse(record.getId());
-      return new CourseResponse(record, this.getImageUrlForCourse(record), tags);
+      return new CourseResponse(record, this.getImageUrlForCourse(record), tags,
+          this.getCreatorUsername(record.getCreatorId()));
     }).collect(Collectors.toList());
   }
 
@@ -105,7 +112,8 @@ public class CourseService {
     // Handle tags
     List<String> tags = tagService.updateCourseTags(id, request.tags());
 
-    return new CourseResponse(updated, this.getImageUrlForCourse(updated), tags);
+    return new CourseResponse(updated, this.getImageUrlForCourse(updated), tags,
+        this.getCreatorUsername(updated.getCreatorId()));
   }
 
   @Transactional
@@ -166,6 +174,10 @@ public class CourseService {
 
   private String getImageKeyForCourse(UUID courseId, String extension) {
     return String.format("thumbnails/%s.%s", courseId, extension);
+  }
+
+  public String getCreatorUsername(UUID creatorId) {
+    return this.accountRepository.findUsernameById(creatorId).orElse(null);
   }
 
   private void checkTeamMembership(UUID courseId, UUID userId) {

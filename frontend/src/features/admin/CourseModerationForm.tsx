@@ -1,7 +1,8 @@
 import { Heading1 } from '@/components/ui/typography';
-import { useApiQuery } from '@/lib/fetch-client';
+import { apiQueryOptions, useApiQuery } from '@/lib/fetch-client';
 import { cn } from '@/lib/utils';
-import { useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import SearchBar from '@/components/ui/searchbar';
 import { AllPublishedCourses } from './course-moderation/AllPublishedCourses';
 import { CoursePendingApprovals } from './course-moderation/CoursePendingApprovals';
@@ -12,18 +13,21 @@ const glassPanelClass =
 export default function CourseModerationForm() {
   const [activeTab, setActiveTab] = useState<'pending' | 'courses'>('pending');
   const [allCoursesSearchQuery, setAllCoursesSearchQuery] = useState('');
+  const queryClient = useQueryClient();
   const { data: pendingCourses } = useApiQuery(
     'get',
     '/api/content-versions/pending',
   );
+  const { data: publishedCourses } = useApiQuery('get', '/api/courses/published');
   const tabTrackRef = useRef<HTMLDivElement | null>(null);
   const [tabPill, setTabPill] = useState({
     left: 0,
     width: 0,
     opacity: 0,
   });
+  const [tabPillReady, setTabPillReady] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const updateTabPill = () => {
       const track = tabTrackRef.current;
       if (!track) return;
@@ -45,20 +49,38 @@ export default function CourseModerationForm() {
         width: activeRect.width,
         opacity: 1,
       });
+      setTabPillReady(true);
     };
 
     updateTabPill();
+    const rafId = window.requestAnimationFrame(updateTabPill);
     window.addEventListener('resize', updateTabPill);
-    return () => window.removeEventListener('resize', updateTabPill);
+    const resizeObserver = new ResizeObserver(updateTabPill);
+    if (tabTrackRef.current) {
+      resizeObserver.observe(tabTrackRef.current);
+    }
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', updateTabPill);
+      resizeObserver.disconnect();
+    };
   }, [activeTab]);
 
+  useEffect(() => {
+    // Warm user-management data to avoid first-switch jitter between admin pages.
+    void queryClient.prefetchQuery(
+      apiQueryOptions('get', '/api/admins/contributor-applications'),
+    );
+    void queryClient.prefetchQuery(apiQueryOptions('get', '/api/account/', {}));
+  }, [queryClient]);
+
   const pendingCount = pendingCourses?.length ?? 0;
-  const pendingCountLabel =
-    pendingCourses == null
-      ? 'Loading pending courses...'
-      : pendingCount === 1
-        ? '1 pending course'
-        : `${pendingCount} pending courses`;
+  const allCoursesCount = publishedCourses?.length ?? 0;
+
+  const pendingCountLabel = pendingCourses == null ? '…' : String(pendingCount);
+  const allCoursesCountLabel =
+    publishedCourses == null ? '…' : String(allCoursesCount);
 
   return (
     <div className="flex min-h-0 w-full flex-1 bg-slate-100/70 p-6 md:p-8">
@@ -74,7 +96,7 @@ export default function CourseModerationForm() {
           </p>
         </section>
 
-        <section className={cn(glassPanelClass, 'min-h-0 flex-1')}>
+        <section className={cn(glassPanelClass, 'min-h-0 flex flex-1 flex-col')}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="rounded-lg border border-slate-300/80 bg-white/65 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_6px_20px_-16px_rgba(15,23,42,0.35)] backdrop-blur-xl">
               <div
@@ -83,7 +105,12 @@ export default function CourseModerationForm() {
               >
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute top-1 bottom-1 rounded-md border border-stone-400/45 bg-gradient-to-b from-white/92 via-slate-100/75 to-stone-200/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-1px_0_rgba(255,255,255,0.38),0_10px_24px_-12px_rgba(51,65,85,0.42)] backdrop-blur-2xl transition-[left,width,opacity] duration-[520ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  className={cn(
+                    'pointer-events-none absolute top-1 bottom-1 rounded-md border border-stone-400/45 bg-gradient-to-b from-white/92 via-slate-100/75 to-stone-200/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-1px_0_rgba(255,255,255,0.38),0_10px_24px_-12px_rgba(51,65,85,0.42)] backdrop-blur-2xl',
+                    tabPillReady
+                      ? 'transition-[left,width,opacity] duration-[520ms] ease-[cubic-bezier(0.22,1,0.36,1)]'
+                      : 'transition-none',
+                  )}
                   style={{
                     width: `${tabPill.width}px`,
                     opacity: tabPill.opacity,
@@ -103,33 +130,51 @@ export default function CourseModerationForm() {
                     )}
                     onClick={() => setActiveTab(tab)}
                   >
-                    {tab === 'pending' ? 'Pending Approvals' : 'All Courses'}
+                    <span className="inline-flex items-center gap-2">
+                      <span>{tab === 'pending' ? 'Pending Approvals' : 'All Courses'}</span>
+                      <span
+                        className={cn(
+                          'inline-flex h-5 min-w-5 items-center justify-center rounded-full border px-1 text-[11px] font-bold',
+                          activeTab === tab
+                            ? 'border-sky-600 bg-sky-600 text-white'
+                            : 'border-slate-300 bg-slate-100 text-slate-600',
+                        )}
+                      >
+                        {tab === 'pending' ? pendingCountLabel : allCoursesCountLabel}
+                      </span>
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
-            {activeTab === 'courses' && (
-              <div className="w-full sm:w-80">
-                <SearchBar
-                  placeholder="Search courses by title, description, or tag"
-                  className="h-9 rounded-lg border-slate-300 bg-white/85"
-                  onSearch={setAllCoursesSearchQuery}
-                />
-              </div>
-            )}
-            {activeTab === 'pending' && (
-              <p className="text-sm font-medium text-slate-600">
-                {pendingCountLabel}
-              </p>
-            )}
+            <div className="w-full sm:w-80">
+              <SearchBar
+                placeholder={
+                  activeTab === 'pending'
+                    ? 'Search pending courses by title, description, or tag'
+                    : 'Search courses by title, description, or tag'
+                }
+                className="h-9 rounded-lg border-slate-300 bg-white/85"
+                onSearch={setAllCoursesSearchQuery}
+              />
+            </div>
           </div>
 
-          <div className="pt-4">
-            {activeTab === 'pending' ? (
-              <CoursePendingApprovals />
-            ) : (
+          <div className="min-h-0 flex-1 pt-4">
+            <div
+              className={cn(
+                activeTab === 'pending' ? 'block h-full overflow-y-auto pr-1' : 'hidden',
+              )}
+            >
+              <CoursePendingApprovals searchQuery={allCoursesSearchQuery} />
+            </div>
+            <div
+              className={cn(
+                activeTab === 'courses' ? 'block h-full overflow-y-auto pr-1' : 'hidden',
+              )}
+            >
               <AllPublishedCourses searchQuery={allCoursesSearchQuery} />
-            )}
+            </div>
           </div>
         </section>
       </div>
