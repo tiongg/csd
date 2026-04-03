@@ -1157,6 +1157,20 @@ export interface components {
             key: string;
             publicUrl: string;
         };
+        ContentVersionResponse: {
+            id: string;
+            /** Format: int32 */
+            versionNumber: number;
+            description: string;
+            publishedAt: string;
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "REJECTED";
+            rejectedReason?: string;
+        };
+        PublishedCourseResponse: {
+            contentVersion: components["schemas"]["ContentVersionResponse"];
+            course: components["schemas"]["Course"];
+        };
         ContributorAnalyticsResponse: {
             engagementSummary: components["schemas"]["CourseEngagementData"];
             enrollmentTrend: components["schemas"]["EnrollmentTrendBucket"][];
@@ -1184,16 +1198,6 @@ export interface components {
             value: number;
             /** Format: int32 */
             attempts: number;
-        };
-        ContentVersionResponse: {
-            id: string;
-            /** Format: int32 */
-            versionNumber: number;
-            description: string;
-            publishedAt: string;
-            /** @enum {string} */
-            status: "PENDING" | "APPROVED" | "REJECTED";
-            rejectedReason?: string;
         };
         LatestContentVersionResponse: {
             downloadUrl: string;
@@ -2460,7 +2464,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["Course"][];
+                    "*/*": components["schemas"]["PublishedCourseResponse"][];
                 };
             };
         };

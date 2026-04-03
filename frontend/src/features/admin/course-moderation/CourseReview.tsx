@@ -50,36 +50,51 @@ export default function CourseReview() {
     currentSection >= 0 ? content[currentSection] : null;
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <nav className="bg-muted/40 flex shrink-0 items-center gap-2 overflow-x-auto border-b p-2">
-        <Button
-          size="sm"
-          variant={currentSection === -1 ? 'default' : 'ghost'}
-          onClick={() => setCurrentSection(-1)}
-        >
-          Overview
-        </Button>
-        <div className="bg-border mx-2 h-6 w-px shrink-0" />
-        <div className="flex gap-1">
-          {content.map((section, index) => (
-            <Button
-              key={index}
-              size="sm"
-              variant={currentSection === index ? 'default' : 'ghost'}
-              onClick={() => setCurrentSection(index)}
-            >
-              {section.title}
-            </Button>
-          ))}
-        </div>
-      </nav>
+    <div className="flex h-full min-h-0 flex-col bg-slate-100/60">
+      <div className="shrink-0 px-4 py-3">
+        <nav className="mx-auto flex w-full max-w-6xl items-center gap-2 overflow-x-auto rounded-xl border border-slate-200/80 bg-white/70 p-2">
+          <Button
+            size="sm"
+            variant={currentSection === -1 ? 'default' : 'ghost'}
+            className={
+              currentSection === -1
+                ? 'bg-slate-900 text-white hover:bg-slate-800'
+                : 'text-slate-600 hover:bg-slate-100'
+            }
+            onClick={() => setCurrentSection(-1)}
+          >
+            Overview
+          </Button>
+          <div className="bg-border mx-2 h-6 w-px shrink-0" />
+          <div className="flex gap-1">
+            {content.map((section, index) => (
+              <Button
+                key={index}
+                size="sm"
+                variant={currentSection === index ? 'default' : 'ghost'}
+                className={
+                  currentSection === index
+                    ? 'bg-slate-900 text-white hover:bg-slate-800'
+                    : 'text-slate-600 hover:bg-slate-100'
+                }
+                onClick={() => setCurrentSection(index)}
+              >
+                {section.title}
+              </Button>
+            ))}
+          </div>
+        </nav>
+      </div>
+
       {currentSection === -1 || !currentSectionData ? (
-        <div className="min-h-0 flex-1 overflow-y-auto p-6">
-          <div className="mx-auto w-full max-w-4xl space-y-4">
-            <Card>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6">
+          <div className="mx-auto w-full max-w-6xl space-y-4">
+            <Card className="border-slate-200/85 bg-white/80 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-xl">{course.title}</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-xl text-slate-900">
+                  {course.title}
+                </CardTitle>
+                <CardDescription className="text-slate-600">
                   {course.description || 'No description'}
                 </CardDescription>
                 <CardDescription className="flex flex-wrap items-center gap-2">
@@ -87,7 +102,7 @@ export default function CourseReview() {
                     ? (course.tags ?? []).map((tag) => (
                         <span
                           key={tag}
-                          className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+                          className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2 py-1 text-xs font-medium text-sky-700"
                         >
                           {tag}
                         </span>
@@ -99,13 +114,13 @@ export default function CourseReview() {
                 <div className="flex flex-wrap items-center gap-4 text-sm">
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">Version:</span>
-                    <span className="font-medium">
+                    <span className="font-medium text-slate-800">
                       v{contentVersion.versionNumber}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">Published:</span>
-                    <span className="font-medium">
+                    <span className="font-medium text-slate-800">
                       {dayjs(contentVersion.publishedAt).fromNow()}
                     </span>
                   </div>
@@ -113,13 +128,17 @@ export default function CourseReview() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-slate-200/85 bg-white/80 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-lg">Version Description</CardTitle>
+                <CardTitle className="text-lg text-slate-900">
+                  Version Description
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {contentVersion.description ? (
-                  <p className="text-sm">{contentVersion.description}</p>
+                  <p className="text-sm text-slate-700">
+                    {contentVersion.description}
+                  </p>
                 ) : (
                   <p className="text-muted-foreground text-sm">
                     No description provided for this version.
@@ -128,10 +147,12 @@ export default function CourseReview() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-slate-200/85 bg-white/80 shadow-sm">
               <CardHeader>
-                <CardTitle className="text-lg">Content Overview</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-lg text-slate-900">
+                  Content Overview
+                </CardTitle>
+                <CardDescription className="text-slate-600">
                   This course contains {sectionCount}{' '}
                   {sectionCount === 1 ? 'section' : 'sections'}
                 </CardDescription>
@@ -142,7 +163,7 @@ export default function CourseReview() {
                     <Button
                       key={index}
                       variant="outline"
-                      className="justify-start text-left"
+                      className="justify-start rounded-lg border-slate-300 bg-white/80 text-left hover:bg-slate-50"
                       onClick={() => setCurrentSection(index)}
                     >
                       <span className="truncate">

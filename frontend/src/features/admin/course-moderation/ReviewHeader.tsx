@@ -72,71 +72,80 @@ export default function ReviewHeader() {
   }
 
   return (
-    <header className="flex w-full shrink-0 items-center justify-between border-b p-4">
-      <p className="text-lg font-medium">Course Review</p>
-      <div className="flex items-center gap-2">
-        <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
-          <DialogTrigger asChild>
-            <Button
-              variant="destructive"
-              className="cursor-pointer rounded-full"
-            >
-              <XCircleIcon className="size-4" />
-              Reject
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Reject Course</DialogTitle>
-              <DialogDescription>
-                Please provide a reason for rejecting this course version.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="reject-reason">Reason for rejection</Label>
-                <Textarea
-                  id="reject-reason"
-                  placeholder="Enter your feedback..."
-                  value={rejectReason}
-                  onChange={(e) => setRejectReason(e.target.value)}
-                  rows={4}
-                />
+    <header className="border-b border-slate-200/80 bg-white/70 px-4 py-3 backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3">
+        <div>
+          <p className="text-lg font-semibold text-slate-900">Course Review</p>
+          <p className="text-sm text-slate-600">
+            Validate content quality before publishing this version.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
+            <DialogTrigger asChild>
+              <Button variant="destructive" className="h-9 rounded-lg">
+                <XCircleIcon className="size-4" />
+                Reject
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="rounded-xl border-slate-200 p-5 sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-xl text-slate-900">
+                  Reject Course
+                </DialogTitle>
+                <DialogDescription className="text-slate-600">
+                  Please provide a reason for rejecting this course version.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reject-reason">Reason for rejection</Label>
+                  <Textarea
+                    id="reject-reason"
+                    placeholder="Enter your feedback..."
+                    className="border-slate-300 bg-white/90 focus-visible:border-slate-400 focus-visible:ring-0"
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                    rows={4}
+                  />
+                </div>
               </div>
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setRejectOpen(false)}
-                disabled={isRejecting}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={handleReject}
-                disabled={isRejecting || !rejectReason.trim()}
-              >
-                {isRejecting ? 'Rejecting...' : 'Reject'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        <Button
-          variant="default"
-          onClick={() =>
-            approveVersion({
-              params: {
-                path: { contentVersionId: contentVersion.id },
-              },
-            })
-          }
-          disabled={isApproving}
-          className="cursor-pointer rounded-full"
-        >
-          <CheckCircleIcon className="size-4" />
-          {isApproving ? 'Approving...' : 'Approve'}
-        </Button>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  className="h-9 rounded-lg border-slate-300"
+                  onClick={() => setRejectOpen(false)}
+                  disabled={isRejecting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="h-9 rounded-lg"
+                  onClick={handleReject}
+                  disabled={isRejecting || !rejectReason.trim()}
+                >
+                  {isRejecting ? 'Rejecting...' : 'Reject'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          <Button
+            variant="default"
+            onClick={() =>
+              approveVersion({
+                params: {
+                  path: { contentVersionId: contentVersion.id },
+                },
+              })
+            }
+            disabled={isApproving}
+            className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+          >
+            <CheckCircleIcon className="size-4" />
+            {isApproving ? 'Approving...' : 'Approve'}
+          </Button>
+        </div>
       </div>
     </header>
   );
