@@ -190,7 +190,7 @@ export default function UserManagementForm() {
                     type="button"
                     data-admin-tab-active={activeTab === tab}
                     className={cn(
-                      'relative z-10 rounded-md border border-transparent px-3 py-1.5 text-xs font-semibold transition-colors duration-240',
+                      'relative z-10 rounded-md border border-transparent px-3 py-1.5 text-sm font-semibold transition-colors duration-240',
                       activeTab === tab
                         ? 'text-slate-900'
                         : 'text-slate-600 hover:text-slate-800',
