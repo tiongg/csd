@@ -9,7 +9,6 @@ import {
 import { useContentEditor } from '@/context/ContentEditorContext';
 import useYArrayLength from '@/hooks/useYArrayLength';
 import type { EditableQuizContent } from '@/lib/content.type';
-import { cn } from '@/lib/utils';
 import _ from 'lodash';
 import { match } from 'ts-pattern';
 import EditorCourseDisplay from './course-overview/EditorCourseDisplay';
@@ -32,9 +31,6 @@ export default function CourseEditor() {
           size="sm"
           variant={currentSection === -1 ? 'default' : 'ghost'}
           onClick={() => setCurrentSection(-1)}
-          className={cn(
-            currentSection === -1 && 'bg-sky-500 text-white hover:bg-sky-600',
-          )}
         >
           Overview
         </Button>

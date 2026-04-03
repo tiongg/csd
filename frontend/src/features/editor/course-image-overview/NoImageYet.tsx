@@ -21,11 +21,7 @@ export default function NoImageYet({ courseId }: NoImageYetProps) {
           Add a thumbnail to make your course stand out
         </p>
         <div className="mt-6">
-          <Button
-            type="button"
-            className="bg-sky-500 text-white hover:bg-sky-600"
-            onClick={() => setIsDialogOpen(true)}
-          >
+          <Button type="button" onClick={() => setIsDialogOpen(true)}>
             Add Image
           </Button>
         </div>
