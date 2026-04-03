@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/ui/searchbar';
 import {
   Select,
@@ -6,15 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TableCell, TableRow } from '@/components/ui/table';
 import { Heading1 } from '@/components/ui/typography';
 import { useAuth, type AccountRole } from '@/context/AuthContext';
 import {
@@ -22,45 +15,269 @@ import {
   useApiMutation,
   useApiQuery,
 } from '@/lib/fetch-client';
+import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import ConfirmActionDialog from './ConfirmActionDialog';
+import { AdminTable, AdminTableMessageRow } from './AdminTable';
 import PendingContributorsForm from './PendingContributorsForm';
 
+const glassPanelClass =
+  'relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6';
+
+type AdminTab = 'pending' | 'users';
+
+type PendingRoleUpdate = {
+  userId: string;
+  username: string;
+  nextRole: AccountRole;
+};
+
 export default function UserManagementForm() {
+  const [activeTab, setActiveTab] = useState<AdminTab>('pending');
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [selectedUuids, setSelectedUuids] = useState(new Set<string>());
+  const [pendingAction, setPendingAction] = useState<
+    'approve' | 'reject' | null
+  >(null);
+
+  const tabTrackRef = useRef<HTMLDivElement | null>(null);
+  const [tabPill, setTabPill] = useState({
+    left: 0,
+    width: 0,
+    opacity: 0,
+  });
+
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: approveContributorsAsync, isPending: isApproving } =
+    useApiMutation('post', '/api/admins/contributor-applications/approve', {
+      onSuccess: async () => {
+        toast.success('Approved contributor(s)');
+        setSelectedUuids(new Set());
+        await queryClient.invalidateQueries({
+          queryKey: apiQueryOptions(
+            'get',
+            '/api/admins/contributor-applications',
+          ).queryKey,
+        });
+      },
+      onError: () => {
+        toast.error('Failed to approve contributor(s)');
+      },
+    });
+
+  const { mutateAsync: rejectContributorsAsync, isPending: isRejecting } =
+    useApiMutation('post', '/api/admins/contributor-applications/reject', {
+      onSuccess: async () => {
+        toast.success('Rejected contributor(s)');
+        setSelectedUuids(new Set());
+        await queryClient.invalidateQueries({
+          queryKey: apiQueryOptions(
+            'get',
+            '/api/admins/contributor-applications',
+          ).queryKey,
+        });
+      },
+      onError: () => {
+        toast.error('Failed to reject contributor(s)');
+      },
+    });
+
+  useEffect(() => {
+    const updateTabPill = () => {
+      const track = tabTrackRef.current;
+      if (!track) return;
+
+      const activeButton = track.querySelector(
+        '[data-admin-tab-active="true"]',
+      ) as HTMLElement | null;
+
+      if (!activeButton) {
+        setTabPill((prev) => ({ ...prev, opacity: 0 }));
+        return;
+      }
+
+      const trackRect = track.getBoundingClientRect();
+      const activeRect = activeButton.getBoundingClientRect();
+
+      setTabPill({
+        left: activeRect.left - trackRect.left,
+        width: activeRect.width,
+        opacity: 1,
+      });
+    };
+
+    updateTabPill();
+    window.addEventListener('resize', updateTabPill);
+    return () => window.removeEventListener('resize', updateTabPill);
+  }, [activeTab]);
+
+  function setSelected(uuid: string, checked: boolean) {
+    setSelectedUuids((prev) =>
+      checked
+        ? new Set([...prev, uuid])
+        : new Set([...prev].filter((x) => x !== uuid)),
+    );
+  }
+
+  async function approveContributors() {
+    const learnerUuids = [...selectedUuids];
+    if (learnerUuids.length === 0) return;
+
+    try {
+      await approveContributorsAsync({
+        body: { learnerUuids },
+      });
+      setPendingAction(null);
+    } catch {
+      return;
+    }
+  }
+
+  async function rejectContributors() {
+    const learnerUuids = [...selectedUuids];
+    if (learnerUuids.length === 0) return;
+
+    try {
+      await rejectContributorsAsync({
+        body: { learnerUuids },
+      });
+      setPendingAction(null);
+    } catch {
+      return;
+    }
+  }
+
+  const isPendingAction = isApproving || isRejecting;
+  const selectedCount = selectedUuids.size;
+  const actionLabel = pendingAction === 'approve' ? 'Approve' : 'Reject';
+
   return (
-    <div className="flex h-full w-full flex-col gap-4 p-16">
-      <div>
-        <Heading1>User Management</Heading1>
-        <p className="font-subtitle">Here's what's happening today!</p>
+    <div className="flex min-h-0 w-full flex-1 bg-slate-100/70 p-6 md:p-8">
+      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col gap-5">
+        <section className={glassPanelClass}>
+          <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
+            Admin Console
+          </div>
+          <Heading1 className="mt-3 text-slate-900">User Management</Heading1>
+          <p className="mt-2 text-sm text-slate-600">
+            Review contributor requests and manage platform access for all
+            users.
+          </p>
+        </section>
+
+        <section className={cn(glassPanelClass, 'min-h-0 flex-1')}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="rounded-lg border border-slate-300/80 bg-white/65 p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_6px_20px_-16px_rgba(15,23,42,0.35)] backdrop-blur-xl">
+              <div
+                ref={tabTrackRef}
+                className="relative inline-flex rounded-md border border-transparent bg-white/30 p-1 shadow-none backdrop-blur-xl"
+              >
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute top-1 bottom-1 rounded-md border border-stone-400/45 bg-gradient-to-b from-white/92 via-slate-100/75 to-stone-200/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-1px_0_rgba(255,255,255,0.38),0_10px_24px_-12px_rgba(51,65,85,0.42)] backdrop-blur-2xl transition-[left,width,opacity] duration-[520ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  style={{
+                    width: `${tabPill.width}px`,
+                    opacity: tabPill.opacity,
+                    left: `${tabPill.left}px`,
+                  }}
+                />
+                {(['pending', 'users'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    data-admin-tab-active={activeTab === tab}
+                    className={cn(
+                      'relative z-10 rounded-md border border-transparent px-3 py-1.5 text-xs font-semibold transition-colors duration-240',
+                      activeTab === tab
+                        ? 'text-slate-900'
+                        : 'text-slate-600 hover:text-slate-800',
+                    )}
+                    onClick={() => setActiveTab(tab)}
+                  >
+                    {tab === 'pending' ? 'Pending Approvals' : 'All Users'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {activeTab === 'pending' && (
+              <div className="flex items-center gap-x-2">
+                <Button
+                  variant="default"
+                  className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+                  disabled={selectedCount === 0 || isPendingAction}
+                  onClick={() => setPendingAction('approve')}
+                >
+                  Approve
+                </Button>
+                <Button
+                  variant="destructive"
+                  className="h-9 rounded-lg"
+                  disabled={selectedCount === 0 || isPendingAction}
+                  onClick={() => setPendingAction('reject')}
+                >
+                  Reject
+                </Button>
+              </div>
+            )}
+
+            {activeTab === 'users' && (
+              <div className="w-full sm:w-80">
+                <SearchBar
+                  placeholder="Search users by name or email"
+                  className="h-9 rounded-lg border-slate-300 bg-white/85"
+                  onSearch={setUserSearchQuery}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="pt-4">
+            {activeTab === 'pending' ? (
+              <PendingContributorsForm
+                selectedUuids={selectedUuids}
+                setSelected={setSelected}
+              />
+            ) : (
+              <AllUsers searchQuery={userSearchQuery} />
+            )}
+          </div>
+        </section>
       </div>
 
-      <div className="text-slate-800">
-        <Tabs defaultValue="pending">
-          <TabsList variant="line">
-            <TabsTrigger value="pending" className="cursor-pointer">
-              Pending Approvals
-            </TabsTrigger>
-            <TabsTrigger value="users" className="cursor-pointer">
-              All Users
-            </TabsTrigger>
-          </TabsList>
+      <ConfirmActionDialog
+        open={pendingAction !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingAction(null);
+          }
+        }}
+        title={`${actionLabel} Selected Applications`}
+        description={`Are you sure you want to ${pendingAction ?? 'approve'} ${selectedCount} pending contributor application${selectedCount === 1 ? '' : 's'}?`}
+        confirmLabel={actionLabel}
+        variant={pendingAction === 'reject' ? 'destructive' : 'default'}
+        isPending={isPendingAction}
+        onConfirm={async () => {
+          if (pendingAction === 'approve') {
+            await approveContributors();
+            return;
+          }
 
-          <TabsContent value="pending">
-            <PendingContributorsForm />
-          </TabsContent>
-
-          <TabsContent value="users">
-            <AllUsers />
-          </TabsContent>
-        </Tabs>
-      </div>
+          if (pendingAction === 'reject') {
+            await rejectContributors();
+          }
+        }}
+      />
     </div>
   );
 }
 
-function AllUsers() {
-  const [searchQuery, setSearchQuery] = useState('');
+function AllUsers({ searchQuery }: { searchQuery: string }) {
+  const [pendingRoleUpdate, setPendingRoleUpdate] =
+    useState<PendingRoleUpdate | null>(null);
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
 
@@ -78,6 +295,7 @@ function AllUsers() {
     {
       onSuccess: async () => {
         toast.success('Role updated successfully');
+        setPendingRoleUpdate(null);
         await Promise.all([
           queryClient.invalidateQueries({
             queryKey: apiQueryOptions('get', '/api/account/').queryKey,
@@ -90,8 +308,13 @@ function AllUsers() {
           }),
         ]);
       },
-      onError: (err) => {
-        toast.error((err as any)?.message ?? 'Failed to update role');
+      onError: (err: unknown) => {
+        if (err instanceof Error) {
+          toast.error(err.message);
+          return;
+        }
+
+        toast.error('Failed to update role');
       },
     },
   );
@@ -104,69 +327,96 @@ function AllUsers() {
   };
 
   return (
-    <div className="flex flex-col gap-4 py-4">
-      <div className="flex w-full items-center justify-end">
-        <SearchBar placeholder="Search for Users" onSearch={setSearchQuery} />
-      </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-2/12">Username</TableHead>
-            <TableHead className="w-3/12">Email</TableHead>
-            <TableHead className="w-2/12">Real Name</TableHead>
-            <TableHead className="w-1/12">Role</TableHead>
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>
-          {isLoading ? (
-            <TableRow>
-              <TableCell
-                colSpan={6}
-                className="py-8 text-center text-slate-400"
-              >
-                Loading users…
+    <div className="flex flex-col gap-4">
+      <AdminTable
+        columns={[
+          { label: 'Username', className: 'w-[20%]' },
+          { label: 'Email', className: 'w-[35%]' },
+          { label: 'Name', className: 'w-[20%]' },
+          { label: 'Role', className: 'w-[25%]' },
+        ]}
+      >
+        {isLoading ? (
+          <AdminTableMessageRow colSpan={4} message="Loading users..." />
+        ) : filteredUsers.length === 0 ? (
+          <AdminTableMessageRow colSpan={4} message="No users found." />
+        ) : (
+          filteredUsers.map((user) => (
+            <TableRow
+              key={user.id}
+              className={cn(
+                'bg-transparent',
+                user.id === currentUser?.id && 'bg-slate-50/70',
+              )}
+            >
+              <TableCell className="px-4 py-3 font-medium text-slate-800">
+                {user.username}
               </TableCell>
-            </TableRow>
-          ) : filteredUsers.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={6}
-                className="py-8 text-center text-slate-400"
-              >
-                No users found.
+              <TableCell className="px-4 py-3 text-slate-600">
+                {user.email}
               </TableCell>
-            </TableRow>
-          ) : (
-            filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.username}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.realname ?? '—'}</TableCell>
-                <TableCell>
-                  <Select
-                    value={user.role}
-                    disabled={isUpdatingRole || user.id === currentUser?.id}
-                    onValueChange={(value) =>
-                      handleRoleChange(user.id, value as AccountRole)
+              <TableCell className="px-4 py-3 text-slate-600">
+                {user.realname ?? '-'}
+              </TableCell>
+              <TableCell className="px-4 py-3">
+                <Select
+                  value={user.role}
+                  disabled={isUpdatingRole || user.id === currentUser?.id}
+                  onValueChange={(value) => {
+                    const nextRole = value as AccountRole;
+                    if (nextRole === user.role) {
+                      return;
                     }
-                  >
-                    <SelectTrigger className="w-36">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="LEARNER">Learner</SelectItem>
-                      <SelectItem value="CONTRIBUTOR">Contributor</SelectItem>
-                      <SelectItem value="ADMIN">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+
+                    setPendingRoleUpdate({
+                      userId: user.id,
+                      username: user.username,
+                      nextRole,
+                    });
+                  }}
+                >
+                  <SelectTrigger className="h-9 w-full rounded-lg border-slate-300 bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="LEARNER">Learner</SelectItem>
+                    <SelectItem value="CONTRIBUTOR">Contributor</SelectItem>
+                    <SelectItem value="ADMIN">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableCell>
+            </TableRow>
+          ))
+        )}
+      </AdminTable>
+
+      <ConfirmActionDialog
+        open={pendingRoleUpdate !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPendingRoleUpdate(null);
+          }
+        }}
+        title="Confirm Role Change"
+        description={
+          pendingRoleUpdate
+            ? `Change ${pendingRoleUpdate.username} to ${pendingRoleUpdate.nextRole.toLowerCase()}?`
+            : ''
+        }
+        confirmLabel="Update Role"
+        variant="default"
+        isPending={isUpdatingRole}
+        onConfirm={() => {
+          if (!pendingRoleUpdate) {
+            return;
+          }
+
+          handleRoleChange(
+            pendingRoleUpdate.userId,
+            pendingRoleUpdate.nextRole,
+          );
+        }}
+      />
     </div>
   );
 }
