@@ -51,6 +51,16 @@ export default function UserManagementForm() {
   const [tabPillReady, setTabPillReady] = useState(false);
 
   const queryClient = useQueryClient();
+  const { data: pendingApplications } = useApiQuery(
+    'get',
+    '/api/admins/contributor-applications',
+    {
+      params: {
+        query: {},
+      },
+    },
+  );
+  const { data: allUsers } = useApiQuery('get', '/api/account/', {});
 
   const { mutateAsync: approveContributorsAsync, isPending: isApproving } =
     useApiMutation('post', '/api/admins/contributor-applications/approve', {
@@ -173,6 +183,9 @@ export default function UserManagementForm() {
   const isPendingAction = isApproving || isRejecting;
   const selectedCount = selectedUuids.size;
   const actionLabel = pendingAction === 'approve' ? 'Approve' : 'Reject';
+  const pendingCountLabel =
+    pendingApplications == null ? '...' : String(pendingApplications.length);
+  const usersCountLabel = allUsers == null ? '...' : String(allUsers.length);
 
   return (
     <div className="flex min-h-0 w-full flex-1 bg-slate-100/70 p-6 md:p-8">
@@ -222,34 +235,53 @@ export default function UserManagementForm() {
                     )}
                     onClick={() => setActiveTab(tab)}
                   >
-                    {tab === 'pending' ? 'Pending Approvals' : 'All Users'}
+                    <span className="inline-flex items-center gap-2">
+                      <span>{tab === 'pending' ? 'Pending Approvals' : 'All Users'}</span>
+                      <span
+                        className={cn(
+                          'inline-flex h-5 min-w-5 items-center justify-center rounded-full border px-1 text-[11px] font-bold',
+                          activeTab === tab
+                            ? 'border-sky-600 bg-sky-600 text-white'
+                            : 'border-slate-300 bg-slate-100 text-slate-600',
+                        )}
+                      >
+                        {tab === 'pending' ? pendingCountLabel : usersCountLabel}
+                      </span>
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
 
-            {activeTab === 'pending' && (
-              <div className="flex items-center gap-x-2">
-                <Button
-                  variant="default"
-                  className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
-                  disabled={selectedCount === 0 || isPendingAction}
-                  onClick={() => setPendingAction('approve')}
-                >
-                  Approve
-                </Button>
-                <Button
-                  variant="destructive"
-                  className="h-9 rounded-lg"
-                  disabled={selectedCount === 0 || isPendingAction}
-                  onClick={() => setPendingAction('reject')}
-                >
-                  Reject
-                </Button>
+            {activeTab === 'pending' ? (
+              <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-nowrap">
+                <div className="w-full sm:w-80">
+                  <SearchBar
+                    placeholder="Search users by name or email"
+                    className="h-9 rounded-lg border-slate-300 bg-white/85"
+                    onSearch={setUserSearchQuery}
+                  />
+                </div>
+                <div className="flex items-center gap-x-2">
+                  <Button
+                    variant="default"
+                    className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+                    disabled={selectedCount === 0 || isPendingAction}
+                    onClick={() => setPendingAction('approve')}
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="h-9 rounded-lg"
+                    disabled={selectedCount === 0 || isPendingAction}
+                    onClick={() => setPendingAction('reject')}
+                  >
+                    Reject
+                  </Button>
+                </div>
               </div>
-            )}
-
-            {activeTab === 'users' && (
+            ) : (
               <div className="w-full sm:w-80">
                 <SearchBar
                   placeholder="Search users by name or email"
@@ -265,6 +297,7 @@ export default function UserManagementForm() {
               <PendingContributorsForm
                 selectedUuids={selectedUuids}
                 setSelected={setSelected}
+                searchQuery={userSearchQuery}
               />
             </div>
             <div className={cn(activeTab === 'users' ? 'block' : 'hidden')}>

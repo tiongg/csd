@@ -18,6 +18,7 @@ export default function CourseModerationForm() {
     'get',
     '/api/content-versions/pending',
   );
+  const { data: publishedCourses } = useApiQuery('get', '/api/courses/published');
   const tabTrackRef = useRef<HTMLDivElement | null>(null);
   const [tabPill, setTabPill] = useState({
     left: 0,
@@ -75,12 +76,11 @@ export default function CourseModerationForm() {
   }, [queryClient]);
 
   const pendingCount = pendingCourses?.length ?? 0;
-  const pendingCountLabel =
-    pendingCourses == null
-      ? 'Loading pending courses...'
-      : pendingCount === 1
-        ? '1 pending course'
-        : `${pendingCount} pending courses`;
+  const allCoursesCount = publishedCourses?.length ?? 0;
+
+  const pendingCountLabel = pendingCourses == null ? '…' : String(pendingCount);
+  const allCoursesCountLabel =
+    publishedCourses == null ? '…' : String(allCoursesCount);
 
   return (
     <div className="flex min-h-0 w-full flex-1 bg-slate-100/70 p-6 md:p-8">
@@ -130,30 +130,39 @@ export default function CourseModerationForm() {
                     )}
                     onClick={() => setActiveTab(tab)}
                   >
-                    {tab === 'pending' ? 'Pending Approvals' : 'All Courses'}
+                    <span className="inline-flex items-center gap-2">
+                      <span>{tab === 'pending' ? 'Pending Approvals' : 'All Courses'}</span>
+                      <span
+                        className={cn(
+                          'inline-flex h-5 min-w-5 items-center justify-center rounded-full border px-1 text-[11px] font-bold',
+                          activeTab === tab
+                            ? 'border-sky-600 bg-sky-600 text-white'
+                            : 'border-slate-300 bg-slate-100 text-slate-600',
+                        )}
+                      >
+                        {tab === 'pending' ? pendingCountLabel : allCoursesCountLabel}
+                      </span>
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
-            {activeTab === 'courses' && (
-              <div className="w-full sm:w-80">
-                <SearchBar
-                  placeholder="Search courses by title, description, or tag"
-                  className="h-9 rounded-lg border-slate-300 bg-white/85"
-                  onSearch={setAllCoursesSearchQuery}
-                />
-              </div>
-            )}
-            {activeTab === 'pending' && (
-              <p className="text-sm font-medium text-slate-600">
-                {pendingCountLabel}
-              </p>
-            )}
+            <div className="w-full sm:w-80">
+              <SearchBar
+                placeholder={
+                  activeTab === 'pending'
+                    ? 'Search pending courses by title, description, or tag'
+                    : 'Search courses by title, description, or tag'
+                }
+                className="h-9 rounded-lg border-slate-300 bg-white/85"
+                onSearch={setAllCoursesSearchQuery}
+              />
+            </div>
           </div>
 
           <div className="pt-4">
             <div className={cn(activeTab === 'pending' ? 'block' : 'hidden')}>
-              <CoursePendingApprovals />
+              <CoursePendingApprovals searchQuery={allCoursesSearchQuery} />
             </div>
             <div className={cn(activeTab === 'courses' ? 'block' : 'hidden')}>
               <AllPublishedCourses searchQuery={allCoursesSearchQuery} />
