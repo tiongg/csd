@@ -37,13 +37,13 @@ export default function TeamsList() {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <CreateTeamCard onInteract={openCreateTeamDialog} />
-
         {isLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
               <LoadingTeamCard key={idx} />
             ))
           : (teams ?? []).map((team) => <TeamCard team={team} key={team.id} />)}
+
+        <CreateTeamCard onInteract={openCreateTeamDialog} />
       </div>
 
       <CreateNewTeamDialog
@@ -159,12 +159,12 @@ function CreateTeamCard({ onInteract }: { onInteract: () => void }) {
       className="h-full w-full text-left"
       onClick={onInteract}
     >
-      <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-dashed border-slate-300 bg-white p-4 transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
-        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition-colors group-hover:bg-sky-100 group-hover:text-sky-700">
-          <Plus className="size-4" />
+      <article className="group flex h-full min-h-40 flex-col items-center justify-center gap-0.5 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
+        <span className="inline-flex size-14 shrink-0 items-center justify-center rounded-lg text-slate-700 transition-colors group-hover:text-sky-700">
+          <Plus className="size-7 leading-none" />
         </span>
-        <div className="space-y-0.5">
-          <h3 className="text-lg font-bold text-slate-900">Add New Team</h3>
+        <div className="space-y-0">
+          <h3 className="text-base font-bold text-slate-900">Add New Team</h3>
           <p className="text-xs text-slate-600">Create a workspace</p>
         </div>
       </article>
