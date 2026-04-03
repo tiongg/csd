@@ -229,7 +229,7 @@ function CourseCard({ course, teamId }: CourseCardProps) {
       <div
         role="button"
         tabIndex={0}
-        className="h-full w-full text-left"
+        className="h-full w-full cursor-pointer text-left"
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
       >
@@ -350,7 +350,7 @@ function CreateCourseCard({ onInteract }: { onInteract: () => void }) {
   return (
     <button
       type="button"
-      className="h-full w-full text-left"
+      className="h-full w-full cursor-pointer text-left"
       onClick={onInteract}
     >
       <article className="group flex h-full min-h-40 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
