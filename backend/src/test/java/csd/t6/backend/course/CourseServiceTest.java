@@ -175,7 +175,7 @@ class CourseServiceTest {
     when(contentVersionRecord.getId()).thenReturn(UUID.randomUUID());
     when(contentVersionRecord.getVersion()).thenReturn(1);
     when(contentVersionRecord.getDescription()).thenReturn("Version description");
-    when(contentVersionRecord.getPublishedAt()).thenReturn(OffsetDateTime.now());
+    when(contentVersionRecord.getPublishedAt()).thenReturn(OffsetDateTime.now().toLocalDateTime());
     when(contentVersionRecord.getStatus()).thenReturn(csd.t6.jooq.public_.enums.ContentStatus.APPROVED);
 
     ContentVersionWithCourseRecord approvedRecord = new ContentVersionWithCourseRecord(
