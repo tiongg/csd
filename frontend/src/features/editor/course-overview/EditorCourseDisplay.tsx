@@ -18,10 +18,10 @@ export default function EditorCourseDisplay({
   return (
     <div className="flex h-full flex-col overflow-auto p-6">
       <div className="mx-auto w-full max-w-4xl space-y-2">
+        <CourseImageOverview />
         <CourseEditorOverview course={course} />
-        <div className='flex flex-col gap-y-2'>
+        <div className="flex flex-col gap-y-2">
           {sectionCount === 0 && <NoCourseSectionsYet />}
-          <CourseImageOverview/>
         </div>
         <CourseVersions course={course} />
       </div>
