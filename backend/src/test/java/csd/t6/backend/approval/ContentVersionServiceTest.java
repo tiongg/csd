@@ -368,13 +368,28 @@ class ContentVersionServiceTest {
   @Test
   @DisplayName("Should throw when rejecting non-pending version")
   void shouldThrowWhenRejectingNonPendingVersion() {
-    lenient().when(mockVersion.getStatus()).thenReturn(ContentStatus.APPROVED);
+    lenient().when(mockVersion.getStatus()).thenReturn(ContentStatus.REJECTED);
     when(contentVersionRepository.findOneBy(any(), eq(contentVersionId))).thenReturn(Optional.of(mockVersion));
 
     assertThatThrownBy(() -> contentVersionService.rejectVersion(contentVersionId, "reason"))
-        .isInstanceOf(BadRequestException.class).hasMessageContaining("Can only reject pending versions");
+        .isInstanceOf(BadRequestException.class).hasMessageContaining("Can only reject pending or approved versions");
     verify(contentVersionRepository, never()).updateStatus(any(UUID.class), any(ContentStatus.class),
         any(String.class));
+  }
+
+  @Test
+  @DisplayName("Should take down approved version and notify team")
+  void shouldTakeDownApprovedVersionAndNotifyTeam() {
+    lenient().when(mockVersion.getStatus()).thenReturn(ContentStatus.APPROVED);
+    when(contentVersionRepository.findOneBy(any(), eq(contentVersionId))).thenReturn(Optional.of(mockVersion));
+    when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
+
+    contentVersionService.rejectVersion(contentVersionId, "Policy violation");
+
+    verify(contentVersionRepository).updateStatus(contentVersionId, ContentStatus.REJECTED,
+        "[TAKEDOWN] Policy violation");
+    verify(notificationService).sendToTeam(teamId, NotificationType.COURSE_APPROVED, "Course Taken Down",
+        "Your course: Test Course has been taken down by an admin", courseId);
   }
 
   @Test

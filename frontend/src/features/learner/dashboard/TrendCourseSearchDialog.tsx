@@ -26,14 +26,20 @@ export function TrendCourseSearchDialog({
 
   const { data: courses } = useApiQuery('get', '/api/courses/published');
   const publishedCourses = courses ?? [];
-  const filteredCourses = publishedCourses.filter(
-    (course) =>
-      course.title.toLowerCase().includes(search.toLowerCase()) ||
-      (course.description ?? '').toLowerCase().includes(search.toLowerCase()) ||
-      (course.tags ?? []).some((tag) =>
-        tag.toLowerCase().includes(search.toLowerCase()),
-      ),
-  );
+  const query = search.toLowerCase();
+
+  const filteredCourses = publishedCourses.filter((courseEntry) => {
+    const course = 'course' in courseEntry ? courseEntry.course : courseEntry;
+    const title = (course.title ?? '').toLowerCase();
+    const description = (course.description ?? '').toLowerCase();
+    const tags = (course.tags ?? []).map((tag) => tag.toLowerCase());
+
+    return (
+      title.includes(query) ||
+      description.includes(query) ||
+      tags.some((tag) => tag.includes(query))
+    );
+  });
 
   // Reset search when initial value changes and dialog opens
   useEffect(() => {
@@ -62,22 +68,26 @@ export function TrendCourseSearchDialog({
 
           {filteredCourses.length > 0 ? (
             <div className="max-h-80 space-y-2 overflow-auto">
-              {filteredCourses.slice(0, 8).map((course) => (
-                <Link
-                  key={course.id}
-                  to="/learner/courses/$courseId"
-                  params={{ courseId: course.id }}
-                  onClick={() => onOpenChange(false)}
-                  className="block rounded-lg border border-slate-200 bg-white p-3 hover:border-slate-300"
-                >
-                  <p className="text-sm font-semibold text-slate-900">
-                    {course.title}
-                  </p>
-                  <p className="mt-1 text-xs text-slate-500">
-                    Updated {dayjs(course.updatedAt).fromNow()}
-                  </p>
-                </Link>
-              ))}
+              {filteredCourses.slice(0, 8).map((courseEntry) => {
+                const course =
+                  'course' in courseEntry ? courseEntry.course : courseEntry;
+                return (
+                  <Link
+                    key={course.id}
+                    to="/learner/courses/$courseId"
+                    params={{ courseId: course.id }}
+                    onClick={() => onOpenChange(false)}
+                    className="block rounded-lg border border-slate-200 bg-white p-3 hover:border-slate-300"
+                  >
+                    <p className="text-sm font-semibold text-slate-900">
+                      {course.title}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Updated {dayjs(course.updatedAt).fromNow()}
+                    </p>
+                  </Link>
+                );
+              })}
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">

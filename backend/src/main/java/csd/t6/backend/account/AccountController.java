@@ -54,7 +54,7 @@ public class AccountController {
   public AccountResponse createAccount(@RequestBody @Valid AccountCreateRequest createDTO) {
     String hashedPassword = passwordEncoder.encode(createDTO.password());
     return new AccountResponse(
-        accountService.createNewAccount(createDTO.username(), createDTO.email(), hashedPassword));
+        accountService.createNewAccount(createDTO.username(), createDTO.email(), createDTO.realName(), hashedPassword));
   }
 
   @DeleteMapping("/{accountId}")
@@ -69,7 +69,18 @@ public class AccountController {
   @OkResponse()
   public AccountResponse updateAccount(@AuthenticationPrincipal AuthUserDetails user,
       @RequestBody @Valid AccountUpdateRequest updateDTO) {
-    return new AccountResponse(accountService.updateAccount(user.getAccount().getId(), updateDTO));
+    String encodedPassword = null;
+    if (updateDTO.password() != null) {
+      encodedPassword = passwordEncoder.encode(updateDTO.password());
+    }
+
+    AccountUpdateRequest normalizedUpdate = new AccountUpdateRequest(
+        updateDTO.username(),
+        updateDTO.realName(),
+        updateDTO.profilePictureUrl(),
+        encodedPassword);
+
+    return new AccountResponse(accountService.updateAccount(user.getAccount().getId(), normalizedUpdate));
   }
 
   @GetMapping("/profile-picture-upload-url")

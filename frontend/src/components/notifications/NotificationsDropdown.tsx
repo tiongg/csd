@@ -18,9 +18,16 @@ import { match } from 'ts-pattern';
 
 dayjs.extend(relativeTime);
 
-type NotificationType = Notification['type'];
+function getNotificationIcon(notification: Notification): ReactNode {
+  const isTakenDownNotification =
+    notification.type === 'COURSE_APPROVED' &&
+    notification.title.toLowerCase().includes('taken down');
 
-function getNotificationIcon(type: NotificationType): ReactNode {
+  if (isTakenDownNotification) {
+    return <BellRing className="size-4 text-red-500" />;
+  }
+
+  const type = notification.type;
   return match(type)
     .with('CONTRIBUTOR_APPLIED', () => (
       <BellRing className="size-4 text-blue-500" />
@@ -51,7 +58,7 @@ function NotificationItem({
   return (
     <div className="group relative flex gap-3 p-3">
       <div className="flex shrink-0 items-center justify-center">
-        {getNotificationIcon(notification.type)}
+        {getNotificationIcon(notification)}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <div className="flex items-center gap-2">

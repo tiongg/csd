@@ -72,12 +72,13 @@ class AccountServiceTest {
     void shouldCreateAccountSuccessfully() {
         when(accountRepository.exists(ACCOUNT.USERNAME, "testuser")).thenReturn(false);
         when(accountRepository.exists(ACCOUNT.EMAIL, "test@example.com")).thenReturn(false);
-        when(accountRepository.insert("test@example.com", "testuser", "hashedpw")).thenReturn(mockAccount);
+        when(accountRepository.insert("test@example.com", "testuser", "hashedpw", "Test User")).thenReturn(mockAccount);
 
-        AccountRecord result = accountService.createNewAccount("testuser", "test@example.com", "hashedpw");
+        AccountRecord result = accountService.createNewAccount("testuser", "test@example.com", "Test User",
+                "hashedpw");
 
         assertThat(result).isNotNull();
-        verify(accountRepository).insert("test@example.com", "testuser", "hashedpw");
+        verify(accountRepository).insert("test@example.com", "testuser", "hashedpw", "Test User");
     }
 
     @Test
@@ -85,7 +86,8 @@ class AccountServiceTest {
     void shouldThrowWhenUsernameExists() {
         when(accountRepository.exists(ACCOUNT.USERNAME, "testuser")).thenReturn(true);
 
-        assertThatThrownBy(() -> accountService.createNewAccount("testuser", "test@example.com", "hashedpw"))
+        assertThatThrownBy(
+                () -> accountService.createNewAccount("testuser", "test@example.com", "Test User", "hashedpw"))
                 .isInstanceOf(BadRequestException.class).hasMessageContaining("Username already exists");
     }
 
@@ -95,7 +97,8 @@ class AccountServiceTest {
         when(accountRepository.exists(ACCOUNT.USERNAME, "testuser")).thenReturn(false);
         when(accountRepository.exists(ACCOUNT.EMAIL, "test@example.com")).thenReturn(true);
 
-        assertThatThrownBy(() -> accountService.createNewAccount("testuser", "test@example.com", "hashedpw"))
+        assertThatThrownBy(
+                () -> accountService.createNewAccount("testuser", "test@example.com", "Test User", "hashedpw"))
                 .isInstanceOf(BadRequestException.class).hasMessageContaining("Email already exists");
     }
 
@@ -144,7 +147,7 @@ class AccountServiceTest {
         when(accountRepository.exists(ACCOUNT.USERNAME, "newuser")).thenReturn(false);
         when(accountRepository.save(existing)).thenReturn(existing);
 
-        AccountUpdateRequest request = new AccountUpdateRequest("newuser", null, null);
+        AccountUpdateRequest request = new AccountUpdateRequest("newuser", null, null, null);
         accountService.updateAccount(id, request);
 
         verify(existing).setUsername("newuser");
@@ -160,7 +163,7 @@ class AccountServiceTest {
         when(accountRepository.findOneBy(ACCOUNT.ID, id)).thenReturn(Optional.of(existing));
         when(accountRepository.exists(ACCOUNT.USERNAME, "takenuser")).thenReturn(true);
 
-        AccountUpdateRequest request = new AccountUpdateRequest("takenuser", null, null);
+        AccountUpdateRequest request = new AccountUpdateRequest("takenuser", null, null, null);
 
         assertThatThrownBy(() -> accountService.updateAccount(id, request)).isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Username already exists");
@@ -175,7 +178,7 @@ class AccountServiceTest {
         when(accountRepository.findOneBy(ACCOUNT.ID, id)).thenReturn(Optional.of(existing));
         when(accountRepository.save(existing)).thenReturn(existing);
 
-        AccountUpdateRequest request = new AccountUpdateRequest(null, "John Doe", null);
+        AccountUpdateRequest request = new AccountUpdateRequest(null, "John Doe", null, null);
         accountService.updateAccount(id, request);
 
         verify(existing).setRealName("John Doe");
@@ -188,7 +191,7 @@ class AccountServiceTest {
         UUID id = UUID.randomUUID();
         when(accountRepository.findOneBy(ACCOUNT.ID, id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> accountService.updateAccount(id, new AccountUpdateRequest("newuser", null, null)))
+        assertThatThrownBy(() -> accountService.updateAccount(id, new AccountUpdateRequest("newuser", null, null, null)))
                 .isInstanceOf(BadRequestException.class).hasMessageContaining("Account does not exist");
     }
 

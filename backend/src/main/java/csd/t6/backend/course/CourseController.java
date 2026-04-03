@@ -19,6 +19,7 @@ import csd.t6.backend.contributor.dto.response.ImageUploadResponse;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
+import csd.t6.backend.course.dto.response.PublishedCourseResponse;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -64,7 +65,7 @@ public class CourseController {
   }
 
   @GetMapping("/published")
-  public List<CourseResponse> getPublishedCourses() {
+  public List<PublishedCourseResponse> getPublishedCourses() {
     return courseService.getCoursesWithApprovedVersion();
   }
 

@@ -1,29 +1,49 @@
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  apiQueryOptions,
-  useApiMutation,
-  useApiQuery,
-} from '@/lib/fetch-client';
-import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { TableCell, TableRow } from '@/components/ui/table';
+import { useApiQuery } from '@/lib/fetch-client';
+import { AdminTable } from './AdminTable';
 
-function PendingApplicationRows({
-  selectedUuids,
-  setSelected,
-}: {
+type PendingContributorsFormProps = {
   selectedUuids: Set<string>;
   setSelected: (uuid: string, checked: boolean) => void;
-}) {
+};
+
+type PendingContributor = {
+  id: string;
+  username: string;
+  email: string;
+  realname?: string | null;
+};
+
+function PendingApplicationRows({
+  applications,
+  selectedUuids,
+  setSelected,
+}: PendingContributorsFormProps & { applications: PendingContributor[] }) {
+  return applications.map(({ username, email, realname, id }) => (
+    <TableRow key={id} className="bg-transparent">
+      <TableCell className="px-4 py-3">
+        <Checkbox
+          className="border-slate-800"
+          checked={selectedUuids.has(id)}
+          onCheckedChange={(value) => setSelected(id, value === true)}
+        />
+      </TableCell>
+      <TableCell className="px-4 py-3 font-medium text-slate-800">
+        {username}
+      </TableCell>
+      <TableCell className="px-4 py-3 text-slate-600">{email}</TableCell>
+      <TableCell className="px-4 py-3 text-slate-600">
+        {realname ?? '-'}
+      </TableCell>
+    </TableRow>
+  ));
+}
+
+export default function PendingContributorsForm({
+  selectedUuids,
+  setSelected,
+}: PendingContributorsFormProps) {
   const { data: applications, isLoading: isLoadingApplications } = useApiQuery(
     'get',
     '/api/admins/contributor-applications',
@@ -36,142 +56,38 @@ function PendingApplicationRows({
 
   if (isLoadingApplications) {
     return (
-      <TableRow>
-        <TableCell colSpan={3} className="text-center">
-          Loading...
-        </TableCell>
-      </TableRow>
+      <div className="rounded-xl border border-slate-200/80 bg-white/70 py-10 text-center text-slate-500">
+        Loading applications...
+      </div>
     );
   }
 
   if (!applications || applications.length === 0) {
     return (
-      <TableRow>
-        <TableCell colSpan={3} className="text-center">
-          No pending applications.
-        </TableCell>
-      </TableRow>
+      <div className="flex min-h-[28rem] w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/55 p-8 text-center text-slate-500">
+        <p className="text-base font-semibold text-slate-700">
+          No pending applications
+        </p>
+      </div>
     );
-  }
-
-  return applications.map(({ username, email, id }) => (
-    <TableRow key={id}>
-      <TableCell>
-        <Checkbox
-          className="border-slate-800"
-          checked={selectedUuids.has(id)}
-          onCheckedChange={(value) => setSelected(id, value === true)}
-        />
-      </TableCell>
-      <TableCell>{username}</TableCell>
-      <TableCell>{email}</TableCell>
-    </TableRow>
-  ));
-}
-
-export default function PendingContributorsForm() {
-  const [selectedUuids, setSelectedUuids] = useState(new Set<string>());
-
-  const queryClient = useQueryClient();
-  const { mutateAsync: approveContributorsAsync } = useApiMutation(
-    'post',
-    '/api/admins/contributor-applications/approve',
-    {
-      onSuccess: async () => {
-        toast.success('Approved contributor(s)');
-        setSelectedUuids(new Set());
-        await queryClient.invalidateQueries({
-          queryKey: apiQueryOptions(
-            'get',
-            '/api/admins/contributor-applications',
-          ).queryKey,
-        });
-      },
-      onError: () => {
-        toast.error('Failed to approve contributor(s)');
-      },
-    },
-  );
-
-  const { mutateAsync: rejectContributorsAsync } = useApiMutation(
-    'post',
-    '/api/admins/contributor-applications/reject',
-    {
-      onSuccess: async () => {
-        toast.success('Rejected contributor(s)');
-        setSelectedUuids(new Set());
-        await queryClient.invalidateQueries({
-          queryKey: apiQueryOptions(
-            'get',
-            '/api/admins/contributor-applications',
-          ).queryKey,
-        });
-      },
-      onError: () => {
-        toast.error('Failed to reject contributor(s)');
-      },
-    },
-  );
-
-  function setSelected(uuid: string, checked: boolean) {
-    setSelectedUuids((prev) =>
-      checked
-        ? new Set([...prev, uuid])
-        : new Set([...prev].filter((x) => x !== uuid)),
-    );
-  }
-
-  async function approveContributors() {
-    const learnerUuids = [...selectedUuids];
-    if (learnerUuids.length === 0) return;
-    await approveContributorsAsync({
-      body: { learnerUuids },
-    });
-  }
-
-  async function rejectContributors() {
-    const learnerUuids = [...selectedUuids];
-    if (learnerUuids.length === 0) return;
-    await rejectContributorsAsync({
-      body: { learnerUuids },
-    });
   }
 
   return (
-    <div className="flex flex-col gap-4 py-4">
-      <div className="flex w-full justify-end gap-x-2">
-        <Button
-          variant="outline"
-          className="w-24 cursor-pointer rounded-full"
-          onClick={approveContributors}
-        >
-          Approve
-        </Button>
-        <Button
-          variant="destructive"
-          className="w-24 cursor-pointer rounded-full"
-          onClick={rejectContributors}
-        >
-          Reject
-        </Button>
-      </div>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-1/6"></TableHead>
-            <TableHead className="w-2/6">Name</TableHead>
-            <TableHead className="w-3/6">Email</TableHead>
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>
-          <PendingApplicationRows
-            selectedUuids={selectedUuids}
-            setSelected={setSelected}
-          />
-        </TableBody>
-      </Table>
+    <div className="flex flex-col gap-4">
+      <AdminTable
+        columns={[
+          { label: '', className: 'w-[12%]' },
+          { label: 'Username', className: 'w-[28%]' },
+          { label: 'Email', className: 'w-[36%]' },
+          { label: 'Name', className: 'w-[24%]' },
+        ]}
+      >
+        <PendingApplicationRows
+          applications={applications}
+          selectedUuids={selectedUuids}
+          setSelected={setSelected}
+        />
+      </AdminTable>
     </div>
   );
 }

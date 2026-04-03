@@ -15,6 +15,7 @@ import csd.t6.backend.contributor.dto.response.ImageUploadResponse;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
+import csd.t6.backend.course.dto.response.PublishedCourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.tag.TagService;
 import csd.t6.backend.team.TeamService;
@@ -65,10 +66,10 @@ public class CourseService {
     }).collect(Collectors.toList());
   }
 
-  public List<CourseResponse> getCoursesWithApprovedVersion() {
+  public List<PublishedCourseResponse> getCoursesWithApprovedVersion() {
     return contentVersionRepository.findCoursesWithApprovedVersion().stream().map(record -> {
-      List<String> tags = tagService.getTagsForCourse(record.getId());
-      return new CourseResponse(record, this.getImageUrlForCourse(record), tags);
+      String imageUrl = this.getImageUrlForCourse(record.course());
+      return new PublishedCourseResponse(record, imageUrl);
     }).collect(Collectors.toList());
   }
 

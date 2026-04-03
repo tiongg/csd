@@ -1,13 +1,7 @@
-import { Badge } from '@/components/ui/badge';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from '@/components/ui/card';
 import { useApiQuery } from '@/lib/fetch-client';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
+import { CourseModerationCard } from './CourseModerationCard';
 
 export function CoursePendingApprovals() {
   const { data: pendingCourses } = useApiQuery(
@@ -17,46 +11,39 @@ export function CoursePendingApprovals() {
   const navigate = useNavigate();
 
   if (!pendingCourses) {
-    return <div>Loading...</div>;
+    return (
+      <div className="rounded-xl border border-slate-200/80 bg-white/70 py-10 text-center text-slate-500">
+        Loading pending courses...
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col gap-4 py-4">
-      <h3 className="text-lg font-semibold text-slate-700">
-        {pendingCourses.length} Pending{' '}
-        {pendingCourses.length === 1 ? 'Course' : 'Courses'}
-      </h3>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {pendingCourses.length === 0 ? (
-          <div className="col-span-full py-12 text-center text-slate-500">
-            No pending course approvals
+          <div className="col-span-full flex min-h-[28rem] w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/55 p-8 text-center text-slate-500">
+            <p className="text-base font-semibold text-slate-700">
+              No pending course approvals
+            </p>
           </div>
         ) : (
           pendingCourses.map(({ course, contentVersion }) => (
-            <Card
+            <CourseModerationCard
               key={course.id}
-              className="cursor-pointer transition-all hover:shadow-md"
+              title={course.title}
+              versionNumber={contentVersion.versionNumber}
+              dateLabel={`Submitted ${dayjs(contentVersion.publishedAt).format('MMM D, YYYY')}`}
+              description={course.description}
+              imageUrl={course.imageUrl}
+              tags={course.tags ?? []}
               onClick={() =>
                 navigate({
                   to: '/admin/review/$versionId',
                   params: { versionId: contentVersion.id },
                 })
               }
-            >
-              <CardContent>
-                <div className="space-y-1">
-                  <CardTitle>{course.title}</CardTitle>
-                  <Badge>Version {contentVersion.versionNumber}</Badge>
-                  <CardDescription>
-                    {contentVersion.description || 'No description provided'}
-                  </CardDescription>
-                  <p className="text-xs text-slate-500">
-                    {dayjs(course.createdAt).format('MMM D, YYYY · h:mm A')}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            />
           ))
         )}
       </div>

@@ -62,6 +62,10 @@ export default function GlossaryPage({
     if (!glossaryItems) {
       return [];
     }
+
+    const normalize = (value: string | null | undefined) =>
+      (value ?? '').toLowerCase();
+
     const q = query.trim().toLowerCase();
 
     const matches = glossaryItems.filter((item) => {
@@ -70,15 +74,15 @@ export default function GlossaryPage({
       }
 
       return (
-        item.title.toLowerCase().includes(q) ||
-        item.description.toLowerCase().includes(q) ||
-        item.context.toLowerCase().includes(q) ||
-        item.example.toLowerCase().includes(q)
+        normalize(item.title).includes(q) ||
+        normalize(item.description).includes(q) ||
+        normalize(item.context).includes(q) ||
+        normalize(item.example).includes(q)
       );
     });
 
     return matches.sort((a, b) => {
-      const compare = a.title.localeCompare(b.title, undefined, {
+      const compare = (a.title ?? '').localeCompare(b.title ?? '', undefined, {
         sensitivity: 'base',
       });
       return sortOrder === SORT_A_TO_Z ? compare : -compare;

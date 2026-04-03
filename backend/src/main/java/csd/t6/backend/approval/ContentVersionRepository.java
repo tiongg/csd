@@ -50,7 +50,7 @@ public class ContentVersionRepository extends BaseRepository<ContentVersionRecor
         .where(CONTENT_VERSION.COURSE_ID.eq(courseId).and(CONTENT_VERSION.STATUS.eq(ContentStatus.PENDING))).execute();
   }
 
-  public List<CourseRecord> findCoursesWithApprovedVersion() {
+  public List<ContentVersionWithCourseRecord> findCoursesWithApprovedVersion() {
     ContentVersion cv = CONTENT_VERSION;
     Course c = COURSE;
 
@@ -61,9 +61,14 @@ public class ContentVersionRepository extends BaseRepository<ContentVersionRecor
     Field<UUID> L_COURSE_ID = latest.field("course_id", UUID.class);
     Field<Integer> L_VERSION = latest.field("max_version", Integer.class);
 
-    return this.dsl.select(c).from(c).join(cv).on(cv.COURSE_ID.eq(c.ID)).join(latest).on(L_COURSE_ID.eq(cv.COURSE_ID))
-        .and(L_VERSION.eq(cv.VERSION)).where(cv.STATUS.eq(ContentStatus.APPROVED)).fetch()
-        .map(record -> record.value1());
+    return this.dsl.select(cv, c).from(c).join(cv).on(cv.COURSE_ID.eq(c.ID)).join(latest)
+        .on(L_COURSE_ID.eq(cv.COURSE_ID)).and(L_VERSION.eq(cv.VERSION)).where(cv.STATUS.eq(ContentStatus.APPROVED))
+        .fetch().map(record -> {
+          ContentVersionRecord contentVersion = record.value1();
+          CourseRecord course = record.value2();
+          List<String> tags = getTagTitlesByCourseId(course.getId());
+          return new ContentVersionWithCourseRecord(contentVersion, course, tags);
+        });
   }
 
   public List<ContentVersionWithCourseRecord> findByStatusWithCourse(ContentStatus status) {
