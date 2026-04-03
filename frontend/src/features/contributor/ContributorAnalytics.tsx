@@ -23,23 +23,35 @@ import type {
 } from './contributor-utils';
 
 export default function ContributorAnalytics() {
-  const [timeframe, setTimeframe] = useState<Timeframe>('1M');
+  const [timeframe, setTimeframe] = useState<Timeframe>('1W');
   const [selectedMetric, setSelectedMetric] =
     useState<MetricKey>('courseEngagement');
 
-  const { data: analytics } = useApiQuery('get', '/api/contributor/analytics', {
-    params: {
-      query: { timeframe },
+  const { data: analytics, isLoading } = useApiQuery(
+    'get',
+    '/api/contributor/analytics',
+    {
+      params: {
+        query: { timeframe },
+      },
     },
-  });
+    {
+      // Keep current data mounted while a new timeframe fetch is in flight.
+      placeholderData: (previousData) => previousData,
+    },
+  );
 
-  if (!analytics) {
+  if (!analytics && isLoading) {
     return (
       <DashboardAnalyticsSkeleton
         title="Contributor Analytics"
         description="Course metrics that spotlight engagement, output, and enrollment trends."
       />
     );
+  }
+
+  if (!analytics) {
+    return null;
   }
 
   const funnelRows: FunnelRow[] = [

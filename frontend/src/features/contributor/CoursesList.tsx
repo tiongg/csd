@@ -356,15 +356,15 @@ function CreateCourseCard({ onInteract }: { onInteract: () => void }) {
       className="h-full w-full text-left"
       onClick={onInteract}
     >
-      <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-dashed border-slate-300 bg-white p-4 transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
-        <span className="m-auto inline-flex size-16 items-center justify-center rounded-lg text-slate-700 transition-colors group-hover:text-sky-700">
+      <article className="group flex h-full min-h-40 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
+        <span className="inline-flex size-16 items-center justify-center rounded-lg text-slate-700 transition-colors group-hover:text-sky-700">
           <Plus className="size-8" />
         </span>
-        <div className="space-y-0.5">
+        <div className="space-y-1">
           <h3 className="text-lg font-bold text-slate-900">
             Create New Course
           </h3>
-          <p className="text-xs text-slate-600">Add a new course</p>
+          <p className="text-sm text-slate-600">Add a new course</p>
         </div>
       </article>
     </button>
