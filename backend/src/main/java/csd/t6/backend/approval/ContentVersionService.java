@@ -30,6 +30,7 @@ import csd.t6.jooq.public_.tables.records.CourseRecord;
 
 @Service
 public class ContentVersionService {
+  private static final String TAKEDOWN_REASON_PREFIX = "[TAKEDOWN] ";
   private final ContentVersionRepository contentVersionRepository;
   private final CourseRepository courseRepository;
   private final TeamService teamService;
@@ -151,7 +152,12 @@ public class ContentVersionService {
       throw new BadRequestException("Can only reject pending or approved versions");
     }
 
-    this.contentVersionRepository.updateStatus(contentVersionId, ContentStatus.REJECTED, rejectedReason);
+    String finalRejectedReason = rejectedReason;
+    if (wasApproved) {
+      finalRejectedReason = TAKEDOWN_REASON_PREFIX + rejectedReason;
+    }
+
+    this.contentVersionRepository.updateStatus(contentVersionId, ContentStatus.REJECTED, finalRejectedReason);
 
     if (wasApproved) {
       CourseRecord course = courseRepository.findById(version.getCourseId())
