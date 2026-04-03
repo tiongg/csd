@@ -1,10 +1,10 @@
 import { useContentEditor } from '@/context/ContentEditorContext';
-import { XCircleIcon } from '@heroicons/react/24/outline';
 import { apiQueryOptions, useApiQuery } from '@/lib/fetch-client';
 import { deleteCourseImage } from '@/lib/file-upload';
-import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
+import { TrashIcon } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import NoImageYet from './NoImageYet';
 
 type ImagePreviewProps = {
@@ -41,10 +41,10 @@ function ImagePreview({ imageUrl, setError, courseId }: ImagePreviewProps) {
       <button
         type="button"
         onClick={handleDelete}
-        className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white shadow-md transition-colors hover:bg-red-600"
+        className="absolute top-2 right-2 rounded-full bg-rose-500 p-2 text-white shadow-md transition-colors hover:bg-rose-600"
         aria-label="Delete image"
       >
-        <XCircleIcon className="h-6 w-6" />
+        <TrashIcon className="size-4" />
       </button>
     </div>
   );
@@ -66,8 +66,7 @@ export default function CourseImageOverview() {
   }
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-slate-900">Course Image</h3>
+    <div className="rounded-xl border border-slate-200 p-4 shadow-sm">
       <ImagePreview
         imageUrl={imageUrl}
         setError={setHasError}
