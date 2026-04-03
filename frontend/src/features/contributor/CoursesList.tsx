@@ -275,7 +275,7 @@ function CourseCard({ course, teamId }: CourseCardProps) {
                     {(course.tags ?? []).map((tag) => (
                       <span
                         key={tag}
-                        className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+                        className="inline-flex items-center rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
                       >
                         {tag}
                       </span>
