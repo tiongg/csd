@@ -50,58 +50,67 @@ export function CourseCard({
             No image
           </div>
         )}
+        {variant === 'enrolled' && enrollment && (
+          <span
+            className={cn(
+              'pointer-events-none absolute top-3 left-3 inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium',
+              enrollment.status === 'COMPLETED'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                : 'border-slate-300 bg-white/95 text-slate-700',
+            )}
+          >
+            {enrollment.status === 'COMPLETED' ? 'Completed' : 'Enrolled'}
+          </span>
+        )}
+        <span className="pointer-events-none absolute right-3 bottom-3 inline-flex items-center rounded-full border border-slate-300 bg-white/95 px-2.5 py-1 text-xs font-medium text-slate-700">
+          By {creatorLabel}
+        </span>
       </div>
       <div className="p-5">
-        {variant === 'discover' ? (
-          <div>
+        <div>
+          <div className="flex items-start justify-between gap-2">
             <h3 className="line-clamp-2 text-xl leading-snug font-semibold text-slate-900">
               {title}
             </h3>
-            <p className="mt-1 text-sm font-medium text-slate-600">
-              By {creatorLabel}
-            </p>
-            <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">
-              {summary}
-            </p>
-            <p className="mt-4 text-sm font-semibold text-sky-700 underline-offset-4 group-hover:underline">
-              View course
-            </p>
           </div>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-start justify-between gap-2">
-              <p className="line-clamp-2 text-xl leading-snug font-semibold text-slate-900">
-                {title}
+          <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">
+            {summary}
+          </p>
+          {variant === 'enrolled' && (
+            <div className="mt-3 flex items-end justify-between gap-3">
+              <div className="flex min-w-0 flex-wrap gap-1.5">
+                {tags?.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <p className="shrink-0 text-sm font-semibold text-sky-700 underline-offset-4 group-hover:underline">
+                View course
               </p>
-              {enrollment && (
-                <span
-                  className={cn(
-                    'inline-flex shrink-0 items-center rounded-full border px-2.5 py-0.5 text-xs font-medium',
-                    enrollment.status === 'COMPLETED'
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                      : 'border-sky-200 bg-sky-50 text-sky-700',
-                  )}
-                >
-                  {enrollment.status === 'COMPLETED' ? 'Completed' : 'Enrolled'}
-                </span>
-              )}
             </div>
-            <p className="text-sm font-medium text-slate-600">By {creatorLabel}</p>
-            <p className="line-clamp-2 text-sm leading-relaxed text-slate-600">
-              {summary}
-            </p>
-            <div className="mt-1 flex flex-wrap gap-1">
-              {tags?.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs font-medium text-slate-600"
-                >
-                  {tag}
-                </span>
-              ))}
+          )}
+          {variant === 'discover' && (
+            <div className="mt-3 flex items-end justify-between gap-3">
+              <div className="flex min-w-0 flex-wrap gap-1.5">
+                {tags?.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <p className="shrink-0 text-sm font-semibold text-sky-700 underline-offset-4 group-hover:underline">
+                View course
+              </p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </Link>
   );
