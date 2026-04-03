@@ -34,9 +34,9 @@ export function PublishedCoursesCard() {
           </ul>
         ) : publishedCourses.length > 0 ? (
           <ul className="space-y-3">
-            {publishedCourses.slice(0, 3).map((course, index) => (
+            {publishedCourses.slice(0, 3).map((entry, index) => (
               <motion.li
-                key={course.id}
+                key={entry.course.id}
                 variants={itemVariants}
                 initial="initial"
                 animate="animate"
@@ -45,10 +45,10 @@ export function PublishedCoursesCard() {
               >
                 <div>
                   <p className="text-sm font-medium text-slate-900">
-                    {course.title}
+                    {entry.course.title}
                   </p>
                   <p className="text-xs text-slate-500">
-                    Updated {dayjs(course.updatedAt).fromNow()}
+                    Updated {dayjs(entry.course.updatedAt).fromNow()}
                   </p>
                 </div>
                 <span className="text-slate-400">↗</span>
