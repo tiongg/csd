@@ -5,6 +5,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import type { Account } from '@/context/AuthContext';
 import { useAuth } from '@/context/AuthContext';
 import useActiveRole from '@/hooks/useActiveRole';
@@ -52,6 +53,43 @@ function getRoleUrl(
     .with('ADMIN', () => `/admin/${path}` as const)
     .with('CONTRIBUTOR', () => `/contributor/${path}` as const)
     .exhaustive();
+}
+
+function isPrimaryNavItemActive(
+  item: PrimaryNavItem,
+  pathname: string,
+  role: Account['role'],
+) {
+  const to = String(item.to);
+
+  if (role === 'CONTRIBUTOR' && to === '/contributor/teams') {
+    const contributorWorkspacePaths = [
+      '/contributor/teams',
+      '/contributor/editor/',
+      '/contributor/',
+    ];
+    const contributorExcludedPaths = [
+      '/contributor/dashboard',
+      '/contributor/glossary',
+      '/contributor/settings',
+      '/contributor/faq',
+    ];
+
+    const isExcluded = contributorExcludedPaths.some((path) =>
+      pathname.startsWith(path),
+    );
+    if (isExcluded) {
+      return false;
+    }
+
+    return contributorWorkspacePaths.some((path) =>
+      path === '/contributor/'
+        ? /^\/contributor\/[^/]+\/courses(?:\/|$)/.test(pathname)
+        : pathname.startsWith(path),
+    );
+  }
+
+  return pathname === to || pathname.startsWith(`${to}/`);
 }
 
 export default function Navbar() {
@@ -140,7 +178,11 @@ export default function Navbar() {
                 <Link
                   key={item.label}
                   to={item.to}
-                  className="relative z-10 inline-flex items-center justify-center rounded-full border border-transparent px-3 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-300 hover:text-slate-900 [&.active]:text-slate-900"
+                  className={cn(
+                    'relative z-10 inline-flex items-center justify-center rounded-full border border-transparent px-3 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-300 hover:text-slate-900 [&.active]:text-slate-900',
+                    isPrimaryNavItemActive(item, pathname, navRole) &&
+                      'active text-slate-900',
+                  )}
                 >
                   {item.label}
                 </Link>
