@@ -1079,6 +1079,7 @@ export interface components {
         AccountCreateRequest: {
             email: string;
             username: string;
+            realName: string;
             password: string;
         };
         MarkAsReadRequest: {
@@ -1092,6 +1093,7 @@ export interface components {
             username?: string;
             realName?: string;
             profilePictureUrl?: string;
+            password?: string;
         };
         CheckMembershipResponse: {
             isMember: boolean;

@@ -15,6 +15,11 @@ import { z } from 'zod';
 
 const registerSchema = z
   .object({
+    realName: z
+      .string()
+      .min(1, 'Name is required')
+      .max(50, 'Name must be 50 characters or fewer')
+      .regex(/^(?=.*[A-Za-z])[A-Za-z ]+$/, 'Name can only contain letters and spaces'),
     email: z
       .string()
       .min(1, 'Email is required')
@@ -22,7 +27,14 @@ const registerSchema = z
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
         'Please enter a valid email address',
       ),
-    username: z.string().min(3, 'Username must be at least 3 characters'),
+    username: z
+      .string()
+      .min(3, 'Username must be at least 3 characters')
+      .max(20, 'Username must be 20 characters or fewer')
+      .regex(
+        /^[A-Za-z0-9_]+$/,
+        'Username can only contain letters, numbers, and underscores',
+      ),
     password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
   })
@@ -43,6 +55,7 @@ export default function RegistrationForm() {
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      realName: '',
       email: '',
       username: '',
       password: '',
@@ -116,6 +129,28 @@ export default function RegistrationForm() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-4">
+          <FieldGroup>
+            <Controller
+              control={control}
+              name="realName"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <Input
+                    {...field}
+                    id="realName"
+                    aria-invalid={fieldState.invalid}
+                    placeholder="Full name"
+                    className="h-12 text-slate-700"
+                    aria-label="Name"
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+
           <FieldGroup>
             <Controller
               control={control}

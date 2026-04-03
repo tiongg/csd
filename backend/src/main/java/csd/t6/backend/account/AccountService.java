@@ -39,14 +39,14 @@ public class AccountService {
     return this.accountRepository.findAll();
   }
 
-  public AccountRecord createNewAccount(String username, String email, String hashedPassword) {
+  public AccountRecord createNewAccount(String username, String email, String realName, String hashedPassword) {
     if (this.accountRepository.exists(ACCOUNT.USERNAME, username)) {
       throw new BadRequestException("Username already exists");
     }
     if (this.accountRepository.exists(ACCOUNT.EMAIL, email)) {
       throw new BadRequestException("Email already exists");
     }
-    return this.accountRepository.insert(email, username, hashedPassword);
+    return this.accountRepository.insert(email, username, hashedPassword, realName);
   }
 
   public OauthConnectionRecord createWithOAuthLogin(String email, String realname, OauthProvider provider,
@@ -87,6 +87,10 @@ public class AccountService {
 
     if (updateDTO.profilePictureUrl() != null) {
       existingAccount.setProfilePictureUrl(updateDTO.profilePictureUrl());
+    }
+
+    if (updateDTO.password() != null) {
+      existingAccount.setPasswordHash(updateDTO.password());
     }
 
     return this.accountRepository.save(existingAccount);
