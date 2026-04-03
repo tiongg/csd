@@ -48,15 +48,12 @@ export default function GlossaryPage({
   const [trendSearch, setTrendSearch] = useState('');
 
   const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
-  const { mutateAsync: generateGlossary } = useApiMutation(
-    'post',
-    '/api/glossary/',
-    {
+  const { mutateAsync: generateGlossary, isPending: isGeneratingGlossary } =
+    useApiMutation('post', '/api/glossary/', {
       onSuccess: () => {
         queryClient.invalidateQueries(apiQueryOptions('get', '/api/glossary/'));
       },
-    },
-  );
+    });
 
   const filteredItems = useMemo(() => {
     if (!glossaryItems) {
@@ -155,11 +152,14 @@ export default function GlossaryPage({
             {showGenerateButton && (
               <div className="ml-auto self-end">
                 <Button
+                  disabled={isGeneratingGlossary}
                   onClick={() => {
                     generateGlossary({});
                   }}
                 >
-                  Regenerate Glossary
+                  {isGeneratingGlossary
+                    ? 'Generating...'
+                    : 'Regenerate Glossary'}
                 </Button>
               </div>
             )}
