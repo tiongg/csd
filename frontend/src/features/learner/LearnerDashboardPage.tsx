@@ -14,6 +14,7 @@ import { TrendCourseSearchDialog } from './dashboard/TrendCourseSearchDialog';
 
 export default function LearnerDashboardPage() {
   const { user } = useAuth();
+  const displayName = user?.realname?.trim() || user?.username;
   const { enrolledCourses } = useEnrolledCourse();
   const { splitContainerRef, splitStyle, startResizing } = useResizableSplit();
   const [isTrendModalOpen, setIsTrendModalOpen] = useState(false);
@@ -40,7 +41,7 @@ export default function LearnerDashboardPage() {
             Learner Dashboard
           </div>
           <Heading1 className="mt-3 text-slate-900">
-            Welcome back, {user?.username}.
+            Welcome back, {displayName}.
           </Heading1>
           <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-600">
             Monitor key trend shifts and focus on what is most relevant today.
