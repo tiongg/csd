@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useApiQuery } from '@/lib/fetch-client';
 import { generateColorFromString, hexToRgb, type Team } from '@/lib/utils';
 import { useNavigate } from '@tanstack/react-router';
-import { ArrowUpRight, Plus, Settings } from 'lucide-react';
+import { Plus, Settings } from 'lucide-react';
 import { useBoolean } from 'usehooks-ts';
 import CreateNewTeamDialog from './CreateNewTeamDialog';
 import EditTeamDialog from './EditTeamDialog';
@@ -111,7 +111,6 @@ function TeamCard({ team }: TeamCardProps) {
                     <Settings className="size-4" />
                   </Button>
                 )}
-                <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition-colors group-hover:text-sky-600" />
               </div>
             </div>
             <p className="line-clamp-2 text-sm leading-5 text-slate-600">

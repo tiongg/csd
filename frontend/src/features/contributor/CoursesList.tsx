@@ -17,7 +17,7 @@ import type { Course, Team } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { ArrowUpRight, Plus, Settings, Trash2, Users } from 'lucide-react';
+import { Plus, Settings, Trash2, Users } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useBoolean } from 'usehooks-ts';
@@ -264,7 +264,6 @@ function CourseCard({ course, teamId }: CourseCardProps) {
                   >
                     <Settings className="size-4" />
                   </Button>
-                  <ArrowUpRight className="size-4 shrink-0 text-slate-400 transition-colors group-hover:text-sky-600" />
                 </div>
               </div>
               <p className="line-clamp-2 text-sm leading-5 text-slate-600">
