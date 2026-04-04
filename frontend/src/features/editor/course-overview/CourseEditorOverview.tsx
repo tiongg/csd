@@ -71,7 +71,7 @@ export default function CourseEditorOverview({
                   <Badge
                     key={tag}
                     variant="outline"
-                    className="rounded-full border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
+                    className="rounded-full border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
                   >
                     {tag}
                   </Badge>
