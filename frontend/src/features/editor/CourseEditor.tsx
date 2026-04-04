@@ -86,15 +86,17 @@ export default function CourseEditor() {
           {currentSection === -1 || !section ? (
             <EditorCourseDisplay course={course} />
           ) : (
-            <div className="mx-auto w-full max-w-4xl p-8">
-              {match(section.get('type')!)
-                .with('markdown', () => <MarkdownEditor />)
-                .with('quiz', () => (
-                  <QuizSectionEditor
-                    quizContent={section.get('content') as EditableQuizContent}
-                  />
-                ))
-                .exhaustive()}
+            <div className="flex h-full flex-col overflow-auto px-6 pt-3 pb-6 md:px-8 md:pt-4 md:pb-8">
+              <div className="mx-auto w-full max-w-4xl">
+                {match(section.get('type')!)
+                  .with('markdown', () => <MarkdownEditor />)
+                  .with('quiz', () => (
+                    <QuizSectionEditor
+                      quizContent={section.get('content') as EditableQuizContent}
+                    />
+                  ))
+                  .exhaustive()}
+              </div>
             </div>
           )}
         </div>
