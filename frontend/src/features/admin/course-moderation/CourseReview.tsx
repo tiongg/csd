@@ -228,7 +228,7 @@ export default function CourseReview() {
                     No past reviews found yet.
                   </p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="h-96 space-y-2 overflow-y-auto pr-1">
                     {sortedVersions.map((version) => (
                       <div
                         key={version.id}
