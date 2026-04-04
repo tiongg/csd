@@ -1,4 +1,5 @@
 import { useContentEditor } from '@/context/ContentEditorContext';
+import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
 type AwarenessState = {
@@ -12,7 +13,11 @@ function getInitial(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
-export default function PresenceIndicator() {
+type PresenceIndicatorProps = {
+  className?: string;
+};
+
+export default function PresenceIndicator({ className }: PresenceIndicatorProps) {
   const { provider } = useContentEditor();
   const [users, setUsers] = useState<AwarenessState[]>([]);
 
@@ -37,7 +42,12 @@ export default function PresenceIndicator() {
   }
 
   return (
-    <div className="bg-background/90 border-border flex items-center gap-2 rounded-full border px-3 py-1.5 shadow-md backdrop-blur-sm">
+    <div
+      className={cn(
+        'bg-background/90 border-border flex items-center gap-2 rounded-full border px-3 py-1.5 shadow-md backdrop-blur-sm',
+        className,
+      )}
+    >
       <div className="flex -space-x-2">
         {users.slice(0, 4).map((state, index) => (
           <div

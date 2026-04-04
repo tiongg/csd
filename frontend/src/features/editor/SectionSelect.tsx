@@ -7,11 +7,11 @@ import * as Y from 'yjs';
 
 type SectionSelectProps = {
   index: number;
+  isActive: boolean;
 };
 
-export default function SectionSelect({ index }: SectionSelectProps) {
-  const { setCurrentSection, currentSection, deleteSection, doc } =
-    useContentEditor();
+export default function SectionSelect({ index, isActive }: SectionSelectProps) {
+  const { setCurrentSection, deleteSection, doc } = useContentEditor();
   const title = useY(doc.getArray('root').get(index)!.get('title')!);
   const {
     value: isEditing,
@@ -36,10 +36,10 @@ export default function SectionSelect({ index }: SectionSelectProps) {
     // Opting to use default input compoents for greater control over styling and behavior
     <div
       className={cn(
-        'group relative flex items-center gap-1 rounded-md px-2 py-1 text-sm text-nowrap transition-colors',
-        index === currentSection
-          ? 'text-primary-foreground bg-sky-500'
-          : 'hover:bg-muted',
+        'group relative z-10 flex h-9 shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border px-3 text-sm font-medium transition-colors duration-200',
+        isActive
+          ? 'border-sky-500 bg-sky-500 text-white'
+          : 'border-transparent bg-transparent text-slate-700 hover:bg-white/80 hover:text-slate-900',
       )}
       onClick={() => !isEditing && setCurrentSection(index)}
     >
@@ -76,7 +76,7 @@ export default function SectionSelect({ index }: SectionSelectProps) {
           deleteSection(index);
         }}
         className={cn(
-          'absolute -top-2 -right-2 z-50 flex size-5 items-center justify-center rounded-full',
+          'absolute -top-1 -right-1 z-50 flex size-5 items-center justify-center rounded-full',
           'border-border bg-background text-muted-foreground border opacity-0 shadow-sm',
           'transition-opacity group-hover:opacity-100 hover:bg-gray-100',
         )}

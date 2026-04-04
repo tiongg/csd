@@ -62,6 +62,14 @@ function isPrimaryNavItemActive(
 ) {
   const to = String(item.to);
 
+  if (role === 'ADMIN' && to === '/admin/course-moderation') {
+    return (
+      pathname === to ||
+      pathname.startsWith(`${to}/`) ||
+      pathname.startsWith('/admin/review')
+    );
+  }
+
   if (role === 'CONTRIBUTOR' && to === '/contributor/teams') {
     const contributorWorkspacePaths = [
       '/contributor/teams',

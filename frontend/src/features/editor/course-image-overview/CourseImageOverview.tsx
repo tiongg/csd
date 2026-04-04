@@ -1,6 +1,7 @@
 import { useContentEditor } from '@/context/ContentEditorContext';
 import { apiQueryOptions, useApiQuery } from '@/lib/fetch-client';
 import { deleteCourseImage } from '@/lib/file-upload';
+import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { TrashIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -11,9 +12,17 @@ type ImagePreviewProps = {
   setError: (hasError: boolean) => void;
   imageUrl?: string;
   courseId: string;
+  className?: string;
+  imageClassName?: string;
 };
 
-function ImagePreview({ imageUrl, setError, courseId }: ImagePreviewProps) {
+function ImagePreview({
+  imageUrl,
+  setError,
+  courseId,
+  className,
+  imageClassName,
+}: ImagePreviewProps) {
   const queryClient = useQueryClient();
 
   async function handleDelete() {
@@ -31,11 +40,19 @@ function ImagePreview({ imageUrl, setError, courseId }: ImagePreviewProps) {
   }
 
   return (
-    <div className="relative">
+    <div
+      className={cn(
+        'relative overflow-hidden rounded-lg border border-slate-200 bg-slate-50',
+        className,
+      )}
+    >
       <img
         src={`${imageUrl}?t=${new Date().getTime()}`}
         alt="Course thumbnail"
-        className="max-h-96 w-full rounded-lg object-cover"
+        className={cn(
+          'max-h-96 w-full rounded-lg object-cover',
+          imageClassName,
+        )}
         onError={() => setError(true)}
       />
       <button
@@ -50,7 +67,15 @@ function ImagePreview({ imageUrl, setError, courseId }: ImagePreviewProps) {
   );
 }
 
-export default function CourseImageOverview() {
+type CourseImageOverviewProps = {
+  className?: string;
+  imageClassName?: string;
+};
+
+export default function CourseImageOverview({
+  className,
+  imageClassName,
+}: CourseImageOverviewProps) {
   const { course } = useContentEditor();
   const [hasError, setHasError] = useState(false);
 
@@ -62,16 +87,16 @@ export default function CourseImageOverview() {
   const imageUrl = courseData?.imageUrl;
 
   if (hasError || !imageUrl) {
-    return <NoImageYet courseId={course.id} />;
+    return <NoImageYet courseId={course.id} className={className} />;
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 p-4 shadow-sm">
-      <ImagePreview
-        imageUrl={imageUrl}
-        setError={setHasError}
-        courseId={course.id}
-      />
-    </div>
+    <ImagePreview
+      imageUrl={imageUrl}
+      setError={setHasError}
+      courseId={course.id}
+      className={className}
+      imageClassName={imageClassName}
+    />
   );
 }
