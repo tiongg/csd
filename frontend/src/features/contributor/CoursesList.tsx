@@ -106,6 +106,8 @@ export default function CoursesList({ team }: CourseListProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <CreateCourseCard onInteract={openCreateCourseDialog} />
+
         {isCoursesLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
               <LoadingCourseCard key={idx} />
@@ -113,8 +115,6 @@ export default function CoursesList({ team }: CourseListProps) {
           : (courses ?? []).map((course) => (
               <CourseCard course={course} teamId={team.id} key={course.id} />
             ))}
-
-        <CreateCourseCard onInteract={openCreateCourseDialog} />
       </div>
 
       <CreateCourseDialog
