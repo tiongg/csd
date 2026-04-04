@@ -106,6 +106,8 @@ export default function CoursesList({ team }: CourseListProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <CreateCourseCard onInteract={openCreateCourseDialog} />
+
         {isCoursesLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
               <LoadingCourseCard key={idx} />
@@ -113,8 +115,6 @@ export default function CoursesList({ team }: CourseListProps) {
           : (courses ?? []).map((course) => (
               <CourseCard course={course} teamId={team.id} key={course.id} />
             ))}
-
-        <CreateCourseCard onInteract={openCreateCourseDialog} />
       </div>
 
       <CreateCourseDialog
@@ -229,7 +229,7 @@ function CourseCard({ course, teamId }: CourseCardProps) {
       <div
         role="button"
         tabIndex={0}
-        className="h-full w-full text-left"
+        className="h-full w-full cursor-pointer text-left"
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
       >
@@ -350,7 +350,7 @@ function CreateCourseCard({ onInteract }: { onInteract: () => void }) {
   return (
     <button
       type="button"
-      className="h-full w-full text-left"
+      className="h-full w-full cursor-pointer text-left"
       onClick={onInteract}
     >
       <article className="group flex h-full min-h-40 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">

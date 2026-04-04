@@ -1,19 +1,28 @@
 import { useContentEditor } from '@/context/ContentEditorContext';
-import { XCircleIcon } from '@heroicons/react/24/outline';
 import { apiQueryOptions, useApiQuery } from '@/lib/fetch-client';
 import { deleteCourseImage } from '@/lib/file-upload';
-import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
+import { X } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import NoImageYet from './NoImageYet';
 
 type ImagePreviewProps = {
   setError: (hasError: boolean) => void;
   imageUrl?: string;
   courseId: string;
+  className?: string;
+  imageClassName?: string;
 };
 
-function ImagePreview({ imageUrl, setError, courseId }: ImagePreviewProps) {
+function ImagePreview({
+  imageUrl,
+  setError,
+  courseId,
+  className,
+  imageClassName,
+}: ImagePreviewProps) {
   const queryClient = useQueryClient();
 
   async function handleDelete() {
@@ -31,26 +40,42 @@ function ImagePreview({ imageUrl, setError, courseId }: ImagePreviewProps) {
   }
 
   return (
-    <div className="relative">
+    <div
+      className={cn(
+        'relative overflow-hidden rounded-lg border border-slate-200 bg-slate-50',
+        className,
+      )}
+    >
       <img
         src={`${imageUrl}?t=${new Date().getTime()}`}
         alt="Course thumbnail"
-        className="max-h-96 w-full rounded-lg object-cover"
+        className={cn(
+          'max-h-96 w-full rounded-lg object-cover',
+          imageClassName,
+        )}
         onError={() => setError(true)}
       />
       <button
         type="button"
         onClick={handleDelete}
-        className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white shadow-md transition-colors hover:bg-red-600"
+        className="absolute top-2 right-2 flex size-7 items-center justify-center rounded-full border border-slate-300/80 bg-white/90 text-slate-600 shadow-sm backdrop-blur-sm transition-colors hover:bg-white hover:text-slate-900"
         aria-label="Delete image"
       >
-        <XCircleIcon className="h-6 w-6" />
+        <X className="size-3.5" />
       </button>
     </div>
   );
 }
 
-export default function CourseImageOverview() {
+type CourseImageOverviewProps = {
+  className?: string;
+  imageClassName?: string;
+};
+
+export default function CourseImageOverview({
+  className,
+  imageClassName,
+}: CourseImageOverviewProps) {
   const { course } = useContentEditor();
   const [hasError, setHasError] = useState(false);
 
@@ -62,17 +87,16 @@ export default function CourseImageOverview() {
   const imageUrl = courseData?.imageUrl;
 
   if (hasError || !imageUrl) {
-    return <NoImageYet courseId={course.id} />;
+    return <NoImageYet courseId={course.id} className={className} />;
   }
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-slate-900">Course Image</h3>
-      <ImagePreview
-        imageUrl={imageUrl}
-        setError={setHasError}
-        courseId={course.id}
-      />
-    </div>
+    <ImagePreview
+      imageUrl={imageUrl}
+      setError={setHasError}
+      courseId={course.id}
+      className={className}
+      imageClassName={imageClassName}
+    />
   );
 }

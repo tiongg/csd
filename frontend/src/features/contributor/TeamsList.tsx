@@ -37,13 +37,12 @@ export default function TeamsList() {
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <CreateTeamCard onInteract={openCreateTeamDialog} />
         {isLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
               <LoadingTeamCard key={idx} />
             ))
           : (teams ?? []).map((team) => <TeamCard team={team} key={team.id} />)}
-
-        <CreateTeamCard onInteract={openCreateTeamDialog} />
       </div>
 
       <CreateNewTeamDialog

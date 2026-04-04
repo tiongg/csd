@@ -1,7 +1,6 @@
 import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import { ContentReviewProvider } from '@/context/ContentReviewContext';
 import CourseReview from '@/features/admin/course-moderation/CourseReview';
-import ReviewHeader from '@/features/admin/course-moderation/ReviewHeader';
 import type { SectionType } from '@/lib/content.type';
 import { fetchClient } from '@/lib/fetch-client';
 import { createFileRoute, redirect } from '@tanstack/react-router';
@@ -47,7 +46,6 @@ function RouteComponent() {
         contentVersion={contentVersion}
       >
         <div className="flex h-full w-full min-w-0 flex-1 flex-col">
-          <ReviewHeader />
           <CourseReview />
         </div>
       </ContentReviewProvider>
