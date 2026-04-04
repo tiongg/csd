@@ -11,13 +11,13 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useContentEditor } from '@/context/ContentEditorContext';
-import { apiQueryOptions } from '@/lib/fetch-client';
+import type { SectionType } from '@/lib/content.type';
+import { apiQueryOptions, useApiQuery } from '@/lib/fetch-client';
 import { uploadCourseContent } from '@/lib/file-upload';
-import type { Course } from '@/lib/utils';
+import type { ContentVersion, Course } from '@/lib/utils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Send } from 'lucide-react';
-import type { FormEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useBoolean } from 'usehooks-ts';
 
 type PublishCourseProps = {
@@ -33,9 +33,131 @@ export default function PublishCourse({ course }: PublishCourseProps) {
     setValue: setOpen,
   } = useBoolean(false);
   const [description, setDescription] = useState('');
+  const [baselineSignature, setBaselineSignature] = useState<string | null>(
+    null,
+  );
+  const [isBaselineResolved, setIsBaselineResolved] = useState(false);
+  const [currentSignature, setCurrentSignature] = useState<string | null>(null);
 
   const sections = doc.getArray('root');
   const sectionCount = sections.length;
+  const hasSections = sectionCount > 0;
+
+  const { data: versions, isLoading: isVersionsLoading } = useApiQuery(
+    'get',
+    '/api/content-versions/{courseId}',
+    {
+      params: {
+        path: {
+          courseId: course.id,
+        },
+      },
+    },
+  );
+
+  const latestVersion = useMemo<ContentVersion | undefined>(
+    () =>
+      versions?.reduce<ContentVersion | undefined>((latest, version) => {
+        if (!latest || version.versionNumber > latest.versionNumber) {
+          return version;
+        }
+        return latest;
+      }, undefined),
+    [versions],
+  );
+
+  const latestVersionId = latestVersion?.id;
+  const { data: latestVersionReview, isLoading: isLatestVersionLoading } =
+    useApiQuery(
+      'get',
+      '/api/content-versions/review/{contentVersionId}',
+      {
+        params: {
+          path: {
+            contentVersionId: latestVersionId ?? '',
+          },
+        },
+      },
+      {
+        enabled: !!latestVersionId,
+      },
+    );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function updateCurrentSignature() {
+      const content = await getDocAsJson();
+      if (isMounted) {
+        setCurrentSignature(JSON.stringify(content));
+      }
+    }
+
+    void updateCurrentSignature();
+    const observeDoc = () => void updateCurrentSignature();
+    sections.observeDeep(observeDoc);
+
+    return () => {
+      isMounted = false;
+      sections.unobserveDeep(observeDoc);
+    };
+  }, [getDocAsJson, sections]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadLatestVersionSignature() {
+      if (!latestVersionReview?.downloadUrl) {
+        setBaselineSignature(null);
+        setIsBaselineResolved(true);
+        return;
+      }
+
+      try {
+        const latestContent = (await fetch(
+          latestVersionReview.downloadUrl,
+        ).then((res) => res.json())) as SectionType[];
+
+        if (isMounted) {
+          setBaselineSignature(JSON.stringify(latestContent));
+          setIsBaselineResolved(true);
+        }
+      } catch {
+        if (isMounted) {
+          setBaselineSignature(null);
+          setIsBaselineResolved(true);
+        }
+      }
+    }
+
+    setIsBaselineResolved(!latestVersionId);
+    void loadLatestVersionSignature();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [latestVersionId, latestVersionReview?.downloadUrl]);
+
+  const hasChanges = useMemo(() => {
+    if (!latestVersionId) {
+      return hasSections;
+    }
+
+    if (currentSignature === null) {
+      return false;
+    }
+
+    if (baselineSignature === null) {
+      return hasSections;
+    }
+
+    return currentSignature !== baselineSignature;
+  }, [baselineSignature, currentSignature, hasSections, latestVersionId]);
+
+  const isCheckingChanges =
+    isVersionsLoading ||
+    (!!latestVersionId && (isLatestVersionLoading || !isBaselineResolved)) ||
+    (!latestVersionId && currentSignature === null);
 
   const { mutateAsync: uploadContent, isPending: isPublishing } = useMutation({
     mutationFn: async (desc: string) => {
@@ -77,7 +199,7 @@ export default function PublishCourse({ course }: PublishCourseProps) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button
-          disabled={sectionCount === 0}
+          disabled={!hasChanges || isCheckingChanges}
           className="gap-2 transition duration-300 active:scale-95"
         >
           <Send className="size-4" />
@@ -116,7 +238,7 @@ export default function PublishCourse({ course }: PublishCourseProps) {
             </Button>
             <Button
               type="submit"
-              disabled={!description.trim() || isPublishing}
+              disabled={!description.trim() || isPublishing || !hasChanges}
               className="gap-2"
             >
               {isPublishing ? (
