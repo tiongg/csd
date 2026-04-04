@@ -3,7 +3,7 @@ import { apiQueryOptions, useApiQuery } from '@/lib/fetch-client';
 import { deleteCourseImage } from '@/lib/file-upload';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { TrashIcon } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import NoImageYet from './NoImageYet';
@@ -58,10 +58,10 @@ function ImagePreview({
       <button
         type="button"
         onClick={handleDelete}
-        className="absolute top-2 right-2 rounded-full bg-rose-500 p-2 text-white shadow-md transition-colors hover:bg-rose-600"
+        className="absolute top-2 right-2 flex size-7 items-center justify-center rounded-full border border-slate-300/80 bg-white/90 text-slate-600 shadow-sm backdrop-blur-sm transition-colors hover:bg-white hover:text-slate-900"
         aria-label="Delete image"
       >
-        <TrashIcon className="size-4" />
+        <X className="size-3.5" />
       </button>
     </div>
   );
