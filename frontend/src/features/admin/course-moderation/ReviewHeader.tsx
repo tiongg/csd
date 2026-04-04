@@ -12,12 +12,17 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useContentReview } from '@/context/ContentReviewContext';
 import { useApiMutation } from '@/lib/fetch-client';
+import { cn } from '@/lib/utils';
 import { useNavigate } from '@tanstack/react-router';
 import { CheckCircleIcon, XCircleIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export default function ReviewHeader() {
+type ReviewHeaderProps = {
+  className?: string;
+};
+
+export default function ReviewHeader({ className }: ReviewHeaderProps) {
   const { contentVersion } = useContentReview();
   const isPending = contentVersion.status === 'PENDING';
   const isApproved = contentVersion.status === 'APPROVED';
@@ -75,104 +80,99 @@ export default function ReviewHeader() {
   }
 
   return (
-    <header className="border-b border-slate-200/80 bg-white/70 px-4 py-3 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3">
-        <div>
-          <p className="text-lg font-semibold text-slate-900">Course Review</p>
-          <p className="text-sm text-slate-600">
-            {isApproved
-              ? 'Manage this already published version.'
-              : 'Validate content quality before publishing this version.'}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {canReject && (
-            <>
-              <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
-                <DialogTrigger asChild>
-                  <Button variant="destructive" className="h-9 rounded-lg">
-                    <XCircleIcon className="size-4" />
-                    {isApproved ? 'Take Down' : 'Reject'}
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="rounded-xl border-slate-200 p-5 sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl text-slate-900">
-                      {isApproved ? 'Take Down Course' : 'Reject Course'}
-                    </DialogTitle>
-                    <DialogDescription className="text-slate-600">
-                      {isApproved
-                        ? 'Please provide a reason for taking this course version down.'
-                        : 'Please provide a reason for rejecting this course version.'}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="reject-reason">
-                        {isApproved ? 'Reason for takedown' : 'Reason for rejection'}
-                      </Label>
-                      <Textarea
-                        id="reject-reason"
-                        placeholder="Enter your feedback..."
-                        className="border-slate-300 bg-white/90 focus-visible:border-slate-400 focus-visible:ring-0"
-                        value={rejectReason}
-                        onChange={(e) => setRejectReason(e.target.value)}
-                        rows={4}
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      className="h-9 rounded-lg border-slate-300"
-                      onClick={() => setRejectOpen(false)}
-                      disabled={isRejecting}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      className="h-9 rounded-lg"
-                      onClick={handleReject}
-                      disabled={isRejecting || !rejectReason.trim()}
-                    >
-                      {isRejecting
-                        ? isApproved
-                          ? 'Taking down...'
-                          : 'Rejecting...'
-                        : isApproved
-                          ? 'Take Down'
-                          : 'Reject'}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-              {isPending && (
-                <Button
-                  variant="default"
-                  onClick={() =>
-                    approveVersion({
-                      params: {
-                        path: { contentVersionId: contentVersion.id },
-                      },
-                    })
-                  }
-                  disabled={isApproving}
-                  className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
-                >
-                  <CheckCircleIcon className="size-4" />
-                  {isApproving ? 'Approving...' : 'Approve'}
+    <div
+      className={cn(
+        'h-14 shrink-0 rounded-xl border border-slate-300/80 bg-white/60 px-3 shadow-[0_10px_22px_-16px_rgba(15,23,42,0.45)] backdrop-blur-xl',
+        className,
+      )}
+    >
+      <div className="flex h-full items-center gap-2">
+        {canReject && (
+          <>
+            <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
+              <DialogTrigger asChild>
+                <Button variant="destructive" className="h-9 rounded-lg">
+                  <XCircleIcon className="size-4" />
+                  {isApproved ? 'Take Down' : 'Reject'}
                 </Button>
-              )}
-            </>
-          )}
-          {!canReject && (
-            <p className="text-sm font-medium text-slate-500">
-              This version is already {contentVersion.status.toLowerCase()}.
-            </p>
-          )}
-        </div>
+              </DialogTrigger>
+              <DialogContent className="rounded-xl border-slate-200 p-5 sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle className="text-xl text-slate-900">
+                    {isApproved ? 'Take Down Course' : 'Reject Course'}
+                  </DialogTitle>
+                  <DialogDescription className="text-slate-600">
+                    {isApproved
+                      ? 'Please provide a reason for taking this course version down.'
+                      : 'Please provide a reason for rejecting this course version.'}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="reject-reason">
+                      {isApproved ? 'Reason for takedown' : 'Reason for rejection'}
+                    </Label>
+                    <Textarea
+                      id="reject-reason"
+                      placeholder="Enter your feedback..."
+                      className="border-slate-300 bg-white/90 focus-visible:border-slate-400 focus-visible:ring-0"
+                      value={rejectReason}
+                      onChange={(e) => setRejectReason(e.target.value)}
+                      rows={4}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    className="h-9 rounded-lg border-slate-300"
+                    onClick={() => setRejectOpen(false)}
+                    disabled={isRejecting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="h-9 rounded-lg"
+                    onClick={handleReject}
+                    disabled={isRejecting || !rejectReason.trim()}
+                  >
+                    {isRejecting
+                      ? isApproved
+                        ? 'Taking down...'
+                        : 'Rejecting...'
+                      : isApproved
+                        ? 'Take Down'
+                        : 'Reject'}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            {isPending && (
+              <Button
+                variant="default"
+                onClick={() =>
+                  approveVersion({
+                    params: {
+                      path: { contentVersionId: contentVersion.id },
+                    },
+                  })
+                }
+                disabled={isApproving}
+                className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+              >
+                <CheckCircleIcon className="size-4" />
+                {isApproving ? 'Approving...' : 'Approve'}
+              </Button>
+            )}
+          </>
+        )}
+        {!canReject && (
+          <p className="text-sm font-medium text-slate-500">
+            Already {contentVersion.status.toLowerCase()}
+          </p>
+        )}
       </div>
-    </header>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
@@ -7,33 +8,49 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useContentReview } from '@/context/ContentReviewContext';
+import { useApiQuery } from '@/lib/fetch-client';
 import { type SectionType } from '@/lib/content.type';
+import { cn } from '@/lib/utils';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { FileText, HelpCircle, Tag } from 'lucide-react';
 import { match } from 'ts-pattern';
 import MarkdownViewer from './MarkdownViewer';
 import QuizViewer from './QuizViewer';
+import ReviewHeader from './ReviewHeader';
 
 dayjs.extend(relativeTime);
+
+const reviewStatusStyles = {
+  APPROVED: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  PENDING: 'bg-slate-100 text-slate-700 border-slate-200',
+  REJECTED: 'bg-red-100 text-red-700 border-red-200',
+} as const;
 
 type ReviewSectionViewerProps = {
   section: SectionType;
 };
 
+type CourseWithCreatorMeta = {
+  creatorUsername?: string;
+  creator?: {
+    username?: string;
+  };
+  createdBy?: {
+    username?: string;
+  };
+};
+
 function ReviewSectionViewer({ section }: ReviewSectionViewerProps) {
   return (
     <div className="flex h-full w-full flex-1 flex-col overflow-hidden">
-      <div className="flex-1">
-        <div className="mx-auto max-w-4xl p-8">
+      <div className="flex-1 overflow-auto px-6 pt-3 pb-6 md:px-8 md:pt-4 md:pb-8">
+        <div className="mx-auto w-full max-w-4xl">
           {match(section)
             .with({ type: 'markdown' }, (s) => (
               <MarkdownViewer content={s.content} />
             ))
-            .with({ type: 'quiz' }, (s) => (
-              <div className="p-4">
-                <QuizViewer quiz={s.content} />
-              </div>
-            ))
+            .with({ type: 'quiz' }, (s) => <QuizViewer quiz={s.content} />)
             .exhaustive()}
         </div>
       </div>
@@ -44,134 +61,233 @@ function ReviewSectionViewer({ section }: ReviewSectionViewerProps) {
 export default function CourseReview() {
   const { content, currentSection, setCurrentSection, contentVersion, course } =
     useContentReview();
+  const { data: versions } = useApiQuery('get', '/api/content-versions/{courseId}', {
+    params: {
+      path: {
+        courseId: course.id,
+      },
+    },
+  });
+  const { data: accounts } = useApiQuery('get', '/api/account/', {});
 
   const sectionCount = content.length;
   const currentSectionData =
     currentSection >= 0 ? content[currentSection] : null;
+  const markdownCount = content.filter((s) => s.type === 'markdown').length;
+  const quizCount = content.filter((s) => s.type === 'quiz').length;
+  const tags = course.tags ?? [];
+  const courseWithCreatorMeta = course as typeof course & CourseWithCreatorMeta;
+  const creatorFromAccounts = accounts?.find((account) => account.id === course.creatorId);
+  const creatorLabel =
+    creatorFromAccounts?.username ??
+    courseWithCreatorMeta.creatorUsername ??
+    courseWithCreatorMeta.creator?.username ??
+    courseWithCreatorMeta.createdBy?.username ??
+    'Course creator';
+  const sortedVersions = [...(versions ?? [])].sort(
+    (a, b) => b.versionNumber - a.versionNumber,
+  );
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-slate-100/60">
       <div className="shrink-0 px-4 py-3">
-        <nav className="mx-auto flex w-full max-w-6xl items-center gap-2 overflow-x-auto rounded-xl border border-slate-200/80 bg-white/70 p-2">
-          <Button
-            size="sm"
-            variant={currentSection === -1 ? 'default' : 'ghost'}
-            className={
-              currentSection === -1
-                ? 'bg-slate-900 text-white hover:bg-slate-800'
-                : 'text-slate-600 hover:bg-slate-100'
-            }
-            onClick={() => setCurrentSection(-1)}
-          >
-            Overview
-          </Button>
-          <div className="bg-border mx-2 h-6 w-px shrink-0" />
-          <div className="flex gap-1">
-            {content.map((section, index) => (
-              <Button
-                key={index}
-                size="sm"
-                variant={currentSection === index ? 'default' : 'ghost'}
-                className={
-                  currentSection === index
-                    ? 'bg-slate-900 text-white hover:bg-slate-800'
-                    : 'text-slate-600 hover:bg-slate-100'
-                }
-                onClick={() => setCurrentSection(index)}
-              >
-                {section.title}
-              </Button>
-            ))}
-          </div>
-        </nav>
+        <div className="mx-auto flex w-full max-w-4xl items-center gap-3">
+          <nav className="relative flex h-14 min-w-0 flex-1 items-center gap-1 rounded-xl border border-slate-300/80 bg-white/60 py-1 pr-2 pl-2 shadow-[0_10px_22px_-16px_rgba(15,23,42,0.45)] backdrop-blur-xl">
+            <Button
+              size="sm"
+              variant="ghost"
+              className={cn(
+                'relative z-10 flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg px-3 text-sm font-medium shadow-none transition-colors duration-200',
+                currentSection === -1
+                  ? 'bg-sky-500 text-white hover:bg-sky-500 hover:text-white'
+                  : 'text-slate-700 hover:bg-white/80 hover:text-slate-900',
+              )}
+              onClick={() => setCurrentSection(-1)}
+            >
+              Overview
+            </Button>
+            <div className="min-w-0 flex-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex w-max items-center gap-1 pr-1">
+                {content.map((section, index) => (
+                  <Button
+                    key={index}
+                    size="sm"
+                    variant="ghost"
+                    className={cn(
+                      'relative z-10 flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg px-3 text-sm font-medium shadow-none transition-colors duration-200',
+                      currentSection === index
+                        ? 'border-sky-500 bg-sky-500 text-white'
+                        : 'text-slate-700 hover:bg-white/80 hover:text-slate-900',
+                    )}
+                    onClick={() => setCurrentSection(index)}
+                  >
+                    {section.title}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </nav>
+          <ReviewHeader />
+        </div>
       </div>
 
       {currentSection === -1 || !currentSectionData ? (
         <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-6">
-          <div className="mx-auto w-full max-w-6xl space-y-4">
-            <Card className="border-slate-200/85 bg-white/80 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-xl text-slate-900">
-                  {course.title}
-                </CardTitle>
-                <CardDescription className="text-slate-600">
-                  {course.description || 'No description'}
-                </CardDescription>
-                <CardDescription className="flex flex-wrap items-center gap-2">
-                  {(course.tags ?? []).length > 0
-                    ? (course.tags ?? []).map((tag) => (
-                        <span
-                          key={tag}
-                          className="inline-flex items-center rounded-full border border-sky-200 bg-sky-50 px-2 py-1 text-xs font-medium text-sky-700"
-                        >
-                          {tag}
-                        </span>
-                      ))
-                    : 'No tags'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap items-center gap-4 text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">Version:</span>
-                    <span className="font-medium text-slate-800">
-                      v{contentVersion.versionNumber}
+          <div className="mx-auto w-full max-w-4xl space-y-3">
+            <Card className="gap-0 border-slate-200/90 bg-white/90 py-0 shadow-sm">
+              <CardContent className="space-y-3 p-4 md:p-5">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="min-w-0 flex-1 space-y-4">
+                    <div className="space-y-2">
+                      <CardTitle className="text-xl leading-tight text-slate-900">
+                        {course.title}
+                      </CardTitle>
+                      <CardDescription className="text-base text-slate-600">
+                        {course.description || 'No description provided.'}
+                      </CardDescription>
+                    </div>
+                    {tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="shrink-0">
+                    <span className="inline-flex items-center rounded-md border border-slate-300 bg-white/90 px-2.5 py-1 text-xs font-medium text-slate-700">
+                      By {creatorLabel}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">Published:</span>
-                    <span className="font-medium text-slate-800">
-                      {dayjs(contentVersion.publishedAt).fromNow()}
-                    </span>
+                </div>
+
+                {'imageUrl' in course && course.imageUrl ? (
+                  <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                    <img
+                      src={course.imageUrl as string}
+                      alt={course.title}
+                      className="h-[240px] w-full object-cover md:h-[320px]"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex h-[180px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+                    No thumbnail
+                  </div>
+                )}
+
+                <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-4">
+                    <div className="flex size-10 items-center justify-center rounded-full bg-blue-100/80">
+                      <FileText className="size-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-sm">Markdown</p>
+                      <p className="text-2xl font-semibold leading-none">{markdownCount}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-4">
+                    <div className="flex size-10 items-center justify-center rounded-full bg-blue-100/80">
+                      <HelpCircle className="size-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-sm">Quizzes</p>
+                      <p className="text-2xl font-semibold leading-none">{quizCount}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-4">
+                    <div className="flex size-10 items-center justify-center rounded-full bg-blue-100/80">
+                      <Tag className="size-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-sm">Total Sections</p>
+                      <p className="text-2xl font-semibold leading-none">{sectionCount}</p>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-slate-200/85 bg-white/80 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg text-slate-900">
-                  Version Description
+            <Card className="border-slate-300/80 bg-white/70 shadow-[0_10px_22px_-16px_rgba(15,23,42,0.45)] backdrop-blur-xl">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base text-slate-900">
+                  Review Queue
                 </CardTitle>
+                <CardDescription className="text-slate-600">
+                  Past review decisions for this course version timeline.
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                {contentVersion.description ? (
-                  <p className="text-sm text-slate-700">
-                    {contentVersion.description}
+                {sortedVersions.length === 0 ? (
+                  <p className="text-muted-foreground text-sm">
+                    No past reviews found yet.
                   </p>
                 ) : (
-                  <p className="text-muted-foreground text-sm">
-                    No description provided for this version.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+                  <div className="space-y-2">
+                    {sortedVersions.map((version) => (
+                      <div
+                        key={version.id}
+                        className={cn(
+                          'rounded-lg border border-slate-200 bg-white/90 px-3 py-3',
+                          version.id === contentVersion.id &&
+                            'border-sky-200 bg-sky-50/60',
+                        )}
+                      >
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                          <p className="text-sm font-semibold text-slate-900">
+                            Version {version.versionNumber}
+                          </p>
+                          <p className="text-xs text-slate-600">
+                            {dayjs(version.publishedAt).format('MMM D, YYYY h:mm A')}
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            {dayjs(version.publishedAt).fromNow()}
+                          </p>
+                          <div className="ml-auto flex min-w-0 items-center gap-2">
+                            {version.id === contentVersion.id && (
+                              <Badge className="border border-sky-200 bg-sky-100 text-sky-700 hover:bg-sky-100">
+                                Current Review
+                              </Badge>
+                            )}
+                            <Badge
+                              className={cn(
+                                'border',
+                                reviewStatusStyles[
+                                  version.status as keyof typeof reviewStatusStyles
+                                ],
+                              )}
+                            >
+                              {version.status}
+                            </Badge>
+                          </div>
+                        </div>
 
-            <Card className="border-slate-200/85 bg-white/80 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-lg text-slate-900">
-                  Content Overview
-                </CardTitle>
-                <CardDescription className="text-slate-600">
-                  This course contains {sectionCount}{' '}
-                  {sectionCount === 1 ? 'section' : 'sections'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {content.map((section, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      className="justify-start rounded-lg border-slate-300 bg-white/80 text-left hover:bg-slate-50"
-                      onClick={() => setCurrentSection(index)}
-                    >
-                      <span className="truncate">
-                        {index + 1}. {section.title}
-                      </span>
-                    </Button>
-                  ))}
-                </div>
+                        <div className="mt-2 border-t border-slate-200/80 pt-2">
+                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                            Review Note
+                          </p>
+                          <p
+                            className="mt-1 break-words text-sm leading-relaxed text-slate-700"
+                            title={
+                              version.description?.trim()
+                                ? version.description
+                                : 'No review note provided.'
+                            }
+                          >
+                            {version.description?.trim()
+                              ? version.description
+                              : 'No review note provided.'}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
