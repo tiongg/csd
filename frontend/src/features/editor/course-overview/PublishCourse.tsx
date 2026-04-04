@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Send } from 'lucide-react';
 import type { FormEvent } from 'react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useBoolean } from 'usehooks-ts';
 
 type PublishCourseProps = {
@@ -52,6 +53,10 @@ export default function PublishCourse({ course }: PublishCourseProps) {
           },
         }),
       );
+    },
+    onError: () => {
+      toast.error('Failed to submit course for approval. Is there content?');
+      closeDialog();
     },
   });
 

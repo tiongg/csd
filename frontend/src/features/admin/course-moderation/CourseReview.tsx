@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -8,8 +8,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useContentReview } from '@/context/ContentReviewContext';
-import { useApiQuery } from '@/lib/fetch-client';
 import { type SectionType } from '@/lib/content.type';
+import { useApiQuery } from '@/lib/fetch-client';
 import { cn } from '@/lib/utils';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -61,13 +61,17 @@ function ReviewSectionViewer({ section }: ReviewSectionViewerProps) {
 export default function CourseReview() {
   const { content, currentSection, setCurrentSection, contentVersion, course } =
     useContentReview();
-  const { data: versions } = useApiQuery('get', '/api/content-versions/{courseId}', {
-    params: {
-      path: {
-        courseId: course.id,
+  const { data: versions } = useApiQuery(
+    'get',
+    '/api/content-versions/{courseId}',
+    {
+      params: {
+        path: {
+          courseId: course.id,
+        },
       },
     },
-  });
+  );
   const { data: accounts } = useApiQuery('get', '/api/account/', {});
 
   const sectionCount = content.length;
@@ -77,7 +81,9 @@ export default function CourseReview() {
   const quizCount = content.filter((s) => s.type === 'quiz').length;
   const tags = course.tags ?? [];
   const courseWithCreatorMeta = course as typeof course & CourseWithCreatorMeta;
-  const creatorFromAccounts = accounts?.find((account) => account.id === course.creatorId);
+  const creatorFromAccounts = accounts?.find(
+    (account) => account.id === course.creatorId,
+  );
   const creatorLabel =
     creatorFromAccounts?.username ??
     courseWithCreatorMeta.creatorUsername ??
@@ -97,7 +103,7 @@ export default function CourseReview() {
               size="sm"
               variant="ghost"
               className={cn(
-                'relative z-10 flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg px-3 text-sm font-medium shadow-none transition-colors duration-200',
+                'relative z-10 flex h-9 shrink-0 items-center justify-center rounded-lg px-3 text-sm font-medium whitespace-nowrap shadow-none transition-colors duration-200',
                 currentSection === -1
                   ? 'bg-sky-500 text-white hover:bg-sky-500 hover:text-white'
                   : 'text-slate-700 hover:bg-white/80 hover:text-slate-900',
@@ -114,7 +120,7 @@ export default function CourseReview() {
                     size="sm"
                     variant="ghost"
                     className={cn(
-                      'relative z-10 flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg px-3 text-sm font-medium shadow-none transition-colors duration-200',
+                      'relative z-10 flex h-9 shrink-0 items-center justify-center rounded-lg px-3 text-sm font-medium whitespace-nowrap shadow-none transition-colors duration-200',
                       currentSection === index
                         ? 'border-sky-500 bg-sky-500 text-white'
                         : 'text-slate-700 hover:bg-white/80 hover:text-slate-900',
@@ -188,7 +194,9 @@ export default function CourseReview() {
                     </div>
                     <div>
                       <p className="text-muted-foreground text-sm">Markdown</p>
-                      <p className="text-2xl font-semibold leading-none">{markdownCount}</p>
+                      <p className="text-2xl leading-none font-semibold">
+                        {markdownCount}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-4">
@@ -197,7 +205,9 @@ export default function CourseReview() {
                     </div>
                     <div>
                       <p className="text-muted-foreground text-sm">Quizzes</p>
-                      <p className="text-2xl font-semibold leading-none">{quizCount}</p>
+                      <p className="text-2xl leading-none font-semibold">
+                        {quizCount}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-4">
@@ -205,8 +215,12 @@ export default function CourseReview() {
                       <Tag className="size-5 text-blue-600" />
                     </div>
                     <div>
-                      <p className="text-muted-foreground text-sm">Total Sections</p>
-                      <p className="text-2xl font-semibold leading-none">{sectionCount}</p>
+                      <p className="text-muted-foreground text-sm">
+                        Total Sections
+                      </p>
+                      <p className="text-2xl leading-none font-semibold">
+                        {sectionCount}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -228,7 +242,7 @@ export default function CourseReview() {
                     No past reviews found yet.
                   </p>
                 ) : (
-                  <div className="h-96 space-y-2 overflow-y-auto pr-1">
+                  <div className="max-h-96 space-y-2 overflow-y-auto pr-1">
                     {sortedVersions.map((version) => (
                       <div
                         key={version.id}
@@ -243,7 +257,9 @@ export default function CourseReview() {
                             Version {version.versionNumber}
                           </p>
                           <p className="text-xs text-slate-600">
-                            {dayjs(version.publishedAt).format('MMM D, YYYY h:mm A')}
+                            {dayjs(version.publishedAt).format(
+                              'MMM D, YYYY h:mm A',
+                            )}
                           </p>
                           <p className="text-xs text-slate-500">
                             {dayjs(version.publishedAt).fromNow()}
@@ -268,11 +284,11 @@ export default function CourseReview() {
                         </div>
 
                         <div className="mt-2 border-t border-slate-200/80 pt-2">
-                          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                          <p className="text-[11px] font-semibold tracking-wide text-slate-500 uppercase">
                             Review Note
                           </p>
                           <p
-                            className="mt-1 break-words text-sm leading-relaxed text-slate-700"
+                            className="mt-1 text-sm leading-relaxed break-words text-slate-700"
                             title={
                               version.description?.trim()
                                 ? version.description
