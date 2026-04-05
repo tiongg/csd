@@ -1051,7 +1051,7 @@ export interface components {
             title?: string;
             description?: string;
             category?: string;
-            tags?: string[];
+            tags: string[];
         };
         Course: {
             /** Format: uuid */
@@ -1085,7 +1085,7 @@ export interface components {
             /** Format: uuid */
             teamId: string;
             category: string;
-            tags?: string[];
+            tags: string[];
         };
         UploadCourseRequest: {
             description: string;

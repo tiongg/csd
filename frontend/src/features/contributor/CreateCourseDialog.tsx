@@ -45,8 +45,8 @@ const courseSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   tags: z
     .array(z.string().max(50, 'Tag must not exceed 50 characters'))
-    .max(8, 'Maximum 8 tags allowed')
-    .optional(),
+    .min(1, 'At least 1 tag is required')
+    .max(8, 'Maximum 8 tags allowed'),
 });
 
 type CourseFormValues = z.infer<typeof courseSchema>;
@@ -107,7 +107,7 @@ export default function CreateCourseDialog({
           description: data.description,
           category: data.category,
           teamId: team.id,
-          tags: data.tags ?? [],
+          tags: data.tags,
         },
       });
     } catch {
@@ -217,7 +217,7 @@ export default function CreateCourseDialog({
               name="tags"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="tags">Tags (Optional)</FieldLabel>
+                  <FieldLabel htmlFor="tags">Tags</FieldLabel>
                   <TagInput
                     value={field.value}
                     onChange={field.onChange}

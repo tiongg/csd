@@ -44,7 +44,10 @@ const courseSchema = z.object({
   title: z.string().min(3, 'Course title must be at least 3 characters'),
   description: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
-  tags: z.array(z.string().max(50, 'Tag must not exceed 50 characters')).max(8, 'Maximum 8 tags allowed').optional(),
+  tags: z
+    .array(z.string().max(50, 'Tag must not exceed 50 characters'))
+    .min(1, 'At least 1 tag is required')
+    .max(8, 'Maximum 8 tags allowed'),
 });
 
 type CourseFormValues = z.infer<typeof courseSchema>;
@@ -79,7 +82,9 @@ export default function EditCourseDialog({
         title: course.title,
         description: course.description ?? '',
         category: course.category,
-        tags: (course as { tags?: string[] }).tags ?? [],
+        tags: (course as { tags?: string[] }).tags?.length
+          ? (course as { tags?: string[] }).tags!
+          : [],
       });
     }
   }, [isOpen, course, reset]);
@@ -115,7 +120,7 @@ export default function EditCourseDialog({
           title: data.title,
           description: data.description,
           category: data.category,
-          tags: data.tags ?? [],
+          tags: data.tags,
         },
       });
     } catch {
@@ -168,10 +173,7 @@ export default function EditCourseDialog({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="category">Category</FieldLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger
                       id="category"
                       className="h-10 border-slate-300 focus-visible:border-slate-400 focus-visible:ring-0"
@@ -223,13 +225,11 @@ export default function EditCourseDialog({
               name="tags"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="tags">
-                    Tags (Optional)
-                  </FieldLabel>
+                  <FieldLabel htmlFor="tags">Tags</FieldLabel>
                   <TagInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Add tags... (max 8)"
+                    placeholder="Add tags... (min 1, max 8)"
                     className="border-slate-300"
                   />
                   {fieldState.invalid && (

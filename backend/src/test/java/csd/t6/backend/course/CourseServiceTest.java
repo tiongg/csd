@@ -38,7 +38,6 @@ import csd.t6.backend.team.TeamService;
 import csd.t6.backend.utils.FileService;
 import csd.t6.jooq.public_.tables.records.ContentVersionRecord;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
-import io.jsonwebtoken.lang.Collections;
 
 @ExtendWith(MockitoExtension.class)
 class CourseServiceTest {
@@ -89,12 +88,13 @@ class CourseServiceTest {
   @Test
   @DisplayName("Should create course successfully when user is team member")
   void shouldCreateCourseSuccessfully() {
+    List<String> tags = List.of("test-tag");
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
     when(courseRepository.create("Test Course", "Desc", creatorId, teamId)).thenReturn(mockCourse);
-    when(tagService.updateCourseTags(courseId, Collections.emptyList())).thenReturn(List.of());
+    when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService.createCourse(
-        new CourseCreateRequest("Test Course", "Desc", teamId, "Others", Collections.emptyList()), creatorId);
+        new CourseCreateRequest("Test Course", "Desc", teamId, "Others", tags), creatorId);
 
     assertThat(result).isNotNull();
     assertThat(result.title()).isEqualTo("Test Course");
@@ -119,10 +119,11 @@ class CourseServiceTest {
   @Test
   @DisplayName("Should throw when creator is not team member")
   void shouldThrowWhenCreatorNotTeamMember() {
+    List<String> tags = List.of("test-tag");
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(false);
 
     assertThatThrownBy(() -> courseService
-        .createCourse(new CourseCreateRequest("Title", "Desc", teamId, "Others", Collections.emptyList()), creatorId))
+        .createCourse(new CourseCreateRequest("Title", "Desc", teamId, "Others", tags), creatorId))
             .isInstanceOf(BadRequestException.class).hasMessageContaining("member of the team");
   }
 
@@ -235,13 +236,14 @@ class CourseServiceTest {
   @Test
   @DisplayName("Should update course when requester is creator")
   void shouldUpdateCourseAsCreator() {
+    List<String> tags = List.of("test-tag");
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
     when(courseRepository.update(eq(courseId), anyString(), isNull(), isNull(), eq(teamId))).thenReturn(mockCourse);
-    when(tagService.updateCourseTags(courseId, Collections.emptyList())).thenReturn(List.of());
+    when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService.updateCourse(courseId,
-        new CourseUpdateRequest("New Title", null, null, Collections.emptyList()), creatorId);
+        new CourseUpdateRequest("New Title", null, null, tags), creatorId);
 
     assertThat(result).isNotNull();
   }
@@ -266,11 +268,12 @@ class CourseServiceTest {
   @DisplayName("Should throw when updater is not creator or team member")
   void shouldThrowWhenUpdaterHasNoPermission() {
     UUID otherId = UUID.randomUUID();
+    List<String> tags = List.of("test-tag");
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
     when(teamService.isTeamMember(teamId, otherId)).thenReturn(false);
 
     assertThatThrownBy(() -> courseService.updateCourse(courseId,
-        new CourseUpdateRequest("Title", null, null, Collections.emptyList()), otherId))
+        new CourseUpdateRequest("Title", null, null, tags), otherId))
             .isInstanceOf(BadRequestException.class);
   }
 
@@ -278,13 +281,14 @@ class CourseServiceTest {
   @DisplayName("Should update course when requester is team member but not creator")
   void shouldUpdateCourseAsTeamMember() {
     UUID otherTeamMemberId = UUID.randomUUID();
+    List<String> tags = List.of("test-tag");
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
     when(teamService.isTeamMember(teamId, otherTeamMemberId)).thenReturn(true);
     when(courseRepository.update(eq(courseId), anyString(), isNull(), isNull(), eq(teamId))).thenReturn(mockCourse);
-    when(tagService.updateCourseTags(courseId, Collections.emptyList())).thenReturn(List.of());
+    when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService.updateCourse(courseId,
-        new CourseUpdateRequest("New Title", null, null, Collections.emptyList()), otherTeamMemberId);
+        new CourseUpdateRequest("New Title", null, null, tags), otherTeamMemberId);
 
     assertThat(result).isNotNull();
   }
@@ -293,10 +297,11 @@ class CourseServiceTest {
   @DisplayName("Should throw when course not found for update")
   void shouldThrowWhenCourseNotFoundForUpdate() {
     UUID otherId = UUID.randomUUID();
+    List<String> tags = List.of("test-tag");
     when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> courseService.updateCourse(courseId,
-        new CourseUpdateRequest("Title", null, null, Collections.emptyList()), otherId))
+        new CourseUpdateRequest("Title", null, null, tags), otherId))
             .isInstanceOf(BadRequestException.class).hasMessageContaining("Course not found");
   }
 
