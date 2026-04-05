@@ -4,6 +4,7 @@ import static csd.t6.jooq.public_.tables.Course.COURSE;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -16,26 +17,35 @@ import csd.t6.backend.contributor.dto.response.ImageUploadResponse;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
+import csd.t6.backend.course.dto.response.FeaturedCourseResponse;
 import csd.t6.backend.course.dto.response.PublishedCourseResponse;
 import csd.t6.backend.exceptions.BadRequestException;
+import csd.t6.backend.exceptions.ForbiddenException;
 import csd.t6.backend.tag.TagService;
+import csd.t6.backend.team.TeamRepository;
 import csd.t6.backend.team.TeamService;
 import csd.t6.backend.utils.FileService;
+import csd.t6.jooq.accounts.enums.Roles;
+import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.public_.tables.records.CourseRecord;
+import csd.t6.jooq.public_.tables.records.TeamRecord;
 
 @Service
 public class CourseService {
   private final CourseRepository courseRepository;
   private final TeamService teamService;
+  private final TeamRepository teamRepository;
   private final AccountRepository accountRepository;
   private final ContentVersionRepository contentVersionRepository;
   private final FileService fileService;
   private final TagService tagService;
 
-  public CourseService(CourseRepository courseRepository, TeamService teamService, AccountRepository accountRepository,
-      ContentVersionRepository contentVersionRepository, FileService fileService, TagService tagService) {
+  public CourseService(CourseRepository courseRepository, TeamService teamService, TeamRepository teamRepository,
+      AccountRepository accountRepository, ContentVersionRepository contentVersionRepository, FileService fileService,
+      TagService tagService) {
     this.courseRepository = courseRepository;
     this.teamService = teamService;
+    this.teamRepository = teamRepository;
     this.accountRepository = accountRepository;
     this.contentVersionRepository = contentVersionRepository;
     this.fileService = fileService;
@@ -187,6 +197,40 @@ public class CourseService {
     if (!teamService.isTeamMember(course.getTeamId(), userId)) {
       throw new BadRequestException("You must be a member of the team to perform this action");
     }
+  }
+
+  public List<FeaturedCourseResponse> getFeaturedCourses() {
+    List<CourseRecord> featuredCourses = courseRepository.findFeaturedCourses();
+
+    return featuredCourses.stream().map(course -> {
+      return contentVersionRepository.findCoursesWithApprovedVersion().stream()
+          .filter(record -> record.course().getId().equals(course.getId())).findFirst().map(record -> {
+            String imageUrl = this.getImageUrlForCourse(record.course());
+            String creatorUsername = this.getCreatorUsername(record.course().getCreatorId());
+            String teamName = this.getTeamName(record.course().getTeamId());
+            List<String> tags = tagService.getTagsForCourse(record.course().getId());
+            return new FeaturedCourseResponse(record.course(), imageUrl, tags, creatorUsername, teamName);
+          }).orElse(null);
+    }).filter(Objects::nonNull).collect(Collectors.toList());
+  }
+
+  public CourseResponse setCourseFeatured(UUID courseId, boolean isFeatured, UUID requesterId) {
+    AccountRecord requesterAccount = accountRepository.findById(requesterId)
+        .orElseThrow(() -> new BadRequestException("Requester account not found"));
+
+    if (requesterAccount.getUserRole() != Roles.ADMIN) {
+      throw new ForbiddenException("Only admins can set featured status");
+    }
+
+    CourseRecord updated = courseRepository.setFeaturedStatus(courseId, isFeatured);
+
+    List<String> tags = tagService.getTagsForCourse(courseId);
+    return new CourseResponse(updated, this.getImageUrlForCourse(updated), tags,
+        this.getCreatorUsername(updated.getCreatorId()));
+  }
+
+  private String getTeamName(UUID teamId) {
+    return teamRepository.findById(teamId).map(TeamRecord::getName).orElse(null);
   }
 
 }

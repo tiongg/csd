@@ -112,6 +112,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/courses/{id}/featured": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set course featured status
+         * @description Sets the featured status of a course. Only admins can set featured status.
+         */
+        put: operations["setCourseFeatured"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/teams/{teamId}/members": {
         parameters: {
             query?: never;
@@ -668,6 +688,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/courses/featured": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get featured courses
+         * @description Retrieves all featured published courses with team names (public endpoint)
+         */
+        get: operations["getFeaturedCourses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/contributor/{courseId}/image-upload-url": {
         parameters: {
             query?: never;
@@ -1026,6 +1066,7 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            isFeatured: boolean;
             imageUrl?: string;
             tags?: string[];
         };
@@ -1173,6 +1214,24 @@ export interface components {
         PublishedCourseResponse: {
             contentVersion: components["schemas"]["ContentVersionResponse"];
             course: components["schemas"]["Course"];
+        };
+        FeaturedCourse: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            description?: string;
+            /** Format: uuid */
+            creatorId: string;
+            creatorUsername?: string;
+            /** Format: uuid */
+            teamId: string;
+            teamName: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            imageUrl?: string;
+            tags?: string[];
         };
         ContributorAnalyticsResponse: {
             engagementSummary: components["schemas"]["CourseEngagementData"];
@@ -1533,6 +1592,39 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Bad request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["HttpErrorPayload"];
+                };
+            };
+        };
+    };
+    setCourseFeatured: {
+        parameters: {
+            query: {
+                isFeatured: boolean;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Course"];
+                };
             };
             /** @description Bad request */
             400: {
@@ -2468,6 +2560,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["PublishedCourseResponse"][];
+                };
+            };
+        };
+    };
+    getFeaturedCourses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["FeaturedCourse"][];
                 };
             };
         };

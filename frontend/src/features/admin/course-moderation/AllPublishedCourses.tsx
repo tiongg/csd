@@ -1,4 +1,5 @@
-import { useApiQuery } from '@/lib/fetch-client';
+import { useApiMutation, useApiQuery } from '@/lib/fetch-client';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import { useMemo } from 'react';
@@ -11,6 +12,28 @@ type AllPublishedCoursesProps = {
 export function AllPublishedCourses({ searchQuery }: AllPublishedCoursesProps) {
   const { data: courses } = useApiQuery('get', '/api/courses/published');
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const setFeaturedMutation = useApiMutation(
+    'put',
+    '/api/courses/{id}/featured',
+  );
+
+  const handleSetFeatured = (courseId: string, isFeatured: boolean) => {
+    setFeaturedMutation.mutate(
+      {
+        params: { path: { id: courseId as any }, query: { isFeatured } },
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ['get', '/api/courses/published'],
+          });
+        },
+      },
+    );
+  };
+
   const courseList = courses ?? [];
 
   const filteredCourses = useMemo(() => {
@@ -71,6 +94,10 @@ export function AllPublishedCourses({ searchQuery }: AllPublishedCoursesProps) {
               description={course.description}
               imageUrl={course.imageUrl}
               tags={course.tags ?? []}
+              isFeatured={course.isFeatured}
+              onToggleFeatured={() =>
+                handleSetFeatured(course.id, !course.isFeatured)
+              }
               onClick={() =>
                 navigate({
                   to: '/admin/review/$versionId',
