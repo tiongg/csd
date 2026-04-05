@@ -133,7 +133,7 @@ class CourseServiceTest {
   @DisplayName("Should return course by ID")
   void shouldReturnCourseById() {
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
-    when(tagService.getTagsForCourse(courseId)).thenReturn(List.of());
+    when(tagService.getTagsForCourse(courseId)).thenReturn(List.of("test-tag"));
 
     CourseResponse result = courseService.getCourseById(courseId);
 
@@ -156,7 +156,7 @@ class CourseServiceTest {
   @DisplayName("Should return all courses")
   void shouldReturnAllCourses() {
     when(courseRepository.findAll()).thenReturn(List.of(mockCourse));
-    when(tagService.getTagsForCourse(courseId)).thenReturn(List.of());
+    when(tagService.getTagsForCourse(courseId)).thenReturn(List.of("test-tag"));
 
     List<CourseResponse> result = courseService.getAllCourses();
 
@@ -239,7 +239,7 @@ class CourseServiceTest {
     List<String> tags = List.of("test-tag");
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
-    when(courseRepository.update(eq(courseId), anyString(), isNull(), isNull(), eq(teamId))).thenReturn(mockCourse);
+    when(courseRepository.update(eq(courseId), anyString(), anyString(), isNull(), eq(teamId))).thenReturn(mockCourse);
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService.updateCourse(courseId,
@@ -254,7 +254,7 @@ class CourseServiceTest {
     List<String> tags = List.of("Java", "Backend");
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
-    when(courseRepository.update(eq(courseId), anyString(), isNull(), isNull(), eq(teamId))).thenReturn(mockCourse);
+    when(courseRepository.update(eq(courseId), anyString(), anyString(), isNull(), eq(teamId))).thenReturn(mockCourse);
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService.updateCourse(courseId, new CourseUpdateRequest("New Title", "This is a test description for the course", null, tags),
@@ -284,7 +284,7 @@ class CourseServiceTest {
     List<String> tags = List.of("test-tag");
     when(courseRepository.findById(courseId)).thenReturn(Optional.of(mockCourse));
     when(teamService.isTeamMember(teamId, otherTeamMemberId)).thenReturn(true);
-    when(courseRepository.update(eq(courseId), anyString(), isNull(), isNull(), eq(teamId))).thenReturn(mockCourse);
+    when(courseRepository.update(eq(courseId), anyString(), anyString(), isNull(), eq(teamId))).thenReturn(mockCourse);
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService.updateCourse(courseId,
