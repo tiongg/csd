@@ -45,7 +45,7 @@ const courseSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   tags: z
     .array(z.string().max(50, 'Tag must not exceed 50 characters'))
-    .max(5, 'Maximum 5 tags allowed')
+    .max(8, 'Maximum 8 tags allowed')
     .optional(),
 });
 
@@ -221,7 +221,7 @@ export default function CreateCourseDialog({
                   <TagInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Add tags... (max 5)"
+                    placeholder="Add tags... (max 8)"
                     className="border-slate-300"
                   />
                   {fieldState.invalid && (

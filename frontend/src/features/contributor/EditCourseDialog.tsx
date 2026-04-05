@@ -44,7 +44,7 @@ const courseSchema = z.object({
   title: z.string().min(3, 'Course title must be at least 3 characters'),
   description: z.string().optional(),
   category: z.string().min(1, 'Category is required'),
-  tags: z.array(z.string().max(50, 'Tag must not exceed 50 characters')).max(5, 'Maximum 5 tags allowed').optional(),
+  tags: z.array(z.string().max(50, 'Tag must not exceed 50 characters')).max(8, 'Maximum 8 tags allowed').optional(),
 });
 
 type CourseFormValues = z.infer<typeof courseSchema>;
@@ -229,7 +229,7 @@ export default function EditCourseDialog({
                   <TagInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Add tags... (max 5)"
+                    placeholder="Add tags... (max 8)"
                     className="border-slate-300"
                   />
                   {fieldState.invalid && (
