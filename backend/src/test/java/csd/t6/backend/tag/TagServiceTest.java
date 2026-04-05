@@ -152,7 +152,7 @@ class TagServiceTest {
   @Test
   @DisplayName("Should throw when tag count exceeds maximum")
   void shouldThrowWhenTagCountExceedsMaximum() {
-    List<String> tooManyTags = List.of("Tag1", "Tag2", "Tag3", "Tag4", "Tag5", "Tag6");
+    List<String> tooManyTags = List.of("Tag1", "Tag2", "Tag3", "Tag4", "Tag5", "Tag6", "Tag7", "Tag8", "Tag9");
 
     assertThatThrownBy(() -> tagService.updateCourseTags(courseId, tooManyTags)).isInstanceOf(BadRequestException.class)
         .hasMessageContaining("Maximum 5 tags");
