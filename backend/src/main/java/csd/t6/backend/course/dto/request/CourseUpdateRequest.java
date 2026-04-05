@@ -7,6 +7,6 @@ import jakarta.validation.constraints.Size;
 
 @Schema(name = "CourseUpdateRequest")
 public record CourseUpdateRequest(
-    @Size(min = 3, max = 200, message = "Title must be between 3 and 200 characters") String title,
-    @Size(max = 1000, message = "Description must not exceed 1000 characters") String description,
-    @Size(max = 5, message = "Maximum 5 tags allowed") List<@Size(max = 50, message = "Tag title must not exceed 50 characters") String> tags) {}
+        @Size(min = 3, max = 200, message = "Title must be between 3 and 200 characters") String title,
+        @Size(max = 1000, message = "Description must not exceed 1000 characters") String description, String category,
+        @Size(max = 5, message = "Maximum 5 tags allowed") List<@Size(max = 50, message = "Tag title must not exceed 50 characters") String> tags) {}

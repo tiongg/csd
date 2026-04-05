@@ -11,6 +11,7 @@ type CourseModerationCardProps = {
   description?: string | null;
   imageUrl?: string | null;
   tags?: string[];
+  category: string;
   footerText?: string;
   onClick: () => void;
   isFeatured?: boolean;
@@ -25,6 +26,7 @@ export function CourseModerationCard({
   description,
   imageUrl,
   tags,
+  category,
   footerText,
   onClick,
   isFeatured,
@@ -83,6 +85,11 @@ export function CourseModerationCard({
         )}
       </div>
       <CardHeader className="space-y-1.5 p-4 pb-1">
+        <div className="mb-2">
+          <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+            {category}
+          </span>
+        </div>
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="line-clamp-1 text-lg font-bold text-slate-900">
             {title}

@@ -23,7 +23,7 @@ export function CourseCard({
   enrollment,
   variant = 'enrolled',
 }: CourseCardProps) {
-  const { title, description, id, tags, imageUrl } = course;
+  const { title, description, id, tags, imageUrl, category } = course;
   const courseWithCreatorMeta = course as CourseWithCreatorMeta;
   const creatorName =
     courseWithCreatorMeta.creatorUsername ??
@@ -68,6 +68,11 @@ export function CourseCard({
       </div>
       <div className="p-5">
         <div>
+          <div className="mb-2">
+            <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+              {category}
+            </span>
+          </div>
           <div className="flex items-start justify-between gap-2">
             <h3 className="line-clamp-2 text-xl leading-snug font-semibold text-slate-900">
               {title}

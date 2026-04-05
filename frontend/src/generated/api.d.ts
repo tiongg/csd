@@ -1050,6 +1050,7 @@ export interface components {
         CourseUpdateRequest: {
             title?: string;
             description?: string;
+            category?: string;
             tags?: string[];
         };
         Course: {
@@ -1067,6 +1068,7 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             isFeatured: boolean;
+            category: string;
             imageUrl?: string;
             tags?: string[];
         };
@@ -1082,6 +1084,7 @@ export interface components {
             description?: string;
             /** Format: uuid */
             teamId: string;
+            category: string;
             tags?: string[];
         };
         UploadCourseRequest: {

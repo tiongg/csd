@@ -250,9 +250,16 @@ function CourseCard({ course, teamId }: CourseCardProps) {
           <div className="p-4">
             <div className="space-y-1.5">
               <div className="flex items-start justify-between gap-3">
-                <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
-                  {course.title}
-                </h3>
+                <div className="flex-1">
+                  <div className="mb-1.5">
+                    <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                      {course.category}
+                    </span>
+                  </div>
+                  <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
+                    {course.title}
+                  </h3>
+                </div>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
