@@ -92,7 +92,7 @@ class CourseRepositoryTest {
     void shouldUpdateCourseTitle() {
         CourseRecord course = courseRepository.create("Old Title", "Desc", creator.getId(), team.getId());
 
-        CourseRecord updated = courseRepository.update(course.getId(), "New Title", null, null);
+        CourseRecord updated = courseRepository.update(course.getId(), "New Title", null, null, null);
 
         assertThat(updated.getTitle()).isEqualTo("New Title");
         assertThat(updated.getDescription()).isEqualTo("Desc");
