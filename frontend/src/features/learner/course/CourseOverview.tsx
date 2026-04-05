@@ -41,7 +41,7 @@ export default function CourseOverview({
             )}
             <Badge variant="secondary" className="gap-1.5">
               <BookOpen className="h-3 w-3" />
-              Course
+              {course.category}
             </Badge>
           </div>
           <CardDescription>
