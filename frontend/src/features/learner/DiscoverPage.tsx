@@ -1,4 +1,11 @@
 import SearchBar from '@/components/ui/searchbar';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Heading1 } from '@/components/ui/typography';
 import { useApiQuery } from '@/lib/fetch-client';
 import { useMemo, useState } from 'react';
@@ -9,18 +16,31 @@ const glassPanelClass =
 
 export default function DiscoverPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const {
     data: courses,
     isLoading,
     isError,
   } = useApiQuery('get', '/api/courses/published', {});
 
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set(
+      (courses ?? []).map(({ course }) => course.category),
+    );
+    return Array.from(uniqueCategories).sort();
+  }, [courses]);
+
   const filteredCourses = useMemo(
     () =>
-      (courses ?? []).filter(({ course }) =>
-        course.title.toLowerCase().includes(searchQuery.toLowerCase()),
-      ),
-    [courses, searchQuery],
+      (courses ?? []).filter(({ course }) => {
+        const matchesSearch = course.title
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const matchesCategory =
+          selectedCategory === 'all' || course.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+      }),
+    [courses, searchQuery, selectedCategory],
   );
 
   return (
@@ -37,7 +57,35 @@ export default function DiscoverPage() {
         </section>
 
         <section className={`${glassPanelClass} flex flex-1 flex-col`}>
-          <div className="mb-4 flex justify-end">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedCategory !== 'all' && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-slate-600">Filtered by:</span>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategory('all')}
+                    className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-200"
+                  >
+                    {selectedCategory}
+                    <span className="ml-1">×</span>
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="w-full sm:w-72">
               <SearchBar
                 placeholder="Search courses"
