@@ -42,7 +42,10 @@ type EditCourseDialogProps = {
 
 const courseSchema = z.object({
   title: z.string().min(3, 'Course title must be at least 3 characters'),
-  description: z.string().optional(),
+  description: z
+    .string()
+    .min(10, 'Description must be at least 10 characters')
+    .max(1000, 'Description must not exceed 1000 characters'),
   category: z.string().min(1, 'Category is required'),
   tags: z
     .array(z.string().max(50, 'Tag must not exceed 50 characters'))
@@ -70,7 +73,7 @@ export default function EditCourseDialog({
     resolver: zodResolver(courseSchema),
     defaultValues: {
       title: course.title,
-      description: course.description ?? '',
+      description: course.description ?? 'Default description for this course',
       category: course.category,
       tags: (course as { tags?: string[] }).tags ?? [],
     },
@@ -80,7 +83,7 @@ export default function EditCourseDialog({
     if (isOpen) {
       reset({
         title: course.title,
-        description: course.description ?? '',
+        description: course.description,
         category: course.category,
         tags: (course as { tags?: string[] }).tags?.length
           ? (course as { tags?: string[] }).tags!
@@ -202,9 +205,7 @@ export default function EditCourseDialog({
               name="description"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="description">
-                    Description (Optional)
-                  </FieldLabel>
+                  <FieldLabel htmlFor="description">Description</FieldLabel>
                   <Textarea
                     {...field}
                     id="description"

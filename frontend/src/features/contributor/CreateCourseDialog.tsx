@@ -41,7 +41,7 @@ type CreateCourseDialogProps = {
 
 const courseSchema = z.object({
   title: z.string().min(3, 'Course title must be at least 3 characters'),
-  description: z.string().optional(),
+  description: z.string().min(10, 'Description must be at least 10 characters').max(1000, 'Description must not exceed 1000 characters'),
   category: z.string().min(1, 'Category is required'),
   tags: z
     .array(z.string().max(50, 'Tag must not exceed 50 characters'))
@@ -195,7 +195,7 @@ export default function CreateCourseDialog({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="description">
-                    Description (Optional)
+                    Description
                   </FieldLabel>
                   <Textarea
                     {...field}

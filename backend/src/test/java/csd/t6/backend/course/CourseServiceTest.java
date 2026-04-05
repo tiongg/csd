@@ -90,11 +90,11 @@ class CourseServiceTest {
   void shouldCreateCourseSuccessfully() {
     List<String> tags = List.of("test-tag");
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
-    when(courseRepository.create("Test Course", "Desc", creatorId, teamId)).thenReturn(mockCourse);
+    when(courseRepository.create("Test Course", "This is a test description for the course", creatorId, teamId)).thenReturn(mockCourse);
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService.createCourse(
-        new CourseCreateRequest("Test Course", "Desc", teamId, "Others", tags), creatorId);
+        new CourseCreateRequest("Test Course", "This is a test description for the course", teamId, "Others", tags), creatorId);
 
     assertThat(result).isNotNull();
     assertThat(result.title()).isEqualTo("Test Course");
@@ -106,11 +106,11 @@ class CourseServiceTest {
   void shouldCreateCourseWithTags() {
     List<String> tags = List.of("Skibidi", "Chungus", "Rizz");
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
-    when(courseRepository.create("Test Course", "Desc", creatorId, teamId)).thenReturn(mockCourse);
+    when(courseRepository.create("Test Course", "This is a test description for the course", creatorId, teamId)).thenReturn(mockCourse);
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService
-        .createCourse(new CourseCreateRequest("Test Course", "Desc", teamId, "Others", tags), creatorId);
+        .createCourse(new CourseCreateRequest("Test Course", "This is a test description for the course", teamId, "Others", tags), creatorId);
 
     assertThat(result).isNotNull();
     assertThat(result.tags()).isEqualTo(tags);
@@ -123,7 +123,7 @@ class CourseServiceTest {
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(false);
 
     assertThatThrownBy(() -> courseService
-        .createCourse(new CourseCreateRequest("Title", "Desc", teamId, "Others", tags), creatorId))
+        .createCourse(new CourseCreateRequest("Title", "This is a test description for the course", teamId, "Others", tags), creatorId))
             .isInstanceOf(BadRequestException.class).hasMessageContaining("member of the team");
   }
 
@@ -243,7 +243,7 @@ class CourseServiceTest {
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService.updateCourse(courseId,
-        new CourseUpdateRequest("New Title", null, null, tags), creatorId);
+        new CourseUpdateRequest("New Title", "This is a test description for the course", null, tags), creatorId);
 
     assertThat(result).isNotNull();
   }
@@ -257,7 +257,7 @@ class CourseServiceTest {
     when(courseRepository.update(eq(courseId), anyString(), isNull(), isNull(), eq(teamId))).thenReturn(mockCourse);
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
-    CourseResponse result = courseService.updateCourse(courseId, new CourseUpdateRequest("New Title", null, null, tags),
+    CourseResponse result = courseService.updateCourse(courseId, new CourseUpdateRequest("New Title", "This is a test description for the course", null, tags),
         creatorId);
 
     assertThat(result).isNotNull();
@@ -273,7 +273,7 @@ class CourseServiceTest {
     when(teamService.isTeamMember(teamId, otherId)).thenReturn(false);
 
     assertThatThrownBy(() -> courseService.updateCourse(courseId,
-        new CourseUpdateRequest("Title", null, null, tags), otherId))
+        new CourseUpdateRequest("Title", "This is a test description for the course", null, tags), otherId))
             .isInstanceOf(BadRequestException.class);
   }
 
@@ -288,7 +288,7 @@ class CourseServiceTest {
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService.updateCourse(courseId,
-        new CourseUpdateRequest("New Title", null, null, tags), otherTeamMemberId);
+        new CourseUpdateRequest("New Title", "This is a test description for the course", null, tags), otherTeamMemberId);
 
     assertThat(result).isNotNull();
   }
@@ -301,7 +301,7 @@ class CourseServiceTest {
     when(courseRepository.findById(courseId)).thenReturn(Optional.empty());
 
     assertThatThrownBy(() -> courseService.updateCourse(courseId,
-        new CourseUpdateRequest("Title", null, null, tags), otherId))
+        new CourseUpdateRequest("Title", "This is a test description for the course", null, tags), otherId))
             .isInstanceOf(BadRequestException.class).hasMessageContaining("Course not found");
   }
 

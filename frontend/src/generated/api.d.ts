@@ -1049,7 +1049,7 @@ export interface components {
         };
         CourseUpdateRequest: {
             title?: string;
-            description?: string;
+            description: string;
             category?: string;
             tags: string[];
         };
@@ -1057,7 +1057,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             title: string;
-            description?: string;
+            description: string;
             /** Format: uuid */
             creatorId: string;
             creatorUsername?: string;
@@ -1081,7 +1081,7 @@ export interface components {
         };
         CourseCreateRequest: {
             title: string;
-            description?: string;
+            description: string;
             /** Format: uuid */
             teamId: string;
             category: string;
