@@ -51,4 +51,8 @@ public class AccountRepository extends BaseRepository<AccountRecord> {
   public Optional<String> findUsernameById(UUID accountId) {
     return this.findOneBy(ACCOUNT.ID, accountId).map(AccountRecord::getUsername);
   }
+
+  public Optional<AccountRecord> findById(UUID accountId) {
+    return this.findOneBy(ACCOUNT.ID, accountId);
+  }
 }

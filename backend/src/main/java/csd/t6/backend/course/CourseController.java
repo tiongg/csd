@@ -19,7 +19,9 @@ import csd.t6.backend.contributor.dto.response.ImageUploadResponse;
 import csd.t6.backend.course.dto.request.CourseCreateRequest;
 import csd.t6.backend.course.dto.request.CourseUpdateRequest;
 import csd.t6.backend.course.dto.response.CourseResponse;
+import csd.t6.backend.course.dto.response.FeaturedCourseResponse;
 import csd.t6.backend.course.dto.response.PublishedCourseResponse;
+import csd.t6.backend.decorators.auth.PublicDecorator;
 import csd.t6.backend.decorators.responses.BadRequestResponse;
 import csd.t6.backend.decorators.responses.CreatedResponse;
 import csd.t6.backend.decorators.responses.NoContentResponse;
@@ -101,5 +103,23 @@ public class CourseController {
   @Operation(summary = "Delete course image", description = "Deletes the course thumbnail image. Only team members can delete.")
   public void deleteImage(@PathVariable UUID courseId, @AuthenticationPrincipal AuthUserDetails userDetails) {
     this.courseService.deleteImage(courseId, userDetails.getId());
+  }
+
+  @PublicDecorator
+  @GetMapping("/featured")
+  @OkResponse
+  @Operation(summary = "Get featured courses", description = "Retrieves all featured published courses with team names (public endpoint)")
+  public List<FeaturedCourseResponse> getFeaturedCourses() {
+    return courseService.getFeaturedCourses();
+  }
+
+  @PutMapping("/{id}/featured")
+  @OkResponse
+  @BadRequestResponse
+  @Operation(summary = "Set course featured status", description = "Sets the featured status of a course. Only admins can set featured status.")
+  public CourseResponse setCourseFeatured(@PathVariable UUID id,
+      @RequestParam boolean isFeatured,
+      @AuthenticationPrincipal AuthUserDetails userDetails) {
+    return courseService.setCourseFeatured(id, isFeatured, userDetails.getId());
   }
 }

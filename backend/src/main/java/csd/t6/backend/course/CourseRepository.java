@@ -51,4 +51,17 @@ public class CourseRepository extends BaseRepository<CourseRecord> {
   public void delete(UUID id) {
     dsl.deleteFrom(COURSE).where(COURSE.ID.eq(id)).execute();
   }
+
+  public List<CourseRecord> findFeaturedCourses() {
+    return dsl.selectFrom(COURSE)
+        .where(COURSE.IS_FEATURED.eq(true))
+        .fetch();
+  }
+
+  public CourseRecord setFeaturedStatus(UUID id, boolean isFeatured) {
+    CourseRecord course = findById(id).orElseThrow();
+    course.setIsFeatured(isFeatured);
+    course.store();
+    return course;
+  }
 }
