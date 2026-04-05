@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { Star, StarOff } from 'lucide-react';
 
 type CourseModerationCardProps = {
   title: string;
@@ -12,6 +13,8 @@ type CourseModerationCardProps = {
   tags?: string[];
   footerText?: string;
   onClick: () => void;
+  isFeatured?: boolean;
+  onToggleFeatured?: (e: React.MouseEvent) => void;
 };
 
 export function CourseModerationCard({
@@ -24,6 +27,8 @@ export function CourseModerationCard({
   tags,
   footerText,
   onClick,
+  isFeatured,
+  onToggleFeatured,
 }: CourseModerationCardProps) {
   const shouldRenderTags = tags !== undefined;
   const tagsList = tags ?? [];
@@ -60,6 +65,14 @@ export function CourseModerationCard({
         >
           Version {versionNumber}
         </Badge>
+        {isFeatured && (
+          <Badge
+            variant="outline"
+            className="pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 border-amber-300 bg-amber-50 text-amber-700"
+          >
+            Featured
+          </Badge>
+        )}
         {creatorUsername && (
           <Badge
             variant="outline"
@@ -74,9 +87,28 @@ export function CourseModerationCard({
           <CardTitle className="line-clamp-1 text-lg font-bold text-slate-900">
             {title}
           </CardTitle>
-          <span className="shrink-0 text-xs font-medium text-slate-500">
-            {dateLabel}
-          </span>
+          <div className="flex items-center gap-2">
+            {onToggleFeatured && (
+              <button
+                type="button"
+                className="shrink-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleFeatured(e);
+                }}
+                aria-label={isFeatured ? 'Unfeature course' : 'Feature course'}
+              >
+                {isFeatured ? (
+                  <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+                ) : (
+                  <StarOff className="h-5 w-5 text-slate-400" />
+                )}
+              </button>
+            )}
+            <span className="shrink-0 text-xs font-medium text-slate-500">
+              {dateLabel}
+            </span>
+          </div>
         </div>
         <p className="line-clamp-2 text-sm leading-relaxed text-slate-600">
           {description || 'No description provided'}

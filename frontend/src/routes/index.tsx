@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { useApiQuery } from '@/lib/fetch-client';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
@@ -20,45 +21,12 @@ function App() {
     Autoplay({ delay: 3200, stopOnInteraction: false, stopOnMouseEnter: true }),
   );
 
+  const { data: featuredCourses, isLoading: isLoadingFeatured } = useApiQuery(
+    'get',
+    '/api/courses/featured'
+  );
+
   const weeklyCompletion = [42, 51, 57, 63, 68, 74, 79];
-  const coursePreviews = [
-    {
-      title: 'Corecore and Emotional Montage Edits',
-      instructor: 'By Youth Signals Desk',
-      image:
-        'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=1200&q=80',
-      imagePosition: 'center center',
-      summary:
-        'Learn why emotionally layered montage edits are driving saves and rewatches across global youth audiences.',
-    },
-    {
-      title: 'Street Interview Vox-Pops and Fast Cuts',
-      instructor: 'By Platform Intelligence Team',
-      image:
-        'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80',
-      imagePosition: 'center center',
-      summary:
-        'Decode how quick question hooks and jump-cut pacing improve hold rate in public interview content.',
-    },
-    {
-      title: 'Clean Girl to Office Siren Style Shift',
-      instructor: 'By Culture Research Unit',
-      image:
-        'https://images.unsplash.com/photo-1445205170230-053b83016050?auto=format&fit=crop&w=1200&q=80',
-      imagePosition: 'center 40%',
-      summary:
-        'Map the shift from soft-minimal beauty culture to sharper workwear-coded identity signaling across feeds.',
-    },
-    {
-      title: 'Underconsumption Core and No-Buy Diaries',
-      instructor: 'By Strategy Applications Team',
-      image:
-        'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&w=1200&q=80',
-      imagePosition: 'center center',
-      summary:
-        'Translate anti-haul and mindful-spending content into practical messaging choices for teams and educators.',
-    },
-  ];
   const chartWidth = 620;
   const chartHeight = 240;
   const chartPadding = 24;
@@ -208,56 +176,77 @@ function App() {
             </h2>
           </div>
 
-          <Carousel
-            opts={{ loop: true, align: 'start' }}
-            plugins={[autoplay.current]}
-            className="w-full"
-          >
-            <CarouselContent>
-              {coursePreviews.map((course) => (
-                <CarouselItem
-                  key={course.title}
-                  className="basis-full sm:basis-1/2"
-                >
-                  <Link
-                    to="/login"
-                    className="group block h-full overflow-hidden rounded-2xl border border-slate-200 bg-white/85 transition-colors hover:border-sky-300"
+          {isLoadingFeatured ? (
+            <div className="flex min-h-[360px] items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70">
+              <p className="animate-pulse text-sm text-slate-500">Loading featured courses...</p>
+            </div>
+          ) : !featuredCourses || featuredCourses.length === 0 ? (
+            <div className="flex min-h-[360px] items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70">
+              <p className="text-sm text-slate-500">No featured courses available yet.</p>
+            </div>
+          ) : (
+            <Carousel
+              opts={{ loop: true, align: 'start' }}
+              plugins={[autoplay.current]}
+              className="w-full"
+            >
+              <CarouselContent>
+                {featuredCourses.map((course) => (
+                  <CarouselItem
+                    key={course.id}
+                    className="basis-full sm:basis-1/2"
                   >
-                    <div className="relative h-64 w-full overflow-hidden">
-                      {course.image ? (
-                        <img
-                          src={course.image}
-                          alt={course.title}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          style={{ objectPosition: course.imagePosition }}
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-xs font-medium tracking-wide text-slate-500 uppercase">
-                          No image
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-5">
-                      <h3 className="text-xl leading-snug font-semibold text-slate-900">
-                        {course.title}
-                      </h3>
-                      <p className="mt-1 text-sm font-medium text-slate-600">
-                        {course.instructor}
-                      </p>
-                      <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                        {course.summary}
-                      </p>
-                      <p className="mt-4 text-sm font-semibold text-sky-700 underline-offset-4 group-hover:underline">
-                        View course
-                      </p>
-                    </div>
-                  </Link>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-          </Carousel>
+                    <Link
+                      to="/login"
+                      className="group block h-full overflow-hidden rounded-2xl border border-slate-200 bg-white/85 transition-colors hover:border-sky-300"
+                    >
+                      <div className="relative h-64 w-full overflow-hidden">
+                        {course.imageUrl ? (
+                          <img
+                            src={course.imageUrl}
+                            alt={course.title}
+                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-xs font-medium tracking-wide text-slate-500 uppercase">
+                            No image
+                          </div>
+                        )}
+                        <span className="pointer-events-none absolute right-3 bottom-3 inline-flex items-center rounded-full border border-slate-300 bg-white/95 px-2.5 py-1 text-xs font-medium text-slate-700">
+                          By {course.teamName || course.creatorUsername || 'Course creator'}
+                        </span>
+                      </div>
+                      <div className="p-5">
+                        <h3 className="line-clamp-2 text-xl leading-snug font-semibold text-slate-900">
+                          {course.title}
+                        </h3>
+                        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-600">
+                          {course.description || 'No description provided'}
+                        </p>
+                        {course.tags && course.tags.length > 0 && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {course.tags.slice(0, 3).map((tag) => (
+                              <span
+                                key={tag}
+                                className="inline-flex items-center rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <p className="mt-4 text-sm font-semibold text-sky-700 underline-offset-4 group-hover:underline">
+                          View course
+                        </p>
+                      </div>
+                    </Link>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+          )}
         </section>
 
         <section className="pb-6 text-center">
