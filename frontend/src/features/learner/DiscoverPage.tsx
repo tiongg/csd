@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Heading1 } from '@/components/ui/typography';
+import { useAuth } from '@/context/AuthContext';
 import { useApiQuery } from '@/lib/fetch-client';
 import { useMemo, useState } from 'react';
 import { CourseCard } from './course-card/CourseCard';
@@ -16,7 +17,10 @@ const glassPanelClass =
 
 export default function DiscoverPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const { preferences } = useAuth();
+  const [selectedCategory, setSelectedCategory] = useState<string>(() =>
+    preferences && preferences.length > 0 ? 'for-me' : 'all',
+  );
   const {
     data: courses,
     isLoading,
@@ -37,10 +41,17 @@ export default function DiscoverPage() {
           .toLowerCase()
           .includes(searchQuery.toLowerCase());
         const matchesCategory =
-          selectedCategory === 'all' || course.category === selectedCategory;
-        return matchesSearch && matchesCategory;
+          selectedCategory === 'all' ||
+          selectedCategory === 'for-me' ||
+          course.category === selectedCategory;
+        const matchesPreferences =
+          selectedCategory !== 'for-me' ||
+          !preferences ||
+          preferences.length === 0 ||
+          preferences.includes(course.category);
+        return matchesSearch && matchesCategory && matchesPreferences;
       }),
-    [courses, searchQuery, selectedCategory],
+    [courses, searchQuery, selectedCategory, preferences],
   );
 
   return (
@@ -68,6 +79,9 @@ export default function DiscoverPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
+                  {preferences && preferences.length > 0 && (
+                    <SelectItem value="for-me">For Me</SelectItem>
+                  )}
                   {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
@@ -75,19 +89,6 @@ export default function DiscoverPage() {
                   ))}
                 </SelectContent>
               </Select>
-              {selectedCategory !== 'all' && (
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-slate-600">Filtered by:</span>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCategory('all')}
-                    className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-200"
-                  >
-                    {selectedCategory}
-                    <span className="ml-1">×</span>
-                  </button>
-                </div>
-              )}
             </div>
             <div className="w-full sm:w-72">
               <SearchBar
