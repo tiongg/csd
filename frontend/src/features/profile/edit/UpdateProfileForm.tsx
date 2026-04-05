@@ -20,6 +20,7 @@ import { useAuth } from '@/context/AuthContext';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import { uploadProfilePicture } from '@/lib/file-upload';
 import { capitalizeFirst, cn } from '@/lib/utils';
+import { Link } from '@tanstack/react-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { User } from 'lucide-react';
@@ -270,14 +271,22 @@ export default function UpdateProfileForm() {
               {capitalizeFirst(user.role)}
             </p>
             <p className="text-sm text-slate-500">{user.email}</p>
-            {user.role === 'LEARNER' && (
-              <p
-                className="cursor-pointer text-sm font-medium text-slate-700 underline underline-offset-2 hover:text-slate-900"
-                onClick={() => applyContributor({})}
+            <div className="flex flex-wrap gap-3">
+              {user.role === 'LEARNER' && (
+                <p
+                  className="cursor-pointer text-sm font-medium text-slate-700 underline underline-offset-2 hover:text-slate-900"
+                  onClick={() => applyContributor({})}
+                >
+                  Apply to be contributor
+                </p>
+              )}
+              <Link
+                to="/preference"
+                className="text-sm font-medium text-slate-700 underline underline-offset-2 hover:text-slate-900"
               >
-                Apply to be contributor
-              </p>
-            )}
+                Update learning preferences
+              </Link>
+            </div>
           </div>
         </div>
 
