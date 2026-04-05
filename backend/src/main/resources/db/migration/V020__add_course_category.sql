@@ -1,0 +1,2 @@
+ALTER TABLE course
+ADD COLUMN category VARCHAR NOT NULL DEFAULT 'Others';

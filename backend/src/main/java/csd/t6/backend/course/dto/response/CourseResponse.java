@@ -9,9 +9,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(name = "Course")
-public record CourseResponse(@NotNull UUID id, @NotNull String title, String description, @NotNull UUID creatorId,
-    String creatorUsername, @NotNull UUID teamId, @NotNull OffsetDateTime createdAt, @NotNull OffsetDateTime updatedAt,
-    @NotNull boolean isFeatured, String imageUrl, List<String> tags) {
+public record CourseResponse(@NotNull UUID id, @NotNull String title, @NotNull String description,
+    @NotNull UUID creatorId, String creatorUsername, @NotNull UUID teamId, @NotNull OffsetDateTime createdAt,
+    @NotNull OffsetDateTime updatedAt, @NotNull boolean isFeatured, @NotNull String category, String imageUrl,
+    List<String> tags) {
 
   public CourseResponse(CourseRecord course, String imageUrl, List<String> tags) {
     this(course, imageUrl, tags, null);
@@ -19,6 +20,7 @@ public record CourseResponse(@NotNull UUID id, @NotNull String title, String des
 
   public CourseResponse(CourseRecord course, String imageUrl, List<String> tags, String creatorUsername) {
     this(course.getId(), course.getTitle(), course.getDescription(), course.getCreatorId(), creatorUsername,
-        course.getTeamId(), course.getCreatedAt(), course.getUpdatedAt(), course.getIsFeatured(), imageUrl, tags);
+        course.getTeamId(), course.getCreatedAt(), course.getUpdatedAt(), course.getIsFeatured(), course.getCategory(),
+        imageUrl, tags);
   }
 }

@@ -14,8 +14,16 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { TagInput } from '@/components/ui/tag-input';
 import { Textarea } from '@/components/ui/textarea';
+import { CATEGORY_OPTIONS } from '@/features/preference/constants';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import type { Course } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,8 +42,15 @@ type EditCourseDialogProps = {
 
 const courseSchema = z.object({
   title: z.string().min(3, 'Course title must be at least 3 characters'),
-  description: z.string().optional(),
-  tags: z.array(z.string().max(50, 'Tag must not exceed 50 characters')).max(5, 'Maximum 5 tags allowed').optional(),
+  description: z
+    .string()
+    .min(10, 'Description must be at least 10 characters')
+    .max(1000, 'Description must not exceed 1000 characters'),
+  category: z.string().min(1, 'Category is required'),
+  tags: z
+    .array(z.string().max(50, 'Tag must not exceed 50 characters'))
+    .min(1, 'At least 1 tag is required')
+    .max(8, 'Maximum 8 tags allowed'),
 });
 
 type CourseFormValues = z.infer<typeof courseSchema>;
@@ -58,7 +73,8 @@ export default function EditCourseDialog({
     resolver: zodResolver(courseSchema),
     defaultValues: {
       title: course.title,
-      description: course.description ?? '',
+      description: course.description ?? 'Default description for this course',
+      category: course.category,
       tags: (course as { tags?: string[] }).tags ?? [],
     },
   });
@@ -67,8 +83,11 @@ export default function EditCourseDialog({
     if (isOpen) {
       reset({
         title: course.title,
-        description: course.description ?? '',
-        tags: (course as { tags?: string[] }).tags ?? [],
+        description: course.description,
+        category: course.category,
+        tags: (course as { tags?: string[] }).tags?.length
+          ? (course as { tags?: string[] }).tags!
+          : [],
       });
     }
   }, [isOpen, course, reset]);
@@ -103,7 +122,8 @@ export default function EditCourseDialog({
         body: {
           title: data.title,
           description: data.description,
-          tags: data.tags ?? [],
+          category: data.category,
+          tags: data.tags,
         },
       });
     } catch {
@@ -152,12 +172,40 @@ export default function EditCourseDialog({
           <FieldGroup>
             <Controller
               control={control}
+              name="category"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor="category">Category</FieldLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger
+                      id="category"
+                      className="h-10 border-slate-300 focus-visible:border-slate-400 focus-visible:ring-0"
+                    >
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORY_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </FieldGroup>
+
+          <FieldGroup>
+            <Controller
+              control={control}
               name="description"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="description">
-                    Description (Optional)
-                  </FieldLabel>
+                  <FieldLabel htmlFor="description">Description</FieldLabel>
                   <Textarea
                     {...field}
                     id="description"
@@ -178,13 +226,11 @@ export default function EditCourseDialog({
               name="tags"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="tags">
-                    Tags (Optional)
-                  </FieldLabel>
+                  <FieldLabel htmlFor="tags">Tags</FieldLabel>
                   <TagInput
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Add tags... (max 5)"
+                    placeholder="Add tags... (min 1, max 8)"
                     className="border-slate-300"
                   />
                   {fieldState.invalid && (

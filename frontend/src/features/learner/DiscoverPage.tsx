@@ -1,5 +1,13 @@
 import SearchBar from '@/components/ui/searchbar';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Heading1 } from '@/components/ui/typography';
+import { useAuth } from '@/context/AuthContext';
 import { useApiQuery } from '@/lib/fetch-client';
 import { useMemo, useState } from 'react';
 import { CourseCard } from './course-card/CourseCard';
@@ -9,18 +17,41 @@ const glassPanelClass =
 
 export default function DiscoverPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const { preferences } = useAuth();
+  const [selectedCategory, setSelectedCategory] = useState<string>(() =>
+    preferences && preferences.length > 0 ? 'for-me' : 'all',
+  );
   const {
     data: courses,
     isLoading,
     isError,
   } = useApiQuery('get', '/api/courses/published', {});
 
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set(
+      (courses ?? []).map(({ course }) => course.category),
+    );
+    return Array.from(uniqueCategories).sort();
+  }, [courses]);
+
   const filteredCourses = useMemo(
     () =>
-      (courses ?? []).filter(({ course }) =>
-        course.title.toLowerCase().includes(searchQuery.toLowerCase()),
-      ),
-    [courses, searchQuery],
+      (courses ?? []).filter(({ course }) => {
+        const matchesSearch = course.title
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        const matchesCategory =
+          selectedCategory === 'all' ||
+          selectedCategory === 'for-me' ||
+          course.category === selectedCategory;
+        const matchesPreferences =
+          selectedCategory !== 'for-me' ||
+          !preferences ||
+          preferences.length === 0 ||
+          preferences.includes(course.category);
+        return matchesSearch && matchesCategory && matchesPreferences;
+      }),
+    [courses, searchQuery, selectedCategory, preferences],
   );
 
   return (
@@ -37,7 +68,28 @@ export default function DiscoverPage() {
         </section>
 
         <section className={`${glassPanelClass} flex flex-1 flex-col`}>
-          <div className="mb-4 flex justify-end">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Filter by category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {preferences && preferences.length > 0 && (
+                    <SelectItem value="for-me">For Me</SelectItem>
+                  )}
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="w-full sm:w-72">
               <SearchBar
                 placeholder="Search courses"
@@ -63,7 +115,11 @@ export default function DiscoverPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {filteredCourses.map(({ course }) => (
-                <CourseCard key={course.id} course={course} variant="discover" />
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  variant="discover"
+                />
               ))}
             </div>
           )}

@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
 import React, { forwardRef, useCallback, useState, type KeyboardEvent } from 'react';
 
-const MAX_TAGS = 5;
+const MAX_TAGS = 8;
 const MAX_TAG_LENGTH = 50;
 
 type TagInputProps = {

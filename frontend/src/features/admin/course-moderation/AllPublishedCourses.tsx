@@ -94,6 +94,7 @@ export function AllPublishedCourses({ searchQuery }: AllPublishedCoursesProps) {
               description={course.description}
               imageUrl={course.imageUrl}
               tags={course.tags ?? []}
+              category={course.category}
               isFeatured={course.isFeatured}
               onToggleFeatured={() =>
                 handleSetFeatured(course.id, !course.isFeatured)

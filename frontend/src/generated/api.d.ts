@@ -1049,14 +1049,15 @@ export interface components {
         };
         CourseUpdateRequest: {
             title?: string;
-            description?: string;
-            tags?: string[];
+            description: string;
+            category?: string;
+            tags: string[];
         };
         Course: {
             /** Format: uuid */
             id: string;
             title: string;
-            description?: string;
+            description: string;
             /** Format: uuid */
             creatorId: string;
             creatorUsername?: string;
@@ -1067,6 +1068,7 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             isFeatured: boolean;
+            category: string;
             imageUrl?: string;
             tags?: string[];
         };
@@ -1079,10 +1081,11 @@ export interface components {
         };
         CourseCreateRequest: {
             title: string;
-            description?: string;
+            description: string;
             /** Format: uuid */
             teamId: string;
-            tags?: string[];
+            category: string;
+            tags: string[];
         };
         UploadCourseRequest: {
             description: string;

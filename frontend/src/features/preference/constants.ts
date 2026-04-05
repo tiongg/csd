@@ -10,6 +10,11 @@ export const PREFERENCE_OPTIONS = [
   'Current Affairs',
 ] as const;
 
+export const CATEGORY_OPTIONS = [
+  ...PREFERENCE_OPTIONS,
+  'Others',
+] as const
+
 export const MAX_PREFERENCE_SELECTION = 3;
 
 export type PreferenceOption = (typeof PREFERENCE_OPTIONS)[number];

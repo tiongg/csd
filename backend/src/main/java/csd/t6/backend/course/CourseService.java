@@ -117,7 +117,8 @@ public class CourseService {
       throw new BadRequestException("You must be a member of the team to update this course");
     }
 
-    CourseRecord updated = courseRepository.update(id, request.title(), request.description(), existing.getTeamId());
+    CourseRecord updated = courseRepository.update(id, request.title(), request.description(), request.category(),
+        existing.getTeamId());
 
     // Handle tags
     List<String> tags = tagService.updateCourseTags(id, request.tags());

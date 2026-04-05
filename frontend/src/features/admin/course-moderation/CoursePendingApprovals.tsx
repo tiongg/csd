@@ -62,6 +62,7 @@ export function CoursePendingApprovals({ searchQuery }: CoursePendingApprovalsPr
               description={course.description}
               imageUrl={course.imageUrl}
               tags={course.tags ?? []}
+              category={course.category}
               onClick={() =>
                 navigate({
                   to: '/admin/review/$versionId',

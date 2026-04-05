@@ -31,7 +31,7 @@ public class CourseRepository extends BaseRepository<CourseRecord> {
     return dsl.selectFrom(COURSE).fetch();
   }
 
-  public CourseRecord update(UUID id, String title, String description, UUID teamId) {
+  public CourseRecord update(UUID id, String title, String description, String category, UUID teamId) {
     CourseRecord existing = findById(id).orElseThrow();
 
     if (title != null) {
@@ -43,6 +43,9 @@ public class CourseRepository extends BaseRepository<CourseRecord> {
     if (teamId != null) {
       existing.setTeamId(teamId);
     }
+    if (category != null) {
+      existing.setCategory(category);
+    }
 
     existing.store();
     return existing;
@@ -53,9 +56,7 @@ public class CourseRepository extends BaseRepository<CourseRecord> {
   }
 
   public List<CourseRecord> findFeaturedCourses() {
-    return dsl.selectFrom(COURSE)
-        .where(COURSE.IS_FEATURED.eq(true))
-        .fetch();
+    return dsl.selectFrom(COURSE).where(COURSE.IS_FEATURED.eq(true)).fetch();
   }
 
   public CourseRecord setFeaturedStatus(UUID id, boolean isFeatured) {

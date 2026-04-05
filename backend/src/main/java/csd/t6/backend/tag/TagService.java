@@ -14,7 +14,7 @@ public class TagService {
 
   private final TagRepository tagRepository;
 
-  private static final int MAX_TAGS_PER_COURSE = 5;
+  private static final int MAX_TAGS_PER_COURSE = 8;
   private static final int MAX_TAG_TITLE_LENGTH = 50;
 
   public TagService(TagRepository tagRepository) {
