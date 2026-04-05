@@ -59,7 +59,10 @@ export default function DiscoverPage() {
         <section className={`${glassPanelClass} flex flex-1 flex-col`}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
                 <SelectTrigger className="w-full sm:w-48">
                   <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
@@ -111,7 +114,11 @@ export default function DiscoverPage() {
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {filteredCourses.map(({ course }) => (
-                <CourseCard key={course.id} course={course} variant="discover" />
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  variant="discover"
+                />
               ))}
             </div>
           )}
