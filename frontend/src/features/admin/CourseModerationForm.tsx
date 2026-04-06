@@ -2,17 +2,29 @@ import { Heading1 } from '@/components/ui/typography';
 import { apiQueryOptions, useApiQuery } from '@/lib/fetch-client';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import SearchBar from '@/components/ui/searchbar';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { AllPublishedCourses } from './course-moderation/AllPublishedCourses';
 import { CoursePendingApprovals } from './course-moderation/CoursePendingApprovals';
 
 const glassPanelClass =
   'relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6';
+const moderationSearchPlaceholder = 'Search title, creator, tags';
 
 export default function CourseModerationForm() {
   const [activeTab, setActiveTab] = useState<'pending' | 'courses'>('pending');
   const [allCoursesSearchQuery, setAllCoursesSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('__all__');
+  const [sortOption, setSortOption] = useState<
+    'newest' | 'oldest' | 'title-asc' | 'title-desc'
+  >('newest');
   const queryClient = useQueryClient();
   const { data: pendingCourses } = useApiQuery(
     'get',
@@ -78,9 +90,20 @@ export default function CourseModerationForm() {
   const pendingCount = pendingCourses?.length ?? 0;
   const allCoursesCount = publishedCourses?.length ?? 0;
 
-  const pendingCountLabel = pendingCourses == null ? '…' : String(pendingCount);
+  const pendingCountLabel = pendingCourses == null ? '...' : String(pendingCount);
   const allCoursesCountLabel =
-    publishedCourses == null ? '…' : String(allCoursesCount);
+    publishedCourses == null ? '...' : String(allCoursesCount);
+
+  const categoryOptions = useMemo(() => {
+    const sourceCategories =
+      activeTab === 'pending'
+        ? (pendingCourses ?? []).map(({ course }) => course.category)
+        : (publishedCourses ?? []).map(({ course }) => course.category);
+
+    return Array.from(new Set(sourceCategories))
+      .filter((category): category is string => Boolean(category))
+      .sort((a, b) => a.localeCompare(b));
+  }, [activeTab, pendingCourses, publishedCourses]);
 
   return (
     <div className="flex min-h-0 w-full flex-1 bg-slate-100/70 p-6 md:p-8">
@@ -147,33 +170,75 @@ export default function CourseModerationForm() {
                 ))}
               </div>
             </div>
-            <div className="w-full sm:w-80">
-              <SearchBar
-                placeholder={
-                  activeTab === 'pending'
-                    ? 'Search pending courses by title, description, or tag'
-                    : 'Search courses by title, description, or tag'
+
+            <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+              <div className="w-full sm:w-80">
+                <SearchBar
+                  placeholder={moderationSearchPlaceholder}
+                  className="h-9 rounded-lg border-slate-300 bg-white/85"
+                  onSearch={setAllCoursesSearchQuery}
+                />
+              </div>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="h-9 w-[190px] rounded-lg border-slate-300 bg-white/85">
+                  <SelectValue placeholder="All categories" />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  <SelectItem value="__all__">All categories</SelectItem>
+                  {categoryOptions.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select
+                value={sortOption}
+                onValueChange={(value) =>
+                  setSortOption(
+                    value as 'newest' | 'oldest' | 'title-asc' | 'title-desc',
+                  )
                 }
-                className="h-9 rounded-lg border-slate-300 bg-white/85"
-                onSearch={setAllCoursesSearchQuery}
-              />
+              >
+                <SelectTrigger className="h-9 w-[150px] rounded-lg border-slate-300 bg-white/85">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent align="end">
+                  <SelectItem value="newest">Newest</SelectItem>
+                  <SelectItem value="oldest">Oldest</SelectItem>
+                  <SelectItem value="title-asc">Title A-Z</SelectItem>
+                  <SelectItem value="title-desc">Title Z-A</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <div className="min-h-0 flex-1 pt-4">
             <div
               className={cn(
-                activeTab === 'pending' ? 'block h-full overflow-y-auto pr-1' : 'hidden',
+                activeTab === 'pending'
+                  ? 'block h-full overflow-y-auto pt-1 pr-1'
+                  : 'hidden',
               )}
             >
-              <CoursePendingApprovals searchQuery={allCoursesSearchQuery} />
+              <CoursePendingApprovals
+                searchQuery={allCoursesSearchQuery}
+                categoryFilter={categoryFilter}
+                sortOption={sortOption}
+              />
             </div>
             <div
               className={cn(
-                activeTab === 'courses' ? 'block h-full overflow-y-auto pr-1' : 'hidden',
+                activeTab === 'courses'
+                  ? 'block h-full overflow-y-auto pt-1 pr-1'
+                  : 'hidden',
               )}
             >
-              <AllPublishedCourses searchQuery={allCoursesSearchQuery} />
+              <AllPublishedCourses
+                searchQuery={allCoursesSearchQuery}
+                categoryFilter={categoryFilter}
+                sortOption={sortOption}
+              />
             </div>
           </div>
         </section>

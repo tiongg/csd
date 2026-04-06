@@ -97,6 +97,14 @@ function isPrimaryNavItemActive(
     );
   }
 
+  if (role === 'LEARNER' && to === '/learner/my-courses') {
+    return (
+      pathname === to ||
+      pathname.startsWith(`${to}/`) ||
+      pathname.startsWith('/learner/courses/')
+    );
+  }
+
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 

@@ -7,6 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import SearchBar from '@/components/ui/searchbar';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Heading1 } from '@/components/ui/typography';
 import {
   apiQueryOptions,
@@ -18,7 +26,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
 import { Plus, Settings, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useBoolean } from 'usehooks-ts';
 import CreateCourseDialog from './CreateCourseDialog';
@@ -32,6 +40,11 @@ type CourseListProps = {
 export default function CoursesList({ team }: CourseListProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const [courseSearchQuery, setCourseSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('__all__');
+  const [sortOption, setSortOption] = useState<
+    'updated-desc' | 'updated-asc' | 'title-asc' | 'title-desc'
+  >('updated-desc');
 
   const { data: courses, isLoading: isCoursesLoading } = useApiQuery(
     'get',
@@ -54,6 +67,43 @@ export default function CoursesList({ team }: CourseListProps) {
   } = useBoolean(false);
 
   const [isDeleteTeamDialogOpen, setIsDeleteTeamDialogOpen] = useState(false);
+  const courseList = courses ?? [];
+  const categoryOptions = useMemo(
+    () =>
+      Array.from(new Set(courseList.map((course) => course.category)))
+        .filter((category): category is string => Boolean(category))
+        .sort((a, b) => a.localeCompare(b)),
+    [courseList],
+  );
+  const filteredCourses = useMemo(() => {
+    const query = courseSearchQuery.trim().toLowerCase();
+    const matched = courseList.filter((course) => {
+      const searchableText = [
+        course.title,
+        course.description ?? '',
+        course.category ?? '',
+        ...(course.tags ?? []),
+      ]
+        .join(' ')
+        .toLowerCase();
+      const matchesSearch = !query || searchableText.includes(query);
+      const matchesCategory =
+        categoryFilter === '__all__' || course.category === categoryFilter;
+      return matchesSearch && matchesCategory;
+    });
+
+    return [...matched].sort((a, b) => {
+      if (sortOption === 'title-asc') {
+        return a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
+      }
+      if (sortOption === 'title-desc') {
+        return b.title.localeCompare(a.title, undefined, { sensitivity: 'base' });
+      }
+      const aTime = dayjs(a.updatedAt).valueOf();
+      const bTime = dayjs(b.updatedAt).valueOf();
+      return sortOption === 'updated-asc' ? aTime - bTime : bTime - aTime;
+    });
+  }, [categoryFilter, courseList, courseSearchQuery, sortOption]);
 
   const { mutate: deleteTeam, isPending: isDeletingTeam } = useApiMutation(
     'delete',
@@ -89,8 +139,14 @@ export default function CoursesList({ team }: CourseListProps) {
 
         <div className="flex flex-wrap items-center gap-2">
           <Button
-            variant="outline"
-            className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700 hover:text-white"
+            className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+            onClick={openCreateCourseDialog}
+          >
+            <Plus className="size-4" />
+            Create Course
+          </Button>
+          <Button
+            className="h-9 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
             onClick={openTeamCollaboratorsDialog}
           >
             Team Members
@@ -105,16 +161,62 @@ export default function CoursesList({ team }: CourseListProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <CreateCourseCard onInteract={openCreateCourseDialog} />
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <div className="w-full sm:w-80">
+          <SearchBar
+            placeholder="Search title, tags, category"
+            className="h-9 rounded-lg border-slate-300 bg-white/90"
+            onSearch={setCourseSearchQuery}
+          />
+        </div>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="h-9 w-[190px] rounded-lg border-slate-300 bg-white/90">
+            <SelectValue placeholder="All categories" />
+          </SelectTrigger>
+          <SelectContent align="end">
+            <SelectItem value="__all__">All categories</SelectItem>
+            {categoryOptions.map((category) => (
+              <SelectItem key={category} value={category}>
+                {category}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={sortOption}
+          onValueChange={(value) =>
+            setSortOption(
+              value as 'updated-desc' | 'updated-asc' | 'title-asc' | 'title-desc',
+            )
+          }
+        >
+          <SelectTrigger className="h-9 w-[170px] rounded-lg border-slate-300 bg-white/90">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent align="end">
+            <SelectItem value="updated-desc">Newest</SelectItem>
+            <SelectItem value="updated-asc">Oldest</SelectItem>
+            <SelectItem value="title-asc">Title A-Z</SelectItem>
+            <SelectItem value="title-desc">Title Z-A</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
 
         {isCoursesLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
             <LoadingCourseCard key={idx} />
           ))
-          : (courses ?? []).map((course) => (
-            <CourseCard course={course} teamId={team.id} key={course.id} />
-          ))}
+          : filteredCourses.length > 0
+            ? filteredCourses.map((course) => (
+              <CourseCard course={course} teamId={team.id} key={course.id} />
+            ))
+            : (
+              <div className="col-span-full rounded-xl border border-dashed border-slate-300 bg-white/70 p-10 text-center text-sm text-slate-600">
+                No courses match the current search or filters.
+              </div>
+            )}
       </div>
 
       <CreateCourseDialog
@@ -350,28 +452,6 @@ function CourseCard({ course, teamId }: CourseCardProps) {
         teamId={teamId}
       />
     </div>
-  );
-}
-
-function CreateCourseCard({ onInteract }: { onInteract: () => void }) {
-  return (
-    <button
-      type="button"
-      className="h-full w-full cursor-pointer text-left"
-      onClick={onInteract}
-    >
-      <article className="group flex h-full min-h-40 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
-        <span className="inline-flex size-16 items-center justify-center rounded-lg text-slate-700 transition-colors group-hover:text-sky-700">
-          <Plus className="size-8" />
-        </span>
-        <div className="space-y-1">
-          <h3 className="text-lg font-bold text-slate-900">
-            Create New Course
-          </h3>
-          <p className="text-sm text-slate-600">Add a new course</p>
-        </div>
-      </article>
-    </button>
   );
 }
 

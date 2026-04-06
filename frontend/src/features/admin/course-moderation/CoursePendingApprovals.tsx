@@ -6,9 +6,15 @@ import { CourseModerationCard } from './CourseModerationCard';
 
 type CoursePendingApprovalsProps = {
   searchQuery: string;
+  categoryFilter: string;
+  sortOption: 'newest' | 'oldest' | 'title-asc' | 'title-desc';
 };
 
-export function CoursePendingApprovals({ searchQuery }: CoursePendingApprovalsProps) {
+export function CoursePendingApprovals({
+  searchQuery,
+  categoryFilter,
+  sortOption,
+}: CoursePendingApprovalsProps) {
   const { data: pendingCourses } = useApiQuery(
     'get',
     '/api/content-versions/pending',
@@ -16,23 +22,46 @@ export function CoursePendingApprovals({ searchQuery }: CoursePendingApprovalsPr
   const navigate = useNavigate();
   const filteredPendingCourses = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) {
-      return pendingCourses ?? [];
-    }
+    const matchesFilters = (pendingCourses ?? []).filter(
+      ({ course, contentVersion }) => {
+      const searchableText = [
+        course.title,
+        course.description ?? '',
+        course.creatorUsername ?? '',
+        course.category ?? '',
+        `version ${contentVersion.versionNumber}`,
+        dayjs(contentVersion.publishedAt).format('MMM D, YYYY'),
+        ...(course.tags ?? []),
+      ]
+        .join(' ')
+        .toLowerCase();
+      const matchesCategory =
+        categoryFilter === '__all__' || course.category === categoryFilter;
 
-    return (pendingCourses ?? []).filter(({ course }) => {
-      const inTitle = course.title.toLowerCase().includes(query);
-      const inDescription = (course.description ?? '')
-        .toLowerCase()
-        .includes(query);
-      const inTags = (course.tags ?? []).some((tag) =>
-        tag.toLowerCase().includes(query),
-      );
+      const matchesSearch = !query || searchableText.includes(query);
+      return matchesSearch && matchesCategory;
+      },
+    );
 
-      return inTitle || inDescription || inTags;
+    return [...matchesFilters].sort((a, b) => {
+      if (sortOption === 'title-asc') {
+        return a.course.title.localeCompare(b.course.title, undefined, {
+          sensitivity: 'base',
+        });
+      }
+      if (sortOption === 'title-desc') {
+        return b.course.title.localeCompare(a.course.title, undefined, {
+          sensitivity: 'base',
+        });
+      }
+
+      const aDate = dayjs(a.contentVersion.publishedAt).valueOf();
+      const bDate = dayjs(b.contentVersion.publishedAt).valueOf();
+      return sortOption === 'oldest' ? aDate - bDate : bDate - aDate;
     });
-  }, [pendingCourses, searchQuery]);
+  }, [categoryFilter, pendingCourses, searchQuery, sortOption]);
   const query = searchQuery.trim();
+  const hasActiveFilters = query.length > 0 || categoryFilter !== '__all__';
 
   if (!pendingCourses) {
     return (
@@ -44,11 +73,13 @@ export function CoursePendingApprovals({ searchQuery }: CoursePendingApprovalsPr
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-3">
         {filteredPendingCourses.length === 0 ? (
           <div className="col-span-full flex min-h-[28rem] w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white/55 p-8 text-center text-slate-500">
             <p className="text-base font-semibold text-slate-700">
-              {query ? 'No pending courses match your search.' : 'No pending course approvals'}
+              {hasActiveFilters
+                ? 'No pending courses match the current filters.'
+                : 'No pending course approvals'}
             </p>
           </div>
         ) : (

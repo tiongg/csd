@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import type { SectionType } from '@/lib/content.type';
-import { capitalizeFirst, type Course, type EnrolledCourse } from '@/lib/utils';
+import { type Course, type EnrolledCourse } from '@/lib/utils';
 import { BookOpen, Clock, FileText } from 'lucide-react';
 import DropCourse from './DropCourse';
 import EnrollCourse from './EnrollCourse';
@@ -17,6 +17,9 @@ type CourseOverviewProps = {
   sections: SectionType[];
   enrollment?: EnrolledCourse;
 };
+
+const learnerTagChipClass =
+  'border-sky-200 bg-sky-100 text-sky-700 hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700';
 
 export default function CourseOverview({
   course,
@@ -48,13 +51,28 @@ export default function CourseOverview({
             <div>{course.description || 'No description provided'}</div>
             <div className="mt-2 flex flex-wrap gap-2">
               {(course.tags ?? []).map((tag) => (
-                <Badge key={tag} variant="outline">
+                <Badge key={tag} variant="outline" className={learnerTagChipClass}>
                   {tag}
                 </Badge>
               ))}
             </div>
           </CardDescription>
         </CardHeader>
+        <CardContent>
+          {'imageUrl' in course && course.imageUrl ? (
+            <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+              <img
+                src={course.imageUrl}
+                alt={course.title}
+                className="h-[220px] w-full object-cover md:h-[300px]"
+              />
+            </div>
+          ) : (
+            <div className="flex h-[180px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+              No thumbnail
+            </div>
+          )}
+        </CardContent>
       </Card>
 
       <div className="grid gap-4 md:grid-cols-3">
@@ -100,34 +118,6 @@ export default function CourseOverview({
           </CardContent>
         </Card>
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Course Contents</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-1">
-            {sections.map((section, index) => (
-              <div key={index}>
-                <div className="hover:bg-muted/50 group flex items-center gap-3 rounded-lg px-3 py-2.5 transition-colors">
-                  <div className="bg-muted text-muted-foreground flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-medium">
-                    {index + 1}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-medium">{section.title}</p>
-                  </div>
-                  <Badge
-                    variant={section.type === 'quiz' ? 'default' : 'outline'}
-                    className="shrink-0 text-xs"
-                  >
-                    {capitalizeFirst(section.type)}
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
 
       {enrollment ? (
         <DropCourse lessonId={enrollment.lessonSessionId} />

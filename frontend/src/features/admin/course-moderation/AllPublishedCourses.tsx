@@ -7,9 +7,15 @@ import { CourseModerationCard } from './CourseModerationCard';
 
 type AllPublishedCoursesProps = {
   searchQuery: string;
+  categoryFilter: string;
+  sortOption: 'newest' | 'oldest' | 'title-asc' | 'title-desc';
 };
 
-export function AllPublishedCourses({ searchQuery }: AllPublishedCoursesProps) {
+export function AllPublishedCourses({
+  searchQuery,
+  categoryFilter,
+  sortOption,
+}: AllPublishedCoursesProps) {
   const { data: courses } = useApiQuery('get', '/api/courses/published');
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -38,20 +44,45 @@ export function AllPublishedCourses({ searchQuery }: AllPublishedCoursesProps) {
 
   const filteredCourses = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) return courseList;
+    const matchesFilters = courseList.filter(({ course, contentVersion }) => {
+      const searchableText = [
+        course.title,
+        course.description ?? '',
+        course.creatorUsername ?? '',
+        course.category ?? '',
+        `version ${contentVersion.versionNumber}`,
+        dayjs(course.updatedAt).format('MMM D, YYYY'),
+        course.isFeatured ? 'featured' : '',
+        ...(course.tags ?? []),
+      ]
+        .join(' ')
+        .toLowerCase();
+      const matchesCategory =
+        categoryFilter === '__all__' || course.category === categoryFilter;
+      const matchesSearch = !query || searchableText.includes(query);
 
-    return courseList.filter(({ course }) => {
-      const inTitle = course.title.toLowerCase().includes(query);
-      const inDescription = (course.description ?? '')
-        .toLowerCase()
-        .includes(query);
-      const inTags = (course.tags ?? []).some((tag) =>
-        tag.toLowerCase().includes(query),
-      );
-
-      return inTitle || inDescription || inTags;
+      return matchesSearch && matchesCategory;
     });
-  }, [courseList, searchQuery]);
+
+    return [...matchesFilters].sort((a, b) => {
+      if (sortOption === 'title-asc') {
+        return a.course.title.localeCompare(b.course.title, undefined, {
+          sensitivity: 'base',
+        });
+      }
+      if (sortOption === 'title-desc') {
+        return b.course.title.localeCompare(a.course.title, undefined, {
+          sensitivity: 'base',
+        });
+      }
+
+      const aDate = dayjs(a.course.updatedAt).valueOf();
+      const bDate = dayjs(b.course.updatedAt).valueOf();
+      return sortOption === 'oldest' ? aDate - bDate : bDate - aDate;
+    });
+  }, [categoryFilter, courseList, searchQuery, sortOption]);
+  const hasActiveFilters =
+    searchQuery.trim().length > 0 || categoryFilter !== '__all__';
 
   if (!courses) {
     return (
@@ -80,10 +111,12 @@ export function AllPublishedCourses({ searchQuery }: AllPublishedCoursesProps) {
     <div className="flex flex-col gap-4">
       {filteredCourses.length === 0 ? (
         <div className="rounded-xl border border-dashed border-slate-300 bg-white/55 py-12 text-center text-slate-500">
-          No approved courses match your search.
+          {hasActiveFilters
+            ? 'No approved courses match the current filters.'
+            : 'No approved courses available.'}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3">
           {filteredCourses.map(({ course, contentVersion }) => (
             <CourseModerationCard
               key={course.id}

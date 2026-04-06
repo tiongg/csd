@@ -46,7 +46,7 @@ class CourseRepositoryTest {
     @Test
     @DisplayName("Should create course")
     void shouldCreateCourse() {
-        CourseRecord course = courseRepository.create("Java Basics", "Learn Java", creator.getId(), team.getId());
+        CourseRecord course = courseRepository.create("Java Basics", "Learn Java", creator.getId(), team.getId(), "Others");
 
         assertThat(course).isNotNull();
         assertThat(course.getId()).isNotNull();
@@ -60,7 +60,7 @@ class CourseRepositoryTest {
     @DisplayName("Should find course by ID")
     void shouldFindById() {
         CourseRecord created = courseRepository.create("Spring Boot", "Spring Boot course", creator.getId(),
-                team.getId());
+                team.getId(), "Others");
 
         Optional<CourseRecord> found = courseRepository.findById(created.getId());
 
@@ -79,8 +79,8 @@ class CourseRepositoryTest {
     @Test
     @DisplayName("Should return all courses")
     void shouldFindAllCourses() {
-        courseRepository.create("Course 1", null, creator.getId(), team.getId());
-        courseRepository.create("Course 2", null, creator.getId(), team.getId());
+        courseRepository.create("Course 1", null, creator.getId(), team.getId(), "Others");
+        courseRepository.create("Course 2", null, creator.getId(), team.getId(), "Others");
 
         List<CourseRecord> all = courseRepository.findAll();
 
@@ -90,7 +90,7 @@ class CourseRepositoryTest {
     @Test
     @DisplayName("Should update course title")
     void shouldUpdateCourseTitle() {
-        CourseRecord course = courseRepository.create("Old Title", "Desc", creator.getId(), team.getId());
+        CourseRecord course = courseRepository.create("Old Title", "Desc", creator.getId(), team.getId(), "Others");
 
         CourseRecord updated = courseRepository.update(course.getId(), "New Title", null, null, null);
 
@@ -101,7 +101,7 @@ class CourseRepositoryTest {
     @Test
     @DisplayName("Should delete course")
     void shouldDeleteCourse() {
-        CourseRecord course = courseRepository.create("Delete Me", null, creator.getId(), team.getId());
+        CourseRecord course = courseRepository.create("Delete Me", null, creator.getId(), team.getId(), "Others");
 
         courseRepository.delete(course.getId());
 
