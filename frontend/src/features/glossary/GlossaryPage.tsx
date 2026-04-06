@@ -16,7 +16,7 @@ import {
 import type { GlossaryItem } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
-import { TrendCourseSearchDialog } from '../learner/dashboard/TrendCourseSearchDialog';
+import { KeywordCourseSearchDialog } from '../learner/dashboard/KeywordCourseSearchDialog';
 import RelationGraph from '../relations/RelationGraph';
 import GlossaryCard from './components/GlossaryCard';
 
@@ -44,8 +44,8 @@ export default function GlossaryPage({
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_A_TO_Z);
-  const [isTrendModalOpen, setIsTrendModalOpen] = useState(false);
-  const [trendSearch, setTrendSearch] = useState('');
+  const [isCourseMatchOpen, setIsCourseMatchOpen] = useState(false);
+  const [keywordSearch, setKeywordSearch] = useState('');
 
   const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
   const { mutateAsync: generateGlossary, isPending: isGeneratingGlossary } =
@@ -87,8 +87,8 @@ export default function GlossaryPage({
   }, [query, sortOrder, glossaryItems]);
 
   const onNodeClick = useCallback((nodeId: string) => {
-    setTrendSearch(nodeId);
-    setIsTrendModalOpen(true);
+    setKeywordSearch(nodeId);
+    setIsCourseMatchOpen(true);
   }, []);
 
   return (
@@ -183,10 +183,10 @@ export default function GlossaryPage({
         </section>
       </div>
 
-      <TrendCourseSearchDialog
-        initialSearchValue={trendSearch}
-        open={isTrendModalOpen}
-        onOpenChange={setIsTrendModalOpen}
+      <KeywordCourseSearchDialog
+        initialSearchValue={keywordSearch}
+        open={isCourseMatchOpen}
+        onOpenChange={setIsCourseMatchOpen}
       />
     </div>
   );

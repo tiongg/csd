@@ -42,7 +42,7 @@ export default function CourseOverview({
             {enrollment?.status === 'COMPLETED' && (
               <Badge variant="success">Complete</Badge>
             )}
-            <Badge variant="secondary" className="gap-1.5">
+            <Badge className="gap-1.5 border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
               <BookOpen className="h-3 w-3" />
               {course.category}
             </Badge>
@@ -64,11 +64,11 @@ export default function CourseOverview({
               <img
                 src={course.imageUrl}
                 alt={course.title}
-                className="h-[220px] w-full object-cover md:h-[300px]"
+                className="h-[320px] w-full object-cover md:h-[420px]"
               />
             </div>
           ) : (
-            <div className="flex h-[180px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+            <div className="flex h-[320px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500 md:h-[420px]">
               No thumbnail
             </div>
           )}

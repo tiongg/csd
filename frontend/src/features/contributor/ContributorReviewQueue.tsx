@@ -1,8 +1,7 @@
 import { fetchClient, useApiQuery } from '@/lib/fetch-client';
 import { useQueries } from '@tanstack/react-query';
-import { Link } from '@tanstack/react-router';
-import dayjs from 'dayjs';
 import { useMemo } from 'react';
+import { ReviewQueueCourseItem } from './ReviewQueueCourseItem';
 
 export function ContributorReviewQueue() {
   const { data: teams } = useApiQuery('get', '/api/teams/');
@@ -94,24 +93,7 @@ export function ContributorReviewQueue() {
         <ul className="mt-4 max-h-[300px] space-y-2 overflow-y-auto pr-1">
           {pendingCourses.map((course) => (
             <li key={course.id}>
-              <Link
-                to="/contributor/editor/$courseId"
-                params={{ courseId: course.id }}
-                search={{ section: undefined }}
-                className="flex items-center justify-between rounded-lg border border-slate-300/85 bg-slate-100/70 px-3 py-2.5 transition-colors hover:border-sky-200 hover:bg-sky-50/40"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-slate-900">
-                    {course.title}
-                  </p>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    Updated {dayjs(course.updatedAt).fromNow()}
-                  </p>
-                </div>
-                <span className="ml-3 shrink-0 rounded-full border border-slate-300/85 bg-white/58 px-2 py-0.5 text-xs font-medium text-slate-600 backdrop-blur-xl">
-                  Pending
-                </span>
-              </Link>
+              <ReviewQueueCourseItem course={course} />
             </li>
           ))}
         </ul>
