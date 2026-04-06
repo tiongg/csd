@@ -11,9 +11,9 @@ import {
   useRef,
   useState,
 } from 'react';
+import { KeywordCourseSearchDialog } from './dashboard/KeywordCourseSearchDialog';
 import PersonalAnalytics from './dashboard/PersonalAnalytics';
 import { TopTrendsTable } from './dashboard/TopTrendsTable';
-import { TrendCourseSearchDialog } from './dashboard/TrendCourseSearchDialog';
 
 export default function LearnerDashboardPage() {
   const { user } = useAuth();
@@ -21,8 +21,8 @@ export default function LearnerDashboardPage() {
   const { enrolledCourses } = useEnrolledCourse();
   const { data: publishedCourses } = useApiQuery('get', '/api/courses/published');
   const { splitContainerRef, splitStyle, startResizing } = useResizableSplit();
-  const [isTrendModalOpen, setIsTrendModalOpen] = useState(false);
-  const [trendSearch, setTrendSearch] = useState('');
+  const [isCourseMatchOpen, setIsCourseMatchOpen] = useState(false);
+  const [keywordSearch, setKeywordSearch] = useState('');
   const [activeCourseIndex, setActiveCourseIndex] = useState(0);
   const touchStartXRef = useRef<number | null>(null);
 
@@ -261,8 +261,8 @@ export default function LearnerDashboardPage() {
 
           <TopTrendsTable
             onTrendClick={(trendName) => {
-              setTrendSearch(trendName);
-              setIsTrendModalOpen(true);
+              setKeywordSearch(trendName);
+              setIsCourseMatchOpen(true);
             }}
           >
             <h2 className="text-lg font-semibold text-slate-900">
@@ -274,10 +274,10 @@ export default function LearnerDashboardPage() {
           </TopTrendsTable>
         </div>
 
-        <TrendCourseSearchDialog
-          initialSearchValue={trendSearch}
-          open={isTrendModalOpen}
-          onOpenChange={setIsTrendModalOpen}
+        <KeywordCourseSearchDialog
+          initialSearchValue={keywordSearch}
+          open={isCourseMatchOpen}
+          onOpenChange={setIsCourseMatchOpen}
         />
       </div>
     </div>
