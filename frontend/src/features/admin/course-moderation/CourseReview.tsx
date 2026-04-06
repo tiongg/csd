@@ -22,9 +22,9 @@ import ReviewHeader from './ReviewHeader';
 dayjs.extend(relativeTime);
 
 const reviewStatusStyles = {
-  APPROVED: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  PENDING: 'bg-slate-100 text-slate-700 border-slate-200',
-  REJECTED: 'bg-red-100 text-red-700 border-red-200',
+  APPROVED: 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100',
+  PENDING: 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-100',
+  REJECTED: 'bg-red-100 text-red-700 border-red-200 hover:bg-red-100',
 } as const;
 
 type ReviewSectionViewerProps = {
@@ -249,7 +249,7 @@ export default function CourseReview() {
                         className={cn(
                           'rounded-lg border border-slate-200 bg-white/90 px-3 py-3',
                           version.id === contentVersion.id &&
-                            'border-sky-200 bg-sky-50/60',
+                          'border-sky-200 bg-sky-50/60',
                         )}
                       >
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -274,7 +274,7 @@ export default function CourseReview() {
                               className={cn(
                                 'border',
                                 reviewStatusStyles[
-                                  version.status as keyof typeof reviewStatusStyles
+                                version.status as keyof typeof reviewStatusStyles
                                 ],
                               )}
                             >
