@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import csd.t6.backend.decorators.responses.OkResponse;
 import csd.t6.backend.tag.dto.response.TagResponse;
+import csd.t6.backend.tag.dto.response.TopTagResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,5 +38,12 @@ public class TagController {
   @Operation(summary = "Search tags", description = "Search tags by title pattern")
   public List<TagResponse> searchTags(@RequestParam String q) {
     return tagService.searchTags(q);
+  }
+
+  @GetMapping("/top")
+  @OkResponse
+  @Operation(summary = "Get top tags", description = "Get the 5 most commonly used tags")
+  public List<TopTagResponse> getTopTags() {
+    return tagService.getTopTags();
   }
 }

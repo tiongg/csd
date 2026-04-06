@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.tag.dto.response.TagResponse;
+import csd.t6.backend.tag.dto.response.TopTagResponse;
 import csd.t6.jooq.public_.tables.records.TagsRecord;
 
 @Service
@@ -33,6 +34,14 @@ public class TagService {
    */
   public List<TagResponse> searchTags(String search) {
     return tagRepository.searchByTitle(search).stream().map(this::toTagResponse).toList();
+  }
+
+  /**
+   * Get top 5 most commonly used tags.
+   */
+  public List<TopTagResponse> getTopTags() {
+    return tagRepository.getTagsByUsageCount().stream().limit(5)
+        .map(record -> new TopTagResponse(record.id, record.title, record.usageCount)).toList();
   }
 
   /**

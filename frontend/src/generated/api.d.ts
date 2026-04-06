@@ -524,6 +524,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/tags/top": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get top tags
+         * @description Get the 5 most commonly used tags
+         */
+        get: operations["getTopTags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/tags/search": {
         parameters: {
             query?: never;
@@ -1143,6 +1163,13 @@ export interface components {
         CheckMembershipResponse: {
             isMember: boolean;
             role: string;
+        };
+        TopTag: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: int32 */
+            usageCount: number;
         };
         Tag: {
             /** Format: uuid */
@@ -2364,6 +2391,26 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["CheckMembershipResponse"];
+                };
+            };
+        };
+    };
+    getTopTags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TopTag"][];
                 };
             };
         };

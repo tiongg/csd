@@ -1,10 +1,10 @@
 import { cleanText, cn } from '@/lib/utils';
+import { useApiQuery } from '@/lib/fetch-client';
 import {
   ArrowTrendingDownIcon,
   ArrowTrendingUpIcon,
   SparklesIcon,
 } from '@heroicons/react/24/outline';
-import { useQuery } from '@tanstack/react-query';
 import { motion, type Variants } from 'framer-motion';
 import _ from 'lodash';
 import type { PropsWithChildren } from 'react';
@@ -23,40 +23,25 @@ const rowVariants: Variants = {
 
 type TrendMovement = 'Rising' | 'Falling' | 'New';
 
-type Trend = {
-  rank: number;
-  name: string;
-  metric: string;
+type TopTag = {
+  id: string;
+  title: string;
+  usageCount: number;
 };
 
 type TopTrendsTableProps = PropsWithChildren<{
-  onTrendClick?: (trendName: string) => void;
+  onTrendClick?: (tagName: string) => void;
   title?: string;
   description?: string;
 }>;
 
-function getMovement(trend: Trend, index: number) {
-  const signal = `${trend.name} ${trend.metric}`.toLowerCase();
-  if (
-    signal.includes('new') ||
-    signal.includes('reviving') ||
-    signal.includes('since january')
-  ) {
-    return 'New';
-  }
-  if (
-    signal.includes('rising') ||
-    signal.includes('surge') ||
-    signal.includes('spike') ||
-    signal.includes('fastest-growing') ||
-    signal.includes('upswing')
-  ) {
-    return 'Rising';
-  }
-  if (trend.rank >= 4 && trend.rank <= 5) {
-    return 'Falling';
-  }
-  return index % 2 === 0 ? 'Rising' : 'New';
+function getMovement(tag: TopTag, index: number) {
+  // For tags, we'll use a simple heuristic based on rank position
+  // Higher rank (lower number) = rising, lower rank = falling/new
+  if (index === 0) return 'Rising';
+  if (tag.usageCount > 10) return 'Rising';
+  if (tag.usageCount < 5) return 'New';
+  return index % 2 === 0 ? 'Rising' : 'Falling';
 }
 
 function movementClass(movement: TrendMovement) {
@@ -86,19 +71,18 @@ export function TopTrendsTable({
   description = 'Top 5 this week',
   children,
 }: TopTrendsTableProps) {
-  const { data: trendData, isLoading } = useQuery({
-    queryKey: ['learnerDashboardTrends'],
-    queryFn: async () => {
-      const response = await fetch('/2026-02-20_130221_gen_alpha_trends.json');
-      const data = await response.json();
-      return {
-        trends: data.trends as Array<Trend>,
-        generatedAtUtc: data.metadata?.generated_at_utc as string | undefined,
-      };
-    },
-  });
+  const { data: topTags, isLoading } = useApiQuery(
+    'get',
+    '/api/tags/top',
+    {},
+  );
 
-  const topTrends = (trendData?.trends ?? []).slice(0, 5);
+  const displayData = (topTags ?? []).map((tag, index) => ({
+    rank: index + 1,
+    name: tag.title,
+    metric: `${tag.usageCount} courses`,
+    originalTag: tag,
+  }));
 
   if (isLoading) {
     return (
@@ -152,11 +136,11 @@ export function TopTrendsTable({
             </tr>
           </thead>
           <tbody>
-            {topTrends.map((trend, index) => {
-              const movement = getMovement(trend, index);
+            {displayData.map((item, index) => {
+              const movement = getMovement(item.originalTag, index);
               return (
                 <motion.tr
-                  key={trend.rank}
+                  key={item.rank}
                   variants={rowVariants}
                   initial="initial"
                   animate="animate"
@@ -167,14 +151,14 @@ export function TopTrendsTable({
                   )}
                   onClick={
                     onTrendClick
-                      ? () => onTrendClick(cleanText(trend.name))
+                      ? () => onTrendClick(cleanText(item.name))
                       : undefined
                   }
                 >
-                  <td className="px-4 py-3 font-semibold">#{trend.rank}</td>
+                  <td className="px-4 py-3 font-semibold">#{item.rank}</td>
                   <td className="px-4 py-3 font-medium">
-                    <p className="truncate" title={cleanText(trend.name)}>
-                      {cleanText(trend.name)}
+                    <p className="truncate" title={cleanText(item.name)}>
+                      {cleanText(item.name)}
                     </p>
                   </td>
                   <td className="px-4 py-3 text-right">
@@ -191,7 +175,7 @@ export function TopTrendsTable({
           </tbody>
         </table>
       </div>
-      {topTrends.length === 0 && (
+      {displayData.length === 0 && (
         <div className="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm text-slate-600">
           Trend data is currently unavailable.
         </div>
