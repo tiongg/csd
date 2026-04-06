@@ -18,9 +18,10 @@ public class CourseRepository extends BaseRepository<CourseRecord> {
     super(dsl, COURSE);
   }
 
-  public CourseRecord create(String title, String description, UUID creatorId, UUID teamId) {
+  public CourseRecord create(String title, String description, UUID creatorId, UUID teamId, String category) {
     return dsl.insertInto(COURSE).set(COURSE.TITLE, title).set(COURSE.DESCRIPTION, description)
-        .set(COURSE.CREATOR_ID, creatorId).set(COURSE.TEAM_ID, teamId).returning().fetchOne();
+        .set(COURSE.CREATOR_ID, creatorId).set(COURSE.TEAM_ID, teamId).set(COURSE.CATEGORY, category).returning()
+        .fetchOne();
   }
 
   public Optional<CourseRecord> findById(UUID id) {

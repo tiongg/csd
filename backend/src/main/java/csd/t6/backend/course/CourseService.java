@@ -58,7 +58,8 @@ public class CourseService {
       throw new BadRequestException("You must be a member of the team to create a course for it");
     }
 
-    CourseRecord course = courseRepository.create(request.title(), request.description(), creatorId, request.teamId());
+    CourseRecord course = courseRepository.create(request.title(), request.description(), creatorId, request.teamId(),
+        request.category());
 
     // Handle tags
     List<String> tags = tagService.updateCourseTags(course.getId(), request.tags());

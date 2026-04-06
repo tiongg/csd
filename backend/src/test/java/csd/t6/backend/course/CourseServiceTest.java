@@ -90,7 +90,7 @@ class CourseServiceTest {
   void shouldCreateCourseSuccessfully() {
     List<String> tags = List.of("test-tag");
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
-    when(courseRepository.create("Test Course", "This is a test description for the course", creatorId, teamId)).thenReturn(mockCourse);
+    when(courseRepository.create("Test Course", "This is a test description for the course", creatorId, teamId, "Others")).thenReturn(mockCourse);
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService.createCourse(
@@ -106,7 +106,7 @@ class CourseServiceTest {
   void shouldCreateCourseWithTags() {
     List<String> tags = List.of("Skibidi", "Chungus", "Rizz");
     when(teamService.isTeamMember(teamId, creatorId)).thenReturn(true);
-    when(courseRepository.create("Test Course", "This is a test description for the course", creatorId, teamId)).thenReturn(mockCourse);
+    when(courseRepository.create("Test Course", "This is a test description for the course", creatorId, teamId, "Others")).thenReturn(mockCourse);
     when(tagService.updateCourseTags(courseId, tags)).thenReturn(tags);
 
     CourseResponse result = courseService
