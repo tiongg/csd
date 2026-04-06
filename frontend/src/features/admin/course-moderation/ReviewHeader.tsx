@@ -89,6 +89,23 @@ export default function ReviewHeader({ className }: ReviewHeaderProps) {
       <div className="flex h-full items-center gap-2">
         {canReject && (
           <>
+            {isPending && (
+              <Button
+                variant="default"
+                onClick={() =>
+                  approveVersion({
+                    params: {
+                      path: { contentVersionId: contentVersion.id },
+                    },
+                  })
+                }
+                disabled={isApproving}
+                className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+              >
+                <CheckCircleIcon className="size-4" />
+                {isApproving ? 'Approving...' : 'Approve'}
+              </Button>
+            )}
             <Dialog open={rejectOpen} onOpenChange={setRejectOpen}>
               <DialogTrigger asChild>
                 <Button variant="destructive" className="h-9 rounded-lg">
@@ -148,23 +165,6 @@ export default function ReviewHeader({ className }: ReviewHeaderProps) {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            {isPending && (
-              <Button
-                variant="default"
-                onClick={() =>
-                  approveVersion({
-                    params: {
-                      path: { contentVersionId: contentVersion.id },
-                    },
-                  })
-                }
-                disabled={isApproving}
-                className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
-              >
-                <CheckCircleIcon className="size-4" />
-                {isApproving ? 'Approving...' : 'Approve'}
-              </Button>
-            )}
           </>
         )}
         {!canReject && (

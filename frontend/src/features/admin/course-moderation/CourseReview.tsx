@@ -266,7 +266,7 @@ export default function CourseReview() {
                           </p>
                           <div className="ml-auto flex min-w-0 items-center gap-2">
                             {version.id === contentVersion.id && (
-                              <Badge className="border border-sky-200 bg-sky-100 text-sky-700 hover:bg-sky-100">
+                              <Badge className="border border-sky-200 bg-sky-100 text-sky-700 hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">
                                 Current Review
                               </Badge>
                             )}
