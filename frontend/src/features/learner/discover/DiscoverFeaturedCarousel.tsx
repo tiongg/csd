@@ -72,9 +72,16 @@ export function DiscoverFeaturedCarousel({
                     )}
                   </div>
                   <div className="flex flex-col p-5 md:p-6">
-                    <p className="inline-flex w-fit rounded-full border border-slate-300 bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
-                      Featured track
-                    </p>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <p className="inline-flex w-fit rounded-full border border-amber-300 bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                        Featured track
+                      </p>
+                      {course.category && (
+                        <p className="inline-flex w-fit rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                          {course.category}
+                        </p>
+                      )}
+                    </div>
                     <h3 className="mt-3 line-clamp-2 text-2xl leading-tight font-semibold text-slate-900">
                       {course.title}
                     </h3>
@@ -98,10 +105,10 @@ export function DiscoverFeaturedCarousel({
                         )}
                       </div>
                     )}
-                    <p className="mt-3 text-xs text-slate-500">
-                      By {course.creatorLabel}
-                    </p>
-                    <div className="mt-auto flex justify-end pt-4">
+                    <div className="mt-auto flex items-center justify-between pt-4">
+                      <p className="truncate pr-3 text-xs text-slate-500">
+                        By {course.creatorLabel}
+                      </p>
                       <p className="text-sm font-semibold text-slate-700 underline-offset-4 group-hover:underline">
                         View
                       </p>

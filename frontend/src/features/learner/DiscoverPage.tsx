@@ -36,15 +36,20 @@ export default function DiscoverPage() {
   }, [courses]);
 
   const normalizedFeaturedCourses = useMemo<DiscoverCourse[]>(() => {
+    const categoryByCourseId = new Map(
+      (courses ?? []).map(({ course }) => [course.id, course.category]),
+    );
+
     return (featuredCourses ?? []).map((course) => ({
       id: course.id,
       title: course.title,
       description: course.description ?? undefined,
       imageUrl: course.imageUrl ?? undefined,
       tags: course.tags ?? [],
-      creatorLabel: course.teamName || course.creatorUsername || 'Course creator',
+      category: categoryByCourseId.get(course.id),
+      creatorLabel: course.creatorUsername ?? 'Course creator',
     }));
-  }, [featuredCourses]);
+  }, [featuredCourses, courses]);
 
   const filteredPublishedCourses = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
