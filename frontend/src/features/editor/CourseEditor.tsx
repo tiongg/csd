@@ -36,7 +36,7 @@ export default function CourseEditor() {
               className={cn(
                 'relative z-10 flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg px-3 text-sm font-medium shadow-none transition-colors duration-200',
                 currentSection === -1
-                  ? 'bg-sky-500 text-white hover:bg-sky-500 hover:text-white'
+                  ? 'bg-sky-500 text-white hover:bg-sky-400 hover:text-white'
                   : 'text-slate-700 hover:bg-white/80 hover:text-slate-900',
               )}
               onClick={() => setCurrentSection(-1)}

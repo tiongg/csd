@@ -38,7 +38,7 @@ export default function SectionSelect({ index, isActive }: SectionSelectProps) {
       className={cn(
         'group relative z-10 flex h-9 shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border px-3 text-sm font-medium transition-colors duration-200',
         isActive
-          ? 'border-sky-500 bg-sky-500 text-white'
+          ? 'border-sky-500 bg-sky-500 text-white hover:bg-sky-400'
           : 'border-transparent bg-transparent text-slate-700 hover:bg-white/80 hover:text-slate-900',
       )}
       onClick={() => !isEditing && setCurrentSection(index)}

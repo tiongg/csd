@@ -90,14 +90,14 @@ export default function CoursesList({ team }: CourseListProps) {
         <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="outline"
-            className="h-9 cursor-pointer rounded-lg border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700 hover:text-white"
             onClick={openTeamCollaboratorsDialog}
           >
             Team Members
           </Button>
           <Button
-            variant="outline"
-            className="h-9 cursor-pointer rounded-lg border-rose-200 bg-rose-50 text-rose-700 hover:border-rose-300 hover:bg-rose-100"
+            variant="destructive"
+            className="h-9 rounded-lg hover:bg-red-700"
             onClick={() => setIsDeleteTeamDialogOpen(true)}
           >
             Delete Team
@@ -110,11 +110,11 @@ export default function CoursesList({ team }: CourseListProps) {
 
         {isCoursesLoading
           ? Array.from({ length: 3 }).map((_, idx) => (
-              <LoadingCourseCard key={idx} />
-            ))
+            <LoadingCourseCard key={idx} />
+          ))
           : (courses ?? []).map((course) => (
-              <CourseCard course={course} teamId={team.id} key={course.id} />
-            ))}
+            <CourseCard course={course} teamId={team.id} key={course.id} />
+          ))}
       </div>
 
       <CreateCourseDialog

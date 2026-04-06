@@ -22,9 +22,9 @@ import ReviewHeader from './ReviewHeader';
 dayjs.extend(relativeTime);
 
 const reviewStatusStyles = {
-  APPROVED: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  PENDING: 'bg-slate-100 text-slate-700 border-slate-200',
-  REJECTED: 'bg-red-100 text-red-700 border-red-200',
+  APPROVED: 'bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-100',
+  PENDING: 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-100',
+  REJECTED: 'bg-red-100 text-red-700 border-red-200 hover:bg-red-100',
 } as const;
 
 type ReviewSectionViewerProps = {
@@ -105,7 +105,7 @@ export default function CourseReview() {
               className={cn(
                 'relative z-10 flex h-9 shrink-0 items-center justify-center rounded-lg px-3 text-sm font-medium whitespace-nowrap shadow-none transition-colors duration-200',
                 currentSection === -1
-                  ? 'bg-sky-500 text-white hover:bg-sky-500 hover:text-white'
+                  ? 'bg-sky-500 text-white hover:bg-sky-400 hover:text-white'
                   : 'text-slate-700 hover:bg-white/80 hover:text-slate-900',
               )}
               onClick={() => setCurrentSection(-1)}
@@ -122,7 +122,7 @@ export default function CourseReview() {
                     className={cn(
                       'relative z-10 flex h-9 shrink-0 items-center justify-center rounded-lg px-3 text-sm font-medium whitespace-nowrap shadow-none transition-colors duration-200',
                       currentSection === index
-                        ? 'border-sky-500 bg-sky-500 text-white'
+                        ? 'border-sky-500 bg-sky-500 text-white hover:bg-sky-400 hover:border-sky-400 hover:text-white'
                         : 'text-slate-700 hover:bg-white/80 hover:text-slate-900',
                     )}
                     onClick={() => setCurrentSection(index)}
@@ -249,7 +249,7 @@ export default function CourseReview() {
                         className={cn(
                           'rounded-lg border border-slate-200 bg-white/90 px-3 py-3',
                           version.id === contentVersion.id &&
-                            'border-sky-200 bg-sky-50/60',
+                          'border-sky-200 bg-sky-50/60',
                         )}
                       >
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
@@ -274,7 +274,7 @@ export default function CourseReview() {
                               className={cn(
                                 'border',
                                 reviewStatusStyles[
-                                  version.status as keyof typeof reviewStatusStyles
+                                version.status as keyof typeof reviewStatusStyles
                                 ],
                               )}
                             >

@@ -57,7 +57,7 @@ function RouteComponent() {
 
         <div className="flex flex-col space-y-4">
           <p className="text-center">If you have any other questions</p>
-          <Button asChild>
+          <Button asChild className='hover:bg-sky-700'>
             <a
               href="mailto:tg.tan.2024@computing.smu.edu.sg"
             >

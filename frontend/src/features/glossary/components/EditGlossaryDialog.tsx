@@ -221,7 +221,7 @@ export default function EditGlossaryDialog({
           >
             Cancel
           </Button>
-          <Button type="button" onClick={handleSave} disabled={isPending}>
+          <Button type="button" onClick={handleSave} disabled={isPending} className='hover:bg-sky-700'>
             {isPending && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
             Save Changes
           </Button>
