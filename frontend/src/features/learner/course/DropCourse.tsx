@@ -59,7 +59,7 @@ export default function DropCourse({ lessonId }: DropCourseProps) {
           </div>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="destructive" size="lg" disabled={isPending}>
+              <Button variant="destructive" size="lg" className='hover:bg-red-700' disabled={isPending}>
                 {isPending ? 'Dropping...' : 'Drop Course'}
               </Button>
             </DialogTrigger>
@@ -81,6 +81,7 @@ export default function DropCourse({ lessonId }: DropCourseProps) {
                   variant="destructive"
                   onClick={handleDrop}
                   disabled={isPending}
+                  className='hover:bg-red-700'
                 >
                   {isPending ? 'Dropping...' : 'Drop Course'}
                 </Button>

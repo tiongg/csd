@@ -18,13 +18,13 @@ const items = [
     value: 'addAdmin',
     trigger: 'How do i add an admin?',
     content:
-      'Go to User Management -> All Users. Search for the user and assign them with the admin role by clicking on the pencil icon',
+      'Go to User Management -> All Users. Search for the user and assign them with the admin role by clicking on the pencil icon.',
   },
   {
     value: 'deleteAdmin',
     trigger: 'How do I deactivate or remove an admin?',
     content:
-      'Go to User Management -> All Admins. Search for the admin and remove the admin by clicking on the "X" icon',
+      'Go to User Management -> All Admins. Search for the admin and remove the admin by clicking on the "X" icon.',
   },
   {
     value: 'content',
@@ -59,7 +59,7 @@ function RouteComponent() {
 
         <div className="flex flex-col space-y-4">
           <p className="text-center">If you have any other questions</p>
-          <Button asChild>
+          <Button asChild className='hover:bg-sky-700'>
             <a
               href="mailto:tg.tan.2024@computing.smu.edu.sg"
             >
