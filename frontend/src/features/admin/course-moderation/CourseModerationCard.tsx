@@ -39,7 +39,7 @@ export function CourseModerationCard({
 
   return (
     <Card
-      className="group overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md"
+      className="group overflow-hidden rounded-xl border border-slate-200 bg-white p-0 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
       onClick={onClick}
       role="button"
       tabIndex={0}

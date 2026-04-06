@@ -216,7 +216,9 @@ export default function CourseModerationForm() {
           <div className="min-h-0 flex-1 pt-4">
             <div
               className={cn(
-                activeTab === 'pending' ? 'block h-full overflow-y-auto pr-1' : 'hidden',
+                activeTab === 'pending'
+                  ? 'block h-full overflow-y-auto pt-1 pr-1'
+                  : 'hidden',
               )}
             >
               <CoursePendingApprovals
@@ -227,7 +229,9 @@ export default function CourseModerationForm() {
             </div>
             <div
               className={cn(
-                activeTab === 'courses' ? 'block h-full overflow-y-auto pr-1' : 'hidden',
+                activeTab === 'courses'
+                  ? 'block h-full overflow-y-auto pt-1 pr-1'
+                  : 'hidden',
               )}
             >
               <AllPublishedCourses
