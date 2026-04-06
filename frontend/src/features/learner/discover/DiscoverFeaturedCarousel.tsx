@@ -43,7 +43,9 @@ export function DiscoverFeaturedCarousel({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-xl font-semibold text-slate-900">Featured</h2>
+      <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+        Featured
+      </h2>
       <Carousel
         opts={{ loop: courses.length > 1 }}
         setApi={setCarouselApi}
