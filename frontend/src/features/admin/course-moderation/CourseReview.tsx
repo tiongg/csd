@@ -105,7 +105,7 @@ export default function CourseReview() {
               className={cn(
                 'relative z-10 flex h-9 shrink-0 items-center justify-center rounded-lg px-3 text-sm font-medium whitespace-nowrap shadow-none transition-colors duration-200',
                 currentSection === -1
-                  ? 'bg-sky-500 text-white hover:bg-sky-500 hover:text-white'
+                  ? 'bg-sky-500 text-white hover:bg-sky-400 hover:text-white'
                   : 'text-slate-700 hover:bg-white/80 hover:text-slate-900',
               )}
               onClick={() => setCurrentSection(-1)}
@@ -122,7 +122,7 @@ export default function CourseReview() {
                     className={cn(
                       'relative z-10 flex h-9 shrink-0 items-center justify-center rounded-lg px-3 text-sm font-medium whitespace-nowrap shadow-none transition-colors duration-200',
                       currentSection === index
-                        ? 'border-sky-500 bg-sky-500 text-white'
+                        ? 'border-sky-500 bg-sky-500 text-white hover:bg-sky-400 hover:border-sky-400 hover:text-white'
                         : 'text-slate-700 hover:bg-white/80 hover:text-slate-900',
                     )}
                     onClick={() => setCurrentSection(index)}
