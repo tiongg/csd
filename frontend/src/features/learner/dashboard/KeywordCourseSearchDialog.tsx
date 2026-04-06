@@ -87,9 +87,9 @@ export function KeywordCourseSearchDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="rounded-xl border-slate-200 p-5 sm:max-w-3xl">
-        <DialogHeader className="rounded-lg border border-sky-200 bg-sky-50 px-4 py-3">
+        <DialogHeader>
           <DialogTitle className="text-sky-900">Keyword to Course Match</DialogTitle>
-          <DialogDescription className="text-sky-700">
+          <DialogDescription className="text-slate-600">
             Search courses using this keyword.
           </DialogDescription>
         </DialogHeader>
