@@ -6,6 +6,7 @@ import * as d3 from 'd3';
 import { useEffect, useRef, useState } from 'react';
 
 const MAX_LINKS_PER_NODE = 3;
+const MAX_COMPONENT_SIZE = 18;
 const SEARCH_FOCUS_SCALE = 2.75;
 const SEARCH_FOCUS_DURATION_MS = 500;
 const LABEL_VISIBILITY_SCALE = 0.98;
@@ -29,7 +30,10 @@ type EdgeCandidate = {
   target: string;
   key: string;
   directedCount: number;
+  sourceDegree: number;
+  targetDegree: number;
   sharedNeighborCount: number;
+  jaccardScore: number;
   strength: number;
   reciprocal: boolean;
 };
@@ -87,7 +91,10 @@ export function buildGraph(glossaryItems: GlossaryItem[]): {
           target: b,
           key,
           directedCount: 1,
+          sourceDegree: 0,
+          targetDegree: 0,
           sharedNeighborCount: 0,
+          jaccardScore: 0,
           strength: 1,
           reciprocal: false,
         });
@@ -98,21 +105,36 @@ export function buildGraph(glossaryItems: GlossaryItem[]): {
   const candidates = Array.from(edgeCandidates.values()).map((candidate) => {
     const sourceNeighbors = outgoing.get(candidate.source) ?? new Set<string>();
     const targetNeighbors = outgoing.get(candidate.target) ?? new Set<string>();
+    const sourceContext = Array.from(sourceNeighbors).filter(
+      (neighbor) => neighbor !== candidate.target,
+    );
+    const targetContext = Array.from(targetNeighbors).filter(
+      (neighbor) => neighbor !== candidate.source,
+    );
 
     let sharedNeighborCount = 0;
-    sourceNeighbors.forEach((neighbor) => {
-      if (neighbor !== candidate.target && targetNeighbors.has(neighbor)) {
+    sourceContext.forEach((neighbor) => {
+      if (targetNeighbors.has(neighbor)) {
         sharedNeighborCount += 1;
       }
     });
 
     const reciprocal = candidate.directedCount > 1;
+    const unionNeighborCount = new Set([
+      ...sourceContext,
+      ...targetContext,
+    ]).size;
+    const jaccardScore =
+      unionNeighborCount > 0 ? sharedNeighborCount / unionNeighborCount : 0;
     const strength =
       candidate.directedCount * 2 + Math.min(sharedNeighborCount, 2);
 
     return {
       ...candidate,
+      sourceDegree: sourceNeighbors.size,
+      targetDegree: targetNeighbors.size,
       sharedNeighborCount,
+      jaccardScore,
       strength,
       reciprocal,
     };
@@ -130,18 +152,37 @@ export function buildGraph(glossaryItems: GlossaryItem[]): {
   const selectedByNode = new Map<string, Set<string>>();
   incidentByNode.forEach((edges, nodeId) => {
     const ranked = [...edges].sort((a, b) => {
+      if (a.sharedNeighborCount !== b.sharedNeighborCount) {
+        return b.sharedNeighborCount - a.sharedNeighborCount;
+      }
+      if (a.jaccardScore !== b.jaccardScore) {
+        return b.jaccardScore - a.jaccardScore;
+      }
       if (a.reciprocal !== b.reciprocal) {
         return a.reciprocal ? -1 : 1;
       }
       if (a.strength !== b.strength) {
         return b.strength - a.strength;
       }
-      return b.sharedNeighborCount - a.sharedNeighborCount;
+      return a.key.localeCompare(b.key);
     });
+
+    const selectionCap = edges.length >= 7 ? 2 : MAX_LINKS_PER_NODE;
+    const preferredEdges = ranked.filter((edge) => {
+      const touchesLeaf = edge.sourceDegree <= 2 || edge.targetDegree <= 2;
+
+      return (
+        edge.reciprocal ||
+        edge.sharedNeighborCount > 0 ||
+        edge.jaccardScore >= 0.16 ||
+        touchesLeaf
+      );
+    });
+    const selectionPool = preferredEdges.length > 0 ? preferredEdges : ranked;
 
     selectedByNode.set(
       nodeId,
-      new Set(ranked.slice(0, MAX_LINKS_PER_NODE).map((edge) => edge.key)),
+      new Set(selectionPool.slice(0, selectionCap).map((edge) => edge.key)),
     );
   });
 
@@ -151,8 +192,16 @@ export function buildGraph(glossaryItems: GlossaryItem[]): {
       selectedByNode.get(candidate.source)?.has(candidate.key) ?? false;
     const selectedByTarget =
       selectedByNode.get(candidate.target)?.has(candidate.key) ?? false;
+    const touchesLeaf =
+      candidate.sourceDegree <= 2 || candidate.targetDegree <= 2;
+    const hasLocalSupport =
+      candidate.sharedNeighborCount > 0 || candidate.jaccardScore >= 0.16;
 
-    if (candidate.reciprocal || (selectedBySource && selectedByTarget)) {
+    if (
+      (candidate.reciprocal && (hasLocalSupport || touchesLeaf)) ||
+      ((selectedBySource && selectedByTarget) &&
+        (hasLocalSupport || touchesLeaf))
+    ) {
       keptEdges.set(candidate.key, candidate);
     }
   });
@@ -182,6 +231,102 @@ export function buildGraph(glossaryItems: GlossaryItem[]): {
       degreeByNode.set(strongest.target, (degreeByNode.get(strongest.target) ?? 0) + 1);
     }
   });
+
+  const buildComponentsFromEdges = (edges: EdgeCandidate[]) => {
+    const adjacency = new Map<string, Set<string>>();
+    nodesById.forEach((_, id) => {
+      adjacency.set(id, new Set());
+    });
+
+    edges.forEach((edge) => {
+      adjacency.get(edge.source)?.add(edge.target);
+      adjacency.get(edge.target)?.add(edge.source);
+    });
+
+    const visited = new Set<string>();
+    const components: string[][] = [];
+
+    nodesById.forEach((_, id) => {
+      if (visited.has(id)) {
+        return;
+      }
+
+      const queue = [id];
+      const component: string[] = [];
+      visited.add(id);
+
+      while (queue.length > 0) {
+        const current = queue.shift();
+        if (!current) {
+          continue;
+        }
+
+        component.push(current);
+        adjacency.get(current)?.forEach((neighbor) => {
+          if (!visited.has(neighbor)) {
+            visited.add(neighbor);
+            queue.push(neighbor);
+          }
+        });
+      }
+
+      components.push(component);
+    });
+
+    return components;
+  };
+
+  const getEdgeRetentionScore = (edge: EdgeCandidate) =>
+    edge.sharedNeighborCount * 18 +
+    edge.jaccardScore * 24 +
+    (edge.reciprocal ? 8 : 0) +
+    edge.strength * 4 -
+    Math.min(edge.sourceDegree, edge.targetDegree) * 2;
+
+  while (true) {
+    const components = buildComponentsFromEdges(Array.from(keptEdges.values()));
+    const oversizedComponent = components.find(
+      (component) => component.length > MAX_COMPONENT_SIZE,
+    );
+
+    if (!oversizedComponent) {
+      break;
+    }
+
+    const componentNodeSet = new Set(oversizedComponent);
+    const componentEdges = Array.from(keptEdges.values()).filter(
+      (edge) =>
+        componentNodeSet.has(edge.source) && componentNodeSet.has(edge.target),
+    );
+    const currentComponentDegrees = new Map<string, number>();
+    oversizedComponent.forEach((nodeId) => {
+      currentComponentDegrees.set(nodeId, 0);
+    });
+    componentEdges.forEach((edge) => {
+      currentComponentDegrees.set(
+        edge.source,
+        (currentComponentDegrees.get(edge.source) ?? 0) + 1,
+      );
+      currentComponentDegrees.set(
+        edge.target,
+        (currentComponentDegrees.get(edge.target) ?? 0) + 1,
+      );
+    });
+
+    const removableEdge = componentEdges
+      .filter(
+        (edge) =>
+          (currentComponentDegrees.get(edge.source) ?? 0) > 1 &&
+          (currentComponentDegrees.get(edge.target) ?? 0) > 1,
+      )
+      .sort((a, b) => getEdgeRetentionScore(a) - getEdgeRetentionScore(b))[0];
+
+    if (!removableEdge) {
+      break;
+    }
+
+    keptEdges.delete(removableEdge.key);
+  }
 
   return {
     nodes: Array.from(nodesById.values()),
