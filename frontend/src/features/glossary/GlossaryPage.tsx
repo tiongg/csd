@@ -54,6 +54,12 @@ export default function GlossaryPage({
         queryClient.invalidateQueries(apiQueryOptions('get', '/api/glossary/'));
       },
     });
+  const { mutateAsync: clearGlossary, isPending: isClearingGlossary } =
+    useApiMutation('delete', '/api/glossary/', {
+      onSuccess: () => {
+        queryClient.invalidateQueries(apiQueryOptions('get', '/api/glossary/'));
+      },
+    });
 
   const filteredItems = useMemo(() => {
     if (!glossaryItems) {
@@ -150,9 +156,18 @@ export default function GlossaryPage({
               </div>
             </div>
             {showGenerateButton && (
-              <div className="ml-auto self-end">
+              <div className="ml-auto flex items-center gap-2 self-end">
                 <Button
-                  disabled={isGeneratingGlossary}
+                  variant="destructive"
+                  disabled={isClearingGlossary || isGeneratingGlossary}
+                  onClick={() => {
+                    clearGlossary({});
+                  }}
+                >
+                  {isClearingGlossary ? 'Clearing...' : 'Clear All'}
+                </Button>
+                <Button
+                  disabled={isGeneratingGlossary || isClearingGlossary}
                   onClick={() => {
                     generateGlossary({});
                   }}

@@ -78,7 +78,7 @@ export interface paths {
         get: operations["getGlossaryTerms"];
         put: operations["updateGlossaryTerm"];
         post: operations["autogenRelationships"];
-        delete?: never;
+        delete: operations["clearGlossaryTerms"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1522,6 +1522,24 @@ export interface operations {
         };
     };
     autogenRelationships: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    clearGlossaryTerms: {
         parameters: {
             query?: never;
             header?: never;

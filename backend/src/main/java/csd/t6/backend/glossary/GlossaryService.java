@@ -11,4 +11,6 @@ public interface GlossaryService {
   public void updateGlossaryTerm(GlossaryUpdateRequest request);
 
   public List<GlossaryResponse> getAllGlossaryTerms();
+
+  public void clearGlossaryTerms();
 }

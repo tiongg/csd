@@ -64,4 +64,9 @@ public class GlossaryRepository extends BaseRepository<GlossaryTermRecord> {
     return dsl.insertInto(GLOSSARY_TERM).set(record).onConflict(GLOSSARY_TERM.TITLE).doUpdate().set(record).returning()
         .fetchOne();
   }
+
+  public void deleteAllTerms() {
+    dsl.deleteFrom(GLOSSARY_TERM_RELATIONSHIP).execute();
+    dsl.deleteFrom(GLOSSARY_TERM).execute();
+  }
 }

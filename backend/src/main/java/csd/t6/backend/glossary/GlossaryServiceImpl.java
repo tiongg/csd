@@ -71,4 +71,9 @@ public class GlossaryServiceImpl implements GlossaryService {
             relationships.getOrDefault(term.getId(), List.of()).toArray(new String[0])))
         .toList();
   }
+
+  @Transactional
+  public void clearGlossaryTerms() {
+    this.glossaryRepository.deleteAllTerms();
+  }
 }
