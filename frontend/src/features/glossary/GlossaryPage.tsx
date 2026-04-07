@@ -15,9 +15,7 @@ import {
 } from '@/lib/fetch-client';
 import type { GlossaryItem } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo, useState } from 'react';
-import { KeywordCourseSearchDialog } from '../learner/dashboard/KeywordCourseSearchDialog';
-import RelationGraph from '../relations/RelationGraph';
+import { useMemo, useState } from 'react';
 import GlossaryCard from './components/GlossaryCard';
 
 const SORT_A_TO_Z = 'asc';
@@ -44,8 +42,6 @@ export default function GlossaryPage({
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_A_TO_Z);
-  const [isCourseMatchOpen, setIsCourseMatchOpen] = useState(false);
-  const [keywordSearch, setKeywordSearch] = useState('');
 
   const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
   const { mutateAsync: generateGlossary, isPending: isGeneratingGlossary } =
@@ -92,11 +88,6 @@ export default function GlossaryPage({
     });
   }, [query, sortOrder, glossaryItems]);
 
-  const onNodeClick = useCallback((nodeId: string) => {
-    setKeywordSearch(nodeId);
-    setIsCourseMatchOpen(true);
-  }, []);
-
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col bg-slate-100/70 p-4 md:p-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
@@ -111,13 +102,6 @@ export default function GlossaryPage({
             Expanded slang and meme vocabulary with practical conversation
             examples for writing, moderation, and learner context.
           </p>
-        </section>
-
-        <section className="relative h-120 rounded-2xl border border-white/75 bg-white/45 p-5 shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 md:p-6">
-          <p className="mb-1 text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
-            Relationships
-          </p>
-          <RelationGraph onNodeClick={onNodeClick} />
         </section>
 
         <section className={glassPanelClass}>
@@ -197,12 +181,6 @@ export default function GlossaryPage({
           )}
         </section>
       </div>
-
-      <KeywordCourseSearchDialog
-        initialSearchValue={keywordSearch}
-        open={isCourseMatchOpen}
-        onOpenChange={setIsCourseMatchOpen}
-      />
     </div>
   );
 }

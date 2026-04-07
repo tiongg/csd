@@ -6,6 +6,10 @@ import * as d3 from 'd3';
 import { useEffect, useRef, useState } from 'react';
 
 const MAX_LINKS_PER_NODE = 3;
+const SEARCH_FOCUS_SCALE = 2.75;
+const SEARCH_FOCUS_DURATION_MS = 500;
+const LABEL_VISIBILITY_SCALE = 0.98;
+export const RELATION_CLUSTER_COLORS = d3.schemeTableau10;
 
 type NodeType = SimulationNodeDatum & {
   id: string;
@@ -33,9 +37,11 @@ type EdgeCandidate = {
 type RelationGraphProps = {
   onNodeClick?: (nodeId: string, connections: string[]) => void;
   className?: string;
+  focusQuery?: string;
+  focusRequestKey?: number;
 };
 
-function buildGraph(glossaryItems: GlossaryItem[]): {
+export function buildGraph(glossaryItems: GlossaryItem[]): {
   nodes: NodeType[];
   links: LinkType[];
 } {
@@ -188,11 +194,11 @@ function buildGraph(glossaryItems: GlossaryItem[]): {
   };
 }
 
-function getNodeId(value: NodeType | string) {
+export function getNodeId(value: NodeType | string) {
   return typeof value === 'string' ? value : value.id;
 }
 
-function buildComponentLookup(nodes: NodeType[], links: LinkType[]) {
+export function buildComponentLookup(nodes: NodeType[], links: LinkType[]) {
   const adjacency = new Map<string, Set<string>>();
   nodes.forEach((node) => {
     adjacency.set(node.id, new Set());
@@ -248,16 +254,16 @@ function buildComponentCenters(componentCount: number, width: number, height: nu
     return centers;
   }
 
-  const radius = Math.max(
-    90,
-    Math.min(width, height) * 0.24,
-  );
+  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+  const radialStep = Math.max(46, Math.min(width, height) * 0.058);
 
   for (let i = 0; i < componentCount; i += 1) {
-    const angle = (i / componentCount) * Math.PI * 2;
+    const radius = i === 0 ? 0 : radialStep * Math.sqrt(i);
+    const angle = i * goldenAngle;
+
     centers.set(i, {
-      x: centerX + radius * Math.cos(angle),
-      y: centerY + radius * Math.sin(angle),
+      x: centerX + Math.cos(angle) * radius,
+      y: centerY + Math.sin(angle) * radius,
     });
   }
 
@@ -267,8 +273,23 @@ function buildComponentCenters(componentCount: number, width: number, height: nu
 export default function RelationGraph({
   onNodeClick,
   className = '',
+  focusQuery = '',
+  focusRequestKey = 0,
 }: RelationGraphProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
+  const svgSelectionRef = useRef<d3.Selection<SVGSVGElement, unknown, null, undefined> | null>(null);
+  const zoomTransformRef = useRef(d3.zoomIdentity);
+  const suppressTooltipDismissRef = useRef(false);
+  const focusTimeoutRef = useRef<number | null>(null);
+  const previousFocusQueryRef = useRef('');
+  const onNodeClickRef = useRef(onNodeClick);
+  const nodeByIdRef = useRef<Map<string, NodeType>>(new Map());
+  const glossaryByIdRef = useRef<Map<string, GlossaryItem>>(new Map());
+  const connectionsRef = useRef<Map<string, Set<string>>>(new Map());
+  const viewportRef = useRef({ width: 0, height: 0 });
+  const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const [tooltip, setTooltip] = useState<{
     x: number;
     y: number;
@@ -279,31 +300,144 @@ export default function RelationGraph({
   const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
 
   useEffect(() => {
-    if (!glossaryItems || !svgRef.current) return;
+    onNodeClickRef.current = onNodeClick;
+  }, [onNodeClick]);
+
+  const hideTooltip = () => {
+    setTooltip((prev) => ({ ...prev, visible: false }));
+  };
+
+  const getTooltipPositionForNode = (
+    node: NodeType,
+    transform = zoomTransformRef.current,
+  ) => {
+    const svgElement = svgRef.current;
+    if (!svgElement || node.x === undefined || node.y === undefined) {
+      return { x: 20, y: 20 };
+    }
+
+    const bounds = svgElement.getBoundingClientRect();
+    const tooltipWidth = 288;
+    const tooltipHeight = 172;
+    const nodeX = bounds.left + transform.applyX(node.x);
+    const nodeY = bounds.top + transform.applyY(node.y);
+    const preferredX = nodeX - tooltipWidth / 2;
+    const preferredY = nodeY - tooltipHeight - 10;
+    const fallbackY = nodeY + 10;
+
+    return {
+      x: Math.max(12, Math.min(preferredX, window.innerWidth - tooltipWidth - 12)),
+      y:
+        preferredY < 12
+          ? Math.max(12, Math.min(fallbackY, window.innerHeight - tooltipHeight - 12))
+          : Math.max(12, Math.min(preferredY, window.innerHeight - tooltipHeight - 12)),
+    };
+  };
+
+  const focusNode = (nodeId: string, scale = SEARCH_FOCUS_SCALE) => {
+    const targetNode = nodeByIdRef.current.get(nodeId);
+    const svg = svgSelectionRef.current;
+    const zoom = zoomRef.current;
+
+    if (
+      !targetNode ||
+      !svg ||
+      !zoom ||
+      targetNode.x === undefined ||
+      targetNode.y === undefined
+    ) {
+      return;
+    }
+
+    const { width, height } = viewportRef.current;
+    const nextTransform = d3.zoomIdentity
+      .translate(width / 2, height / 2)
+      .scale(scale)
+      .translate(-targetNode.x, -targetNode.y);
+
+    if (focusTimeoutRef.current !== null) {
+      window.clearTimeout(focusTimeoutRef.current);
+    }
+    suppressTooltipDismissRef.current = true;
+
+    svg
+      .interrupt()
+      .transition()
+      .duration(SEARCH_FOCUS_DURATION_MS)
+      .call(zoom.transform, nextTransform);
+
+    const glossaryItem = glossaryByIdRef.current.get(nodeId) ?? null;
+    const tooltipPos = getTooltipPositionForNode(targetNode, nextTransform);
+    setTooltip({
+      x: tooltipPos.x,
+      y: tooltipPos.y,
+      item: glossaryItem,
+      connections: Array.from(connectionsRef.current.get(nodeId) ?? []).sort(),
+      visible: glossaryItem !== null,
+    });
+
+    focusTimeoutRef.current = window.setTimeout(() => {
+      suppressTooltipDismissRef.current = false;
+      focusTimeoutRef.current = null;
+    }, SEARCH_FOCUS_DURATION_MS + 40);
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) {
+      return;
+    }
+
+    const updateSize = () => {
+      const nextWidth = Math.max(1, Math.floor(container.clientWidth));
+      const nextHeight = Math.max(1, Math.floor(container.clientHeight));
+      setViewportSize((prev) =>
+        prev.width === nextWidth && prev.height === nextHeight
+          ? prev
+          : { width: nextWidth, height: nextHeight },
+      );
+    };
+
+    updateSize();
+
+    const resizeObserver = new ResizeObserver(updateSize);
+    resizeObserver.observe(container);
+    window.addEventListener('resize', updateSize);
+
+    return () => {
+      if (focusTimeoutRef.current !== null) {
+        window.clearTimeout(focusTimeoutRef.current);
+        focusTimeoutRef.current = null;
+      }
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', updateSize);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      !glossaryItems ||
+      !svgRef.current ||
+      viewportSize.width <= 0 ||
+      viewportSize.height <= 0
+    ) {
+      return;
+    }
 
     const { nodes, links } = buildGraph(glossaryItems);
     const { componentByNode, componentCount } = buildComponentLookup(nodes, links);
-    const width = svgRef.current.clientWidth || 800;
-    const height = svgRef.current.clientHeight || 600;
-    const componentCenters = buildComponentCenters(componentCount, width, height);
+    const width = viewportSize.width;
+    const height = viewportSize.height;
+    const componentCenters = buildComponentCenters(
+      componentCount,
+      width,
+      height,
+    );
+    viewportRef.current = { width, height };
 
     nodes.forEach((node) => {
       node.cluster = componentByNode.get(node.id) ?? 0;
     });
-
-    d3.select(svgRef.current).selectAll('*').remove();
-    const svg = d3.select(svgRef.current);
-
-    const g = svg.append('g');
-
-    const zoom = d3
-      .zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.1, 4])
-      .on('zoom', (event) => {
-        g.attr('transform', event.transform);
-      });
-
-    svg.call(zoom as any);
 
     const nodeDegrees = new Map<string, number>();
     nodes.forEach((node) => {
@@ -316,41 +450,143 @@ export default function RelationGraph({
       nodeDegrees.set(targetId, (nodeDegrees.get(targetId) ?? 0) + 1);
     });
 
+    const nodesByCluster = new Map<number, NodeType[]>();
+    nodes.forEach((node) => {
+      const clusterId = node.cluster ?? 0;
+      const clusterNodes = nodesByCluster.get(clusterId) ?? [];
+      clusterNodes.push(node);
+      nodesByCluster.set(clusterId, clusterNodes);
+    });
+
+    nodesByCluster.forEach((clusterNodes, clusterId) => {
+      const center = componentCenters.get(clusterId) ?? { x: width / 2, y: height / 2 };
+      const sortedClusterNodes = [...clusterNodes].sort((a, b) => {
+        const degreeDifference =
+          (nodeDegrees.get(b.id) ?? 0) - (nodeDegrees.get(a.id) ?? 0);
+
+        if (degreeDifference !== 0) {
+          return degreeDifference;
+        }
+
+        return a.id.localeCompare(b.id);
+      });
+
+      let placedCount = 0;
+      let ringIndex = 0;
+
+      while (placedCount < sortedClusterNodes.length) {
+        const ringNodeCount =
+          ringIndex === 0
+            ? 1
+            : Math.min(sortedClusterNodes.length - placedCount, Math.max(6, ringIndex * 8));
+        const radius = ringIndex === 0 ? 0 : ringIndex * 28;
+        const angleOffset = clusterId * 0.45 + (ringIndex % 2 === 0 ? 0 : Math.PI / 10);
+
+        for (let i = 0; i < ringNodeCount; i += 1) {
+          const node = sortedClusterNodes[placedCount + i];
+          if (!node) {
+            continue;
+          }
+
+          if (ringIndex === 0) {
+            node.x = center.x;
+            node.y = center.y;
+            continue;
+          }
+
+          const angle = angleOffset + (i / ringNodeCount) * Math.PI * 2;
+          node.x = center.x + Math.cos(angle) * radius;
+          node.y = center.y + Math.sin(angle) * radius * 0.8;
+        }
+
+        placedCount += ringNodeCount;
+        ringIndex += 1;
+      }
+    });
+
+    d3.select(svgRef.current).selectAll('*').remove();
+    const svg = d3.select(svgRef.current);
+    svg.attr('width', width).attr('height', height);
+    svgSelectionRef.current = svg;
+
+    const g = svg.append('g');
+    let emphasizedNodeIds = new Set<string>();
+    let labels:
+      | d3.Selection<SVGTextElement, NodeType, SVGGElement, unknown>
+      | null = null;
+    const updateLabelVisibility = () => {
+      if (!labels) {
+        return;
+      }
+
+      const showAllLabels = zoomTransformRef.current.k >= LABEL_VISIBILITY_SCALE;
+      labels
+        .style('display', (node) =>
+          showAllLabels || emphasizedNodeIds.has(node.id) ? null : 'none',
+        )
+        .style('opacity', (node) =>
+          showAllLabels || emphasizedNodeIds.has(node.id) ? 0.95 : 0,
+        );
+    };
+
+    const zoom = d3
+      .zoom<SVGSVGElement, unknown>()
+      .scaleExtent([0.1, 5])
+      .on('zoom', (event) => {
+        zoomTransformRef.current = event.transform;
+        g.attr('transform', event.transform);
+        emphasizedNodeIds = new Set();
+        updateLabelVisibility();
+        if (!suppressTooltipDismissRef.current) {
+          hideTooltip();
+        }
+      });
+    zoomRef.current = zoom;
+
+    svg.call(zoom as any);
+    svg.on('click', (event) => {
+      const target = event.target as Element | null;
+      if (target?.closest('.node')) {
+        return;
+      }
+      hideTooltip();
+    });
+
     const clusterColor = d3
-      .scaleOrdinal<number, string>(d3.schemeTableau10)
+      .scaleOrdinal<number, string>(RELATION_CLUSTER_COLORS)
       .domain(d3.range(Math.max(1, componentCount)));
 
     const linkForce = d3
       .forceLink<NodeType, LinkType>(links)
       .id((d) => d.id)
       .distance((graphLink) => {
-        const baseDistance = graphLink.reciprocal ? 58 : 78;
-        return Math.max(42, baseDistance - graphLink.strength * 4);
+        const baseDistance = graphLink.reciprocal ? 96 : 118;
+        return Math.max(76, baseDistance - graphLink.strength * 3);
       })
-      .strength((graphLink) => Math.min(0.95, 0.22 + graphLink.strength * 0.12));
+      .strength((graphLink) => Math.min(0.85, 0.2 + graphLink.strength * 0.1));
 
     const simulation = d3
       .forceSimulation<NodeType, LinkType>(nodes)
       .force('link', linkForce)
-      .force('charge', d3.forceManyBody().strength(-130))
+      .force('charge', d3.forceManyBody().strength(-165))
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force(
         'x',
         d3
           .forceX<NodeType>((node) => componentCenters.get(node.cluster ?? 0)?.x ?? width / 2)
-          .strength(0.12),
+          .strength(0.11),
       )
       .force(
         'y',
         d3
           .forceY<NodeType>((node) => componentCenters.get(node.cluster ?? 0)?.y ?? height / 2)
-          .strength(0.12),
+          .strength(0.22),
       )
       .force(
         'collision',
         d3
           .forceCollide<NodeType>()
-          .radius((node) => 8 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 2.2),
+          .radius((node) => 14 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 2.8),
       );
 
     const link = g
@@ -360,8 +596,9 @@ export default function RelationGraph({
       .data(links)
       .join('line')
       .attr('stroke', '#94a3b8')
-      .attr('stroke-opacity', 0.32)
-      .attr('stroke-width', 1.2);
+      .attr('stroke-opacity', 0.55)
+      .attr('stroke-width', 2.2)
+      .attr('stroke-linecap', 'round');
 
     const nodeGroups = g
       .append('g')
@@ -382,7 +619,7 @@ export default function RelationGraph({
       .attr('stroke', '#ffffff')
       .attr('stroke-width', 1.4);
 
-    nodeGroups
+    labels = nodeGroups
       .append('text')
       .text((node) => node.id)
       .attr('x', 0)
@@ -394,8 +631,9 @@ export default function RelationGraph({
       .attr('font-size', '10.5px')
       .attr('font-weight', '500')
       .style('pointer-events', 'none')
-      .style('user-select', 'none')
-      .style('opacity', 0.95);
+      .style('user-select', 'none');
+
+    updateLabelVisibility();
 
     const connections = new Map<string, Set<string>>();
     nodes.forEach((node) => {
@@ -412,10 +650,15 @@ export default function RelationGraph({
     for (const item of glossaryItems) {
       glossaryMap.set(item.title, item);
     }
+    glossaryByIdRef.current = glossaryMap;
+    connectionsRef.current = connections;
+    nodeByIdRef.current = new Map(nodes.map((node) => [node.id, node]));
 
-    nodeGroups.on('mouseenter', function (event, d) {
+    nodeGroups.on('mouseenter', function (_event, d) {
       const connected = connections.get(d.id) ?? new Set();
       const activeNodes = new Set([d.id, ...Array.from(connected)]);
+      const tooltipPos = getTooltipPositionForNode(d);
+      emphasizedNodeIds = activeNodes;
 
       nodeGroups.style('opacity', 0.2);
       link.style('opacity', 0.06);
@@ -430,10 +673,7 @@ export default function RelationGraph({
         })
         .attr('stroke-width', 2.2);
 
-      nodeGroups
-        .filter((node) => activeNodes.has(node.id))
-        .select('text')
-        .style('opacity', 1);
+      updateLabelVisibility();
 
       link
         .filter(
@@ -443,43 +683,45 @@ export default function RelationGraph({
         )
         .style('opacity', 0.85)
         .attr('stroke', '#3b82f6')
-        .attr('stroke-width', 1.2);
+        .attr('stroke-width', 2.6);
 
       setTooltip({
-        x: event.clientX + 10,
-        y: event.clientY - 10,
+        x: tooltipPos.x,
+        y: tooltipPos.y,
         item: glossaryMap.get(d.id) ?? null,
         connections: Array.from(connected).sort(),
         visible: true,
       });
     });
 
-    nodeGroups.on('mousemove', function (event) {
+    nodeGroups.on('mousemove', function (_event, d) {
+      const tooltipPos = getTooltipPositionForNode(d);
       setTooltip((prev) => ({
         ...prev,
-        x: event.clientX + 10,
-        y: event.clientY - 10,
+        x: tooltipPos.x,
+        y: tooltipPos.y,
       }));
     });
 
     nodeGroups.on('mouseleave', function () {
+      emphasizedNodeIds = new Set();
       nodeGroups.style('opacity', 1);
       nodeGroups
         .select('circle')
         .attr('fill', (node) => clusterColor(node.cluster ?? 0))
         .attr('stroke-width', 1.4);
-      nodeGroups.select('text').style('opacity', 0.95);
+      updateLabelVisibility();
       link
-        .style('opacity', 0.32)
+        .style('opacity', 0.55)
         .attr('stroke', '#94a3b8')
-        .attr('stroke-width', 1.2);
-      setTooltip((prev) => ({ ...prev, visible: false }));
+        .attr('stroke-width', 2.2);
+      hideTooltip();
     });
 
     nodeGroups.on('click', function (_e, d) {
       const connected = Array.from(connections.get(d.id) ?? []);
-      onNodeClick?.(d.id, connected);
-      setTooltip((prev) => ({ ...prev, visible: false }));
+      onNodeClickRef.current?.(d.id, connected);
+      hideTooltip();
     });
 
     simulation.on('tick', () => {
@@ -496,21 +738,54 @@ export default function RelationGraph({
     const stopTimer = window.setTimeout(() => simulation.stop(), 3500);
 
     return () => {
+      svg.on('.zoom', null);
+      svg.on('click', null);
       window.clearTimeout(stopTimer);
       simulation.stop();
     };
-  }, [onNodeClick, glossaryItems]);
+  }, [glossaryItems, viewportSize.height, viewportSize.width]);
+
+  useEffect(() => {
+    const query = focusQuery.trim().toLowerCase();
+    const previousQuery = previousFocusQueryRef.current;
+    previousFocusQueryRef.current = query;
+
+    if (!query) {
+      hideTooltip();
+      return;
+    }
+
+    const isDeleting =
+      previousQuery.length > query.length && previousQuery.startsWith(query);
+    if (isDeleting) {
+      hideTooltip();
+      return;
+    }
+
+    const nodeById = nodeByIdRef.current;
+    const matchedId =
+      Array.from(nodeById.keys()).find((id) => id.toLowerCase() === query) ??
+      Array.from(nodeById.keys()).find((id) => id.toLowerCase().includes(query));
+
+    if (!matchedId) {
+      hideTooltip();
+      return;
+    }
+
+    focusNode(matchedId);
+  }, [focusQuery, focusRequestKey]);
 
   return (
     <div
+      ref={containerRef}
       className={cn(
-        'relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden',
+        'absolute inset-0 overflow-hidden',
         className,
       )}
     >
       <svg
         ref={svgRef}
-        className="h-full w-full flex-1"
+        className="block h-full w-full"
         style={{ cursor: 'grab' }}
       />
       {tooltip.visible && tooltip.item && (
