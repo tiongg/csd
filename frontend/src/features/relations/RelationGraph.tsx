@@ -436,12 +436,10 @@ export default function RelationGraph({
   const viewportRef = useRef({ width: 0, height: 0 });
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const [tooltip, setTooltip] = useState<{
-    x: number;
-    y: number;
     item: GlossaryItem | null;
     connections: string[];
     visible: boolean;
-  }>({ x: 0, y: 0, item: null, connections: [], visible: false });
+  }>({ item: null, connections: [], visible: false });
   const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
 
   useEffect(() => {
@@ -450,33 +448,6 @@ export default function RelationGraph({
 
   const hideTooltip = () => {
     setTooltip((prev) => ({ ...prev, visible: false }));
-  };
-
-  const getTooltipPositionForNode = (
-    node: NodeType,
-    transform = zoomTransformRef.current,
-  ) => {
-    const svgElement = svgRef.current;
-    if (!svgElement || node.x === undefined || node.y === undefined) {
-      return { x: 20, y: 20 };
-    }
-
-    const bounds = svgElement.getBoundingClientRect();
-    const tooltipWidth = 288;
-    const tooltipHeight = 172;
-    const nodeX = bounds.left + transform.applyX(node.x);
-    const nodeY = bounds.top + transform.applyY(node.y);
-    const preferredX = nodeX - tooltipWidth / 2;
-    const preferredY = nodeY - tooltipHeight - 10;
-    const fallbackY = nodeY + 10;
-
-    return {
-      x: Math.max(12, Math.min(preferredX, window.innerWidth - tooltipWidth - 12)),
-      y:
-        preferredY < 12
-          ? Math.max(12, Math.min(fallbackY, window.innerHeight - tooltipHeight - 12))
-          : Math.max(12, Math.min(preferredY, window.innerHeight - tooltipHeight - 12)),
-    };
   };
 
   const focusNode = (nodeId: string, scale = SEARCH_FOCUS_SCALE) => {
@@ -512,10 +483,7 @@ export default function RelationGraph({
       .call(zoom.transform, nextTransform);
 
     const glossaryItem = glossaryByIdRef.current.get(nodeId) ?? null;
-    const tooltipPos = getTooltipPositionForNode(targetNode, nextTransform);
     setTooltip({
-      x: tooltipPos.x,
-      y: tooltipPos.y,
       item: glossaryItem,
       connections: Array.from(connectionsRef.current.get(nodeId) ?? []).sort(),
       visible: glossaryItem !== null,
@@ -802,7 +770,6 @@ export default function RelationGraph({
     nodeGroups.on('mouseenter', function (_event, d) {
       const connected = connections.get(d.id) ?? new Set();
       const activeNodes = new Set([d.id, ...Array.from(connected)]);
-      const tooltipPos = getTooltipPositionForNode(d);
       emphasizedNodeIds = activeNodes;
 
       nodeGroups.style('opacity', 0.2);
@@ -831,21 +798,10 @@ export default function RelationGraph({
         .attr('stroke-width', 2.6);
 
       setTooltip({
-        x: tooltipPos.x,
-        y: tooltipPos.y,
         item: glossaryMap.get(d.id) ?? null,
         connections: Array.from(connected).sort(),
         visible: true,
       });
-    });
-
-    nodeGroups.on('mousemove', function (_event, d) {
-      const tooltipPos = getTooltipPositionForNode(d);
-      setTooltip((prev) => ({
-        ...prev,
-        x: tooltipPos.x,
-        y: tooltipPos.y,
-      }));
     });
 
     nodeGroups.on('mouseleave', function () {
@@ -934,41 +890,39 @@ export default function RelationGraph({
         style={{ cursor: 'grab' }}
       />
       {tooltip.visible && tooltip.item && (
-        <div
-          className="pointer-events-none fixed z-50 w-72 rounded-md bg-slate-900 px-4 py-3 text-xs text-white shadow-lg"
-          style={{
-            left: `${tooltip.x}px`,
-            top: `${tooltip.y}px`,
-          }}
-        >
-          <h3 className="mb-2 border-b border-slate-700 pb-1 text-sm font-semibold">
-            {tooltip.item.title}
-          </h3>
-          {tooltip.item.description && (
-            <p className="mb-2 text-slate-200">{tooltip.item.description}</p>
-          )}
-          {tooltip.item.context && (
-            <div className="mb-2">
-              <span className="font-medium text-slate-400">Context: </span>
-              <span className="text-slate-200">{tooltip.item.context}</span>
+        <div className="pointer-events-none absolute inset-x-4 top-4 z-20 flex justify-center">
+          <div className="w-full max-w-2xl rounded-xl border border-slate-700/80 bg-slate-900/92 px-4 py-3 text-xs text-white shadow-xl backdrop-blur">
+            <h3 className="mb-2 border-b border-slate-700 pb-1 text-sm font-semibold">
+              {tooltip.item.title}
+            </h3>
+            {tooltip.item.description && (
+              <p className="mb-2 text-slate-200">{tooltip.item.description}</p>
+            )}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-300">
+              {tooltip.item.context && (
+                <div>
+                  <span className="font-medium text-slate-400">Context: </span>
+                  <span className="text-slate-200">{tooltip.item.context}</span>
+                </div>
+              )}
+              {tooltip.item.example && (
+                <div className="min-w-0 flex-1">
+                  <span className="font-medium text-slate-400">Example: </span>
+                  <span className="text-slate-300 italic">
+                    {tooltip.item.example}
+                  </span>
+                </div>
+              )}
             </div>
-          )}
-          {tooltip.item.example && (
-            <div className="mb-2">
-              <span className="font-medium text-slate-400">Example: </span>
-              <span className="text-slate-300 italic">
-                {tooltip.item.example}
-              </span>
-            </div>
-          )}
-          {tooltip.connections.length > 0 && (
-            <div className="mt-2 border-t border-slate-700 pt-2">
-              <span className="font-medium text-slate-400">Related to: </span>
-              <span className="text-slate-200">
-                {tooltip.connections.join(', ')}
-              </span>
-            </div>
-          )}
+            {tooltip.connections.length > 0 && (
+              <div className="mt-2 border-t border-slate-700 pt-2">
+                <span className="font-medium text-slate-400">Related to: </span>
+                <span className="text-slate-200">
+                  {tooltip.connections.join(', ')}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
