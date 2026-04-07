@@ -429,10 +429,16 @@ export default function RelationGraph({
   const suppressTooltipDismissRef = useRef(false);
   const focusTimeoutRef = useRef<number | null>(null);
   const previousFocusQueryRef = useRef('');
+  const focusedNodeIdRef = useRef<string | null>(null);
   const onNodeClickRef = useRef(onNodeClick);
   const nodeByIdRef = useRef<Map<string, NodeType>>(new Map());
   const glossaryByIdRef = useRef<Map<string, GlossaryItem>>(new Map());
   const connectionsRef = useRef<Map<string, Set<string>>>(new Map());
+  const activeHighlightNodeIdsRef = useRef<Set<string>>(new Set());
+  const applyNodeHighlightRef = useRef<
+    ((nodeId: string, showTooltip?: boolean) => void) | null
+  >(null);
+  const clearNodeHighlightRef = useRef<(() => void) | null>(null);
   const viewportRef = useRef({ width: 0, height: 0 });
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const [tooltip, setTooltip] = useState<{
@@ -474,20 +480,15 @@ export default function RelationGraph({
     if (focusTimeoutRef.current !== null) {
       window.clearTimeout(focusTimeoutRef.current);
     }
+    focusedNodeIdRef.current = nodeId;
     suppressTooltipDismissRef.current = true;
+    applyNodeHighlightRef.current?.(nodeId, true);
 
     svg
       .interrupt()
       .transition()
       .duration(SEARCH_FOCUS_DURATION_MS)
       .call(zoom.transform, nextTransform);
-
-    const glossaryItem = glossaryByIdRef.current.get(nodeId) ?? null;
-    setTooltip({
-      item: glossaryItem,
-      connections: Array.from(connectionsRef.current.get(nodeId) ?? []).sort(),
-      visible: glossaryItem !== null,
-    });
 
     focusTimeoutRef.current = window.setTimeout(() => {
       suppressTooltipDismissRef.current = false;
@@ -648,9 +649,9 @@ export default function RelationGraph({
       .on('zoom', (event) => {
         zoomTransformRef.current = event.transform;
         g.attr('transform', event.transform);
-        emphasizedNodeIds = new Set();
+        emphasizedNodeIds = new Set(activeHighlightNodeIdsRef.current);
         updateLabelVisibility();
-        if (!suppressTooltipDismissRef.current) {
+        if (!suppressTooltipDismissRef.current && focusedNodeIdRef.current === null) {
           hideTooltip();
         }
       });
@@ -662,6 +663,8 @@ export default function RelationGraph({
       if (target?.closest('.node')) {
         return;
       }
+      focusedNodeIdRef.current = null;
+      clearNodeHighlightRef.current?.();
       hideTooltip();
     });
 
@@ -767,11 +770,36 @@ export default function RelationGraph({
     connectionsRef.current = connections;
     nodeByIdRef.current = new Map(nodes.map((node) => [node.id, node]));
 
-    nodeGroups.on('mouseenter', function (_event, d) {
-      const connected = connections.get(d.id) ?? new Set();
-      const activeNodes = new Set([d.id, ...Array.from(connected)]);
-      emphasizedNodeIds = activeNodes;
+    const showNodeTooltip = (nodeId: string) => {
+      const glossaryItem = glossaryMap.get(nodeId) ?? null;
+      setTooltip({
+        item: glossaryItem,
+        connections: Array.from(connections.get(nodeId) ?? []).sort(),
+        visible: glossaryItem !== null,
+      });
+    };
 
+    const resetNodeStyles = () => {
+      activeHighlightNodeIdsRef.current = new Set();
+      emphasizedNodeIds = new Set();
+      nodeGroups.style('opacity', 1);
+      nodeGroups
+        .select('circle')
+        .attr('fill', (node) => clusterColor(node.cluster ?? 0))
+        .attr('stroke-width', 1.4);
+      link
+        .style('opacity', 0.55)
+        .attr('stroke', '#94a3b8')
+        .attr('stroke-width', 2.2);
+      updateLabelVisibility();
+    };
+
+    const highlightNode = (nodeId: string, showTooltip = true) => {
+      const connected = connections.get(nodeId) ?? new Set();
+      const activeNodes = new Set([nodeId, ...Array.from(connected)]);
+
+      activeHighlightNodeIdsRef.current = activeNodes;
+      emphasizedNodeIds = activeNodes;
       nodeGroups.style('opacity', 0.2);
       link.style('opacity', 0.06);
 
@@ -785,8 +813,6 @@ export default function RelationGraph({
         })
         .attr('stroke-width', 2.2);
 
-      updateLabelVisibility();
-
       link
         .filter(
           (graphLink) =>
@@ -797,25 +823,30 @@ export default function RelationGraph({
         .attr('stroke', '#3b82f6')
         .attr('stroke-width', 2.6);
 
-      setTooltip({
-        item: glossaryMap.get(d.id) ?? null,
-        connections: Array.from(connected).sort(),
-        visible: true,
-      });
+      updateLabelVisibility();
+
+      if (showTooltip) {
+        showNodeTooltip(nodeId);
+      }
+    };
+
+    applyNodeHighlightRef.current = highlightNode;
+    clearNodeHighlightRef.current = () => {
+      resetNodeStyles();
+      hideTooltip();
+    };
+
+    nodeGroups.on('mouseenter', function (_event, d) {
+      highlightNode(d.id, true);
     });
 
     nodeGroups.on('mouseleave', function () {
-      emphasizedNodeIds = new Set();
-      nodeGroups.style('opacity', 1);
-      nodeGroups
-        .select('circle')
-        .attr('fill', (node) => clusterColor(node.cluster ?? 0))
-        .attr('stroke-width', 1.4);
-      updateLabelVisibility();
-      link
-        .style('opacity', 0.55)
-        .attr('stroke', '#94a3b8')
-        .attr('stroke-width', 2.2);
+      if (focusedNodeIdRef.current) {
+        highlightNode(focusedNodeIdRef.current, true);
+        return;
+      }
+
+      resetNodeStyles();
       hideTooltip();
     });
 
@@ -839,6 +870,8 @@ export default function RelationGraph({
     const stopTimer = window.setTimeout(() => simulation.stop(), 3500);
 
     return () => {
+      applyNodeHighlightRef.current = null;
+      clearNodeHighlightRef.current = null;
       svg.on('.zoom', null);
       svg.on('click', null);
       window.clearTimeout(stopTimer);
@@ -852,6 +885,8 @@ export default function RelationGraph({
     previousFocusQueryRef.current = query;
 
     if (!query) {
+      focusedNodeIdRef.current = null;
+      clearNodeHighlightRef.current?.();
       hideTooltip();
       return;
     }
@@ -859,6 +894,8 @@ export default function RelationGraph({
     const isDeleting =
       previousQuery.length > query.length && previousQuery.startsWith(query);
     if (isDeleting) {
+      focusedNodeIdRef.current = null;
+      clearNodeHighlightRef.current?.();
       hideTooltip();
       return;
     }
@@ -869,6 +906,8 @@ export default function RelationGraph({
       Array.from(nodeById.keys()).find((id) => id.toLowerCase().includes(query));
 
     if (!matchedId) {
+      focusedNodeIdRef.current = null;
+      clearNodeHighlightRef.current?.();
       hideTooltip();
       return;
     }
