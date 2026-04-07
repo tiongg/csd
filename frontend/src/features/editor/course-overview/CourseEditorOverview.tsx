@@ -85,8 +85,8 @@ export default function CourseEditorOverview({
         </div>
 
         <CourseImageOverview
-          className="min-h-[240px]"
-          imageClassName="h-[240px] w-full object-cover md:h-[320px]"
+          className="min-h-[300px]"
+          imageClassName="h-[300px] w-full object-cover md:h-[420px]"
         />
 
         <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
