@@ -47,10 +47,11 @@ public class ContributorAnalyticsRepository extends BaseRepository<CourseRecord>
   /**
    * Count active learners (enrolled with non-empty metadata and not completed)
    */
-  public int countActiveLearnersByContributor(UUID contributorId) {
+  public int countActiveLearnersByContributor(UUID contributorId, OffsetDateTime since) {
     return Math
         .toIntExact(this.dsl.selectCount().from(LEARNER_COURSE).join(COURSE).on(LEARNER_COURSE.COURSE_ID.eq(COURSE.ID))
-            .where(COURSE.CREATOR_ID.eq(contributorId)).and(LEARNER_COURSE.METADATA.ne(JSONB.valueOf("{}")))
+            .where(COURSE.CREATOR_ID.eq(contributorId)).and(LEARNER_COURSE.ENROLLED_AT.greaterOrEqual(since.toLocalDateTime()))
+            .and(LEARNER_COURSE.METADATA.ne(JSONB.valueOf("{}")))
             .and(LEARNER_COURSE.STATUS.ne(COMPLETED)).fetchOne(0, long.class));
   }
 
