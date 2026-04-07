@@ -5,7 +5,7 @@ import { useApiQuery } from '@/lib/fetch-client';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type KeywordCourseSearchDialogProps = {
   initialSearchValue: string;
@@ -30,6 +30,7 @@ export function KeywordCourseSearchDialog({
 }: KeywordCourseSearchDialogProps) {
   const { user } = useAuth();
   const [search, setSearch] = useState(initialSearchValue);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const { data: courses, isLoading, isError } = useApiQuery(
     'get',
     '/api/courses/published',
@@ -86,7 +87,20 @@ export function KeywordCourseSearchDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-xl border-slate-200 p-5 sm:max-w-3xl">
+      <DialogContent
+        className="rounded-xl border-slate-200 p-5 sm:max-w-3xl"
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          const input = searchInputRef.current;
+          if (!input) {
+            return;
+          }
+
+          input.focus();
+          const caretPosition = input.value.length;
+          input.setSelectionRange(caretPosition, caretPosition);
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-sky-900">Keyword to Course Match</DialogTitle>
           <DialogDescription className="text-slate-600">
@@ -96,6 +110,7 @@ export function KeywordCourseSearchDialog({
 
         <div className="space-y-4">
           <Input
+            ref={searchInputRef}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by keyword"
