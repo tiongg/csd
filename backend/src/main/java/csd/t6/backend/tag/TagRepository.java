@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
 import csd.t6.backend.utils.BaseRepository;
@@ -89,5 +90,24 @@ public class TagRepository extends BaseRepository<TagsRecord> {
    */
   public List<TagsRecord> searchByTitle(String search) {
     return dsl.selectFrom(TAGS).where(TAGS.TITLE.likeIgnoreCase("%" + search + "%")).limit(10).fetch();
+  }
+
+  /**
+   * Get tags ordered by usage count (most used first). Returns a list of records
+   * with tag id, title, and usage count.
+   */
+  public List<TagUsageRecord> getTagsByUsageCount() {
+    return dsl.select(TAGS.ID, TAGS.TITLE, DSL.count(COURSE_TAGS.COURSE_ID).as("usage_count")).from(TAGS)
+        .leftJoin(COURSE_TAGS).on(TAGS.ID.eq(COURSE_TAGS.TAG_ID)).groupBy(TAGS.ID, TAGS.TITLE)
+        .orderBy(DSL.field("usage_count").desc()).fetch().into(TagUsageRecord.class);
+  }
+
+  /**
+   * Record class to hold tag usage information.
+   */
+  public static class TagUsageRecord {
+    public UUID id;
+    public String title;
+    public int usageCount;
   }
 }

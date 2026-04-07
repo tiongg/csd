@@ -33,7 +33,7 @@ public class ContributorAnalyticsService {
 
     int enrolled = repository.countEnrollmentsByContributor(contributorId, since);
     int completed = repository.countCompletionsByContributor(contributorId, since);
-    int active = repository.countActiveLearnersByContributor(contributorId);
+    int active = repository.countActiveLearnersByContributor(contributorId, since);
 
     CourseEngagementData engagementSummary = new CourseEngagementData(enrolled, active, completed);
 

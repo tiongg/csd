@@ -101,22 +101,22 @@ export default function ContributorAnalytics() {
     {
       key: 'courseEngagement',
       title: 'Course Engagement',
-      value: engagementSummary.totalEnrollments.toString(),
-      description: `${engagementSummary.totalEnrollments} -> ${engagementSummary.activeLearners} -> ${engagementSummary.totalCompletions}`,
+      value: engagementSummary.totalCompletions.toString(),
+      description: 'Course completions',
       icon: ArrowTrendingUpIcon,
     },
     {
       key: 'publishedOutput',
       title: 'Published Output',
       value: analytics.publishedTotal.toString(),
-      description: `${analytics.publishedDelta > 0 ? '+' : ''}${analytics.publishedDelta} vs prior window`,
+      description: 'Course updates',
       icon: RocketLaunchIcon,
     },
     {
       key: 'coursePipeline',
       title: 'Enrollment Trend',
-      value: analytics.latestEnrollmentCount.toString(),
-      description: `${analytics.totalEnrollmentCount} enrollments across ${timeframe}`,
+      value: analytics.totalEnrollmentCount.toString(),
+      description: 'New users enrolled',
       icon: ChartBarIcon,
     },
   ];
