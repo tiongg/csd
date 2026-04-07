@@ -28,7 +28,7 @@ import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import type { Course } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -62,6 +62,7 @@ export default function EditCourseDialog({
   teamId,
 }: EditCourseDialogProps) {
   const queryClient = useQueryClient();
+  const courseTitleInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     handleSubmit,
@@ -133,7 +134,20 @@ export default function EditCourseDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setDialogOpen}>
-      <DialogContent className="rounded-xl border-slate-200 p-5 sm:max-w-lg">
+      <DialogContent
+        className="rounded-xl border-slate-200 p-5 sm:max-w-lg"
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          const input = courseTitleInputRef.current;
+          if (!input) {
+            return;
+          }
+
+          input.focus();
+          const caretPosition = input.value.length;
+          input.setSelectionRange(caretPosition, caretPosition);
+        }}
+      >
         <DialogHeader>
           <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
             Course Settings
@@ -156,6 +170,10 @@ export default function EditCourseDialog({
                   <FieldLabel htmlFor="title">Course Title</FieldLabel>
                   <Input
                     {...field}
+                    ref={(element) => {
+                      field.ref(element);
+                      courseTitleInputRef.current = element;
+                    }}
                     id="title"
                     aria-invalid={fieldState.invalid}
                     placeholder="e.g., Introduction to Gen-Alpha Culture"

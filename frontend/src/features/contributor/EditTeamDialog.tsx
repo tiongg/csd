@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 type EditTeamDialogProps = {
   isOpen: boolean;
@@ -42,6 +42,7 @@ export default function EditTeamDialog({
   team,
 }: EditTeamDialogProps) {
   const queryClient = useQueryClient();
+  const teamNameInputRef = useRef<HTMLInputElement | null>(null);
 
   const {
     handleSubmit,
@@ -103,7 +104,20 @@ export default function EditTeamDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={setDialogOpen}>
-      <DialogContent className="sm:max-w-lg rounded-xl border-slate-200 p-5">
+      <DialogContent
+        className="sm:max-w-lg rounded-xl border-slate-200 p-5"
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          const input = teamNameInputRef.current;
+          if (!input) {
+            return;
+          }
+
+          input.focus();
+          const caretPosition = input.value.length;
+          input.setSelectionRange(caretPosition, caretPosition);
+        }}
+      >
         <DialogHeader>
           <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
             Team Settings
@@ -126,6 +140,10 @@ export default function EditTeamDialog({
                   <FieldLabel htmlFor="name">Team Name</FieldLabel>
                   <Input
                     {...field}
+                    ref={(element) => {
+                      field.ref(element);
+                      teamNameInputRef.current = element;
+                    }}
                     id="name"
                     aria-invalid={fieldState.invalid}
                     placeholder="e.g., Marketing Team"
