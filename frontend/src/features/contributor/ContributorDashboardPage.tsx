@@ -49,8 +49,8 @@ export default function ContributorDashboardPage() {
           </div>
 
           <TopTrendsTable
-            title="Today's Top Trends"
-            description="Top 5 signals to monitor."
+            title="Trending"
+            description="Top signals to monitor."
           />
         </div>
       </div>
