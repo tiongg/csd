@@ -39,7 +39,7 @@ export function CourseModerationCard({
 
   return (
     <Card
-      className="group overflow-hidden rounded-xl border border-slate-300 bg-white p-0 shadow-sm transition-colors duration-150 hover:border-slate-400"
+      className="group cursor-pointer overflow-hidden rounded-xl border border-slate-300 bg-white p-0 shadow-sm transition-colors duration-150 hover:border-slate-400"
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -90,7 +90,7 @@ export function CourseModerationCard({
               {onToggleFeatured && (
                 <button
                   type="button"
-                  className="shrink-0"
+                  className="shrink-0 cursor-pointer"
                   onClick={(e) => {
                     e.stopPropagation();
                     onToggleFeatured(e);

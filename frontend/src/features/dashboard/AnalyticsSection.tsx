@@ -108,7 +108,7 @@ export function DashboardAnalyticsSection<
                 type="button"
                 data-timeframe-active={timeframe === windowValue}
                 className={cn(
-                  'relative z-10 rounded-md border border-transparent px-3 py-1.5 text-xs font-semibold transition-colors duration-240',
+                  'relative z-10 cursor-pointer rounded-md border border-transparent px-3 py-1.5 text-xs font-semibold transition-colors duration-240',
                   timeframe === windowValue
                     ? 'text-slate-900'
                     : 'text-slate-600 hover:text-slate-800',
@@ -133,7 +133,7 @@ export function DashboardAnalyticsSection<
                 type="button"
                 onClick={() => onMetricSelect(metric.key)}
                 className={cn(
-                  'flex w-full flex-col rounded-lg border px-4 py-3 text-left transition-colors',
+                  'flex w-full cursor-pointer flex-col rounded-lg border px-4 py-3 text-left transition-colors',
                   selected
                     ? 'border-sky-300 bg-sky-50/75 shadow-sm'
                     : 'border-slate-300/85 bg-slate-100/70 hover:border-sky-200 hover:bg-sky-50/40',

@@ -19,7 +19,7 @@ export default function NotificationBell({
     <button
       type="button"
       className={cn(
-        'relative inline-flex size-10 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 transition-colors hover:bg-slate-100',
+        'relative inline-flex size-10 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 transition-colors hover:bg-slate-100',
         className,
       )}
       aria-label="Notifications"
