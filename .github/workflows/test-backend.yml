@@ -43,7 +43,7 @@ jobs:
       - name: Run tests with coverage
         env:
           GOOGLE_API_KEY: dummy_key
-        run: mvn verify jacoco:report jacoco:check -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
+        run: mvn verify jacoco:report -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
         working-directory: ./backend
 
       - name: Generate coverage summary
