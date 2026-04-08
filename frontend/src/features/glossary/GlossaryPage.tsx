@@ -142,15 +142,6 @@ export default function GlossaryPage({
             {showGenerateButton && (
               <div className="ml-auto flex items-center gap-2 self-end">
                 <Button
-                  variant="destructive"
-                  disabled={isClearingGlossary || isGeneratingGlossary}
-                  onClick={() => {
-                    clearGlossary({});
-                  }}
-                >
-                  {isClearingGlossary ? 'Clearing...' : 'Clear All'}
-                </Button>
-                <Button
                   disabled={isGeneratingGlossary || isClearingGlossary}
                   onClick={() => {
                     generateGlossary({});
@@ -159,6 +150,15 @@ export default function GlossaryPage({
                   {isGeneratingGlossary
                     ? 'Generating...'
                     : 'Regenerate Glossary'}
+                </Button>
+                <Button
+                  variant="destructive"
+                  disabled={isClearingGlossary || isGeneratingGlossary}
+                  onClick={() => {
+                    clearGlossary({});
+                  }}
+                >
+                  {isClearingGlossary ? 'Clearing...' : 'Clear All'}
                 </Button>
               </div>
             )}
