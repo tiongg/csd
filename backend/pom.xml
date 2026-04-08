@@ -3,12 +3,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.0.1</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>csd.t6</groupId>
@@ -144,40 +144,53 @@
 
 	<build>
 		<plugins>
-				<!-- JaCoCo -->
-				<plugin>
-					<groupId>org.jacoco</groupId>
-					<artifactId>jacoco-maven-plugin</artifactId>
-					<version>0.8.12</version>
-					<executions>
-						<execution>
-							<id>prepare-agent</id>
-							<goals><goal>prepare-agent</goal></goals>
-							<configuration>
-								<destFile>${project.build.directory}/jacoco.exec</destFile>
-								<append>true</append>
-								<excludes>
-									<exclude>**/generated/**</exclude>
-									<exclude>**/jooq/**</exclude>
-								</excludes>
-							</configuration>
-						</execution>
-						<execution>
-							<id>report</id>
-							<phase>test</phase>
-							<goals><goal>report</goal></goals>
-							<configuration>
-								<dataFile>${project.build.directory}/jacoco.exec</dataFile>
-								<outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
-								<sourceEncoding>UTF-8</sourceEncoding>
-								<formats>
-									<format>HTML</format>
-									<format>XML</format>
-								</formats>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
+			<!-- JaCoCo -->
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.12</version>
+
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<destFile>${project.build.directory}/jacoco.exec</destFile>
+							<append>true</append>
+							<excludes>
+								<exclude>csd/t6/jooq/**</exclude>
+								<exclude>csd/t6/jooq/public_/tables/pojos/**</exclude>
+								<exclude>**/*$$*</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>report</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<dataFile>${project.build.directory}/jacoco.exec</dataFile>
+							<outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
+							<sourceEncoding>UTF-8</sourceEncoding>
+							<formats>
+								<format>HTML</format>
+							</formats>
+							<excludes>
+								<exclude>csd/t6/jooq/**</exclude>
+								<exclude>csd/t6/jooq/public_/tables/pojos/**</exclude>
+								<exclude>**/generated/**</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Spring boot maven plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -209,7 +222,9 @@
 				<executions>
 					<execution>
 						<phase>generate-sources</phase>
-						<goals><goal>generate</goal></goals>
+						<goals>
+							<goal>generate</goal>
+						</goals>
 					</execution>
 				</executions>
 				<configuration>
@@ -223,10 +238,18 @@
 						<database>
 							<name>org.jooq.meta.postgres.PostgresDatabase</name>
 							<schemata>
-								<schema><inputSchema>public</inputSchema></schema>
-								<schema><inputSchema>accounts</inputSchema></schema>
-								<schema><inputSchema>teams</inputSchema></schema>
-								<schema><inputSchema>courses</inputSchema></schema>
+								<schema>
+									<inputSchema>public</inputSchema>
+								</schema>
+								<schema>
+									<inputSchema>accounts</inputSchema>
+								</schema>
+								<schema>
+									<inputSchema>teams</inputSchema>
+								</schema>
+								<schema>
+									<inputSchema>courses</inputSchema>
+								</schema>
 							</schemata>
 							<forcedTypes>
 								<forcedType>
@@ -257,7 +280,9 @@
 					<execution>
 						<id>01-add-jooq-sources</id>
 						<phase>generate-sources</phase>
-						<goals><goal>add-source</goal></goals>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
 						<configuration>
 							<sources>
 								<source>target/generated-sources/jooq</source>

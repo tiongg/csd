@@ -5,4 +5,4 @@ WORKDIR /usr/src/maven
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-CMD ["mvn", "test", "-Dspring.profiles.active=test"]
+CMD ["mvn", "clean", "test", "-Dspring.profiles.active=test"]
