@@ -1,6 +1,7 @@
 import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
 import useEnrolledCourse from '@/context/EnrolledCourseContext';
+import { DesmosLaunchTile } from '@/features/dashboard/DesmosLaunchTile';
 import { useResizableSplit } from '@/features/dashboard/useResizableSplit';
 import { useApiQuery } from '@/lib/fetch-client';
 import {
@@ -101,16 +102,23 @@ export default function LearnerDashboardPage() {
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-8">
-          <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
-            Learner Dashboard
+        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6">
+          <div className="grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <div className="min-w-0">
+              <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
+                Learner Dashboard
+              </div>
+              <Heading1 className="mt-3 text-slate-900">
+                Welcome back, {displayName}.
+              </Heading1>
+              <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-600">
+                Monitor key trend shifts and focus on what is most relevant today.
+              </p>
+            </div>
+            <div>
+              <DesmosLaunchTile />
+            </div>
           </div>
-          <Heading1 className="mt-3 text-slate-900">
-            Welcome back, {displayName}.
-          </Heading1>
-          <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-600">
-            Monitor key trend shifts and focus on what is most relevant today.
-          </p>
         </section>
 
         <PersonalAnalytics />
