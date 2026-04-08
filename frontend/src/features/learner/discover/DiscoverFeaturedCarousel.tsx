@@ -4,8 +4,9 @@ import {
   CarouselContent,
   CarouselItem,
 } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 import { Link } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type DiscoverCourse } from './types';
 
 type DiscoverFeaturedCarouselProps = {
@@ -15,6 +16,9 @@ type DiscoverFeaturedCarouselProps = {
 export function DiscoverFeaturedCarousel({
   courses,
 }: DiscoverFeaturedCarouselProps) {
+  const autoplay = useRef(
+    Autoplay({ delay: 3200, stopOnInteraction: false, stopOnMouseEnter: true }),
+  );
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -48,6 +52,7 @@ export function DiscoverFeaturedCarousel({
       </h2>
       <Carousel
         opts={{ loop: courses.length > 1 }}
+        plugins={courses.length > 1 ? [autoplay.current] : undefined}
         setApi={setCarouselApi}
         className="w-full"
       >
