@@ -5,4 +5,4 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(name = "GlossaryItem", description = "Response object for a glossary term")
 public record GlossaryResponse(@NotNull String title, @NotNull String description, @NotNull String context,
-        @NotNull String example, @NotNull String[] relationships) {}
+        @NotNull String example, String category, @NotNull String[] relationships) {}

@@ -24,12 +24,14 @@ public class GeminiAIService implements AIService {
     this.client = new Client();
   }
 
-  public List<GlossaryUpdateRequest> generateTags(List<String> genTags, List<String> existingGlossaryTerms) {
+  public List<GlossaryUpdateRequest> generateTags(List<String> genTags, List<String> existingGlossaryTerms,
+      List<String> existingCategories) {
     String prompt = String.format(
         """
             You are given two sets of tags related to courses about **Gen Alpha culture**:
             - Pending Tags: Tags that require processing
             - Existing Tags: Tags that are already defined and must NOT be modified
+            - Existing Categories: Prefer these category names whenever they fit
 
             # Your Tasks for pending tags
             1. Derive Relationships
@@ -41,14 +43,17 @@ public class GeminiAIService implements AIService {
                     - Description: Clear, concise explanation (1-2 sentences, factual, no speculation)
                     - Context: Maximum 5 words
                     - Example: A realistic sentence showing how the tag is used in conversation
+                    - Category: Reuse an existing category when possible. Only create a new short category if none fit.
 
             # Inputs:
             ## Pending Tags:
             %s
             ## Existing Tags:
             %s
+            ## Existing Categories:
+            %s
             """,
-        String.join("\n", genTags), String.join("\n", existingGlossaryTerms));
+        String.join("\n", genTags), String.join("\n", existingGlossaryTerms), String.join("\n", existingCategories));
 
     // @formatter:off
     Schema schema = Schema.builder()
@@ -60,12 +65,13 @@ public class GeminiAIService implements AIService {
               .items(
                   Schema.builder()
                       .type("object")
-                      .required(List.of("name", "description", "usedInConversationExample", "usedInContext", "relationships"))
+                      .required(List.of("name", "description", "usedInConversationExample", "usedInContext", "category", "relationships"))
                       .properties(Map.of(
                           "name", Schema.builder().type("string").build(),
                           "description", Schema.builder().type("string").build(),
                           "usedInConversationExample", Schema.builder().type("string").build(),
                           "usedInContext", Schema.builder().type("string").build(),
+                          "category", Schema.builder().type("string").build(),
                           "relationships", Schema.builder()
                               .type("array")
                               .items(Schema.builder().type("string").build())

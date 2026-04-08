@@ -27,6 +27,7 @@ export type EditFormData = {
   description: string;
   context: string;
   example: string;
+  category: string;
   relationships: string[];
 };
 
@@ -35,6 +36,7 @@ type EditGlossaryDialogProps = {
   onOpenChange: (open: boolean) => void;
   item: GlossaryItem | null;
   allTitles: string[];
+  allCategories: string[];
 };
 
 export default function EditGlossaryDialog({
@@ -42,6 +44,7 @@ export default function EditGlossaryDialog({
   onOpenChange,
   item,
   allTitles,
+  allCategories,
 }: EditGlossaryDialogProps) {
   const queryClient = useQueryClient();
   const titleInputRef = useRef<HTMLInputElement | null>(null);
@@ -50,6 +53,7 @@ export default function EditGlossaryDialog({
     description: '',
     context: '',
     example: '',
+    category: '',
     relationships: [],
   });
 
@@ -71,6 +75,7 @@ export default function EditGlossaryDialog({
         description: item.description,
         context: item.context,
         example: item.example,
+        category: item.category ?? '',
         relationships: item.relationships ?? [],
       });
     }
@@ -88,6 +93,7 @@ export default function EditGlossaryDialog({
           description: formData.description,
           usedInContext: formData.context,
           usedInConversationExample: formData.example,
+          category: formData.category || undefined,
           relationships: formData.relationships,
         },
       });
@@ -173,6 +179,34 @@ export default function EditGlossaryDialog({
                 setFormData({ ...formData, example: e.target.value })
               }
             />
+          </div>
+
+          <div className="grid gap-2">
+            <Label>Category</Label>
+            <Select
+              value={formData.category || undefined}
+              onValueChange={(value) =>
+                setFormData({ ...formData, category: value })
+              }
+              disabled={allCategories.length === 0}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select an existing category" />
+              </SelectTrigger>
+              <SelectContent>
+                {allCategories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {allCategories.length === 0 ? (
+              <p className="text-xs text-slate-500">
+                No existing categories yet. Regenerate the glossary to create
+                AI-generated categories first.
+              </p>
+            ) : null}
           </div>
 
           <div className="grid gap-2">

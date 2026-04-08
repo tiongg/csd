@@ -1065,6 +1065,7 @@ export interface components {
             description: string;
             usedInConversationExample: string;
             usedInContext: string;
+            category?: string;
             relationships: string[];
         };
         CourseUpdateRequest: {
@@ -1224,6 +1225,7 @@ export interface components {
             description: string;
             context: string;
             example: string;
+            category?: string;
             relationships: string[];
         };
         ImageUploadResponse: {

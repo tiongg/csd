@@ -2,7 +2,10 @@ package csd.t6.backend.glossary;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +33,23 @@ public class GlossaryServiceImpl implements GlossaryService {
   @Transactional
   public void generateGlossary() {
     List<String> unresolvedTerms = glossaryRepository.getAllUnresolvedTerms();
-    List<String> existingGlossaryTerms = glossaryRepository.getAll().stream().map(record -> record.getTitle()).toList();
+    List<GlossaryTermRecord> existingTerms = glossaryRepository.getAll();
+    List<String> uncategorizedTerms = existingTerms.stream()
+        .filter(record -> record.getCategory() == null || record.getCategory().isBlank()).map(record -> record.getTitle())
+        .toList();
+    List<String> pendingTerms = Stream.concat(unresolvedTerms.stream(), uncategorizedTerms.stream()).distinct().toList();
 
-    List<GlossaryUpdateRequest> generatedTags = aiService.generateTags(unresolvedTerms, existingGlossaryTerms);
+    if (pendingTerms.isEmpty()) {
+      return;
+    }
+
+    Set<String> pendingTermSet = Set.copyOf(pendingTerms);
+    List<String> existingGlossaryTerms = existingTerms.stream().map(record -> record.getTitle())
+        .filter(title -> !pendingTermSet.contains(title)).toList();
+    List<String> existingCategories = existingTerms.stream().map(record -> record.getCategory()).filter(Objects::nonNull)
+        .filter(category -> !category.isBlank()).distinct().toList();
+
+    List<GlossaryUpdateRequest> generatedTags = aiService.generateTags(pendingTerms, existingGlossaryTerms, existingCategories);
     // Avoid using updateGlossaryTerm here as it is a batch call
     // This means that it is possible that pending tags reference each other,
     // but are not inserted into the db yet, which would cause the relationship
@@ -67,7 +84,7 @@ public class GlossaryServiceImpl implements GlossaryService {
 
     return terms.stream()
         .map(term -> new GlossaryResponse(term.getTitle(), term.getDescription(), term.getUsedInContext(),
-            term.getUsedInConversationExample(),
+            term.getUsedInConversationExample(), term.getCategory(),
             relationships.getOrDefault(term.getId(), List.of()).toArray(new String[0])))
         .toList();
   }
