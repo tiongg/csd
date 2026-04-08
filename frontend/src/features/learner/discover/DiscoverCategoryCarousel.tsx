@@ -102,7 +102,7 @@ export function DiscoverCategoryCarousel({
             {courses.map((course) => (
               <CarouselItem
                 key={course.id}
-                className="basis-[84%] sm:basis-1/2 lg:basis-1/2 xl:basis-1/2"
+                className="basis-[84%] sm:basis-1/2 lg:basis-1/2 xl:basis-1/2 mb-1"
               >
                 <DiscoverCarouselCard course={course} compact />
               </CarouselItem>
