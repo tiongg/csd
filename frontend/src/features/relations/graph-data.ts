@@ -326,6 +326,26 @@ function generateRelationCategoryColor(label: string) {
   return hslToHex(hue, saturation, lightness);
 }
 
+function assignRelationCategoryColors(labels: string[]) {
+  const colors = new Map<string, string>();
+  if (labels.length === 0) {
+    return colors;
+  }
+
+  const baseHue = 210;
+  const hueStep = 360 / labels.length;
+
+  labels.forEach((label, index) => {
+    const hue = (baseHue + hueStep * index) % 360;
+    const saturation = index % 2 === 0 ? 74 : 68;
+    const lightness = index % 3 === 0 ? 46 : 50;
+
+    colors.set(label, hslToHex(hue, saturation, lightness));
+  });
+
+  return colors;
+}
+
 export function buildGraph(glossaryItems: GlossaryItem[]): {
   nodes: RelationNode[];
   links: RelationLink[];
@@ -617,14 +637,19 @@ export function buildGroupedRelationGraph(
   });
 
   const mergedCategories = coalesceNicheCategories(categorizedItems);
-  const categoryGroups = Array.from(mergedCategories.entries())
-    .sort(([a], [b]) => a.localeCompare(b, undefined, alphabeticalSortOptions))
+  const orderedCategories = Array.from(mergedCategories.entries()).sort(([a], [b]) =>
+    a.localeCompare(b, undefined, alphabeticalSortOptions),
+  );
+  const categoryColors = assignRelationCategoryColors(
+    orderedCategories.map(([category]) => category),
+  );
+  const categoryGroups = orderedCategories
     .map(([category, items]) =>
       buildGroup(
         category,
         items,
         'category',
-        generateRelationCategoryColor(category),
+        categoryColors.get(category) ?? generateRelationCategoryColor(category),
       ),
     );
   const strayGroup =
