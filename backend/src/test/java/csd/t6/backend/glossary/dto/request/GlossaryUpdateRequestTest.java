@@ -2,16 +2,17 @@ package csd.t6.backend.glossary.dto.request;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 class GlossaryUpdateRequestTest {
 
@@ -27,7 +28,7 @@ class GlossaryUpdateRequestTest {
     @DisplayName("Should create valid glossary update request")
     void shouldCreateValidGlossaryUpdateRequest() {
         GlossaryUpdateRequest request = new GlossaryUpdateRequest("Test Term", "Test Description", "Test Example",
-                "Test Context", List.of("Related Term 1", "Related Term 2"));
+                "Test Context", "Category", List.of("Related Term 1", "Related Term 2"));
 
         assertThat(request.name()).isEqualTo("Test Term");
         assertThat(request.description()).isEqualTo("Test Description");
@@ -39,7 +40,7 @@ class GlossaryUpdateRequestTest {
     @Test
     @DisplayName("Should validate required fields")
     void shouldValidateRequiredFields() {
-        GlossaryUpdateRequest request = new GlossaryUpdateRequest(null, null, null, null, null);
+        GlossaryUpdateRequest request = new GlossaryUpdateRequest(null, null, null, null, null, null);
 
         Set<ConstraintViolation<GlossaryUpdateRequest>> violations = validator.validate(request);
 
@@ -55,7 +56,7 @@ class GlossaryUpdateRequestTest {
     @DisplayName("Should validate non-null relationships")
     void shouldValidateNonNullRelationships() {
         GlossaryUpdateRequest request = new GlossaryUpdateRequest("Test Term", "Test Description", "Test Example",
-                "Test Context", null);
+                "Test Context", "Category", null);
 
         Set<ConstraintViolation<GlossaryUpdateRequest>> violations = validator.validate(request);
 
@@ -67,7 +68,7 @@ class GlossaryUpdateRequestTest {
     @DisplayName("Should create request with empty relationships")
     void shouldCreateRequestWithEmptyRelationships() {
         GlossaryUpdateRequest request = new GlossaryUpdateRequest("Test Term", "Test Description", "Test Example",
-                "Test Context", List.of());
+                "Test Context", "Category", List.of());
 
         Set<ConstraintViolation<GlossaryUpdateRequest>> violations = validator.validate(request);
 
@@ -79,7 +80,7 @@ class GlossaryUpdateRequestTest {
     @DisplayName("Should create request with single relationship")
     void shouldCreateRequestWithSingleRelationship() {
         GlossaryUpdateRequest request = new GlossaryUpdateRequest("Test Term", "Test Description", "Test Example",
-                "Test Context", List.of("Single Related"));
+                "Test Context", "Category", List.of("Single Related"));
 
         assertThat(request.relationships()).hasSize(1);
         assertThat(request.relationships()).containsExactly("Single Related");
@@ -90,7 +91,7 @@ class GlossaryUpdateRequestTest {
     void shouldCreateRequestWithMultipleRelationships() {
         List<String> relationships = List.of("Related 1", "Related 2", "Related 3");
         GlossaryUpdateRequest request = new GlossaryUpdateRequest("Test Term", "Test Description", "Test Example",
-                "Test Context", relationships);
+                "Test Context", "Category", relationships);
 
         assertThat(request.relationships()).hasSize(3);
         assertThat(request.relationships()).containsExactlyInAnyOrder("Related 1", "Related 2", "Related 3");

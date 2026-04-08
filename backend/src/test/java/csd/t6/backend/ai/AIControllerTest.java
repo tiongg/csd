@@ -54,12 +54,12 @@ class AIControllerTest {
         String jsonBody = objectMapper.writeValueAsString(tags);
 
         GlossaryUpdateRequest response1 = new GlossaryUpdateRequest("tag1", "Description 1", "Example 1", "Context 1",
-                List.of("tag2"));
+                "Category", List.of("tag2"));
         GlossaryUpdateRequest response2 = new GlossaryUpdateRequest("tag2", "Description 2", "Example 2", "Context 2",
-                List.of("tag1"));
+                "Category", List.of("tag1"));
         List<GlossaryUpdateRequest> aiResponse = List.of(response1, response2);
 
-        when(aiService.generateTags(tags, List.of())).thenReturn(aiResponse);
+        when(aiService.generateTags(tags, List.of(), List.of())).thenReturn(aiResponse);
 
         mockMvc.perform(get("/api/ai/relations").contentType(MediaType.APPLICATION_JSON).content(jsonBody))
                 .andExpect(status().isOk()).andExpect(jsonPath("$[0].name").value("tag1"))
@@ -67,7 +67,7 @@ class AIControllerTest {
                 .andExpect(jsonPath("$[0].relationships[0]").value("tag2"))
                 .andExpect(jsonPath("$[1].name").value("tag2"));
 
-        verify(aiService).generateTags(tags, List.of());
+        verify(aiService).generateTags(tags, List.of(), List.of());
     }
 
     @Test
@@ -76,11 +76,11 @@ class AIControllerTest {
         List<String> tags = List.of();
         String jsonBody = objectMapper.writeValueAsString(tags);
 
-        when(aiService.generateTags(tags, List.of())).thenReturn(List.of());
+        when(aiService.generateTags(tags, List.of(), List.of())).thenReturn(List.of());
 
         mockMvc.perform(get("/api/ai/relations").contentType(MediaType.APPLICATION_JSON).content(jsonBody))
                 .andExpect(status().isOk()).andExpect(jsonPath("$").isArray());
 
-        verify(aiService).generateTags(tags, List.of());
+        verify(aiService).generateTags(tags, List.of(), List.of());
     }
 }

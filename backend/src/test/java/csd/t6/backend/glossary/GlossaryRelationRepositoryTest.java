@@ -34,15 +34,15 @@ class GlossaryRelationRepositoryTest {
     @BeforeEach
     void setUp() {
         GlossaryUpdateRequest parentRequest = new GlossaryUpdateRequest("Parent Term", "Parent Description",
-                "Parent Example", "Parent Context", List.of());
+                "Parent Example", "Parent Context", "Category", List.of());
         parentTerm = glossaryRepository.upsert(parentRequest);
 
         GlossaryUpdateRequest childRequest1 = new GlossaryUpdateRequest("Child Term 1", "Child Description 1",
-                "Child Example 1", "Child Context 1", List.of());
+                "Child Example 1", "Child Context 1", "Category", List.of());
         childTerm1 = glossaryRepository.upsert(childRequest1);
 
         GlossaryUpdateRequest childRequest2 = new GlossaryUpdateRequest("Child Term 2", "Child Description 2",
-                "Child Example 2", "Child Context 2", List.of());
+                "Child Example 2", "Child Context 2", "Category", List.of());
         childTerm2 = glossaryRepository.upsert(childRequest2);
     }
 
@@ -83,7 +83,8 @@ class GlossaryRelationRepositoryTest {
     @DisplayName("Should clear all relationships when empty list provided")
     void shouldClearRelationshipsWithEmptyList() {
         // Set initial relationships
-        glossaryRelationRepository.setRelationships(parentTerm.getId(), List.of(childTerm1.getId(), childTerm2.getId()));
+        glossaryRelationRepository.setRelationships(parentTerm.getId(),
+                List.of(childTerm1.getId(), childTerm2.getId()));
 
         // Clear relationships
         glossaryRelationRepository.setRelationships(parentTerm.getId(), List.of());

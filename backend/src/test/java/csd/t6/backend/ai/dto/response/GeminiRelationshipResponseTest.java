@@ -2,10 +2,6 @@ package csd.t6.backend.ai.dto.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +10,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import csd.t6.backend.glossary.dto.request.GlossaryUpdateRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 class GeminiRelationshipResponseTest {
 
@@ -29,9 +29,9 @@ class GeminiRelationshipResponseTest {
     @DisplayName("Should create valid gemini relationship response")
     void shouldCreateValidGeminiRelationshipResponse() {
         GlossaryUpdateRequest tag1 = new GlossaryUpdateRequest("Tag 1", "Description 1", "Example 1", "Context 1",
-                List.of("Tag 2"));
+                "Category", List.of("Tag 2"));
         GlossaryUpdateRequest tag2 = new GlossaryUpdateRequest("Tag 2", "Description 2", "Example 2", "Context 2",
-                List.of("Tag 1"));
+                "Category", List.of("Tag 1"));
         List<GlossaryUpdateRequest> tags = List.of(tag1, tag2);
 
         GeminiRelationshipResponse response = new GeminiRelationshipResponse(tags);
@@ -67,7 +67,7 @@ class GeminiRelationshipResponseTest {
     @DisplayName("Should create response with single tag")
     void shouldCreateResponseWithSingleTag() {
         GlossaryUpdateRequest tag1 = new GlossaryUpdateRequest("Tag 1", "Description 1", "Example 1", "Context 1",
-                List.of());
+                "Category", List.of());
         List<GlossaryUpdateRequest> tags = List.of(tag1);
 
         GeminiRelationshipResponse response = new GeminiRelationshipResponse(tags);
@@ -80,11 +80,11 @@ class GeminiRelationshipResponseTest {
     @DisplayName("Should create response with multiple tags")
     void shouldCreateResponseWithMultipleTags() {
         GlossaryUpdateRequest tag1 = new GlossaryUpdateRequest("Tag 1", "Description 1", "Example 1", "Context 1",
-                List.of("Tag 2", "Tag 3"));
+                "Category", List.of("Tag 2", "Tag 3"));
         GlossaryUpdateRequest tag2 = new GlossaryUpdateRequest("Tag 2", "Description 2", "Example 2", "Context 2",
-                List.of("Tag 1"));
+                "Category", List.of("Tag 1"));
         GlossaryUpdateRequest tag3 = new GlossaryUpdateRequest("Tag 3", "Description 3", "Example 3", "Context 3",
-                List.of("Tag 1"));
+                "Category", List.of("Tag 1"));
         List<GlossaryUpdateRequest> tags = List.of(tag1, tag2, tag3);
 
         GeminiRelationshipResponse response = new GeminiRelationshipResponse(tags);
@@ -97,14 +97,15 @@ class GeminiRelationshipResponseTest {
     @DisplayName("Should handle tags with complex relationships")
     void shouldHandleTagsWithComplexRelationships() {
         GlossaryUpdateRequest tag1 = new GlossaryUpdateRequest("Tag 1", "Description 1", "Example 1", "Context 1",
-                List.of("Tag 2", "Tag 3", "Tag 4", "Tag 5"));
+                "Category", List.of("Tag 2", "Tag 3", "Tag 4", "Tag 5"));
         List<GlossaryUpdateRequest> tags = List.of(tag1);
 
         GeminiRelationshipResponse response = new GeminiRelationshipResponse(tags);
 
         assertThat(response.tags()).hasSize(1);
         assertThat(response.tags().get(0).relationships()).hasSize(4);
-        assertThat(response.tags().get(0).relationships()).containsExactlyInAnyOrder("Tag 2", "Tag 3", "Tag 4", "Tag 5");
+        assertThat(response.tags().get(0).relationships()).containsExactlyInAnyOrder("Tag 2", "Tag 3", "Tag 4",
+                "Tag 5");
     }
 
     @Test
@@ -122,7 +123,7 @@ class GeminiRelationshipResponseTest {
     @DisplayName("Should handle tags with no relationships")
     void shouldHandleTagsWithNoRelationships() {
         GlossaryUpdateRequest tag1 = new GlossaryUpdateRequest("Tag 1", "Description 1", "Example 1", "Context 1",
-                List.of());
+                "Category", List.of());
         List<GlossaryUpdateRequest> tags = List.of(tag1);
 
         GeminiRelationshipResponse response = new GeminiRelationshipResponse(tags);

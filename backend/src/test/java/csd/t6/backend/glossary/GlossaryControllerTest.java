@@ -53,8 +53,7 @@ class GlossaryControllerTest {
     @Test
     @DisplayName("POST /api/glossary/ - should autogen relationships")
     void shouldAutogenRelationships() throws Exception {
-        mockMvc.perform(post("/api/glossary/").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/glossary/").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 
         verify(glossaryService).generateGlossary();
     }
@@ -63,12 +62,13 @@ class GlossaryControllerTest {
     @DisplayName("GET /api/glossary/ - should get all glossary terms")
     void shouldGetAllGlossaryTerms() throws Exception {
         GlossaryResponse response = new GlossaryResponse("Term 1", "Description 1", "Context 1", "Example 1",
-                new String[] { "Related 1" });
+                "Category", new String[] {
+                        "Related 1"
+                });
 
         when(glossaryService.getAllGlossaryTerms()).thenReturn(List.of(response));
 
-        mockMvc.perform(get("/api/glossary/").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/glossary/").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 
         verify(glossaryService).getAllGlossaryTerms();
     }
@@ -77,7 +77,7 @@ class GlossaryControllerTest {
     @DisplayName("PUT /api/glossary/ - should update glossary term")
     void shouldUpdateGlossaryTerm() throws Exception {
         GlossaryUpdateRequest request = new GlossaryUpdateRequest("Test Term", "Test Description", "Test Example",
-                "Test Context", List.of("Related Term"));
+                "Category", "Test Context", List.of("Related Term"));
         String json = objectMapper.writeValueAsString(request);
 
         mockMvc.perform(put("/api/glossary/").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -89,8 +89,7 @@ class GlossaryControllerTest {
     @Test
     @DisplayName("DELETE /api/glossary/ - should clear all glossary terms")
     void shouldClearAllGlossaryTerms() throws Exception {
-        mockMvc.perform(delete("/api/glossary/").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/api/glossary/").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 
         verify(glossaryService).clearGlossaryTerms();
     }
