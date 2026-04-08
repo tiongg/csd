@@ -142,11 +142,10 @@ export default function CoursesList({ team }: CourseListProps) {
             className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
             onClick={openCreateCourseDialog}
           >
-            <Plus className="size-4" />
             Create Course
           </Button>
           <Button
-            className="h-9 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+            className="h-9 rounded-lg bg-teal-600 text-white hover:bg-teal-700"
             onClick={openTeamCollaboratorsDialog}
           >
             Team Members
