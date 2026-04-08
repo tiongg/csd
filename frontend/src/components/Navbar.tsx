@@ -28,21 +28,21 @@ function getPrimaryNavItems(
     .with('ADMIN', () => [
       { label: 'User Management', to: '/admin/user-management' as const },
       { label: 'Course Moderation', to: '/admin/course-moderation' as const },
-      { label: 'Glossary', to: '/admin/glossary' as const },
       { label: 'Desmos', to: '/admin/desmos' as const },
+      { label: 'Glossary', to: '/admin/glossary' as const },
     ])
     .with('CONTRIBUTOR', () => [
       { label: 'Dashboard', to: '/contributor/dashboard' as const },
       { label: 'Workspace', to: '/contributor/teams' as const },
-      { label: 'Glossary', to: '/contributor/glossary' as const },
       { label: 'Desmos', to: '/contributor/desmos' as const },
+      { label: 'Glossary', to: '/contributor/glossary' as const },
     ])
     .with('LEARNER', () => [
       { label: 'Dashboard', to: '/learner/dashboard' as const },
       { label: 'Discover', to: '/learner/discover' as const },
       { label: 'My Courses', to: '/learner/my-courses' as const },
-      { label: 'Glossary', to: '/learner/glossary' as const },
       { label: 'Desmos', to: '/learner/desmos' as const },
+      { label: 'Glossary', to: '/learner/glossary' as const },
     ])
     .exhaustive();
 }
