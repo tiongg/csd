@@ -144,7 +144,7 @@ export function KeywordCourseSearchDialog({
                       to="/learner/courses/$courseId"
                       params={{ courseId: course.id }}
                       onClick={() => onOpenChange(false)}
-                      className="group block rounded-xl border border-slate-300 bg-white p-4 transition-colors hover:border-slate-400 hover:bg-slate-50/40"
+                      className="group block rounded-xl border border-slate-300 bg-white p-4 transition-colors hover:border-slate-400"
                     >
                       <div className="flex gap-3">
                         <div className="h-24 w-36 shrink-0 overflow-hidden rounded-lg bg-slate-200 sm:h-28 sm:w-44">

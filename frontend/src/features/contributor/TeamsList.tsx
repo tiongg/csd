@@ -93,7 +93,7 @@ function TeamCard({ team }: TeamCardProps) {
         className="h-full w-full cursor-pointer text-left"
         onClick={handleCardClick}
       >
-        <article className="group relative flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
+        <article className="group relative flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-300 bg-white p-4 shadow-sm transition-colors duration-150 hover:border-slate-400">
           <div className="space-y-1.5">
             <div className="flex items-start justify-between gap-3">
               <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
@@ -157,7 +157,7 @@ function CreateTeamCard({ onInteract }: { onInteract: () => void }) {
       className="h-full w-full text-left"
       onClick={onInteract}
     >
-      <article className="group flex h-full min-h-40 flex-col items-center justify-center gap-0.5 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
+      <article className="group flex h-full min-h-40 flex-col items-center justify-center gap-0.5 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center transition-colors duration-150 hover:border-slate-400">
         <span className="inline-flex size-14 shrink-0 items-center justify-center rounded-lg text-slate-700 transition-colors group-hover:text-sky-700">
           <Plus className="size-7 leading-none" />
         </span>

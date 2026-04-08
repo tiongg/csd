@@ -19,7 +19,7 @@ export function InProgressCourseCarouselItem({
     <Link
       to="/learner/courses/$courseId"
       params={{ courseId }}
-      className="group block h-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-colors hover:border-slate-300"
+      className="group block h-full overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm transition-colors hover:border-slate-400"
     >
       <div className="flex h-full gap-3 p-3 md:gap-4 md:p-4">
         <div className="w-[16.25rem] shrink-0 self-stretch overflow-hidden rounded-lg bg-slate-200">
