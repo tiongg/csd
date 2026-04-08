@@ -8,7 +8,7 @@ export type GlossaryCardProps = {
 
 export default function GlossaryCard({ item, onEdit }: GlossaryCardProps) {
   return (
-    <article className="group relative rounded-xl border border-slate-300 bg-white p-4 md:p-5">
+    <article className="group relative rounded-xl border border-slate-300/85 bg-white/95 p-4 md:p-5">
       {onEdit && (
         <button
           onClick={() => onEdit(item)}
