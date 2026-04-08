@@ -17,6 +17,12 @@ import { FileText, HelpCircle, Tag } from 'lucide-react';
 import CourseImageOverview from '../course-image-overview/CourseImageOverview';
 import PublishCourse from './PublishCourse';
 
+const courseCategoryChipClass =
+  'rounded-full border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700';
+const courseTagChipClass =
+  'rounded-full border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700';
+const courseImageClassName = 'h-[320px] w-full object-cover md:h-[420px]';
+
 type CourseEditorOverviewProps = {
   course: Course;
 };
@@ -72,14 +78,16 @@ export default function CourseEditorOverview({
 
           {(course.category || tags.length > 0) && (
             <div className="flex flex-wrap gap-2">
-              <Badge className="rounded-full border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
-                {course.category}
-              </Badge>
+              {course.category && (
+                <Badge className={courseCategoryChipClass}>
+                  {course.category}
+                </Badge>
+              )}
               {tags.map((tag) => (
                 <Badge
                   key={tag}
                   variant="outline"
-                  className="rounded-full border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
+                  className={courseTagChipClass}
                 >
                   {tag}
                 </Badge>
@@ -89,8 +97,8 @@ export default function CourseEditorOverview({
         </div>
 
         <CourseImageOverview
-          className="min-h-[300px]"
-          imageClassName="h-[300px] w-full object-cover md:h-[420px]"
+          className="min-h-[320px] md:min-h-[420px]"
+          imageClassName={courseImageClassName}
         />
 
         <CourseMetricsGrid metrics={metrics} />

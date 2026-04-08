@@ -23,6 +23,9 @@ type CourseOverviewProps = {
 
 const learnerTagChipClass =
   'border-sky-200 bg-sky-100 text-sky-700 hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700';
+const learnerImageClassName = 'h-[320px] w-full object-cover md:h-[420px]';
+const learnerImagePlaceholderClassName =
+  'flex h-[320px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500 md:h-[420px]';
 
 export default function CourseOverview({
   course,
@@ -83,11 +86,11 @@ export default function CourseOverview({
               <img
                 src={course.imageUrl}
                 alt={course.title}
-                className="h-[320px] w-full object-cover md:h-[420px]"
+                className={learnerImageClassName}
               />
             </div>
           ) : (
-            <div className="flex h-[320px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500 md:h-[420px]">
+            <div className={learnerImagePlaceholderClassName}>
               No thumbnail
             </div>
           )}
