@@ -40,8 +40,18 @@ jobs:
             -locations="filesystem:./backend/src/main/resources/db/migration" \
             -outOfOrder=true
 
-      - name: Run tests
+      - name: Run tests with coverage
         env:
           GOOGLE_API_KEY: dummy_key
-        run: mvn verify -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
+        run: mvn verify jacoco:report -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
         working-directory: ./backend
+
+      - name: Add coverage to PR
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.7.2
+        with:
+          paths: ${{ github.workspace }}/backend/target/site/jacoco/jacoco.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 0
+          min-coverage-changed-files: 0
+          title: Code Coverage Report
