@@ -24,6 +24,9 @@ public class FileService {
   @Value("${spring.cloud.config.server.awss3.bucket}")
   private String bucketName;
 
+  @Value("${S3_CDN_URL:}")
+  private String s3CdnUrl;
+
   private final S3Client s3Client;
 
   private final S3Presigner s3Presigner;
@@ -95,7 +98,8 @@ public class FileService {
    * @return the public URL
    */
   public String getPublicUrl(String key) {
-    return String.format("%s/%s/%s", endpoint, bucketName, key);
+    String baseUrl = s3CdnUrl != null && !s3CdnUrl.isEmpty() ? s3CdnUrl : endpoint;
+    return String.format("%s/%s/%s", baseUrl, bucketName, key);
   }
 
   public void deleteObject(String key) {
