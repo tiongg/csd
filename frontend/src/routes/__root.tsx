@@ -2,10 +2,10 @@ import { Outlet, createRootRouteWithContext } from '@tanstack/react-router';
 
 import Navbar from '../components/Navbar';
 
+import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { type AuthContextType } from '@/context/AuthContext';
 import type { QueryClient } from '@tanstack/react-query';
-import { Toaster } from 'sonner';
 
 interface RouterContext {
   queryClient: QueryClient;
