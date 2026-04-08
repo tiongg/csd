@@ -1062,6 +1062,17 @@ function toRgba(color: string, opacity: number) {
   return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
+function darkenColor(color: string, amount = 0.45) {
+  const parsed = d3.color(color);
+  return parsed ? parsed.darker(amount).formatHex() : color;
+}
+
+function darkenStroke(color: string, amount = 0.75, opacity = 0.38) {
+  const parsed = d3.color(color);
+  const nextColor = parsed ? parsed.darker(amount).formatHex() : color;
+  return toRgba(nextColor, opacity);
+}
+
 export default function RelationGraph({
   glossaryItems,
   onNodeClick,
@@ -1282,9 +1293,9 @@ export default function RelationGraph({
       .attr('cx', (group) => groupLayouts.get(group.id)?.center.x ?? width / 2)
       .attr('cy', (group) => groupLayouts.get(group.id)?.center.y ?? height / 2)
       .attr('r', (group) => groupLayouts.get(group.id)?.radius ?? 96)
-      .attr('fill', (group) => toRgba(group.color, 0.08))
-      .attr('stroke', (group) => toRgba(group.color, 0.26))
-      .attr('stroke-width', 1.6);
+      .attr('fill', (group) => toRgba(group.color, 0.04))
+      .attr('stroke', (group) => darkenStroke(group.color))
+      .attr('stroke-width', 1.9);
 
     backdropLayer
       .selectAll<SVGTextElement, RelationGroup>('text')
@@ -1360,9 +1371,9 @@ export default function RelationGraph({
           Math.min(10.5, 4.2 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 1.25),
         ),
       )
-      .attr('fill', (node) => node.color)
+      .attr('fill', (node) => darkenColor(node.color, 0.62))
       .attr('fill-opacity', 0.98)
-      .attr('stroke', (node) => toRgba(node.color, 0.3))
+      .attr('stroke', (node) => darkenStroke(node.color, 0.9, 0.24))
       .attr('stroke-width', 1.6);
 
     labels = nodeGroups
@@ -1416,7 +1427,7 @@ export default function RelationGraph({
       nodeGroups.style('opacity', 1);
       nodeGroups
         .select('circle')
-        .attr('fill', (node) => node.color)
+        .attr('fill', (node) => darkenColor(node.color, 0.62))
         .attr('stroke-width', 1.4);
       link
         .style('opacity', 0.52)
@@ -1442,7 +1453,7 @@ export default function RelationGraph({
         .select('circle')
         .attr('fill', (node) => {
           const baseColor = d3.color(node.color);
-          return baseColor ? baseColor.brighter(0.4).formatHex() : node.color;
+          return baseColor ? baseColor.darker(0.28).formatHex() : node.color;
         })
         .attr('stroke-width', 2.2);
 
