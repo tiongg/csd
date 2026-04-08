@@ -39,6 +39,7 @@ services:
         condition: service_completed_successfully
     volumes:
       - ./backend:/usr/src/maven
+      - ./backend/target:/usr/src/maven/target
       - maven-repo:/root/.m2
     environment:
       SPRING_PROFILES_ACTIVE: test
