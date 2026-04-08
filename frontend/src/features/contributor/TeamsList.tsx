@@ -2,15 +2,25 @@ import { Button } from '@/components/ui/button';
 import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
 import { useApiQuery } from '@/lib/fetch-client';
-import { generateColorFromString, hexToRgb, type Team } from '@/lib/utils';
+import { type Team } from '@/lib/utils';
 import { useNavigate } from '@tanstack/react-router';
 import { Plus, Settings } from 'lucide-react';
+import { useMemo } from 'react';
 import { useBoolean } from 'usehooks-ts';
 import CreateNewTeamDialog from './CreateNewTeamDialog';
 import EditTeamDialog from './EditTeamDialog';
+import TeamMemberAvatar from './TeamMemberAvatar';
 
 export default function TeamsList() {
   const { data: teams, isLoading } = useApiQuery('get', '/api/teams/');
+  const { data: accounts } = useApiQuery('get', '/api/account/', {});
+  const accountProfilePictureMap = useMemo(
+    () =>
+      new Map(
+        (accounts ?? []).map((account) => [account.id, account.profilePictureUrl]),
+      ),
+    [accounts],
+  );
 
   const {
     value: isCreateTeamDialogOpen,
@@ -42,7 +52,13 @@ export default function TeamsList() {
           ? Array.from({ length: 3 }).map((_, idx) => (
               <LoadingTeamCard key={idx} />
             ))
-          : (teams ?? []).map((team) => <TeamCard team={team} key={team.id} />)}
+          : (teams ?? []).map((team) => (
+              <TeamCard
+                team={team}
+                key={team.id}
+                accountProfilePictureMap={accountProfilePictureMap}
+              />
+            ))}
       </div>
 
       <CreateNewTeamDialog
@@ -55,9 +71,10 @@ export default function TeamsList() {
 
 type TeamCardProps = {
   team: Team;
+  accountProfilePictureMap: Map<string, string | undefined>;
 };
 
-function TeamCard({ team }: TeamCardProps) {
+function TeamCard({ team, accountProfilePictureMap }: TeamCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const {
@@ -93,7 +110,7 @@ function TeamCard({ team }: TeamCardProps) {
         className="h-full w-full cursor-pointer text-left"
         onClick={handleCardClick}
       >
-        <article className="group relative flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
+        <article className="group relative flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-300 bg-white p-4 shadow-sm transition-colors duration-150 hover:border-slate-400">
           <div className="space-y-1.5">
             <div className="flex items-start justify-between gap-3">
               <h3 className="line-clamp-1 text-lg font-bold text-slate-900">
@@ -119,14 +136,15 @@ function TeamCard({ team }: TeamCardProps) {
           <div className="flex items-center justify-between pt-4">
             <div className="flex -space-x-2">
               {displayedMembers.map((member) => (
-                <span
+                <TeamMemberAvatar
                   key={member.id}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white text-[10px] font-semibold"
-                  style={getAvatarStyle(member.username)}
-                  title={member.username}
-                >
-                  {getInitials(member.username)}
-                </span>
+                  member={member}
+                  profilePictureUrl={accountProfilePictureMap.get(
+                    member.accountId,
+                  )}
+                  fallbackText={getInitials(member.username)}
+                  className="h-7 w-7 border-2 border-white text-[10px]"
+                />
               ))}
               {extraMembers > 0 && (
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-slate-700 text-[10px] font-semibold text-white">
@@ -157,7 +175,7 @@ function CreateTeamCard({ onInteract }: { onInteract: () => void }) {
       className="h-full w-full text-left"
       onClick={onInteract}
     >
-      <article className="group flex h-full min-h-40 flex-col items-center justify-center gap-0.5 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-400 hover:bg-sky-50/30">
+      <article className="group flex h-full min-h-40 flex-col items-center justify-center gap-0.5 rounded-xl border border-dashed border-slate-300 bg-white p-4 text-center transition-colors duration-150 hover:border-slate-400">
         <span className="inline-flex size-14 shrink-0 items-center justify-center rounded-lg text-slate-700 transition-colors group-hover:text-sky-700">
           <Plus className="size-7 leading-none" />
         </span>
@@ -188,17 +206,4 @@ function getInitials(value: string) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('');
-}
-
-function getAvatarStyle(username: string) {
-  const hex = generateColorFromString(username);
-  const { r, g, b } = hexToRgb(hex);
-  const darkR = Math.round(r * 0.55);
-  const darkG = Math.round(g * 0.55);
-  const darkB = Math.round(b * 0.55);
-
-  return {
-    backgroundColor: `rgb(${darkR}, ${darkG}, ${darkB})`,
-    color: '#ffffff',
-  };
 }

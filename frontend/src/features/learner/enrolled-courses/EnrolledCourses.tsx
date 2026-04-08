@@ -1,10 +1,11 @@
 import { Button } from '@/components/ui/button';
 import useEnrolledCourse from '@/context/EnrolledCourseContext';
 import { useApiQuery } from '@/lib/fetch-client';
+import type { Course } from '@/lib/utils';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
 import { useMemo } from 'react';
-import { CourseCard } from '../course-card/CourseCard';
+import { EnrolledCourseRow } from './EnrolledCourseRow';
 
 type EnrolledCoursesProps = {
   searchQuery: string;
@@ -16,14 +17,21 @@ export function EnrolledCourses({
   categoryFilter,
 }: EnrolledCoursesProps) {
   const { enrolledCourses } = useEnrolledCourse();
-  const { data: publishedCourses } = useApiQuery('get', '/api/courses/published');
+  const { data: publishedCourses } = useApiQuery(
+    'get',
+    '/api/courses/published',
+  );
 
   const publishedCourseMetaById = useMemo(() => {
-    const map = new Map<string, { imageUrl?: string; tags?: string[] }>();
+    const map = new Map<
+      string,
+      Pick<Course, 'imageUrl' | 'tags' | 'creatorUsername'>
+    >();
     (publishedCourses ?? []).forEach(({ course }) => {
       map.set(course.id, {
         imageUrl: course.imageUrl,
         tags: course.tags,
+        creatorUsername: course.creatorUsername,
       });
     });
     return map;
@@ -31,23 +39,28 @@ export function EnrolledCourses({
 
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
-  const filteredCourses = enrolledCourses.filter((enrollment) => {
-    const searchableText = [
-      enrollment.course.title,
-      enrollment.course.description ?? '',
-      ...(enrollment.course.tags ?? []),
-    ]
-      .join(' ')
-      .toLowerCase();
+  const filteredCourses = useMemo(
+    () =>
+      enrolledCourses.filter((enrollment) => {
+        const searchableText = [
+          enrollment.course.title,
+          enrollment.course.description ?? '',
+          ...(enrollment.course.tags ?? []),
+        ]
+          .join(' ')
+          .toLowerCase();
 
-    const matchesSearch =
-      normalizedQuery.length === 0 || searchableText.includes(normalizedQuery);
-    const matchesCategory =
-      categoryFilter === '__all__' ||
-      enrollment.course.category === categoryFilter;
+        const matchesSearch =
+          normalizedQuery.length === 0 ||
+          searchableText.includes(normalizedQuery);
+        const matchesCategory =
+          categoryFilter === '__all__' ||
+          enrollment.course.category === categoryFilter;
 
-    return matchesSearch && matchesCategory;
-  });
+        return matchesSearch && matchesCategory;
+      }),
+    [categoryFilter, enrolledCourses, normalizedQuery],
+  );
 
   const hasActiveFilters =
     normalizedQuery.length > 0 || categoryFilter !== '__all__';
@@ -79,29 +92,30 @@ export function EnrolledCourses({
   }
 
   return (
-    <div className="w-full grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {filteredCourses.map((enrollment) => (
-        (() => {
-          const publishedMeta = publishedCourseMetaById.get(enrollment.course.id);
-          const enrollmentTags = enrollment.course.tags ?? [];
-          const resolvedTags =
-            enrollmentTags.length > 0
-              ? enrollmentTags
-              : (publishedMeta?.tags ?? []);
+    <div className="flex w-full flex-col gap-4">
+      {filteredCourses.map((enrollment) => {
+        const publishedMeta = publishedCourseMetaById.get(enrollment.course.id);
+        const enrollmentTags = enrollment.course.tags ?? [];
+        const resolvedTags =
+          enrollmentTags.length > 0
+            ? enrollmentTags
+            : (publishedMeta?.tags ?? []);
 
-          return (
-            <CourseCard
-              key={enrollment.lessonSessionId}
-              course={{
-                ...enrollment.course,
-                imageUrl: enrollment.course.imageUrl ?? publishedMeta?.imageUrl,
-                tags: resolvedTags,
-              }}
-              enrollment={enrollment}
-            />
-          );
-        })()
-      ))}
+        return (
+          <EnrolledCourseRow
+            key={enrollment.lessonSessionId}
+            course={{
+              ...enrollment.course,
+              imageUrl: enrollment.course.imageUrl ?? publishedMeta?.imageUrl,
+              tags: resolvedTags,
+              creatorUsername:
+                enrollment.course.creatorUsername ??
+                publishedMeta?.creatorUsername,
+            }}
+            enrollment={enrollment}
+          />
+        );
+      })}
     </div>
   );
 }

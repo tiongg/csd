@@ -36,7 +36,7 @@ export function CourseCard({
     <Link
       to="/learner/courses/$courseId"
       params={{ courseId: id }}
-      className="group block h-full overflow-hidden rounded-2xl border border-slate-200 bg-white/85 transition-colors hover:border-sky-300"
+      className="group block h-full overflow-hidden rounded-2xl border border-slate-300 bg-white/85 transition-colors hover:border-slate-400"
     >
       <div className="relative h-64 w-full overflow-hidden bg-slate-200">
         {imageUrl ? (

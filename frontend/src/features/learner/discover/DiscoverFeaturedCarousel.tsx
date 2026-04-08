@@ -4,8 +4,9 @@ import {
   CarouselContent,
   CarouselItem,
 } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
 import { Link } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { type DiscoverCourse } from './types';
 
 type DiscoverFeaturedCarouselProps = {
@@ -15,6 +16,9 @@ type DiscoverFeaturedCarouselProps = {
 export function DiscoverFeaturedCarousel({
   courses,
 }: DiscoverFeaturedCarouselProps) {
+  const autoplay = useRef(
+    Autoplay({ delay: 3200, stopOnInteraction: false, stopOnMouseEnter: true }),
+  );
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -48,6 +52,7 @@ export function DiscoverFeaturedCarousel({
       </h2>
       <Carousel
         opts={{ loop: courses.length > 1 }}
+        plugins={courses.length > 1 ? [autoplay.current] : undefined}
         setApi={setCarouselApi}
         className="w-full"
       >
@@ -59,8 +64,8 @@ export function DiscoverFeaturedCarousel({
                 params={{ courseId: course.id }}
                 className="group block overflow-hidden rounded-2xl border border-slate-300 bg-white"
               >
-                <div className="grid min-h-[18rem] gap-0 md:grid-cols-[1.2fr_1fr]">
-                  <div className="h-64 w-full overflow-hidden md:h-full">
+                <div className="grid min-h-[22rem] gap-0 md:grid-cols-[1.2fr_1fr]">
+                  <div className="h-80 w-full overflow-hidden md:h-full">
                     {course.imageUrl ? (
                       <img
                         src={course.imageUrl}

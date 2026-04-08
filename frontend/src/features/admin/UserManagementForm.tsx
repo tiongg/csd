@@ -17,7 +17,7 @@ import {
 } from '@/lib/fetch-client';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import ConfirmActionDialog from './ConfirmActionDialog';
 import { AdminTable, AdminTableMessageRow } from './AdminTable';
@@ -228,7 +228,7 @@ export default function UserManagementForm() {
                     type="button"
                     data-admin-tab-active={activeTab === tab}
                     className={cn(
-                      'relative z-10 rounded-md border border-transparent px-3 py-1.5 text-sm font-semibold transition-colors duration-240',
+                      'relative z-10 cursor-pointer rounded-md border border-transparent px-3 py-1.5 text-sm font-semibold transition-colors duration-240',
                       activeTab === tab
                         ? 'text-slate-900'
                         : 'text-slate-600 hover:text-slate-800',
@@ -342,10 +342,25 @@ function AllUsers({ searchQuery }: { searchQuery: string }) {
 
   const { data: users, isLoading } = useApiQuery('get', '/api/account/', {});
 
-  const filteredUsers = (users ?? []).filter(
-    (user) =>
-      user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()),
+  const filteredUsers = useMemo(
+    () =>
+      (users ?? [])
+        .filter(
+          (user) =>
+            user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            user.email.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+        .sort((a, b) => {
+          const aIsCurrentUser = a.id === currentUser?.id;
+          const bIsCurrentUser = b.id === currentUser?.id;
+
+          if (aIsCurrentUser === bIsCurrentUser) {
+            return 0;
+          }
+
+          return aIsCurrentUser ? -1 : 1;
+        }),
+    [currentUser?.id, searchQuery, users],
   );
 
   const { mutate: updateRole, isPending: isUpdatingRole } = useApiMutation(

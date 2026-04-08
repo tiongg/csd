@@ -21,6 +21,10 @@ export default function CourseView() {
     <div className="flex h-full w-full flex-1 flex-col overflow-hidden">
       <div className="flex-1">
         <div className="mx-auto max-w-4xl p-8">
+          <div className="mb-4">
+            <CourseNavigationFooter />
+          </div>
+
           <div className="mb-4 flex items-center gap-2">
             {currentSectionIndex >= 0 &&
               currentSectionIndex < sections.length && (
@@ -60,8 +64,6 @@ export default function CourseView() {
           </div>
         </div>
       </div>
-
-      <CourseNavigationFooter />
     </div>
   );
 }

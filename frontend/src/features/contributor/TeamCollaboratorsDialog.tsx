@@ -10,13 +10,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { components } from '@/generated/api';
-import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
-import { generateColorFromString, hexToRgb, type Team } from '@/lib/utils';
+import { apiQueryOptions, useApiMutation, useApiQuery } from '@/lib/fetch-client';
+import { type Team } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { Trash2, UserPlus } from 'lucide-react';
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { match } from 'ts-pattern';
+import TeamMemberAvatar from './TeamMemberAvatar';
 
 type TeamMember = components['schemas']['TeamMember'];
 
@@ -40,19 +41,6 @@ function getRoleDisplay(role: TeamMember['teamRole']) {
     .otherwise(() => 'Member');
 }
 
-function getAvatarStyle(username: string) {
-  const hex = generateColorFromString(username);
-  const { r, g, b } = hexToRgb(hex);
-  const darkR = Math.round(r * 0.55);
-  const darkG = Math.round(g * 0.55);
-  const darkB = Math.round(b * 0.55);
-
-  return {
-    backgroundColor: `rgb(${darkR}, ${darkG}, ${darkB})`,
-    color: '#ffffff',
-  };
-}
-
 export default function TeamCollaboratorsDialog({
   isOpen,
   setDialogOpen,
@@ -62,6 +50,14 @@ export default function TeamCollaboratorsDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const { data: accounts } = useApiQuery('get', '/api/account/', {});
+  const accountProfilePictureMap = useMemo(
+    () =>
+      new Map(
+        (accounts ?? []).map((account) => [account.id, account.profilePictureUrl]),
+      ),
+    [accounts],
+  );
 
   async function onMutationSuccess() {
     await queryClient.invalidateQueries({
@@ -187,10 +183,16 @@ export default function TeamCollaboratorsDialog({
                   >
                     <div className="flex min-w-0 items-center gap-3">
                       <div
-                        className="flex size-8 items-center justify-center rounded-full text-xs font-semibold text-white"
-                        style={getAvatarStyle(member.username)}
+                        className="shrink-0"
                       >
-                        {member.username.charAt(0).toUpperCase()}
+                        <TeamMemberAvatar
+                          member={member}
+                          profilePictureUrl={accountProfilePictureMap.get(
+                            member.accountId,
+                          )}
+                          fallbackText={member.username.charAt(0).toUpperCase()}
+                          className="size-8 text-xs"
+                        />
                       </div>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold text-slate-900">

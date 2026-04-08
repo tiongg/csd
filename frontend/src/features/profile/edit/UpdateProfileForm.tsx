@@ -237,6 +237,16 @@ export default function UpdateProfileForm() {
   };
 
   const displayImageUrl = previewUrl ?? profilePictureUrl;
+  const primaryButtonClassName =
+    'h-11 rounded-lg bg-sky-600 px-5 text-white shadow-sm hover:bg-sky-700';
+  const secondaryButtonClassName =
+    'h-11 rounded-lg border border-slate-300 bg-white px-4 text-slate-700 shadow-xs hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900';
+  const destructiveButtonClassName =
+    'h-11 rounded-lg px-4 text-white shadow-sm';
+  const dialogPrimaryButtonClassName =
+    'h-9 rounded-lg bg-sky-600 text-white shadow-sm hover:bg-sky-700';
+  const dialogSecondaryButtonClassName =
+    'h-9 rounded-lg border border-slate-300 bg-white text-slate-700 shadow-xs hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900';
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-5">
@@ -248,13 +258,13 @@ export default function UpdateProfileForm() {
                 src={displayImageUrl}
                 alt="Profile avatar"
                 className={cn(
-                  'h-24 w-24 rounded-full border-2 border-slate-200 bg-slate-100 object-cover',
+                  'h-28 w-28 rounded-full border-2 border-slate-200 bg-slate-100 object-cover',
                   isUploading && 'opacity-50',
                 )}
               />
             ) : (
-              <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-slate-200 bg-slate-100">
-                <User className="h-10 w-10 text-slate-500" />
+              <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-slate-200 bg-slate-100">
+                <User className="h-12 w-12 text-slate-500" />
               </div>
             )}
             {isUploading && (
@@ -304,10 +314,9 @@ export default function UpdateProfileForm() {
           <Button
             type="button"
             variant="outline"
-            size="sm"
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="h-10 rounded-lg border-slate-300 bg-white/90 text-slate-700 hover:bg-slate-50"
+            className={secondaryButtonClassName}
           >
             {isUploading
               ? 'Uploading...'
@@ -318,11 +327,10 @@ export default function UpdateProfileForm() {
           {profilePictureUrl && (
             <Button
               type="button"
-              variant="ghost"
-              size="sm"
+              variant="destructive"
               onClick={handleRemovePicture}
               disabled={isUploading}
-              className="h-10 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-800"
+              className={destructiveButtonClassName}
             >
               Remove picture
             </Button>
@@ -409,10 +417,10 @@ export default function UpdateProfileForm() {
               <DialogTrigger asChild>
                 <Button
                   type="button"
-                  variant="ghost"
-                  className="h-11 rounded-lg border border-slate-300 bg-white/90 px-4 text-slate-700 hover:bg-slate-50"
+                  variant="outline"
+                  className={secondaryButtonClassName}
                 >
-                  Change Password
+                  Change password
                 </Button>
               </DialogTrigger>
               <DialogContent className="rounded-xl border-slate-200 p-5 sm:max-w-md">
@@ -487,16 +495,16 @@ export default function UpdateProfileForm() {
                   <DialogFooter>
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="outline"
                       onClick={() => setPasswordDialogOpen(false)}
-                      className="h-9 rounded-lg text-slate-600 hover:bg-slate-100"
+                      className={dialogSecondaryButtonClassName}
                     >
                       Cancel
                     </Button>
                     <Button
                       type="submit"
                       disabled={isPasswordSubmitting}
-                      className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
+                      className={dialogPrimaryButtonClassName}
                     >
                       {isPasswordSubmitting ? 'Updating...' : 'Update Password'}
                     </Button>
@@ -507,7 +515,7 @@ export default function UpdateProfileForm() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="h-11 rounded-lg bg-sky-600 px-5 text-white hover:bg-sky-700"
+              className={primaryButtonClassName}
             >
               {isSubmitting ? 'Saving...' : 'Save changes'}
             </Button>

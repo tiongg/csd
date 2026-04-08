@@ -1,8 +1,10 @@
 import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
 import useEnrolledCourse from '@/context/EnrolledCourseContext';
+import { DesmosLaunchTile } from '@/features/dashboard/DesmosLaunchTile';
 import { useResizableSplit } from '@/features/dashboard/useResizableSplit';
 import { useApiQuery } from '@/lib/fetch-client';
+import { Link } from '@tanstack/react-router';
 import {
   useEffect,
   useMemo,
@@ -39,7 +41,7 @@ export default function LearnerDashboardPage() {
     return map;
   }, [publishedCourses]);
 
-  const inProgressCourses = useMemo(
+  const activeEnrolledCourses = useMemo(
     () =>
       (enrolledCourses ?? [])
         .filter((enrollment) => enrollment.status === 'ENROLLED')
@@ -47,9 +49,16 @@ export default function LearnerDashboardPage() {
           (a, b) =>
             new Date(b.course.updatedAt).getTime() -
             new Date(a.course.updatedAt).getTime(),
-        )
-        .slice(0, 5),
+        ),
     [enrolledCourses],
+  );
+  const inProgressCourses = useMemo(
+    () => activeEnrolledCourses.slice(0, 5),
+    [activeEnrolledCourses],
+  );
+  const hiddenActiveCourseCount = Math.max(
+    activeEnrolledCourses.length - inProgressCourses.length,
+    0,
   );
 
   useEffect(() => {
@@ -101,16 +110,23 @@ export default function LearnerDashboardPage() {
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-5">
-        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-8">
-          <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
-            Learner Dashboard
+        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6">
+          <div className="grid items-center gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <div className="min-w-0">
+              <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
+                Learner Dashboard
+              </div>
+              <Heading1 className="mt-3 text-slate-900">
+                Welcome back, {displayName}.
+              </Heading1>
+              <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-600">
+                Monitor key trend shifts and focus on what is most relevant today.
+              </p>
+            </div>
+            <div>
+              <DesmosLaunchTile />
+            </div>
           </div>
-          <Heading1 className="mt-3 text-slate-900">
-            Welcome back, {displayName}.
-          </Heading1>
-          <p className="mt-2 max-w-4xl text-base leading-relaxed text-slate-600">
-            Monitor key trend shifts and focus on what is most relevant today.
-          </p>
         </section>
 
         <PersonalAnalytics />
@@ -121,17 +137,24 @@ export default function LearnerDashboardPage() {
           style={splitStyle}
         >
           <section className="relative flex min-w-0 basis-full flex-col overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6 lg:[flex-basis:var(--left-pane)]">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-slate-900">
-                Enrolled Courses
-              </h2>
-              <p className="text-sm text-slate-500">
-                {inProgressCourses.length} active
-              </p>
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">
+                  Enrolled Courses
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Continue where you left off.
+                </p>
+              </div>
+              {hiddenActiveCourseCount > 0 && (
+                <Link
+                  to="/learner/my-courses"
+                  className="text-sm font-semibold text-sky-700 underline-offset-4 hover:underline"
+                >
+                  View all courses
+                </Link>
+              )}
             </div>
-            <p className="mt-1 text-sm text-slate-600">
-              Continue where you left off.
-            </p>
 
             {inProgressCourses.length > 0 ? (
               <div

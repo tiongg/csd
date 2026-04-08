@@ -17,7 +17,11 @@ export function DiscoverCarouselCard({
       className="group block h-full overflow-hidden rounded-xl border border-slate-300 bg-white transition-colors hover:border-slate-400"
     >
       <div
-        className={compact ? 'relative h-56 w-full overflow-hidden' : 'relative h-64 w-full overflow-hidden'}
+        className={
+          compact
+            ? 'relative h-64 w-full overflow-hidden'
+            : 'relative h-80 w-full overflow-hidden'
+        }
       >
         {course.imageUrl ? (
           <img
@@ -35,11 +39,11 @@ export function DiscoverCarouselCard({
         </span>
       </div>
 
-      <div className="flex flex-col p-4">
+      <div className={compact ? 'flex flex-col p-3' : 'flex flex-col p-4'}>
         <p className="line-clamp-2 text-sm font-semibold text-slate-900">
           {course.title}
         </p>
-        <p className="mt-1 line-clamp-3 text-xs text-slate-600">
+        <p className="mt-1 line-clamp-2 text-xs text-slate-600">
           {course.description || 'No description provided'}
         </p>
         <div className="mt-2 flex items-end justify-between gap-2">

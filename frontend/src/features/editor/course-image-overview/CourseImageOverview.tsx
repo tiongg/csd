@@ -50,7 +50,7 @@ function ImagePreview({
         src={`${imageUrl}?t=${new Date().getTime()}`}
         alt="Course thumbnail"
         className={cn(
-          'max-h-96 w-full rounded-lg object-cover',
+          'block w-full rounded-lg object-cover',
           imageClassName,
         )}
         onError={() => setError(true)}

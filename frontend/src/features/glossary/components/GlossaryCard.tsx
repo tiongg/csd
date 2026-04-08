@@ -8,7 +8,7 @@ export type GlossaryCardProps = {
 
 export default function GlossaryCard({ item, onEdit }: GlossaryCardProps) {
   return (
-    <article className="group relative rounded-xl border border-slate-200 bg-white p-4 md:p-5">
+    <article className="group relative rounded-xl border border-slate-300 bg-white p-4 md:p-5">
       {onEdit && (
         <button
           onClick={() => onEdit(item)}
@@ -22,7 +22,7 @@ export default function GlossaryCard({ item, onEdit }: GlossaryCardProps) {
       <div
         className={cn('flex flex-wrap items-center gap-2.5', onEdit && 'pr-8')}
       >
-        <h3 className="text-base font-semibold text-slate-900">{item.title}</h3>
+        <h3 className="text-base font-semibold text-sky-800">{item.title}</h3>
       </div>
 
       <p className="mt-2 text-sm leading-6 text-slate-700">

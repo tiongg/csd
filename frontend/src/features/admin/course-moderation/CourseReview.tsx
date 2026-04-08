@@ -26,6 +26,13 @@ const reviewStatusStyles = {
   PENDING: 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-100',
   REJECTED: 'bg-red-100 text-red-700 border-red-200 hover:bg-red-100',
 } as const;
+const courseCategoryChipClass =
+  'rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700';
+const courseTagChipClass =
+  'rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700';
+const courseImageClassName = 'h-[320px] w-full object-cover md:h-[420px]';
+const courseImagePlaceholderClassName =
+  'flex h-[320px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500 md:h-[420px]';
 
 type ReviewSectionViewerProps = {
   section: SectionType;
@@ -142,35 +149,38 @@ export default function CourseReview() {
           <div className="mx-auto w-full max-w-4xl space-y-3">
             <Card className="gap-0 border-slate-200/90 bg-white/90 py-0 shadow-sm">
               <CardContent className="space-y-3 p-4 md:p-5">
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-                  <div className="min-w-0 flex-1 space-y-4">
-                    <div className="space-y-2">
-                      <CardTitle className="text-xl leading-tight text-slate-900">
-                        {course.title}
-                      </CardTitle>
-                      <CardDescription className="text-base text-slate-600">
-                        {course.description || 'No description provided.'}
-                      </CardDescription>
+                <div className="space-y-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <CardTitle className="min-w-0 flex-1 text-xl leading-[1.15] text-slate-900">
+                      {course.title}
+                    </CardTitle>
+                    <div className="flex shrink-0 items-center">
+                      <span className="inline-flex items-center rounded-md border border-slate-300 bg-white/90 px-2.5 py-1 text-xs font-medium text-slate-700">
+                        By {creatorLabel}
+                      </span>
                     </div>
-                    {tags.length > 0 && (
+                  </div>
+
+                  <CardDescription className="text-base text-slate-600">
+                    {course.description || 'No description provided.'}
+                  </CardDescription>
+
+                  {(course.category || tags.length > 0) && (
+                    <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap gap-2">
+                        {course.category && (
+                          <span className={courseCategoryChipClass}>
+                            {course.category}
+                          </span>
+                        )}
                         {tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
-                          >
+                          <span key={tag} className={courseTagChipClass}>
                             {tag}
                           </span>
                         ))}
                       </div>
-                    )}
-                  </div>
-
-                  <div className="shrink-0">
-                    <span className="inline-flex items-center rounded-md border border-slate-300 bg-white/90 px-2.5 py-1 text-xs font-medium text-slate-700">
-                      By {creatorLabel}
-                    </span>
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 {'imageUrl' in course && course.imageUrl ? (
@@ -178,11 +188,11 @@ export default function CourseReview() {
                     <img
                       src={course.imageUrl as string}
                       alt={course.title}
-                      className="h-[240px] w-full object-cover md:h-[320px]"
+                      className={courseImageClassName}
                     />
                   </div>
                 ) : (
-                  <div className="flex h-[180px] items-center justify-center rounded-lg border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
+                  <div className={courseImagePlaceholderClassName}>
                     No thumbnail
                   </div>
                 )}

@@ -70,45 +70,46 @@ export function DiscoverCategoryCarousel({
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+      <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+      <div className="relative">
         {courses.length > 1 && (
-          <div className="flex items-center gap-1.5">
+          <>
             <button
               type="button"
               onClick={goToPrevious}
-              className="inline-flex size-8 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-colors hover:bg-slate-100"
+              className="absolute top-1/2 -left-4 z-10 hidden size-8 -translate-y-1/2 items-center justify-center rounded-full border border-slate-300 bg-white/92 text-slate-700 shadow-sm transition-colors hover:border-slate-400 hover:bg-white xl:inline-flex"
               aria-label={`Previous courses in ${title}`}
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className="size-3.5" />
             </button>
             <button
               type="button"
               onClick={goToNext}
-              className="inline-flex size-8 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition-colors hover:bg-slate-100"
+              className="absolute top-1/2 -right-4 z-10 hidden size-8 -translate-y-1/2 items-center justify-center rounded-full border border-slate-300 bg-white/92 text-slate-700 shadow-sm transition-colors hover:border-slate-400 hover:bg-white xl:inline-flex"
               aria-label={`Next courses in ${title}`}
             >
-              <ChevronRight className="size-4" />
+              <ChevronRight className="size-3.5" />
             </button>
-          </div>
+          </>
         )}
+
+        <Carousel
+          setApi={setCarouselApi}
+          opts={{ align: 'start', slidesToScroll: 1, containScroll: 'trimSnaps' }}
+          className="w-full"
+        >
+          <CarouselContent>
+            {courses.map((course) => (
+              <CarouselItem
+                key={course.id}
+                className="basis-[84%] sm:basis-1/2 lg:basis-1/2 xl:basis-1/2 mb-1"
+              >
+                <DiscoverCarouselCard course={course} compact />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
       </div>
-      <Carousel
-        setApi={setCarouselApi}
-        opts={{ align: 'start', slidesToScroll: 1, containScroll: 'trimSnaps' }}
-        className="w-full"
-      >
-        <CarouselContent>
-          {courses.map((course) => (
-            <CarouselItem
-              key={course.id}
-              className="basis-[84%] sm:basis-1/2 lg:basis-1/2 xl:basis-1/2"
-            >
-              <DiscoverCarouselCard course={course} compact />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
     </section>
   );
 }

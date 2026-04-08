@@ -81,7 +81,7 @@ function NotificationItem({
           <button
             type="button"
             onClick={() => onMarkAsRead(notification.id)}
-            className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="cursor-pointer rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
             aria-label="Mark as read"
           >
             <Check className="size-3.5" />
@@ -90,7 +90,7 @@ function NotificationItem({
         <button
           type="button"
           onClick={() => onDelete(notification.id)}
-          className="rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-500"
+          className="cursor-pointer rounded p-1 text-slate-400 hover:bg-red-50 hover:text-red-500"
           aria-label="Delete notification"
         >
           <Trash2 className="size-3.5" />
@@ -185,7 +185,7 @@ export default function NotificationsDropdown({ children }: PropsWithChildren) {
             <button
               type="button"
               onClick={handleMarkAllAsRead}
-              className="text-xs font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50"
+              className="cursor-pointer text-xs font-medium text-blue-600 hover:text-blue-700 disabled:opacity-50"
               disabled={isMarkingAsRead}
             >
               Mark all as read

@@ -25,7 +25,7 @@ import type { Course, Team } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { Plus, Settings, Trash2 } from 'lucide-react';
+import { Settings, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useBoolean } from 'usehooks-ts';
@@ -142,11 +142,10 @@ export default function CoursesList({ team }: CourseListProps) {
             className="h-9 rounded-lg bg-sky-600 text-white hover:bg-sky-700"
             onClick={openCreateCourseDialog}
           >
-            <Plus className="size-4" />
             Create Course
           </Button>
           <Button
-            className="h-9 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+            className="h-9 rounded-lg bg-teal-600 text-white hover:bg-teal-700"
             onClick={openTeamCollaboratorsDialog}
           >
             Team Members
@@ -338,7 +337,7 @@ function CourseCard({ course, teamId }: CourseCardProps) {
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
       >
-        <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md">
+        <article className="group flex h-full min-h-40 flex-col justify-between rounded-xl border border-slate-300 bg-white shadow-sm transition-colors duration-150 hover:border-slate-400">
           <div className="aspect-video w-full overflow-hidden rounded-t-xl bg-slate-200">
             {course.imageUrl ? (
               <img
