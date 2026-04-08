@@ -21,7 +21,7 @@ import {
 } from '@/lib/fetch-client';
 import type { GlossaryItem } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { normalizeGlossaryCategory } from '@/features/relations/graph-data';
 import GlossaryCard from './components/GlossaryCard';
 
@@ -56,6 +56,7 @@ export default function GlossaryPage({
   const [query, setQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_A_TO_Z);
   const [categoryFilter, setCategoryFilter] = useState(CATEGORY_FILTER_ALL);
+  const [openCategories, setOpenCategories] = useState<string[]>([]);
 
   const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
   const { mutateAsync: generateGlossary, isPending: isGeneratingGlossary } =
@@ -142,6 +143,15 @@ export default function GlossaryPage({
         items,
       }));
   }, [categoryFilter, query, sortOrder, glossaryItems]);
+
+  useEffect(() => {
+    if (query.trim() || categoryFilter !== CATEGORY_FILTER_ALL) {
+      setOpenCategories(groupedItems.map((section) => section.category));
+      return;
+    }
+
+    setOpenCategories([]);
+  }, [categoryFilter, groupedItems, query]);
 
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col bg-slate-100/70 p-4 md:p-6">
@@ -239,12 +249,17 @@ export default function GlossaryPage({
           </div>
 
           {groupedItems.length > 0 ? (
-            <Accordion type="multiple" className="space-y-3">
+            <Accordion
+              type="multiple"
+              value={openCategories}
+              onValueChange={setOpenCategories}
+              className="space-y-3"
+            >
               {groupedItems.map((section) => (
                 <AccordionItem
                   key={section.category}
                   value={section.category}
-                  className="rounded-xl border border-slate-200/80 bg-white/55 px-4"
+                  className="rounded-xl border border-slate-300 bg-white/55 px-4 pb-1 shadow-sm"
                 >
                   <AccordionTrigger className="py-4 hover:no-underline">
                     <div className="text-left">
@@ -253,7 +268,7 @@ export default function GlossaryPage({
                       </h2>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="pt-1 pb-4">
+                  <AccordionContent className="overflow-visible pt-2 pb-6">
                     <div className="grid gap-3">
                       {section.items.map((item) => (
                         <GlossaryCard
