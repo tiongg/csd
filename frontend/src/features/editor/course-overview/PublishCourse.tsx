@@ -83,9 +83,9 @@ export default function PublishCourse({ course }: PublishCourseProps) {
       <DialogTrigger asChild>
         <Button
           disabled={sectionCount === 0}
-          className="gap-2 transition duration-300 active:scale-95"
+          className="h-9 gap-1.5 rounded-lg px-3.5 text-sm transition duration-300 active:scale-95"
         >
-          <Send className="size-4" />
+          <Send className="size-3.5" />
           Submit for Approval
         </Button>
       </DialogTrigger>

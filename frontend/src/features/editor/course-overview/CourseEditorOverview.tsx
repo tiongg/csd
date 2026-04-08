@@ -23,33 +23,33 @@ export default function CourseEditorOverview({
   return (
     <Card className="gap-0 border-slate-200/90 bg-white/90 py-0 shadow-sm">
       <CardContent className="space-y-3 p-4 md:p-5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          <div className="min-w-0 flex-1 space-y-4">
-            <div className="space-y-2">
-              <CardTitle className="text-xl leading-tight text-slate-900">
-                {course.title}
-              </CardTitle>
-              <CardDescription className="text-base">
-                {course.description || 'No description provided.'}
-              </CardDescription>
+        <div className="space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle className="min-w-0 flex-1 text-xl leading-[1.15] text-slate-900">
+              {course.title}
+            </CardTitle>
+            <div className="flex shrink-0 items-center">
+              <PublishCourse course={course} />
             </div>
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="outline"
-                    className="rounded-full border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
           </div>
-          <div className="flex w-full flex-col items-start gap-3 lg:w-auto lg:items-end">
-            <PublishCourse course={course} />
-          </div>
+
+          <CardDescription className="text-base">
+            {course.description || 'No description provided.'}
+          </CardDescription>
+
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className="rounded-full border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
 
         <CourseImageOverview
