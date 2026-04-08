@@ -120,10 +120,8 @@ export function buildGraph(glossaryItems: GlossaryItem[]): {
     });
 
     const reciprocal = candidate.directedCount > 1;
-    const unionNeighborCount = new Set([
-      ...sourceContext,
-      ...targetContext,
-    ]).size;
+    const unionNeighborCount = new Set([...sourceContext, ...targetContext])
+      .size;
     const jaccardScore =
       unionNeighborCount > 0 ? sharedNeighborCount / unionNeighborCount : 0;
     const strength =
@@ -199,8 +197,7 @@ export function buildGraph(glossaryItems: GlossaryItem[]): {
 
     if (
       (candidate.reciprocal && (hasLocalSupport || touchesLeaf)) ||
-      ((selectedBySource && selectedByTarget) &&
-        (hasLocalSupport || touchesLeaf))
+      (selectedBySource && selectedByTarget && (hasLocalSupport || touchesLeaf))
     ) {
       keptEdges.set(candidate.key, candidate);
     }
@@ -227,8 +224,14 @@ export function buildGraph(glossaryItems: GlossaryItem[]): {
 
     if (!keptEdges.has(strongest.key)) {
       keptEdges.set(strongest.key, strongest);
-      degreeByNode.set(strongest.source, (degreeByNode.get(strongest.source) ?? 0) + 1);
-      degreeByNode.set(strongest.target, (degreeByNode.get(strongest.target) ?? 0) + 1);
+      degreeByNode.set(
+        strongest.source,
+        (degreeByNode.get(strongest.source) ?? 0) + 1,
+      );
+      degreeByNode.set(
+        strongest.target,
+        (degreeByNode.get(strongest.target) ?? 0) + 1,
+      );
     }
   });
 
@@ -389,7 +392,11 @@ export function buildComponentLookup(nodes: NodeType[], links: LinkType[]) {
   };
 }
 
-function buildComponentCenters(componentCount: number, width: number, height: number) {
+function buildComponentCenters(
+  componentCount: number,
+  width: number,
+  height: number,
+) {
   const centers = new Map<number, { x: number; y: number }>();
   const centerX = width / 2;
   const centerY = height / 2;
@@ -424,7 +431,12 @@ export default function RelationGraph({
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
-  const svgSelectionRef = useRef<d3.Selection<SVGSVGElement, unknown, null, undefined> | null>(null);
+  const svgSelectionRef = useRef<d3.Selection<
+    SVGSVGElement,
+    unknown,
+    null,
+    undefined
+  > | null>(null);
   const zoomTransformRef = useRef(d3.zoomIdentity);
   const suppressTooltipDismissRef = useRef(false);
   const focusTimeoutRef = useRef<number | null>(null);
@@ -539,7 +551,10 @@ export default function RelationGraph({
     }
 
     const { nodes, links } = buildGraph(glossaryItems);
-    const { componentByNode, componentCount } = buildComponentLookup(nodes, links);
+    const { componentByNode, componentCount } = buildComponentLookup(
+      nodes,
+      links,
+    );
     const width = viewportSize.width;
     const height = viewportSize.height;
     const componentCenters = buildComponentCenters(
@@ -573,7 +588,10 @@ export default function RelationGraph({
     });
 
     nodesByCluster.forEach((clusterNodes, clusterId) => {
-      const center = componentCenters.get(clusterId) ?? { x: width / 2, y: height / 2 };
+      const center = componentCenters.get(clusterId) ?? {
+        x: width / 2,
+        y: height / 2,
+      };
       const sortedClusterNodes = [...clusterNodes].sort((a, b) => {
         const degreeDifference =
           (nodeDegrees.get(b.id) ?? 0) - (nodeDegrees.get(a.id) ?? 0);
@@ -592,9 +610,13 @@ export default function RelationGraph({
         const ringNodeCount =
           ringIndex === 0
             ? 1
-            : Math.min(sortedClusterNodes.length - placedCount, Math.max(6, ringIndex * 8));
+            : Math.min(
+                sortedClusterNodes.length - placedCount,
+                Math.max(6, ringIndex * 8),
+              );
         const radius = ringIndex === 0 ? 0 : ringIndex * 28;
-        const angleOffset = clusterId * 0.45 + (ringIndex % 2 === 0 ? 0 : Math.PI / 10);
+        const angleOffset =
+          clusterId * 0.45 + (ringIndex % 2 === 0 ? 0 : Math.PI / 10);
 
         for (let i = 0; i < ringNodeCount; i += 1) {
           const node = sortedClusterNodes[placedCount + i];
@@ -625,15 +647,19 @@ export default function RelationGraph({
 
     const g = svg.append('g');
     let emphasizedNodeIds = new Set<string>();
-    let labels:
-      | d3.Selection<SVGTextElement, NodeType, SVGGElement, unknown>
-      | null = null;
+    let labels: d3.Selection<
+      SVGTextElement,
+      NodeType,
+      SVGGElement,
+      unknown
+    > | null = null;
     const updateLabelVisibility = () => {
       if (!labels) {
         return;
       }
 
-      const showAllLabels = zoomTransformRef.current.k >= LABEL_VISIBILITY_SCALE;
+      const showAllLabels =
+        zoomTransformRef.current.k >= LABEL_VISIBILITY_SCALE;
       labels
         .style('display', (node) =>
           showAllLabels || emphasizedNodeIds.has(node.id) ? null : 'none',
@@ -651,7 +677,10 @@ export default function RelationGraph({
         g.attr('transform', event.transform);
         emphasizedNodeIds = new Set(activeHighlightNodeIdsRef.current);
         updateLabelVisibility();
-        if (!suppressTooltipDismissRef.current && focusedNodeIdRef.current === null) {
+        if (
+          !suppressTooltipDismissRef.current &&
+          focusedNodeIdRef.current === null
+        ) {
           hideTooltip();
         }
       });
@@ -689,20 +718,26 @@ export default function RelationGraph({
       .force(
         'x',
         d3
-          .forceX<NodeType>((node) => componentCenters.get(node.cluster ?? 0)?.x ?? width / 2)
+          .forceX<NodeType>(
+            (node) => componentCenters.get(node.cluster ?? 0)?.x ?? width / 2,
+          )
           .strength(0.11),
       )
       .force(
         'y',
         d3
-          .forceY<NodeType>((node) => componentCenters.get(node.cluster ?? 0)?.y ?? height / 2)
+          .forceY<NodeType>(
+            (node) => componentCenters.get(node.cluster ?? 0)?.y ?? height / 2,
+          )
           .strength(0.22),
       )
       .force(
         'collision',
         d3
           .forceCollide<NodeType>()
-          .radius((node) => 14 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 2.8),
+          .radius(
+            (node) => 14 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 2.8,
+          ),
       );
 
     const link = g
@@ -728,7 +763,10 @@ export default function RelationGraph({
     nodeGroups
       .append('circle')
       .attr('r', (node) =>
-        Math.max(4.2, Math.min(10.5, 4.2 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 1.25)),
+        Math.max(
+          4.2,
+          Math.min(10.5, 4.2 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 1.25),
+        ),
       )
       .attr('fill', (node) => clusterColor(node.cluster ?? 0))
       .attr('fill-opacity', 0.9)
@@ -740,7 +778,10 @@ export default function RelationGraph({
       .text((node) => node.id)
       .attr('x', 0)
       .attr('y', (node) =>
-        Math.max(13, Math.min(20, 11 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 1.25)),
+        Math.max(
+          13,
+          Math.min(20, 11 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 1.25),
+        ),
       )
       .attr('text-anchor', 'middle')
       .attr('fill', '#334155')
@@ -863,7 +904,10 @@ export default function RelationGraph({
         .attr('x2', (graphLink) => (graphLink.target as NodeType).x ?? 0)
         .attr('y2', (graphLink) => (graphLink.target as NodeType).y ?? 0);
 
-      nodeGroups.attr('transform', (node) => `translate(${node.x ?? 0},${node.y ?? 0})`);
+      nodeGroups.attr(
+        'transform',
+        (node) => `translate(${node.x ?? 0},${node.y ?? 0})`,
+      );
     });
 
     simulation.alpha(1).restart();
@@ -903,7 +947,9 @@ export default function RelationGraph({
     const nodeById = nodeByIdRef.current;
     const matchedId =
       Array.from(nodeById.keys()).find((id) => id.toLowerCase() === query) ??
-      Array.from(nodeById.keys()).find((id) => id.toLowerCase().includes(query));
+      Array.from(nodeById.keys()).find((id) =>
+        id.toLowerCase().includes(query),
+      );
 
     if (!matchedId) {
       focusedNodeIdRef.current = null;
@@ -918,10 +964,7 @@ export default function RelationGraph({
   return (
     <div
       ref={containerRef}
-      className={cn(
-        'absolute inset-0 overflow-hidden',
-        className,
-      )}
+      className={cn('absolute inset-0 overflow-hidden', className)}
     >
       <svg
         ref={svgRef}
