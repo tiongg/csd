@@ -5,7 +5,7 @@ import { useApiQuery } from '@/lib/fetch-client';
 import { useAuth } from '@/context/AuthContext';
 import { Link } from '@tanstack/react-router';
 import dayjs from 'dayjs';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type KeywordCourseSearchDialogProps = {
   initialSearchValue: string;
@@ -30,6 +30,7 @@ export function KeywordCourseSearchDialog({
 }: KeywordCourseSearchDialogProps) {
   const { user } = useAuth();
   const [search, setSearch] = useState(initialSearchValue);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const { data: courses, isLoading, isError } = useApiQuery(
     'get',
     '/api/courses/published',
@@ -86,7 +87,20 @@ export function KeywordCourseSearchDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="rounded-xl border-slate-200 p-5 sm:max-w-3xl">
+      <DialogContent
+        className="rounded-xl border-slate-200 p-5 sm:max-w-3xl"
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          const input = searchInputRef.current;
+          if (!input) {
+            return;
+          }
+
+          input.focus();
+          const caretPosition = input.value.length;
+          input.setSelectionRange(caretPosition, caretPosition);
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-sky-900">Keyword to Course Match</DialogTitle>
           <DialogDescription className="text-slate-600">
@@ -96,6 +110,7 @@ export function KeywordCourseSearchDialog({
 
         <div className="space-y-4">
           <Input
+            ref={searchInputRef}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by keyword"
@@ -132,7 +147,7 @@ export function KeywordCourseSearchDialog({
                       className="group block rounded-xl border border-slate-300 bg-white p-4 transition-colors hover:border-slate-400 hover:bg-slate-50/40"
                     >
                       <div className="flex gap-3">
-                        <div className="w-52 shrink-0 self-stretch overflow-hidden rounded-lg bg-slate-200">
+                        <div className="h-24 w-36 shrink-0 overflow-hidden rounded-lg bg-slate-200 sm:h-28 sm:w-44">
                           {course.imageUrl ? (
                             <img
                               src={course.imageUrl}
@@ -146,7 +161,7 @@ export function KeywordCourseSearchDialog({
                           )}
                         </div>
 
-                        <div className="min-w-0 flex-1">
+                        <div className="min-w-0 flex flex-1 flex-col">
                           <div className="flex items-start justify-between gap-2">
                             <p className="line-clamp-2 text-sm font-semibold text-slate-900">
                               {course.title}
@@ -175,7 +190,7 @@ export function KeywordCourseSearchDialog({
                             Updated {dayjs(course.updatedAt).fromNow()}
                           </p>
 
-                          <div className="mt-2 flex items-center gap-1.5 overflow-hidden">
+                          <div className="mt-auto pt-2 flex items-center gap-1.5 overflow-hidden">
                             <span className="inline-flex shrink-0 items-center rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
                               {course.category}
                             </span>

@@ -275,6 +275,9 @@ function CourseCard({ course, teamId }: CourseCardProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const tags = course.tags ?? [];
+  const visibleTags = tags.slice(0, 4);
+  const hiddenTagsCount = tags.length - visibleTags.length;
   const {
     value: isEditDialogOpen,
     setTrue: openEditDialog,
@@ -377,19 +380,25 @@ function CourseCard({ course, teamId }: CourseCardProps) {
                 {course.description?.trim() || 'No description yet.'}
               </p>
               <div>
-                {(course.tags ?? []).length > 0 ? (
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {(course.tags ?? []).map((tag) => (
+                {tags.length > 0 ? (
+                  <div className="mt-2 flex min-h-8 items-center gap-2 overflow-hidden">
+                    {visibleTags.map((tag) => (
                       <span
                         key={tag}
-                        className="inline-flex items-center rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
+                        className="inline-flex max-w-[120px] shrink-0 items-center truncate rounded-full border border-sky-200 bg-sky-100 px-2 py-1 text-xs font-medium text-sky-700"
+                        title={tag}
                       >
                         {tag}
                       </span>
                     ))}
+                    {hiddenTagsCount > 0 && (
+                      <span className="inline-flex shrink-0 items-center rounded-full border border-slate-200 bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600">
+                        +{hiddenTagsCount}
+                      </span>
+                    )}
                   </div>
                 ) : (
-                  <span className="mt-2 inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-500">
+                  <span className="mt-2 inline-flex min-h-8 items-center rounded-full bg-slate-100 px-2 py-1 text-xs font-medium text-slate-500">
                     No tags
                   </span>
                 )}

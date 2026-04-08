@@ -8,6 +8,8 @@ import {
 } from '@/components/ui/select';
 
 type DiscoverBrowseToolbarProps = {
+  title?: string;
+  searchPlaceholder?: string;
   onSearchQueryChange: (value: string) => void;
   categoryFilter: string;
   onCategoryFilterChange: (value: string) => void;
@@ -16,6 +18,8 @@ type DiscoverBrowseToolbarProps = {
 };
 
 export function DiscoverBrowseToolbar({
+  title = 'Browse',
+  searchPlaceholder = 'Search title, description, tags',
   onSearchQueryChange,
   categoryFilter,
   onCategoryFilterChange,
@@ -24,11 +28,11 @@ export function DiscoverBrowseToolbar({
 }: DiscoverBrowseToolbarProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <h2 className="text-2xl font-bold tracking-tight text-slate-900">Browse</h2>
+      <h2 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h2>
       <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
         <div className="w-full sm:w-80">
           <SearchBar
-            placeholder="Search title, description, tags"
+            placeholder={searchPlaceholder}
             className="h-9 rounded-lg border-slate-300 bg-white/85"
             onSearch={onSearchQueryChange}
           />

@@ -3,12 +3,16 @@ import { useAuth } from '@/context/AuthContext';
 import ContributorAnalytics from '@/features/contributor/ContributorAnalytics';
 import { ContributorReviewQueue } from '@/features/contributor/ContributorReviewQueue';
 import { useResizableSplit } from '@/features/dashboard/useResizableSplit';
+import { useState } from 'react';
+import { KeywordCourseSearchDialog } from '../learner/dashboard/KeywordCourseSearchDialog';
 import { TopTrendsTable } from '../learner/dashboard/TopTrendsTable';
 
 export default function ContributorDashboardPage() {
   const { user } = useAuth();
   const displayName = user?.realname?.trim() || user?.username;
   const { splitContainerRef, splitStyle, startResizing } = useResizableSplit();
+  const [isCourseMatchOpen, setIsCourseMatchOpen] = useState(false);
+  const [keywordSearch, setKeywordSearch] = useState('');
 
   return (
     <div className="w-full bg-slate-100/70 p-6 md:p-8">
@@ -49,10 +53,20 @@ export default function ContributorDashboardPage() {
           </div>
 
           <TopTrendsTable
-            title="Today's Top Trends"
-            description="Top 5 signals to monitor."
+            title="Trending"
+            description="Top signals to monitor."
+            onTrendClick={(trendName) => {
+              setKeywordSearch(trendName);
+              setIsCourseMatchOpen(true);
+            }}
           />
         </div>
+
+        <KeywordCourseSearchDialog
+          initialSearchValue={keywordSearch}
+          open={isCourseMatchOpen}
+          onOpenChange={setIsCourseMatchOpen}
+        />
       </div>
     </div>
   );

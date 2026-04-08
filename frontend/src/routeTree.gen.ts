@@ -23,18 +23,21 @@ import { Route as AuthenticatedLearnerMyCoursesRouteImport } from './routes/_aut
 import { Route as AuthenticatedLearnerGlossaryRouteImport } from './routes/_authenticated/learner/glossary'
 import { Route as AuthenticatedLearnerFaqRouteImport } from './routes/_authenticated/learner/faq'
 import { Route as AuthenticatedLearnerDiscoverRouteImport } from './routes/_authenticated/learner/discover'
+import { Route as AuthenticatedLearnerDesmosRouteImport } from './routes/_authenticated/learner/desmos'
 import { Route as AuthenticatedLearnerDashboardRouteImport } from './routes/_authenticated/learner/dashboard'
 import { Route as AuthenticatedContributorTeamsRouteImport } from './routes/_authenticated/contributor/teams'
 import { Route as AuthenticatedContributorSettingsRouteImport } from './routes/_authenticated/contributor/settings'
 import { Route as AuthenticatedContributorGlossaryRouteImport } from './routes/_authenticated/contributor/glossary'
 import { Route as AuthenticatedContributorFaqRouteImport } from './routes/_authenticated/contributor/faq'
 import { Route as AuthenticatedContributorDiscoverRouteImport } from './routes/_authenticated/contributor/discover'
+import { Route as AuthenticatedContributorDesmosRouteImport } from './routes/_authenticated/contributor/desmos'
 import { Route as AuthenticatedContributorDashboardRouteImport } from './routes/_authenticated/contributor/dashboard'
 import { Route as AuthenticatedAdminUserManagementRouteImport } from './routes/_authenticated/admin/user-management'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminGlossaryRouteImport } from './routes/_authenticated/admin/glossary'
 import { Route as AuthenticatedAdminFaqRouteImport } from './routes/_authenticated/admin/faq'
 import { Route as AuthenticatedAdminDiscoverRouteImport } from './routes/_authenticated/admin/discover'
+import { Route as AuthenticatedAdminDesmosRouteImport } from './routes/_authenticated/admin/desmos'
 import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin/dashboard'
 import { Route as AuthenticatedAdminCourseModerationRouteImport } from './routes/_authenticated/admin/course-moderation'
 import { Route as AuthenticatedLearnerCoursesCourseIdRouteImport } from './routes/_authenticated/learner/courses/$courseId'
@@ -115,6 +118,12 @@ const AuthenticatedLearnerDiscoverRoute =
     path: '/learner/discover',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedLearnerDesmosRoute =
+  AuthenticatedLearnerDesmosRouteImport.update({
+    id: '/learner/desmos',
+    path: '/learner/desmos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedLearnerDashboardRoute =
   AuthenticatedLearnerDashboardRouteImport.update({
     id: '/learner/dashboard',
@@ -149,6 +158,12 @@ const AuthenticatedContributorDiscoverRoute =
   AuthenticatedContributorDiscoverRouteImport.update({
     id: '/contributor/discover',
     path: '/contributor/discover',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedContributorDesmosRoute =
+  AuthenticatedContributorDesmosRouteImport.update({
+    id: '/contributor/desmos',
+    path: '/contributor/desmos',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedContributorDashboardRoute =
@@ -186,6 +201,12 @@ const AuthenticatedAdminDiscoverRoute =
     path: '/admin/discover',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminDesmosRoute =
+  AuthenticatedAdminDesmosRouteImport.update({
+    id: '/admin/desmos',
+    path: '/admin/desmos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAdminDashboardRoute =
   AuthenticatedAdminDashboardRouteImport.update({
     id: '/admin/dashboard',
@@ -220,18 +241,21 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginIndexRoute
   '/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/desmos': typeof AuthenticatedAdminDesmosRoute
   '/admin/discover': typeof AuthenticatedAdminDiscoverRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
+  '/contributor/desmos': typeof AuthenticatedContributorDesmosRoute
   '/contributor/discover': typeof AuthenticatedContributorDiscoverRoute
   '/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/contributor/glossary': typeof AuthenticatedContributorGlossaryRoute
   '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
   '/contributor/teams': typeof AuthenticatedContributorTeamsRoute
   '/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
+  '/learner/desmos': typeof AuthenticatedLearnerDesmosRoute
   '/learner/discover': typeof AuthenticatedLearnerDiscoverRoute
   '/learner/faq': typeof AuthenticatedLearnerFaqRoute
   '/learner/glossary': typeof AuthenticatedLearnerGlossaryRoute
@@ -251,18 +275,21 @@ export interface FileRoutesByTo {
   '/login': typeof LoginIndexRoute
   '/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
   '/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/admin/desmos': typeof AuthenticatedAdminDesmosRoute
   '/admin/discover': typeof AuthenticatedAdminDiscoverRoute
   '/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
+  '/contributor/desmos': typeof AuthenticatedContributorDesmosRoute
   '/contributor/discover': typeof AuthenticatedContributorDiscoverRoute
   '/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/contributor/glossary': typeof AuthenticatedContributorGlossaryRoute
   '/contributor/settings': typeof AuthenticatedContributorSettingsRoute
   '/contributor/teams': typeof AuthenticatedContributorTeamsRoute
   '/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
+  '/learner/desmos': typeof AuthenticatedLearnerDesmosRoute
   '/learner/discover': typeof AuthenticatedLearnerDiscoverRoute
   '/learner/faq': typeof AuthenticatedLearnerFaqRoute
   '/learner/glossary': typeof AuthenticatedLearnerGlossaryRoute
@@ -284,18 +311,21 @@ export interface FileRoutesById {
   '/login/': typeof LoginIndexRoute
   '/_authenticated/admin/course-moderation': typeof AuthenticatedAdminCourseModerationRoute
   '/_authenticated/admin/dashboard': typeof AuthenticatedAdminDashboardRoute
+  '/_authenticated/admin/desmos': typeof AuthenticatedAdminDesmosRoute
   '/_authenticated/admin/discover': typeof AuthenticatedAdminDiscoverRoute
   '/_authenticated/admin/faq': typeof AuthenticatedAdminFaqRoute
   '/_authenticated/admin/glossary': typeof AuthenticatedAdminGlossaryRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/user-management': typeof AuthenticatedAdminUserManagementRoute
   '/_authenticated/contributor/dashboard': typeof AuthenticatedContributorDashboardRoute
+  '/_authenticated/contributor/desmos': typeof AuthenticatedContributorDesmosRoute
   '/_authenticated/contributor/discover': typeof AuthenticatedContributorDiscoverRoute
   '/_authenticated/contributor/faq': typeof AuthenticatedContributorFaqRoute
   '/_authenticated/contributor/glossary': typeof AuthenticatedContributorGlossaryRoute
   '/_authenticated/contributor/settings': typeof AuthenticatedContributorSettingsRoute
   '/_authenticated/contributor/teams': typeof AuthenticatedContributorTeamsRoute
   '/_authenticated/learner/dashboard': typeof AuthenticatedLearnerDashboardRoute
+  '/_authenticated/learner/desmos': typeof AuthenticatedLearnerDesmosRoute
   '/_authenticated/learner/discover': typeof AuthenticatedLearnerDiscoverRoute
   '/_authenticated/learner/faq': typeof AuthenticatedLearnerFaqRoute
   '/_authenticated/learner/glossary': typeof AuthenticatedLearnerGlossaryRoute
@@ -317,18 +347,21 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/course-moderation'
     | '/admin/dashboard'
+    | '/admin/desmos'
     | '/admin/discover'
     | '/admin/faq'
     | '/admin/glossary'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
+    | '/contributor/desmos'
     | '/contributor/discover'
     | '/contributor/faq'
     | '/contributor/glossary'
     | '/contributor/settings'
     | '/contributor/teams'
     | '/learner/dashboard'
+    | '/learner/desmos'
     | '/learner/discover'
     | '/learner/faq'
     | '/learner/glossary'
@@ -348,18 +381,21 @@ export interface FileRouteTypes {
     | '/login'
     | '/admin/course-moderation'
     | '/admin/dashboard'
+    | '/admin/desmos'
     | '/admin/discover'
     | '/admin/faq'
     | '/admin/glossary'
     | '/admin/settings'
     | '/admin/user-management'
     | '/contributor/dashboard'
+    | '/contributor/desmos'
     | '/contributor/discover'
     | '/contributor/faq'
     | '/contributor/glossary'
     | '/contributor/settings'
     | '/contributor/teams'
     | '/learner/dashboard'
+    | '/learner/desmos'
     | '/learner/discover'
     | '/learner/faq'
     | '/learner/glossary'
@@ -380,18 +416,21 @@ export interface FileRouteTypes {
     | '/login/'
     | '/_authenticated/admin/course-moderation'
     | '/_authenticated/admin/dashboard'
+    | '/_authenticated/admin/desmos'
     | '/_authenticated/admin/discover'
     | '/_authenticated/admin/faq'
     | '/_authenticated/admin/glossary'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/user-management'
     | '/_authenticated/contributor/dashboard'
+    | '/_authenticated/contributor/desmos'
     | '/_authenticated/contributor/discover'
     | '/_authenticated/contributor/faq'
     | '/_authenticated/contributor/glossary'
     | '/_authenticated/contributor/settings'
     | '/_authenticated/contributor/teams'
     | '/_authenticated/learner/dashboard'
+    | '/_authenticated/learner/desmos'
     | '/_authenticated/learner/discover'
     | '/_authenticated/learner/faq'
     | '/_authenticated/learner/glossary'
@@ -514,6 +553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedLearnerDiscoverRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/learner/desmos': {
+      id: '/_authenticated/learner/desmos'
+      path: '/learner/desmos'
+      fullPath: '/learner/desmos'
+      preLoaderRoute: typeof AuthenticatedLearnerDesmosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/learner/dashboard': {
       id: '/_authenticated/learner/dashboard'
       path: '/learner/dashboard'
@@ -554,6 +600,13 @@ declare module '@tanstack/react-router' {
       path: '/contributor/discover'
       fullPath: '/contributor/discover'
       preLoaderRoute: typeof AuthenticatedContributorDiscoverRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/contributor/desmos': {
+      id: '/_authenticated/contributor/desmos'
+      path: '/contributor/desmos'
+      fullPath: '/contributor/desmos'
+      preLoaderRoute: typeof AuthenticatedContributorDesmosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/contributor/dashboard': {
@@ -598,6 +651,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDiscoverRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/desmos': {
+      id: '/_authenticated/admin/desmos'
+      path: '/admin/desmos'
+      fullPath: '/admin/desmos'
+      preLoaderRoute: typeof AuthenticatedAdminDesmosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/admin/dashboard': {
       id: '/_authenticated/admin/dashboard'
       path: '/admin/dashboard'
@@ -633,18 +693,21 @@ interface AuthenticatedRouteChildren {
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedAdminCourseModerationRoute: typeof AuthenticatedAdminCourseModerationRoute
   AuthenticatedAdminDashboardRoute: typeof AuthenticatedAdminDashboardRoute
+  AuthenticatedAdminDesmosRoute: typeof AuthenticatedAdminDesmosRoute
   AuthenticatedAdminDiscoverRoute: typeof AuthenticatedAdminDiscoverRoute
   AuthenticatedAdminFaqRoute: typeof AuthenticatedAdminFaqRoute
   AuthenticatedAdminGlossaryRoute: typeof AuthenticatedAdminGlossaryRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminUserManagementRoute: typeof AuthenticatedAdminUserManagementRoute
   AuthenticatedContributorDashboardRoute: typeof AuthenticatedContributorDashboardRoute
+  AuthenticatedContributorDesmosRoute: typeof AuthenticatedContributorDesmosRoute
   AuthenticatedContributorDiscoverRoute: typeof AuthenticatedContributorDiscoverRoute
   AuthenticatedContributorFaqRoute: typeof AuthenticatedContributorFaqRoute
   AuthenticatedContributorGlossaryRoute: typeof AuthenticatedContributorGlossaryRoute
   AuthenticatedContributorSettingsRoute: typeof AuthenticatedContributorSettingsRoute
   AuthenticatedContributorTeamsRoute: typeof AuthenticatedContributorTeamsRoute
   AuthenticatedLearnerDashboardRoute: typeof AuthenticatedLearnerDashboardRoute
+  AuthenticatedLearnerDesmosRoute: typeof AuthenticatedLearnerDesmosRoute
   AuthenticatedLearnerDiscoverRoute: typeof AuthenticatedLearnerDiscoverRoute
   AuthenticatedLearnerFaqRoute: typeof AuthenticatedLearnerFaqRoute
   AuthenticatedLearnerGlossaryRoute: typeof AuthenticatedLearnerGlossaryRoute
@@ -659,6 +722,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminCourseModerationRoute:
     AuthenticatedAdminCourseModerationRoute,
   AuthenticatedAdminDashboardRoute: AuthenticatedAdminDashboardRoute,
+  AuthenticatedAdminDesmosRoute: AuthenticatedAdminDesmosRoute,
   AuthenticatedAdminDiscoverRoute: AuthenticatedAdminDiscoverRoute,
   AuthenticatedAdminFaqRoute: AuthenticatedAdminFaqRoute,
   AuthenticatedAdminGlossaryRoute: AuthenticatedAdminGlossaryRoute,
@@ -666,12 +730,14 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminUserManagementRoute: AuthenticatedAdminUserManagementRoute,
   AuthenticatedContributorDashboardRoute:
     AuthenticatedContributorDashboardRoute,
+  AuthenticatedContributorDesmosRoute: AuthenticatedContributorDesmosRoute,
   AuthenticatedContributorDiscoverRoute: AuthenticatedContributorDiscoverRoute,
   AuthenticatedContributorFaqRoute: AuthenticatedContributorFaqRoute,
   AuthenticatedContributorGlossaryRoute: AuthenticatedContributorGlossaryRoute,
   AuthenticatedContributorSettingsRoute: AuthenticatedContributorSettingsRoute,
   AuthenticatedContributorTeamsRoute: AuthenticatedContributorTeamsRoute,
   AuthenticatedLearnerDashboardRoute: AuthenticatedLearnerDashboardRoute,
+  AuthenticatedLearnerDesmosRoute: AuthenticatedLearnerDesmosRoute,
   AuthenticatedLearnerDiscoverRoute: AuthenticatedLearnerDiscoverRoute,
   AuthenticatedLearnerFaqRoute: AuthenticatedLearnerFaqRoute,
   AuthenticatedLearnerGlossaryRoute: AuthenticatedLearnerGlossaryRoute,

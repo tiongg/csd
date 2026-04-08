@@ -212,18 +212,13 @@ export default function LearnerDashboardPage() {
           </div>
 
           <TopTrendsTable
+            title="Trending"
+            description="Top signals to monitor."
             onTrendClick={(trendName) => {
               setKeywordSearch(trendName);
               setIsCourseMatchOpen(true);
             }}
-          >
-            <h2 className="text-lg font-semibold text-slate-900">
-              Today&apos;s Top Trends
-            </h2>
-            <p className="mt-1 text-sm text-slate-600">
-              Top 5 signals to monitor.
-            </p>
-          </TopTrendsTable>
+          />
         </div>
 
         <KeywordCourseSearchDialog

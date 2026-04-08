@@ -8,9 +8,13 @@ import { CourseCard } from '../course-card/CourseCard';
 
 type EnrolledCoursesProps = {
   searchQuery: string;
+  categoryFilter: string;
 };
 
-export function EnrolledCourses({ searchQuery }: EnrolledCoursesProps) {
+export function EnrolledCourses({
+  searchQuery,
+  categoryFilter,
+}: EnrolledCoursesProps) {
   const { enrolledCourses } = useEnrolledCourse();
   const { data: publishedCourses } = useApiQuery('get', '/api/courses/published');
 
@@ -25,17 +29,40 @@ export function EnrolledCourses({ searchQuery }: EnrolledCoursesProps) {
     return map;
   }, [publishedCourses]);
 
-  const filteredCourses = enrolledCourses.filter((enrollment) =>
-    enrollment.course.title.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  const filteredCourses = enrolledCourses.filter((enrollment) => {
+    const searchableText = [
+      enrollment.course.title,
+      enrollment.course.description ?? '',
+      ...(enrollment.course.tags ?? []),
+    ]
+      .join(' ')
+      .toLowerCase();
+
+    const matchesSearch =
+      normalizedQuery.length === 0 || searchableText.includes(normalizedQuery);
+    const matchesCategory =
+      categoryFilter === '__all__' ||
+      enrollment.course.category === categoryFilter;
+
+    return matchesSearch && matchesCategory;
+  });
+
+  const hasActiveFilters =
+    normalizedQuery.length > 0 || categoryFilter !== '__all__';
 
   if (filteredCourses.length === 0) {
     return (
       <div className="flex min-h-[360px] flex-1 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-100/70 text-slate-500">
         <div className="text-center">
-          <p className="text-lg font-semibold text-slate-800">No courses yet</p>
+          <p className="text-lg font-semibold text-slate-800">
+            {hasActiveFilters ? 'No matching courses' : 'No courses yet'}
+          </p>
           <p className="mb-4 text-sm text-slate-600">
-            Explore our course catalog to start learning.
+            {hasActiveFilters
+              ? 'Try a different search or category.'
+              : 'Explore our course catalog to start learning.'}
           </p>
           <Button asChild>
             <Link

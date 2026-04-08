@@ -22,10 +22,11 @@ public class TagRepository extends BaseRepository<TagsRecord> {
   }
 
   /**
-   * Find a tag by title (case-insensitive due to CITEXT type).
+   * Find a tag by title
    */
   public Optional<TagsRecord> findByTitle(String title) {
-    return findOneBy(TAGS.TITLE, title);
+    TagsRecord found = dsl.selectFrom(TAGS).where(TAGS.TITLE.equalIgnoreCase(title)).fetchOne();
+    return Optional.ofNullable(found);
   }
 
   /**

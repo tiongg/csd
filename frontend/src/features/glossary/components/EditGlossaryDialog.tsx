@@ -19,7 +19,7 @@ import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import type { GlossaryItem } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2Icon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 export type EditFormData = {
@@ -44,6 +44,7 @@ export default function EditGlossaryDialog({
   allTitles,
 }: EditGlossaryDialogProps) {
   const queryClient = useQueryClient();
+  const titleInputRef = useRef<HTMLInputElement | null>(null);
   const [formData, setFormData] = useState<EditFormData>({
     title: '',
     description: '',
@@ -99,7 +100,20 @@ export default function EditGlossaryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
+      <DialogContent
+        className="max-h-[90vh] max-w-2xl overflow-y-auto"
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          const input = titleInputRef.current;
+          if (!input) {
+            return;
+          }
+
+          input.focus();
+          const caretPosition = input.value.length;
+          input.setSelectionRange(caretPosition, caretPosition);
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Edit Glossary Term</DialogTitle>
           <DialogDescription>
@@ -111,6 +125,7 @@ export default function EditGlossaryDialog({
           <div className="grid gap-2">
             <Label htmlFor="title">Title</Label>
             <input
+              ref={titleInputRef}
               id="title"
               type="text"
               className="border-input focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
