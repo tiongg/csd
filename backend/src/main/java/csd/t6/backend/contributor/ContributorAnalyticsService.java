@@ -2,9 +2,10 @@ package csd.t6.backend.contributor;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -68,12 +69,11 @@ public class ContributorAnalyticsService {
     for (var record : updateCounts) {
       OffsetDateTime timestamp = record.value1();
       int count = record.value2();
-      long ageMs = timestamp.toEpochSecond() * 1000 - (since.toEpochSecond() * 1000);
+      long ageMs = timestamp.toInstant().toEpochMilli() - since.toInstant().toEpochMilli();
       if (ageMs < 0 || ageMs >= totalWindowMs) {
         continue;
       }
-      int slot = (int) (ageMs / bucketDurationMs);
-      int bucketIndex = bucketCount - 1 - slot;
+      int bucketIndex = (int) (ageMs / bucketDurationMs);
       if (bucketIndex >= 0 && bucketIndex < bucketCount) {
         EnrollmentTrendBucket existing = buckets.get(bucketIndex);
         buckets.set(bucketIndex, new EnrollmentTrendBucket(existing.label(), existing.value() + count, 0));
@@ -98,16 +98,16 @@ public class ContributorAnalyticsService {
     long totalWindowMs = bucketDurationMs * bucketCount;
 
     for (var record : enrollmentCounts) {
-      LocalDate enrolledAt = record.value1().toLocalDate();
+      LocalDateTime enrolledAt = record.value1();
       int count = record.value2();
       int uniqueUsers = record.value3();
 
-      long ageMs = ChronoUnit.DAYS.between(since.toLocalDate(), enrolledAt) * 24 * 60 * 60 * 1000;
+      long ageMs = enrolledAt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+          - since.toInstant().toEpochMilli();
       if (ageMs < 0 || ageMs >= totalWindowMs) {
         continue;
       }
-      int slot = (int) (ageMs / bucketDurationMs);
-      int bucketIndex = bucketCount - 1 - slot;
+      int bucketIndex = (int) (ageMs / bucketDurationMs);
       if (bucketIndex >= 0 && bucketIndex < bucketCount) {
         EnrollmentTrendBucket existing = buckets.get(bucketIndex);
         buckets.set(bucketIndex,
