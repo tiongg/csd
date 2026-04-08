@@ -1,3 +1,6 @@
+import CourseMetricsGrid, {
+  type CourseMetric,
+} from '@/components/CourseMetricsGrid';
 import {
   Badge,
 } from '@/components/ui/badge';
@@ -7,7 +10,10 @@ import {
   CardDescription,
   CardTitle,
 } from '@/components/ui/card';
+import { useContentEditor } from '@/context/ContentEditorContext';
+import type { EditableSectionType } from '@/lib/content.type';
 import type { Course } from '@/lib/utils';
+import { FileText, HelpCircle, Tag } from 'lucide-react';
 import CourseImageOverview from '../course-image-overview/CourseImageOverview';
 import PublishCourse from './PublishCourse';
 
@@ -18,7 +24,34 @@ type CourseEditorOverviewProps = {
 export default function CourseEditorOverview({
   course,
 }: CourseEditorOverviewProps) {
+  const { doc } = useContentEditor();
+  const sections = doc.getArray('root');
+  const sectionCount = sections.length;
+  const quizCount = Array.from<EditableSectionType>(sections).filter(
+    (section) => section.get('type') === 'quiz',
+  ).length;
   const tags = (course as { tags?: string[] }).tags ?? [];
+  const metrics: CourseMetric[] = [
+    {
+      label: 'Sections',
+      value: sectionCount,
+      icon: FileText,
+    },
+    {
+      label: 'Quizzes',
+      value: quizCount,
+      icon: HelpCircle,
+    },
+    ...(tags.length > 0
+      ? [
+          {
+            label: 'Tags',
+            value: tags.length,
+            icon: Tag,
+          },
+        ]
+      : []),
+  ];
 
   return (
     <Card className="gap-0 border-slate-200/90 bg-white/90 py-0 shadow-sm">
@@ -56,6 +89,8 @@ export default function CourseEditorOverview({
           className="min-h-[300px]"
           imageClassName="h-[300px] w-full object-cover md:h-[420px]"
         />
+
+        <CourseMetricsGrid metrics={metrics} />
       </CardContent>
     </Card>
   );

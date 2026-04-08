@@ -78,7 +78,7 @@ export default function CourseOverview({
             </div>
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
           {'imageUrl' in course && course.imageUrl ? (
             <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
               <img
@@ -92,10 +92,10 @@ export default function CourseOverview({
               No thumbnail
             </div>
           )}
+
+          <CourseMetricsGrid metrics={metrics} />
         </CardContent>
       </Card>
-
-      <CourseMetricsGrid metrics={metrics} />
 
       {enrollment ? (
         <DropCourse lessonId={enrollment.lessonSessionId} />
