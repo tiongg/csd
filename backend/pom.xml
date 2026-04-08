@@ -161,6 +161,7 @@
 							<append>true</append>
 							<excludes>
 								<exclude>csd/t6/jooq/**</exclude>
+								<exclude>**/dto/**</exclude>
 								<exclude>csd/t6/jooq/public_/tables/pojos/**</exclude>
 								<exclude>**/*$$*</exclude>
 							</excludes>
@@ -182,6 +183,7 @@
 							</formats>
 							<excludes>
 								<exclude>csd/t6/jooq/**</exclude>
+								<exclude>**/dto/**</exclude>
 								<exclude>csd/t6/jooq/public_/tables/pojos/**</exclude>
 								<exclude>**/generated/**</exclude>
 							</excludes>
