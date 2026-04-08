@@ -1,17 +1,13 @@
-import { cn, type Course, type EnrolledCourse } from '@/lib/utils';
+import { type Course, type EnrolledCourse } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
-import dayjs from 'dayjs';
 import { Link } from '@tanstack/react-router';
 
 type EnrolledCourseRowProps = {
   course: Course;
-  enrollment: EnrolledCourse;
+  enrollment?: EnrolledCourse;
 };
 
-export function EnrolledCourseRow({
-  course,
-  enrollment,
-}: EnrolledCourseRowProps) {
+export function EnrolledCourseRow({ course }: EnrolledCourseRowProps) {
   const creatorLabel = course.creatorUsername ?? 'Course creator';
   const summary =
     course.description?.trim() ||
@@ -47,22 +43,9 @@ export function EnrolledCourseRow({
               <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
                 {course.category}
               </span>
-              <span
-                className={cn(
-                  'inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold',
-                  enrollment.status === 'COMPLETED'
-                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                    : 'border-sky-200 bg-sky-50 text-sky-700',
-                )}
-              >
-                {enrollment.status === 'COMPLETED' ? 'Completed' : 'Enrolled'}
-              </span>
-              <span className="inline-flex max-w-full items-center rounded-full border border-slate-300 bg-white/95 px-2 py-0.5 text-xs font-medium text-slate-700">
-                <span className="truncate">By {creatorLabel}</span>
-              </span>
             </div>
-            <span className="shrink-0 text-xs font-medium whitespace-nowrap text-slate-500">
-              Updated {dayjs(course.updatedAt).fromNow()}
+            <span className="inline-flex max-w-full items-center rounded-full border border-slate-300 bg-white/95 px-2 py-0.5 text-xs font-medium text-slate-700">
+              <span className="truncate">By {creatorLabel}</span>
             </span>
           </div>
 

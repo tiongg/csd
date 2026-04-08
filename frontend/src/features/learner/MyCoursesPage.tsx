@@ -36,7 +36,7 @@ export default function MyCoursesPage() {
         <section className="flex flex-1 flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
           <div className="flex h-full flex-1 flex-col gap-4">
             <DiscoverBrowseToolbar
-              title="Your Course List"
+              title="Enrolled Course List"
               searchPlaceholder="Search enrolled courses"
               onSearchQueryChange={setSearchQuery}
               categoryFilter={categoryFilter}
