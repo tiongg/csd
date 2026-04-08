@@ -62,14 +62,13 @@ export default function CourseOverview({
             {enrollment?.status === 'COMPLETED' && (
               <Badge variant="success">Complete</Badge>
             )}
-            <Badge className="gap-1.5 border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
-              <BookOpen className="h-3 w-3" />
-              {course.category}
-            </Badge>
           </div>
           <CardDescription>
             <div>{course.description || 'No description provided'}</div>
             <div className="mt-2 flex flex-wrap gap-2">
+              <Badge className="border-emerald-200 bg-emerald-50 text-emerald-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
+                {course.category}
+              </Badge>
               {(course.tags ?? []).map((tag) => (
                 <Badge key={tag} variant="outline" className={learnerTagChipClass}>
                   {tag}

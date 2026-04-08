@@ -70,8 +70,11 @@ export default function CourseEditorOverview({
             {course.description || 'No description provided.'}
           </CardDescription>
 
-          {tags.length > 0 && (
+          {(course.category || tags.length > 0) && (
             <div className="flex flex-wrap gap-2">
+              <Badge className="rounded-full border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-700">
+                {course.category}
+              </Badge>
               {tags.map((tag) => (
                 <Badge
                   key={tag}
