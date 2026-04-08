@@ -64,8 +64,8 @@ export function DiscoverFeaturedCarousel({
                 params={{ courseId: course.id }}
                 className="group block overflow-hidden rounded-2xl border border-slate-300 bg-white"
               >
-                <div className="grid min-h-[18rem] gap-0 md:grid-cols-[1.2fr_1fr]">
-                  <div className="h-64 w-full overflow-hidden md:h-full">
+                <div className="grid min-h-[22rem] gap-0 md:grid-cols-[1.2fr_1fr]">
+                  <div className="h-80 w-full overflow-hidden md:h-full">
                     {course.imageUrl ? (
                       <img
                         src={course.imageUrl}

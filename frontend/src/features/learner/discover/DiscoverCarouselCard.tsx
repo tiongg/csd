@@ -17,7 +17,11 @@ export function DiscoverCarouselCard({
       className="group block h-full overflow-hidden rounded-xl border border-slate-300 bg-white transition-colors hover:border-slate-400"
     >
       <div
-        className={compact ? 'relative h-48 w-full overflow-hidden' : 'relative h-64 w-full overflow-hidden'}
+        className={
+          compact
+            ? 'relative h-64 w-full overflow-hidden'
+            : 'relative h-80 w-full overflow-hidden'
+        }
       >
         {course.imageUrl ? (
           <img
