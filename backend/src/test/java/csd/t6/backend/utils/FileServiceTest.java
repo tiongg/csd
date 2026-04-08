@@ -127,9 +127,10 @@ class FileServiceTest {
 
   @Test
   @DisplayName("Should return true when object exists")
+  @SuppressWarnings("unchecked")
   void shouldReturnTrueWhenObjectExists() {
     HeadObjectResponse response = mock(HeadObjectResponse.class);
-    when(s3Client.headObject((java.util.function.Consumer<software.amazon.awssdk.services.s3.model.HeadObjectRequest.Builder>) any())).thenReturn(response);
+    when(s3Client.headObject(any(java.util.function.Consumer.class))).thenReturn(response);
 
     boolean result = fileService.exists(testKey);
 
@@ -138,9 +139,10 @@ class FileServiceTest {
 
   @Test
   @DisplayName("Should return false when object does not exist")
+  @SuppressWarnings("unchecked")
   void shouldReturnFalseWhenObjectDoesNotExist() {
     SdkException exception = mock(SdkException.class);
-    when(s3Client.headObject((java.util.function.Consumer<software.amazon.awssdk.services.s3.model.HeadObjectRequest.Builder>) any())).thenThrow(exception);
+    when(s3Client.headObject(any(java.util.function.Consumer.class))).thenThrow(exception);
 
     boolean result = fileService.exists(testKey);
 
@@ -149,9 +151,10 @@ class FileServiceTest {
 
   @Test
   @DisplayName("Should handle S3 exception when checking existence")
+  @SuppressWarnings("unchecked")
   void shouldHandleS3ExceptionWhenCheckingExistence() {
     SdkException exception = mock(SdkException.class);
-    when(s3Client.headObject((java.util.function.Consumer<software.amazon.awssdk.services.s3.model.HeadObjectRequest.Builder>) any())).thenThrow(exception);
+    when(s3Client.headObject(any(java.util.function.Consumer.class))).thenThrow(exception);
 
     boolean result = fileService.exists(testKey);
 
