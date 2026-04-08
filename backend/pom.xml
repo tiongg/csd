@@ -166,6 +166,9 @@
 							<dataFile>${project.build.directory}/jacoco.exec</dataFile>
 							<outputDirectory>${project.reporting.outputDirectory}/jacoco</outputDirectory>
 							<sourceEncoding>UTF-8</sourceEncoding>
+							<excludes>
+								<exclude>**/jooq/**</exclude>
+							</excludes>
 						</configuration>
 					</execution>
 				</executions>
