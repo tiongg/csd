@@ -25,15 +25,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { normalizeGlossaryCategory } from '@/features/relations/graph-data';
 import GlossaryCard from './components/GlossaryCard';
 
-const SORT_A_TO_Z = 'asc';
-const SORT_Z_TO_A = 'desc';
 const CATEGORY_FILTER_ALL = '__all__';
-const SORT_OPTIONS = [
-  { value: SORT_A_TO_Z, label: 'Alphabetic Order: A-Z' },
-  { value: SORT_Z_TO_A, label: 'Alphabetic Order: Z-A' },
-] as const;
-
-type SortOrder = typeof SORT_A_TO_Z | typeof SORT_Z_TO_A;
 
 type GroupedGlossarySection = {
   category: string;
@@ -54,7 +46,6 @@ export default function GlossaryPage({
 }: GlossaryPageProps) {
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SORT_A_TO_Z);
   const [categoryFilter, setCategoryFilter] = useState(CATEGORY_FILTER_ALL);
   const [openCategories, setOpenCategories] = useState<string[]>([]);
 
@@ -121,12 +112,11 @@ export default function GlossaryPage({
       );
     });
 
-    const sortedItems = matches.sort((a, b) => {
-      const compare = (a.title ?? '').localeCompare(b.title ?? '', undefined, {
+    const sortedItems = matches.sort((a, b) =>
+      (a.title ?? '').localeCompare(b.title ?? '', undefined, {
         sensitivity: 'base',
-      });
-      return sortOrder === SORT_A_TO_Z ? compare : -compare;
-    });
+      }),
+    );
 
     const grouped = new Map<string, GlossaryItem[]>();
     sortedItems.forEach((item) => {
@@ -142,7 +132,7 @@ export default function GlossaryPage({
         category,
         items,
       }));
-  }, [categoryFilter, query, sortOrder, glossaryItems]);
+  }, [categoryFilter, query, glossaryItems]);
 
   useEffect(() => {
     if (query.trim() || categoryFilter !== CATEGORY_FILTER_ALL) {
@@ -202,26 +192,6 @@ export default function GlossaryPage({
                 </Select>
               </div>
 
-              <div className="w-full xl:w-64">
-                <p className="mb-1 text-[11px] font-semibold tracking-[0.12em] text-slate-500 uppercase">
-                  Sorting
-                </p>
-                <Select
-                  value={sortOrder}
-                  onValueChange={(value) => setSortOrder(value as SortOrder)}
-                >
-                  <SelectTrigger className="h-10 w-full border-slate-300/85 bg-slate-100/70">
-                    <SelectValue placeholder="Alphabetic Order: A-Z" />
-                  </SelectTrigger>
-                  <SelectContent align="start">
-                    {SORT_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
             {showGenerateButton && (
               <div className="ml-auto flex items-center gap-2 self-end">
