@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import csd.t6.backend.account.AccountRepository;
 import csd.t6.backend.course.CourseRepository;
-import csd.t6.backend.learner.LearnerCourseService;
 import csd.t6.backend.team.TeamRepository;
 import csd.t6.jooq.accounts.tables.records.AccountRecord;
 import csd.t6.jooq.public_.enums.LearnerCourseStatus;
@@ -72,8 +71,9 @@ class ContributorAnalyticsRepositoryTest {
         learnerCourse1.setId(UUID.randomUUID());
         learnerCourse1.setUserId(learner1.getId());
         learnerCourse1.setCourseId(course1.getId());
-        learnerCourse1.setStatus(LearnerCourseStatus.IN_PROGRESS);
+        learnerCourse1.setStatus(LearnerCourseStatus.ENROLLED);
         learnerCourse1.setEnrolledAt(testTime.minusHours(1).toLocalDateTime());
+        learnerCourse1.setMetadata(org.jooq.JSONB.valueOf("{}"));
         learnerCourseRepository.save(learnerCourse1);
 
         LearnerCourseRecord learnerCourse2 = new LearnerCourseRecord();
@@ -83,6 +83,7 @@ class ContributorAnalyticsRepositoryTest {
         learnerCourse2.setStatus(LearnerCourseStatus.COMPLETED);
         learnerCourse2.setEnrolledAt(testTime.minusHours(2).toLocalDateTime());
         learnerCourse2.setCompletedAt(testTime.minusMinutes(30).toLocalDateTime());
+        learnerCourse2.setMetadata(org.jooq.JSONB.valueOf("{}"));
         learnerCourseRepository.save(learnerCourse2);
     }
 

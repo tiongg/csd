@@ -10,8 +10,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import org.jooq.Record2;
-import org.jooq.Record3;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,8 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import csd.t6.backend.contributor.dto.response.ContributorAnalyticsResponse;
-import csd.t6.backend.contributor.dto.response.CourseEngagementData;
-import csd.t6.backend.contributor.dto.response.EnrollmentTrendBucket;
 
 @ExtendWith(MockitoExtension.class)
 class ContributorAnalyticsServiceTest {
@@ -34,12 +30,10 @@ class ContributorAnalyticsServiceTest {
     private ContributorAnalyticsService analyticsService;
 
     private UUID contributorId;
-    private OffsetDateTime testTime;
 
     @BeforeEach
     void setUp() {
         contributorId = UUID.randomUUID();
-        testTime = OffsetDateTime.now();
     }
 
     @Test
