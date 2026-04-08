@@ -2,15 +2,25 @@ import { Button } from '@/components/ui/button';
 import { Heading1 } from '@/components/ui/typography';
 import { useAuth } from '@/context/AuthContext';
 import { useApiQuery } from '@/lib/fetch-client';
-import { generateColorFromString, hexToRgb, type Team } from '@/lib/utils';
+import { type Team } from '@/lib/utils';
 import { useNavigate } from '@tanstack/react-router';
 import { Plus, Settings } from 'lucide-react';
+import { useMemo } from 'react';
 import { useBoolean } from 'usehooks-ts';
 import CreateNewTeamDialog from './CreateNewTeamDialog';
 import EditTeamDialog from './EditTeamDialog';
+import TeamMemberAvatar from './TeamMemberAvatar';
 
 export default function TeamsList() {
   const { data: teams, isLoading } = useApiQuery('get', '/api/teams/');
+  const { data: accounts } = useApiQuery('get', '/api/account/', {});
+  const accountProfilePictureMap = useMemo(
+    () =>
+      new Map(
+        (accounts ?? []).map((account) => [account.id, account.profilePictureUrl]),
+      ),
+    [accounts],
+  );
 
   const {
     value: isCreateTeamDialogOpen,
@@ -42,7 +52,13 @@ export default function TeamsList() {
           ? Array.from({ length: 3 }).map((_, idx) => (
               <LoadingTeamCard key={idx} />
             ))
-          : (teams ?? []).map((team) => <TeamCard team={team} key={team.id} />)}
+          : (teams ?? []).map((team) => (
+              <TeamCard
+                team={team}
+                key={team.id}
+                accountProfilePictureMap={accountProfilePictureMap}
+              />
+            ))}
       </div>
 
       <CreateNewTeamDialog
@@ -55,9 +71,10 @@ export default function TeamsList() {
 
 type TeamCardProps = {
   team: Team;
+  accountProfilePictureMap: Map<string, string | undefined>;
 };
 
-function TeamCard({ team }: TeamCardProps) {
+function TeamCard({ team, accountProfilePictureMap }: TeamCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const {
@@ -119,14 +136,15 @@ function TeamCard({ team }: TeamCardProps) {
           <div className="flex items-center justify-between pt-4">
             <div className="flex -space-x-2">
               {displayedMembers.map((member) => (
-                <span
+                <TeamMemberAvatar
                   key={member.id}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white text-[10px] font-semibold"
-                  style={getAvatarStyle(member.username)}
-                  title={member.username}
-                >
-                  {getInitials(member.username)}
-                </span>
+                  member={member}
+                  profilePictureUrl={accountProfilePictureMap.get(
+                    member.accountId,
+                  )}
+                  fallbackText={getInitials(member.username)}
+                  className="h-7 w-7 border-2 border-white text-[10px]"
+                />
               ))}
               {extraMembers > 0 && (
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-slate-700 text-[10px] font-semibold text-white">
@@ -188,17 +206,4 @@ function getInitials(value: string) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase() ?? '')
     .join('');
-}
-
-function getAvatarStyle(username: string) {
-  const hex = generateColorFromString(username);
-  const { r, g, b } = hexToRgb(hex);
-  const darkR = Math.round(r * 0.55);
-  const darkG = Math.round(g * 0.55);
-  const darkB = Math.round(b * 0.55);
-
-  return {
-    backgroundColor: `rgb(${darkR}, ${darkG}, ${darkB})`,
-    color: '#ffffff',
-  };
 }
