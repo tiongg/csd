@@ -35,6 +35,11 @@ public class GlossaryRepository extends BaseRepository<GlossaryTermRecord> {
     return this.findAll();
   }
 
+  public List<String> getAllCategories() {
+    return dsl.selectDistinct(GLOSSARY_TERM.CATEGORY).from(GLOSSARY_TERM).where(GLOSSARY_TERM.CATEGORY.isNotNull())
+        .and(GLOSSARY_TERM.CATEGORY.ne("")).orderBy(GLOSSARY_TERM.CATEGORY.asc()).fetch(GLOSSARY_TERM.CATEGORY);
+  }
+
   public List<GlossaryTermRecord> getByTitles(List<String> titles) {
     return dsl.selectFrom(GLOSSARY_TERM).where(GLOSSARY_TERM.TITLE.in(titles)).fetchInto(GlossaryTermRecord.class);
   }
@@ -60,6 +65,7 @@ public class GlossaryRepository extends BaseRepository<GlossaryTermRecord> {
     record.setDescription(request.description());
     record.setUsedInContext(request.usedInContext());
     record.setUsedInConversationExample(request.usedInConversationExample());
+    record.setCategory(request.category());
 
     return dsl.insertInto(GLOSSARY_TERM).set(record).onConflict(GLOSSARY_TERM.TITLE).doUpdate().set(record).returning()
         .fetchOne();

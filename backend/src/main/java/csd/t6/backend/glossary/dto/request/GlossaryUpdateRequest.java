@@ -6,4 +6,4 @@ import jakarta.validation.constraints.NotNull;
 
 public record GlossaryUpdateRequest(@NotNull String name, @NotNull String description,
                 @NotNull String usedInConversationExample, @NotNull String usedInContext,
-                @NotNull List<@NotNull String> relationships) {}
+                String category, @NotNull List<@NotNull String> relationships) {}

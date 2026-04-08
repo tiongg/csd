@@ -1,5 +1,6 @@
 import GlossaryPage from '@/features/glossary/GlossaryPage';
 import EditGlossaryDialog from '@/features/glossary/components/EditGlossaryDialog';
+import { normalizeGlossaryCategory } from '@/features/relations/graph-data';
 import { useApiQuery } from '@/lib/fetch-client';
 import type { GlossaryItem } from '@/lib/utils';
 import { createFileRoute } from '@tanstack/react-router';
@@ -16,6 +17,13 @@ function AdminGlossaryPage() {
   const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
 
   const allTitles = glossaryItems?.map((item) => item.title) ?? [];
+  const allCategories =
+    glossaryItems
+      ?.map((item) => normalizeGlossaryCategory(item.category))
+      .filter((category): category is string => Boolean(category))
+      .filter((category, index, categories) => categories.indexOf(category) === index)
+      .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' })) ??
+    [];
 
   const handleEditClick = (item: GlossaryItem) => {
     setEditingItem(item);
@@ -30,6 +38,7 @@ function AdminGlossaryPage() {
         onOpenChange={setIsDialogOpen}
         item={editingItem}
         allTitles={allTitles}
+        allCategories={allCategories}
       />
     </div>
   );

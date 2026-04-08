@@ -1,433 +1,687 @@
-import { useApiQuery } from '@/lib/fetch-client';
-import type { GlossaryItem } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { cn, hexToRgb, type GlossaryItem } from '@/lib/utils';
 import type { SimulationLinkDatum, SimulationNodeDatum } from 'd3';
 import * as d3 from 'd3';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
-const MAX_LINKS_PER_NODE = 3;
-const MAX_COMPONENT_SIZE = 18;
+import {
+  buildGroupedRelationGraph,
+  normalizeGlossaryCategory,
+  STRAY_TERMS_LABEL,
+  type GroupedRelationLink,
+  type GroupedRelationNode,
+  type RelationGroup,
+} from './graph-data';
+
 const SEARCH_FOCUS_SCALE = 2.75;
 const SEARCH_FOCUS_DURATION_MS = 500;
 const LABEL_VISIBILITY_SCALE = 0.98;
-export const RELATION_CLUSTER_COLORS = d3.schemeTableau10;
+const CATEGORY_HEADER_GAP = 18;
+const MIN_GRAPH_LAYOUT_SCALE = 0.82;
+const CATEGORY_RADIUS_SCALE = 0.9;
+const CLUSTER_SLOT_SPACING = 22;
+const CLUSTER_PADDING = 26;
+const CLUSTER_GAP = 34;
+const GROUP_PADDING = 40;
+const GROUP_GAP = 108;
 
-type NodeType = SimulationNodeDatum & {
-  id: string;
-  cluster?: number;
-  x?: number;
-  y?: number;
-};
-type LinkType = SimulationLinkDatum<NodeType> & {
-  source: NodeType | string;
-  target: NodeType | string;
-  strength: number;
-  reciprocal: boolean;
-};
+type NodeType = SimulationNodeDatum &
+  GroupedRelationNode & {
+    clusterKey: string;
+    anchorX?: number;
+    anchorY?: number;
+    x?: number;
+    y?: number;
+  };
 
-type EdgeCandidate = {
-  source: string;
-  target: string;
-  key: string;
-  directedCount: number;
-  sourceDegree: number;
-  targetDegree: number;
-  sharedNeighborCount: number;
-  jaccardScore: number;
-  strength: number;
-  reciprocal: boolean;
-};
+type LinkType = SimulationLinkDatum<NodeType> & GroupedRelationLink;
 
 type RelationGraphProps = {
+  glossaryItems: GlossaryItem[];
   onNodeClick?: (nodeId: string, connections: string[]) => void;
   className?: string;
   focusQuery?: string;
   focusRequestKey?: number;
 };
 
-export function buildGraph(glossaryItems: GlossaryItem[]): {
-  nodes: NodeType[];
-  links: LinkType[];
-} {
-  const nodesById = new Map<string, NodeType>();
-  glossaryItems.forEach((item) => {
-    nodesById.set(item.title, { id: item.title });
-  });
+type Point = {
+  x: number;
+  y: number;
+};
 
-  const outgoing = new Map<string, Set<string>>();
-  nodesById.forEach((_, id) => {
-    outgoing.set(id, new Set());
-  });
+type StrayZone = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
 
-  glossaryItems.forEach((item) => {
-    const source = item.title;
-    const sourceNeighbors = outgoing.get(source);
-    if (!sourceNeighbors) {
-      return;
-    }
+type GroupLayout = {
+  center: Point;
+  radius: number;
+};
 
-    (item.relationships ?? []).forEach((target) => {
-      if (target === source) {
-        return;
-      }
-      if (!nodesById.has(target)) {
-        return;
-      }
-      sourceNeighbors.add(target);
-    });
-  });
+type ClusterLayout = {
+  center: Point;
+  radius: number;
+  width: number;
+  height: number;
+  slots: Point[];
+};
 
-  const edgeCandidates = new Map<string, EdgeCandidate>();
-  outgoing.forEach((targets, source) => {
-    targets.forEach((target) => {
-      const [a, b] = source < target ? [source, target] : [target, source];
-      const key = `${a}|||${b}`;
-      const existing = edgeCandidates.get(key);
-      if (existing) {
-        existing.directedCount += 1;
-      } else {
-        edgeCandidates.set(key, {
-          source: a,
-          target: b,
-          key,
-          directedCount: 1,
-          sourceDegree: 0,
-          targetDegree: 0,
-          sharedNeighborCount: 0,
-          jaccardScore: 0,
-          strength: 1,
-          reciprocal: false,
-        });
-      }
-    });
-  });
+type LayoutBounds = {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
+};
 
-  const candidates = Array.from(edgeCandidates.values()).map((candidate) => {
-    const sourceNeighbors = outgoing.get(candidate.source) ?? new Set<string>();
-    const targetNeighbors = outgoing.get(candidate.target) ?? new Set<string>();
-    const sourceContext = Array.from(sourceNeighbors).filter(
-      (neighbor) => neighbor !== candidate.target,
-    );
-    const targetContext = Array.from(targetNeighbors).filter(
-      (neighbor) => neighbor !== candidate.source,
-    );
+type HexCell = {
+  q: number;
+  r: number;
+};
 
-    let sharedNeighborCount = 0;
-    sourceContext.forEach((neighbor) => {
-      if (targetNeighbors.has(neighbor)) {
-        sharedNeighborCount += 1;
-      }
-    });
+type PackedLayouts = {
+  layouts: Map<string, ClusterLayout>;
+  radius: number;
+  bounds: LayoutBounds;
+};
 
-    const reciprocal = candidate.directedCount > 1;
-    const unionNeighborCount = new Set([...sourceContext, ...targetContext])
-      .size;
-    const jaccardScore =
-      unionNeighborCount > 0 ? sharedNeighborCount / unionNeighborCount : 0;
-    const strength =
-      candidate.directedCount * 2 + Math.min(sharedNeighborCount, 2);
-
-    return {
-      ...candidate,
-      sourceDegree: sourceNeighbors.size,
-      targetDegree: targetNeighbors.size,
-      sharedNeighborCount,
-      jaccardScore,
-      strength,
-      reciprocal,
-    };
-  });
-
-  const incidentByNode = new Map<string, EdgeCandidate[]>();
-  nodesById.forEach((_, id) => {
-    incidentByNode.set(id, []);
-  });
-  candidates.forEach((candidate) => {
-    incidentByNode.get(candidate.source)?.push(candidate);
-    incidentByNode.get(candidate.target)?.push(candidate);
-  });
-
-  const selectedByNode = new Map<string, Set<string>>();
-  incidentByNode.forEach((edges, nodeId) => {
-    const ranked = [...edges].sort((a, b) => {
-      if (a.sharedNeighborCount !== b.sharedNeighborCount) {
-        return b.sharedNeighborCount - a.sharedNeighborCount;
-      }
-      if (a.jaccardScore !== b.jaccardScore) {
-        return b.jaccardScore - a.jaccardScore;
-      }
-      if (a.reciprocal !== b.reciprocal) {
-        return a.reciprocal ? -1 : 1;
-      }
-      if (a.strength !== b.strength) {
-        return b.strength - a.strength;
-      }
-      return a.key.localeCompare(b.key);
-    });
-
-    const selectionCap = edges.length >= 7 ? 2 : MAX_LINKS_PER_NODE;
-    const preferredEdges = ranked.filter((edge) => {
-      const touchesLeaf = edge.sourceDegree <= 2 || edge.targetDegree <= 2;
-
-      return (
-        edge.reciprocal ||
-        edge.sharedNeighborCount > 0 ||
-        edge.jaccardScore >= 0.16 ||
-        touchesLeaf
-      );
-    });
-    const selectionPool = preferredEdges.length > 0 ? preferredEdges : ranked;
-
-    selectedByNode.set(
-      nodeId,
-      new Set(selectionPool.slice(0, selectionCap).map((edge) => edge.key)),
-    );
-  });
-
-  const keptEdges = new Map<string, EdgeCandidate>();
-  candidates.forEach((candidate) => {
-    const selectedBySource =
-      selectedByNode.get(candidate.source)?.has(candidate.key) ?? false;
-    const selectedByTarget =
-      selectedByNode.get(candidate.target)?.has(candidate.key) ?? false;
-    const touchesLeaf =
-      candidate.sourceDegree <= 2 || candidate.targetDegree <= 2;
-    const hasLocalSupport =
-      candidate.sharedNeighborCount > 0 || candidate.jaccardScore >= 0.16;
-
-    if (
-      (candidate.reciprocal && (hasLocalSupport || touchesLeaf)) ||
-      (selectedBySource && selectedByTarget && (hasLocalSupport || touchesLeaf))
-    ) {
-      keptEdges.set(candidate.key, candidate);
-    }
-  });
-
-  const degreeByNode = new Map<string, number>();
-  nodesById.forEach((_, id) => {
-    degreeByNode.set(id, 0);
-  });
-  keptEdges.forEach((edge) => {
-    degreeByNode.set(edge.source, (degreeByNode.get(edge.source) ?? 0) + 1);
-    degreeByNode.set(edge.target, (degreeByNode.get(edge.target) ?? 0) + 1);
-  });
-
-  incidentByNode.forEach((edges, nodeId) => {
-    if ((degreeByNode.get(nodeId) ?? 0) > 0 || edges.length === 0) {
-      return;
-    }
-
-    const strongest = [...edges].sort((a, b) => b.strength - a.strength)[0];
-    if (!strongest) {
-      return;
-    }
-
-    if (!keptEdges.has(strongest.key)) {
-      keptEdges.set(strongest.key, strongest);
-      degreeByNode.set(
-        strongest.source,
-        (degreeByNode.get(strongest.source) ?? 0) + 1,
-      );
-      degreeByNode.set(
-        strongest.target,
-        (degreeByNode.get(strongest.target) ?? 0) + 1,
-      );
-    }
-  });
-
-  const buildComponentsFromEdges = (edges: EdgeCandidate[]) => {
-    const adjacency = new Map<string, Set<string>>();
-    nodesById.forEach((_, id) => {
-      adjacency.set(id, new Set());
-    });
-
-    edges.forEach((edge) => {
-      adjacency.get(edge.source)?.add(edge.target);
-      adjacency.get(edge.target)?.add(edge.source);
-    });
-
-    const visited = new Set<string>();
-    const components: string[][] = [];
-
-    nodesById.forEach((_, id) => {
-      if (visited.has(id)) {
-        return;
-      }
-
-      const queue = [id];
-      const component: string[] = [];
-      visited.add(id);
-
-      while (queue.length > 0) {
-        const current = queue.shift();
-        if (!current) {
-          continue;
-        }
-
-        component.push(current);
-        adjacency.get(current)?.forEach((neighbor) => {
-          if (!visited.has(neighbor)) {
-            visited.add(neighbor);
-            queue.push(neighbor);
-          }
-        });
-      }
-
-      components.push(component);
-    });
-
-    return components;
-  };
-
-  const getEdgeRetentionScore = (edge: EdgeCandidate) =>
-    edge.sharedNeighborCount * 18 +
-    edge.jaccardScore * 24 +
-    (edge.reciprocal ? 8 : 0) +
-    edge.strength * 4 -
-    Math.min(edge.sourceDegree, edge.targetDegree) * 2;
-
-  while (true) {
-    const components = buildComponentsFromEdges(Array.from(keptEdges.values()));
-    const oversizedComponent = components.find(
-      (component) => component.length > MAX_COMPONENT_SIZE,
-    );
-
-    if (!oversizedComponent) {
-      break;
-    }
-
-    const componentNodeSet = new Set(oversizedComponent);
-    const componentEdges = Array.from(keptEdges.values()).filter(
-      (edge) =>
-        componentNodeSet.has(edge.source) && componentNodeSet.has(edge.target),
-    );
-    const currentComponentDegrees = new Map<string, number>();
-    oversizedComponent.forEach((nodeId) => {
-      currentComponentDegrees.set(nodeId, 0);
-    });
-    componentEdges.forEach((edge) => {
-      currentComponentDegrees.set(
-        edge.source,
-        (currentComponentDegrees.get(edge.source) ?? 0) + 1,
-      );
-      currentComponentDegrees.set(
-        edge.target,
-        (currentComponentDegrees.get(edge.target) ?? 0) + 1,
-      );
-    });
-
-    const removableEdge = componentEdges
-      .filter(
-        (edge) =>
-          (currentComponentDegrees.get(edge.source) ?? 0) > 1 &&
-          (currentComponentDegrees.get(edge.target) ?? 0) > 1,
-      )
-      .sort((a, b) => getEdgeRetentionScore(a) - getEdgeRetentionScore(b))[0];
-
-    if (!removableEdge) {
-      break;
-    }
-
-    keptEdges.delete(removableEdge.key);
-  }
-
-  return {
-    nodes: Array.from(nodesById.values()),
-    links: Array.from(keptEdges.values()).map((edge) => ({
-      source: edge.source,
-      target: edge.target,
-      strength: edge.strength,
-      reciprocal: edge.reciprocal,
-    })),
-  };
-}
-
-export function getNodeId(value: NodeType | string) {
+function getNodeId(value: NodeType | string) {
   return typeof value === 'string' ? value : value.id;
 }
 
-export function buildComponentLookup(nodes: NodeType[], links: LinkType[]) {
-  const adjacency = new Map<string, Set<string>>();
-  nodes.forEach((node) => {
-    adjacency.set(node.id, new Set());
-  });
-  links.forEach((link) => {
-    const sourceId = getNodeId(link.source);
-    const targetId = getNodeId(link.target);
-    adjacency.get(sourceId)?.add(targetId);
-    adjacency.get(targetId)?.add(sourceId);
-  });
+function getStableHash(value: string) {
+  let hash = 0;
 
-  const componentByNode = new Map<string, number>();
-  let componentCount = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = value.charCodeAt(i) + ((hash << 5) - hash);
+  }
 
-  nodes.forEach((node) => {
-    if (componentByNode.has(node.id)) {
-      return;
-    }
+  return Math.abs(hash);
+}
 
-    const queue: string[] = [node.id];
-    componentByNode.set(node.id, componentCount);
+function getCellKey(cell: HexCell) {
+  return `${cell.q},${cell.r}`;
+}
 
-    while (queue.length > 0) {
-      const current = queue.shift();
-      if (!current) {
-        continue;
-      }
-
-      adjacency.get(current)?.forEach((neighbor) => {
-        if (!componentByNode.has(neighbor)) {
-          componentByNode.set(neighbor, componentCount);
-          queue.push(neighbor);
-        }
-      });
-    }
-
-    componentCount += 1;
-  });
-
+function axialToPoint(cell: HexCell): Point {
   return {
-    componentByNode,
-    componentCount,
+    x: Math.sqrt(3) * (cell.q + cell.r / 2),
+    y: 1.5 * cell.r,
   };
 }
 
-function buildComponentCenters(
-  componentCount: number,
+function countOccupiedNeighbors(cell: HexCell, occupied: Set<string>) {
+  const directions: HexCell[] = [
+    { q: 1, r: 0 },
+    { q: 1, r: -1 },
+    { q: 0, r: -1 },
+    { q: -1, r: 0 },
+    { q: -1, r: 1 },
+    { q: 0, r: 1 },
+  ];
+
+  return directions.reduce((count, direction) => {
+    const neighborKey = getCellKey({
+      q: cell.q + direction.q,
+      r: cell.r + direction.r,
+    });
+
+    return occupied.has(neighborKey) ? count + 1 : count;
+  }, 0);
+}
+
+function buildOrganicClusterShape(
+  clusterId: string,
+  itemCount: number,
+): Pick<ClusterLayout, 'radius' | 'width' | 'height' | 'slots'> {
+  if (itemCount <= 1) {
+    return {
+      width: CLUSTER_PADDING * 2,
+      height: CLUSTER_PADDING * 2,
+      radius: CLUSTER_PADDING,
+      slots: [{ x: 0, y: 0 }],
+    };
+  }
+
+  const directions: HexCell[] = [
+    { q: 1, r: 0 },
+    { q: 1, r: -1 },
+    { q: 0, r: -1 },
+    { q: -1, r: 0 },
+    { q: -1, r: 1 },
+    { q: 0, r: 1 },
+  ];
+  const occupied = new Set<string>();
+  const frontier = new Map<string, HexCell>();
+  const cells: HexCell[] = [{ q: 0, r: 0 }];
+  const clusterSeed = getStableHash(clusterId);
+  const initialCell = cells[0];
+
+  const addFrontierNeighbors = (cell: HexCell) => {
+    directions.forEach((direction) => {
+      const neighbor = {
+        q: cell.q + direction.q,
+        r: cell.r + direction.r,
+      };
+      const neighborKey = getCellKey(neighbor);
+      if (!occupied.has(neighborKey) && !frontier.has(neighborKey)) {
+        frontier.set(neighborKey, neighbor);
+      }
+    });
+  };
+
+  if (!initialCell) {
+    return {
+      width: CLUSTER_PADDING * 2,
+      height: CLUSTER_PADDING * 2,
+      radius: CLUSTER_PADDING,
+      slots: [{ x: 0, y: 0 }],
+    };
+  }
+
+  occupied.add(getCellKey(initialCell));
+  addFrontierNeighbors(initialCell);
+
+  while (cells.length < itemCount && frontier.size > 0) {
+    const nextCell = [...frontier.values()].sort((left, right) => {
+      const leftNeighbors = countOccupiedNeighbors(left, occupied);
+      const rightNeighbors = countOccupiedNeighbors(right, occupied);
+      if (leftNeighbors !== rightNeighbors) {
+        return rightNeighbors - leftNeighbors;
+      }
+
+      const leftDistance = Math.hypot(left.q, left.r);
+      const rightDistance = Math.hypot(right.q, right.r);
+      if (leftDistance !== rightDistance) {
+        return leftDistance - rightDistance;
+      }
+
+      const leftNoise =
+        (getStableHash(`${clusterSeed}:${left.q}:${left.r}`) % 1000) / 1000;
+      const rightNoise =
+        (getStableHash(`${clusterSeed}:${right.q}:${right.r}`) % 1000) / 1000;
+
+      return leftNoise - rightNoise;
+    })[0];
+
+    if (!nextCell) {
+      break;
+    }
+
+    frontier.delete(getCellKey(nextCell));
+    occupied.add(getCellKey(nextCell));
+    cells.push(nextCell);
+    addFrontierNeighbors(nextCell);
+  }
+
+  const rawPoints = cells.map(axialToPoint);
+  const centroid = rawPoints.reduce(
+    (accumulator, point) => ({
+      x: accumulator.x + point.x / rawPoints.length,
+      y: accumulator.y + point.y / rawPoints.length,
+    }),
+    { x: 0, y: 0 },
+  );
+  const slots = rawPoints
+    .map((point) => ({
+      x: (point.x - centroid.x) * CLUSTER_SLOT_SPACING,
+      y: (point.y - centroid.y) * CLUSTER_SLOT_SPACING,
+    }))
+    .sort((left, right) => Math.hypot(left.x, left.y) - Math.hypot(right.x, right.y));
+  const minX = Math.min(...slots.map((slot) => slot.x));
+  const maxX = Math.max(...slots.map((slot) => slot.x));
+  const minY = Math.min(...slots.map((slot) => slot.y));
+  const maxY = Math.max(...slots.map((slot) => slot.y));
+  const radius =
+    Math.max(...slots.map((slot) => Math.hypot(slot.x, slot.y))) +
+    CLUSTER_PADDING;
+
+  return {
+    width: maxX - minX + CLUSTER_PADDING * 2,
+    height: maxY - minY + CLUSTER_PADDING * 2,
+    radius,
+    slots,
+  };
+}
+
+function packCircles(
+  items: {
+    id: string;
+    radius: number;
+    width?: number;
+    height?: number;
+    slots?: Point[];
+  }[],
+  gap: number,
+): PackedLayouts {
+  const layouts = new Map<string, ClusterLayout>();
+  if (items.length === 0) {
+    return {
+      layouts,
+      radius: 0,
+      bounds: {
+        minX: 0,
+        maxX: 0,
+        minY: 0,
+        maxY: 0,
+      },
+    };
+  }
+
+  if (items.length === 1) {
+    const onlyItem = items[0];
+    if (!onlyItem) {
+      return {
+        layouts,
+        radius: 0,
+        bounds: {
+          minX: 0,
+          maxX: 0,
+          minY: 0,
+          maxY: 0,
+        },
+      };
+    }
+
+    const halfWidth = (onlyItem.width ?? onlyItem.radius * 2) / 2;
+    const halfHeight = (onlyItem.height ?? onlyItem.radius * 2) / 2;
+
+    layouts.set(onlyItem.id, {
+      center: { x: 0, y: 0 },
+      radius: onlyItem.radius,
+      width: halfWidth * 2,
+      height: halfHeight * 2,
+      slots: onlyItem.slots ?? [],
+    });
+
+    return {
+      layouts,
+      radius: Math.hypot(halfWidth, halfHeight),
+      bounds: {
+        minX: -halfWidth,
+        maxX: halfWidth,
+        minY: -halfHeight,
+        maxY: halfHeight,
+      },
+    };
+  }
+
+  const packedItems = [...items]
+    .sort(
+      (a, b) =>
+        b.radius - a.radius ||
+        a.id.localeCompare(b.id, undefined, { sensitivity: 'base' }),
+    )
+    .map((item) => ({
+      id: item.id,
+      actualRadius: item.radius,
+      actualWidth: item.width ?? item.radius * 2,
+      actualHeight: item.height ?? item.radius * 2,
+      actualSlots: item.slots ?? [],
+      r: item.radius + gap / 2,
+      x: 0,
+      y: 0,
+    }));
+
+  d3.packSiblings(packedItems as any[]);
+  const enclosure = d3.packEnclose(packedItems as any[]);
+  let minX = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+  let outerRadius = 0;
+
+  packedItems.forEach((item) => {
+    const center = {
+      x: (item.x ?? 0) - enclosure.x,
+      y: (item.y ?? 0) - enclosure.y,
+    };
+    const halfWidth = item.actualWidth / 2;
+    const halfHeight = item.actualHeight / 2;
+
+    layouts.set(item.id, {
+      center,
+      radius: item.actualRadius,
+      width: item.actualWidth,
+      height: item.actualHeight,
+      slots: item.actualSlots,
+    });
+    minX = Math.min(minX, center.x - halfWidth);
+    maxX = Math.max(maxX, center.x + halfWidth);
+    minY = Math.min(minY, center.y - halfHeight);
+    maxY = Math.max(maxY, center.y + halfHeight);
+    outerRadius = Math.max(
+      outerRadius,
+      Math.hypot(center.x - halfWidth, center.y - halfHeight),
+      Math.hypot(center.x - halfWidth, center.y + halfHeight),
+      Math.hypot(center.x + halfWidth, center.y - halfHeight),
+      Math.hypot(center.x + halfWidth, center.y + halfHeight),
+    );
+  });
+
+  return {
+    layouts,
+    radius: outerRadius,
+    bounds: {
+      minX,
+      maxX,
+      minY,
+      maxY,
+    },
+  };
+}
+
+function buildStrayZone(width: number, height: number): StrayZone {
+  const zoneWidth = Math.max(200, Math.min(320, width * 0.28));
+
+  return {
+    x: width - zoneWidth + 28,
+    y: 42,
+    width: Math.max(140, zoneWidth - 56),
+    height: Math.max(220, height - 84),
+  };
+}
+
+function buildClusterCenters(
+  categories: RelationGroup[],
+  stray: RelationGroup | null,
   width: number,
   height: number,
 ) {
-  const centers = new Map<number, { x: number; y: number }>();
-  const centerX = width / 2;
-  const centerY = height / 2;
+  const centers = new Map<string, Point>();
+  const clusterLayouts = new Map<string, ClusterLayout>();
+  const groupLayouts = new Map<string, GroupLayout>();
+  const reservedStrayWidth = stray
+    ? Math.max(200, Math.min(320, width * 0.28))
+    : 0;
+  const usableWidth = Math.max(240, width - reservedStrayWidth);
+  const usableLeft = 48;
+  const usableTop = 64;
+  const availableWidth = Math.max(220, usableWidth - 96);
+  const availableHeight = Math.max(220, height - 128);
 
-  if (componentCount <= 1) {
-    centers.set(0, { x: centerX, y: centerY });
-    return centers;
-  }
+  const categoryBlueprints = categories.map((group) => {
+    const packedClusters = packCircles(
+      group.clusters.map((cluster) => {
+        const shape = buildOrganicClusterShape(cluster.id, cluster.items.length);
 
-  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
-  const radialStep = Math.max(46, Math.min(width, height) * 0.058);
+        return {
+          id: cluster.id,
+          radius: shape.radius,
+          width: shape.width,
+          height: shape.height,
+          slots: shape.slots,
+        };
+      }),
+      CLUSTER_GAP,
+    );
 
-  for (let i = 0; i < componentCount; i += 1) {
-    const radius = i === 0 ? 0 : radialStep * Math.sqrt(i);
-    const angle = i * goldenAngle;
+    return {
+      group,
+      radius: packedClusters.radius * CATEGORY_RADIUS_SCALE + GROUP_PADDING,
+      clusterLayouts: packedClusters.layouts,
+    };
+  });
 
-    centers.set(i, {
-      x: centerX + Math.cos(angle) * radius,
-      y: centerY + Math.sin(angle) * radius,
+  const packedGroups = packCircles(
+    categoryBlueprints.map((blueprint) => ({
+      id: blueprint.group.id,
+      radius: blueprint.radius,
+    })),
+    GROUP_GAP,
+  );
+
+  const packedWidth = Math.max(
+    1,
+    packedGroups.bounds.maxX - packedGroups.bounds.minX,
+  );
+  const packedHeight = Math.max(
+    1,
+    packedGroups.bounds.maxY - packedGroups.bounds.minY,
+  );
+  const scale = Math.max(
+    MIN_GRAPH_LAYOUT_SCALE,
+    Math.min(1, availableWidth / packedWidth, availableHeight / packedHeight),
+  );
+  const translateX =
+    usableLeft +
+    (availableWidth - packedWidth * scale) / 2 -
+    packedGroups.bounds.minX * scale;
+  const translateY =
+    usableTop +
+    (availableHeight - packedHeight * scale) / 2 -
+    packedGroups.bounds.minY * scale;
+
+  categoryBlueprints.forEach((blueprint) => {
+    const packedGroup = packedGroups.layouts.get(blueprint.group.id);
+    if (!packedGroup) {
+      return;
+    }
+
+    const groupCenter = {
+      x: packedGroup.center.x * scale + translateX,
+      y: packedGroup.center.y * scale + translateY,
+    };
+    const groupRadius = blueprint.radius * scale;
+
+    groupLayouts.set(blueprint.group.id, {
+      center: groupCenter,
+      radius: groupRadius,
+    });
+
+    blueprint.clusterLayouts.forEach((clusterLayout, clusterId) => {
+      const absoluteLayout = {
+        center: {
+          x: groupCenter.x + clusterLayout.center.x * scale,
+          y: groupCenter.y + clusterLayout.center.y * scale,
+        },
+        radius: clusterLayout.radius * scale,
+        width: clusterLayout.width * scale,
+        height: clusterLayout.height * scale,
+        slots: clusterLayout.slots.map((slot) => ({
+          x: slot.x * scale,
+          y: slot.y * scale,
+        })),
+      };
+      centers.set(clusterId, absoluteLayout.center);
+      clusterLayouts.set(clusterId, absoluteLayout);
+    });
+  });
+
+  const strayZone = stray ? buildStrayZone(width, height) : null;
+  if (stray && strayZone) {
+    const packedStrayClusters = packCircles(
+      stray.clusters.map((cluster) => {
+        const shape = buildOrganicClusterShape(cluster.id, cluster.items.length);
+
+        return {
+          id: cluster.id,
+          radius: shape.radius,
+          width: shape.width,
+          height: shape.height,
+          slots: shape.slots,
+        };
+      }),
+      CLUSTER_GAP,
+    );
+    const strayPackedWidth = Math.max(
+      1,
+      packedStrayClusters.bounds.maxX - packedStrayClusters.bounds.minX,
+    );
+    const strayPackedHeight = Math.max(
+      1,
+      packedStrayClusters.bounds.maxY - packedStrayClusters.bounds.minY,
+    );
+    const strayScale = Math.min(
+      1,
+      Math.max(0.55, (strayZone.width - 36) / strayPackedWidth),
+      Math.max(0.55, (strayZone.height - 52) / strayPackedHeight),
+    );
+    const strayTranslateX =
+      strayZone.x +
+      (strayZone.width - strayPackedWidth * strayScale) / 2 -
+      packedStrayClusters.bounds.minX * strayScale;
+    const strayTranslateY =
+      strayZone.y +
+      (strayZone.height - strayPackedHeight * strayScale) / 2 -
+      packedStrayClusters.bounds.minY * strayScale;
+
+    packedStrayClusters.layouts.forEach((clusterLayout, clusterId) => {
+      const absoluteLayout = {
+        center: {
+          x: clusterLayout.center.x * strayScale + strayTranslateX,
+          y: clusterLayout.center.y * strayScale + strayTranslateY,
+        },
+        radius: clusterLayout.radius * strayScale,
+        width: clusterLayout.width * strayScale,
+        height: clusterLayout.height * strayScale,
+        slots: clusterLayout.slots.map((slot) => ({
+          x: slot.x * strayScale,
+          y: slot.y * strayScale,
+        })),
+      };
+      centers.set(clusterId, absoluteLayout.center);
+      clusterLayouts.set(clusterId, absoluteLayout);
     });
   }
 
-  return centers;
+  return {
+    centers,
+    clusterLayouts,
+    groupLayouts,
+    strayZone,
+  };
+}
+
+function placeNodesAroundClusterCenters(
+  nodes: NodeType[],
+  links: LinkType[],
+  clusterLayouts: Map<string, ClusterLayout>,
+) {
+  const nodeDegrees = new Map<string, number>();
+  nodes.forEach((node) => {
+    nodeDegrees.set(node.id, 0);
+  });
+
+  links.forEach((graphLink) => {
+    const sourceId = getNodeId(graphLink.source);
+    const targetId = getNodeId(graphLink.target);
+    nodeDegrees.set(sourceId, (nodeDegrees.get(sourceId) ?? 0) + 1);
+    nodeDegrees.set(targetId, (nodeDegrees.get(targetId) ?? 0) + 1);
+  });
+
+  const nodesByCluster = new Map<string, NodeType[]>();
+  nodes.forEach((node) => {
+    const clusterNodes = nodesByCluster.get(node.clusterKey) ?? [];
+    clusterNodes.push(node);
+    nodesByCluster.set(node.clusterKey, clusterNodes);
+  });
+
+  nodesByCluster.forEach((clusterNodes, clusterKey) => {
+    const clusterLayout = clusterLayouts.get(clusterKey);
+    const center = clusterLayout?.center ?? { x: 0, y: 0 };
+    const slotLayout = clusterLayout?.slots ?? [{ x: 0, y: 0 }];
+    const sortedClusterNodes = [...clusterNodes].sort((a, b) => {
+      const degreeDifference =
+        (nodeDegrees.get(b.id) ?? 0) - (nodeDegrees.get(a.id) ?? 0);
+
+      if (degreeDifference !== 0) {
+        return degreeDifference;
+      }
+
+      return a.id.localeCompare(b.id, undefined, { sensitivity: 'base' });
+    });
+
+    sortedClusterNodes.forEach((node, index) => {
+      const slot = slotLayout[index] ?? { x: 0, y: 0 };
+
+      node.anchorX = center.x + slot.x;
+      node.anchorY = center.y + slot.y;
+      node.x = node.anchorX;
+      node.y = node.anchorY;
+    });
+  });
+}
+
+function constrainNodesToGroupLayouts(
+  nodes: NodeType[],
+  groupLayouts: Map<string, GroupLayout>,
+) {
+  nodes.forEach((node) => {
+    const groupLayout = groupLayouts.get(node.groupId);
+    if (!groupLayout) {
+      return;
+    }
+
+    const currentX = node.x ?? groupLayout.center.x;
+    const currentY = node.y ?? groupLayout.center.y;
+    const dx = currentX - groupLayout.center.x;
+    const dy = currentY - groupLayout.center.y;
+    const distance = Math.hypot(dx, dy);
+    const maxDistance = Math.max(0, groupLayout.radius - 18);
+
+    if (distance <= maxDistance) {
+      return;
+    }
+
+    const ratio = maxDistance / (distance || 1);
+    node.x = groupLayout.center.x + dx * ratio;
+    node.y = groupLayout.center.y + dy * ratio;
+  });
+}
+
+function recenterNodesWithinClusters(
+  nodes: NodeType[],
+  clusterLayouts: Map<string, ClusterLayout>,
+) {
+  const nodesByCluster = new Map<string, NodeType[]>();
+
+  nodes.forEach((node) => {
+    const clusterNodes = nodesByCluster.get(node.clusterKey) ?? [];
+    clusterNodes.push(node);
+    nodesByCluster.set(node.clusterKey, clusterNodes);
+  });
+
+  nodesByCluster.forEach((clusterNodes, clusterKey) => {
+    const clusterLayout = clusterLayouts.get(clusterKey);
+    if (!clusterLayout || clusterNodes.length === 0) {
+      return;
+    }
+
+    const centroid = clusterNodes.reduce(
+      (accumulator, node) => ({
+        x: accumulator.x + (node.x ?? clusterLayout.center.x) / clusterNodes.length,
+        y: accumulator.y + (node.y ?? clusterLayout.center.y) / clusterNodes.length,
+      }),
+      { x: 0, y: 0 },
+    );
+    const translateX = clusterLayout.center.x - centroid.x;
+    const translateY = clusterLayout.center.y - centroid.y;
+
+    clusterNodes.forEach((node) => {
+      node.x = (node.x ?? clusterLayout.center.x) + translateX;
+      node.y = (node.y ?? clusterLayout.center.y) + translateY;
+    });
+  });
+}
+
+function toRgba(color: string, opacity: number) {
+  const { r, g, b } = hexToRgb(color);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
 export default function RelationGraph({
+  glossaryItems,
   onNodeClick,
   className = '',
   focusQuery = '',
   focusRequestKey = 0,
 }: RelationGraphProps) {
+  const graphData = useMemo(
+    () => buildGroupedRelationGraph(glossaryItems),
+    [glossaryItems],
+  );
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
@@ -444,8 +698,6 @@ export default function RelationGraph({
   const focusedNodeIdRef = useRef<string | null>(null);
   const onNodeClickRef = useRef(onNodeClick);
   const nodeByIdRef = useRef<Map<string, NodeType>>(new Map());
-  const glossaryByIdRef = useRef<Map<string, GlossaryItem>>(new Map());
-  const connectionsRef = useRef<Map<string, Set<string>>>(new Map());
   const activeHighlightNodeIdsRef = useRef<Set<string>>(new Set());
   const applyNodeHighlightRef = useRef<
     ((nodeId: string, showTooltip?: boolean) => void) | null
@@ -458,7 +710,6 @@ export default function RelationGraph({
     connections: string[];
     visible: boolean;
   }>({ item: null, connections: [], visible: false });
-  const { data: glossaryItems } = useApiQuery('get', '/api/glossary/');
 
   useEffect(() => {
     onNodeClickRef.current = onNodeClick;
@@ -541,32 +792,26 @@ export default function RelationGraph({
   }, []);
 
   useEffect(() => {
-    if (
-      !glossaryItems ||
-      !svgRef.current ||
-      viewportSize.width <= 0 ||
-      viewportSize.height <= 0
-    ) {
+    if (!svgRef.current || viewportSize.width <= 0 || viewportSize.height <= 0) {
       return;
     }
 
-    const { nodes, links } = buildGraph(glossaryItems);
-    const { componentByNode, componentCount } = buildComponentLookup(
-      nodes,
-      links,
-    );
     const width = viewportSize.width;
     const height = viewportSize.height;
-    const componentCenters = buildComponentCenters(
-      componentCount,
-      width,
-      height,
-    );
     viewportRef.current = { width, height };
 
-    nodes.forEach((node) => {
-      node.cluster = componentByNode.get(node.id) ?? 0;
-    });
+    const nodes: NodeType[] = graphData.nodes.map((node) => ({
+      ...node,
+      clusterKey: `${node.groupId}-${node.cluster}`,
+    }));
+    const links: LinkType[] = graphData.links.map((link) => ({
+      ...link,
+      source: link.source,
+      target: link.target,
+    }));
+    const { clusterLayouts, groupLayouts, strayZone } =
+      buildClusterCenters(graphData.categories, graphData.stray, width, height);
+    placeNodesAroundClusterCenters(nodes, links, clusterLayouts);
 
     const nodeDegrees = new Map<string, number>();
     nodes.forEach((node) => {
@@ -577,67 +822,6 @@ export default function RelationGraph({
       const targetId = getNodeId(graphLink.target);
       nodeDegrees.set(sourceId, (nodeDegrees.get(sourceId) ?? 0) + 1);
       nodeDegrees.set(targetId, (nodeDegrees.get(targetId) ?? 0) + 1);
-    });
-
-    const nodesByCluster = new Map<number, NodeType[]>();
-    nodes.forEach((node) => {
-      const clusterId = node.cluster ?? 0;
-      const clusterNodes = nodesByCluster.get(clusterId) ?? [];
-      clusterNodes.push(node);
-      nodesByCluster.set(clusterId, clusterNodes);
-    });
-
-    nodesByCluster.forEach((clusterNodes, clusterId) => {
-      const center = componentCenters.get(clusterId) ?? {
-        x: width / 2,
-        y: height / 2,
-      };
-      const sortedClusterNodes = [...clusterNodes].sort((a, b) => {
-        const degreeDifference =
-          (nodeDegrees.get(b.id) ?? 0) - (nodeDegrees.get(a.id) ?? 0);
-
-        if (degreeDifference !== 0) {
-          return degreeDifference;
-        }
-
-        return a.id.localeCompare(b.id);
-      });
-
-      let placedCount = 0;
-      let ringIndex = 0;
-
-      while (placedCount < sortedClusterNodes.length) {
-        const ringNodeCount =
-          ringIndex === 0
-            ? 1
-            : Math.min(
-                sortedClusterNodes.length - placedCount,
-                Math.max(6, ringIndex * 8),
-              );
-        const radius = ringIndex === 0 ? 0 : ringIndex * 28;
-        const angleOffset =
-          clusterId * 0.45 + (ringIndex % 2 === 0 ? 0 : Math.PI / 10);
-
-        for (let i = 0; i < ringNodeCount; i += 1) {
-          const node = sortedClusterNodes[placedCount + i];
-          if (!node) {
-            continue;
-          }
-
-          if (ringIndex === 0) {
-            node.x = center.x;
-            node.y = center.y;
-            continue;
-          }
-
-          const angle = angleOffset + (i / ringNodeCount) * Math.PI * 2;
-          node.x = center.x + Math.cos(angle) * radius;
-          node.y = center.y + Math.sin(angle) * radius * 0.8;
-        }
-
-        placedCount += ringNodeCount;
-        ringIndex += 1;
-      }
     });
 
     d3.select(svgRef.current).selectAll('*').remove();
@@ -653,6 +837,7 @@ export default function RelationGraph({
       SVGGElement,
       unknown
     > | null = null;
+
     const updateLabelVisibility = () => {
       if (!labels) {
         return;
@@ -697,48 +882,63 @@ export default function RelationGraph({
       hideTooltip();
     });
 
-    const clusterColor = d3
-      .scaleOrdinal<number, string>(RELATION_CLUSTER_COLORS)
-      .domain(d3.range(Math.max(1, componentCount)));
+    const backdropLayer = g.append('g').attr('class', 'group-backdrops');
+    backdropLayer
+      .selectAll<SVGCircleElement, RelationGroup>('circle')
+      .data(graphData.categories)
+      .join('circle')
+      .attr('cx', (group) => groupLayouts.get(group.id)?.center.x ?? width / 2)
+      .attr('cy', (group) => groupLayouts.get(group.id)?.center.y ?? height / 2)
+      .attr('r', (group) => groupLayouts.get(group.id)?.radius ?? 96)
+      .attr('fill', (group) => toRgba(group.color, 0.08))
+      .attr('stroke', (group) => toRgba(group.color, 0.26))
+      .attr('stroke-width', 1.6);
 
-    const linkForce = d3
-      .forceLink<NodeType, LinkType>(links)
-      .id((d) => d.id)
-      .distance((graphLink) => {
-        const baseDistance = graphLink.reciprocal ? 96 : 118;
-        return Math.max(76, baseDistance - graphLink.strength * 3);
-      })
-      .strength((graphLink) => Math.min(0.85, 0.2 + graphLink.strength * 0.1));
-
-    const simulation = d3
-      .forceSimulation<NodeType, LinkType>(nodes)
-      .force('link', linkForce)
-      .force('charge', d3.forceManyBody().strength(-165))
-      .force('center', d3.forceCenter(width / 2, height / 2))
-      .force(
-        'x',
-        d3
-          .forceX<NodeType>(
-            (node) => componentCenters.get(node.cluster ?? 0)?.x ?? width / 2,
-          )
-          .strength(0.11),
-      )
-      .force(
+    backdropLayer
+      .selectAll<SVGTextElement, RelationGroup>('text')
+      .data(graphData.categories)
+      .join('text')
+      .text((group) => group.label)
+      .attr('x', (group) => groupLayouts.get(group.id)?.center.x ?? width / 2)
+      .attr(
         'y',
-        d3
-          .forceY<NodeType>(
-            (node) => componentCenters.get(node.cluster ?? 0)?.y ?? height / 2,
-          )
-          .strength(0.22),
+        (group) =>
+          (groupLayouts.get(group.id)?.center.y ?? height / 2) -
+          ((groupLayouts.get(group.id)?.radius ?? 96) + CATEGORY_HEADER_GAP),
       )
-      .force(
-        'collision',
-        d3
-          .forceCollide<NodeType>()
-          .radius(
-            (node) => 14 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 2.8,
-          ),
-      );
+      .attr('text-anchor', 'middle')
+      .attr('fill', '#334155')
+      .attr('font-size', '26px')
+      .attr('font-weight', '700')
+      .style('letter-spacing', '0.08em')
+      .style('text-transform', 'uppercase')
+      .style('pointer-events', 'none');
+
+    if (strayZone && graphData.stray) {
+      const strayLayer = g.append('g').attr('class', 'stray-zone');
+      strayLayer
+        .append('rect')
+        .attr('x', strayZone.x)
+        .attr('y', strayZone.y)
+        .attr('width', strayZone.width)
+        .attr('height', strayZone.height)
+        .attr('rx', 28)
+        .attr('fill', toRgba('#cbd5e1', 0.12))
+        .attr('stroke', toRgba('#64748b', 0.24))
+        .attr('stroke-dasharray', '8 10');
+      strayLayer
+        .append('text')
+        .text(STRAY_TERMS_LABEL)
+        .attr('x', strayZone.x + strayZone.width / 2)
+        .attr('y', strayZone.y + 26)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#475569')
+        .attr('font-size', '11px')
+        .attr('font-weight', '700')
+        .style('letter-spacing', '0.08em')
+        .style('text-transform', 'uppercase')
+        .style('pointer-events', 'none');
+    }
 
     const link = g
       .append('g')
@@ -747,8 +947,8 @@ export default function RelationGraph({
       .data(links)
       .join('line')
       .attr('stroke', '#94a3b8')
-      .attr('stroke-opacity', 0.55)
-      .attr('stroke-width', 2.2)
+      .attr('stroke-opacity', 0.52)
+      .attr('stroke-width', 2.1)
       .attr('stroke-linecap', 'round');
 
     const nodeGroups = g
@@ -768,10 +968,10 @@ export default function RelationGraph({
           Math.min(10.5, 4.2 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 1.25),
         ),
       )
-      .attr('fill', (node) => clusterColor(node.cluster ?? 0))
-      .attr('fill-opacity', 0.9)
-      .attr('stroke', '#ffffff')
-      .attr('stroke-width', 1.4);
+      .attr('fill', (node) => node.color)
+      .attr('fill-opacity', 0.98)
+      .attr('stroke', (node) => toRgba(node.color, 0.3))
+      .attr('stroke-width', 1.6);
 
     labels = nodeGroups
       .append('text')
@@ -785,7 +985,7 @@ export default function RelationGraph({
       )
       .attr('text-anchor', 'middle')
       .attr('fill', '#334155')
-      .attr('font-size', '10.5px')
+      .attr('font-size', '11px')
       .attr('font-weight', '500')
       .style('pointer-events', 'none')
       .style('user-select', 'none');
@@ -804,11 +1004,9 @@ export default function RelationGraph({
     });
 
     const glossaryMap = new Map<string, GlossaryItem>();
-    for (const item of glossaryItems) {
+    glossaryItems.forEach((item) => {
       glossaryMap.set(item.title, item);
-    }
-    glossaryByIdRef.current = glossaryMap;
-    connectionsRef.current = connections;
+    });
     nodeByIdRef.current = new Map(nodes.map((node) => [node.id, node]));
 
     const showNodeTooltip = (nodeId: string) => {
@@ -826,31 +1024,33 @@ export default function RelationGraph({
       nodeGroups.style('opacity', 1);
       nodeGroups
         .select('circle')
-        .attr('fill', (node) => clusterColor(node.cluster ?? 0))
+        .attr('fill', (node) => node.color)
         .attr('stroke-width', 1.4);
       link
-        .style('opacity', 0.55)
+        .style('opacity', 0.52)
         .attr('stroke', '#94a3b8')
-        .attr('stroke-width', 2.2);
+        .attr('stroke-width', 2.1);
       updateLabelVisibility();
     };
 
     const highlightNode = (nodeId: string, showTooltip = true) => {
+      const selectedNode = nodeByIdRef.current.get(nodeId);
       const connected = connections.get(nodeId) ?? new Set();
       const activeNodes = new Set([nodeId, ...Array.from(connected)]);
+      const highlightColor = selectedNode?.color ?? '#3b82f6';
 
       activeHighlightNodeIdsRef.current = activeNodes;
       emphasizedNodeIds = activeNodes;
-      nodeGroups.style('opacity', 0.2);
-      link.style('opacity', 0.06);
+      nodeGroups.style('opacity', 0.18);
+      link.style('opacity', 0.05);
 
       nodeGroups
         .filter((node) => activeNodes.has(node.id))
         .style('opacity', 1)
         .select('circle')
         .attr('fill', (node) => {
-          const baseColor = d3.color(clusterColor(node.cluster ?? 0));
-          return baseColor ? baseColor.brighter(0.35).formatHex() : '#3b82f6';
+          const baseColor = d3.color(node.color);
+          return baseColor ? baseColor.brighter(0.4).formatHex() : node.color;
         })
         .attr('stroke-width', 2.2);
 
@@ -861,7 +1061,7 @@ export default function RelationGraph({
             activeNodes.has(getNodeId(graphLink.target)),
         )
         .style('opacity', 0.85)
-        .attr('stroke', '#3b82f6')
+        .attr('stroke', highlightColor)
         .attr('stroke-width', 2.6);
 
       updateLabelVisibility();
@@ -891,13 +1091,63 @@ export default function RelationGraph({
       hideTooltip();
     });
 
-    nodeGroups.on('click', function (_e, d) {
+    nodeGroups.on('click', function (_event, d) {
       const connected = Array.from(connections.get(d.id) ?? []);
       onNodeClickRef.current?.(d.id, connected);
       hideTooltip();
     });
 
+    const simulation = d3
+      .forceSimulation<NodeType, LinkType>(nodes)
+      .force(
+        'link',
+        d3
+          .forceLink<NodeType, LinkType>(links)
+          .id((d) => d.id)
+          .distance((graphLink) => {
+            const baseDistance = graphLink.reciprocal ? 104 : 126;
+            return Math.max(84, baseDistance - graphLink.strength * 2.2);
+          })
+          .strength((graphLink) =>
+            Math.min(0.68, 0.14 + graphLink.strength * 0.05),
+          ),
+      )
+      .force('charge', d3.forceManyBody().strength(-162))
+      .force(
+        'x',
+        d3
+          .forceX<NodeType>(
+            (node) =>
+              node.anchorX ??
+              clusterLayouts.get(node.clusterKey)?.center.x ??
+              width / 2,
+          )
+          .strength((node) => (node.area === 'stray' ? 0.4 : 0.34)),
+      )
+      .force(
+        'y',
+        d3
+          .forceY<NodeType>(
+            (node) =>
+              node.anchorY ??
+              clusterLayouts.get(node.clusterKey)?.center.y ??
+              height / 2,
+          )
+          .strength((node) => (node.area === 'stray' ? 0.44 : 0.38)),
+      )
+      .force(
+        'collision',
+        d3
+          .forceCollide<NodeType>()
+          .radius(
+            (node) => 17 + Math.sqrt(nodeDegrees.get(node.id) ?? 0) * 2.9,
+          ),
+      );
+
     simulation.on('tick', () => {
+      recenterNodesWithinClusters(nodes, clusterLayouts);
+      constrainNodesToGroupLayouts(nodes, groupLayouts);
+
       link
         .attr('x1', (graphLink) => (graphLink.source as NodeType).x ?? 0)
         .attr('y1', (graphLink) => (graphLink.source as NodeType).y ?? 0)
@@ -921,7 +1171,7 @@ export default function RelationGraph({
       window.clearTimeout(stopTimer);
       simulation.stop();
     };
-  }, [glossaryItems, viewportSize.height, viewportSize.width]);
+  }, [glossaryItems, graphData, viewportSize.height, viewportSize.width]);
 
   useEffect(() => {
     const query = focusQuery.trim().toLowerCase();
@@ -981,6 +1231,13 @@ export default function RelationGraph({
               <p className="mb-2 text-slate-200">{tooltip.item.description}</p>
             )}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-300">
+              <div>
+                <span className="font-medium text-slate-400">Category: </span>
+                <span className="text-slate-200">
+                  {normalizeGlossaryCategory(tooltip.item.category) ||
+                    STRAY_TERMS_LABEL}
+                </span>
+              </div>
               {tooltip.item.context && (
                 <div>
                   <span className="font-medium text-slate-400">Context: </span>
