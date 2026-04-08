@@ -7,10 +7,7 @@ import {
   CardDescription,
   CardTitle,
 } from '@/components/ui/card';
-import { useContentEditor } from '@/context/ContentEditorContext';
-import type { EditableSectionType } from '@/lib/content.type';
 import type { Course } from '@/lib/utils';
-import { FileText, HelpCircle, Tag } from 'lucide-react';
 import CourseImageOverview from '../course-image-overview/CourseImageOverview';
 import PublishCourse from './PublishCourse';
 
@@ -21,36 +18,7 @@ type CourseEditorOverviewProps = {
 export default function CourseEditorOverview({
   course,
 }: CourseEditorOverviewProps) {
-  const { doc } = useContentEditor();
-
-  const sections = doc.getArray('root');
-  const sectionCount = sections.length;
-  const quizCount = Array.from<EditableSectionType>(sections).filter(
-    (section) => section.get('type') === 'quiz',
-  ).length;
-
   const tags = (course as { tags?: string[] }).tags ?? [];
-  const stats = [
-    {
-      label: 'Sections',
-      value: sectionCount,
-      icon: FileText,
-    },
-    {
-      label: 'Quizzes',
-      value: quizCount,
-      icon: HelpCircle,
-    },
-    ...(tags.length > 0
-      ? [
-          {
-            label: 'Tags',
-            value: tags.length,
-            icon: Tag,
-          },
-        ]
-      : []),
-  ];
 
   return (
     <Card className="gap-0 border-slate-200/90 bg-white/90 py-0 shadow-sm">
@@ -88,23 +56,6 @@ export default function CourseEditorOverview({
           className="min-h-[300px]"
           imageClassName="h-[300px] w-full object-cover md:h-[420px]"
         />
-
-        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50/70 p-4"
-            >
-              <div className="flex size-10 items-center justify-center rounded-full bg-blue-100/80">
-                <stat.icon className="size-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-muted-foreground text-sm">{stat.label}</p>
-                <p className="text-2xl font-semibold leading-none">{stat.value}</p>
-              </div>
-            </div>
-          ))}
-        </div>
       </CardContent>
     </Card>
   );

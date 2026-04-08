@@ -1,3 +1,6 @@
+import CourseMetricsGrid, {
+  type CourseMetric,
+} from '@/components/CourseMetricsGrid';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -28,6 +31,23 @@ export default function CourseOverview({
 }: CourseOverviewProps) {
   const markdownCount = sections.filter((s) => s.type === 'markdown').length;
   const quizCount = sections.filter((s) => s.type === 'quiz').length;
+  const metrics: CourseMetric[] = [
+    {
+      label: 'Total Sections',
+      value: sections.length,
+      icon: FileText,
+    },
+    {
+      label: 'Content',
+      value: markdownCount,
+      icon: BookOpen,
+    },
+    {
+      label: 'Quizzes',
+      value: quizCount,
+      icon: Clock,
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -75,49 +95,7 @@ export default function CourseOverview({
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardContent>
-            <div className="flex items-center gap-3">
-              <div className="bg-primary/10 text-primary rounded-lg p-2.5">
-                <FileText className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-muted-foreground text-sm">Total Sections</p>
-                <p className="text-2xl font-semibold">{sections.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent>
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-blue-500/10 p-2.5 text-blue-600">
-                <BookOpen className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-muted-foreground text-sm">Content</p>
-                <p className="text-2xl font-semibold">{markdownCount}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent>
-            <div className="flex items-center gap-3">
-              <div className="rounded-lg bg-amber-500/10 p-2.5 text-amber-600">
-                <Clock className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-muted-foreground text-sm">Quizzes</p>
-                <p className="text-2xl font-semibold">{quizCount}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <CourseMetricsGrid metrics={metrics} />
 
       {enrollment ? (
         <DropCourse lessonId={enrollment.lessonSessionId} />
