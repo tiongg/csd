@@ -16,13 +16,19 @@ const SEARCH_FOCUS_SCALE = 2.75;
 const SEARCH_FOCUS_DURATION_MS = 500;
 const LABEL_VISIBILITY_SCALE = 0.98;
 const CATEGORY_HEADER_GAP = 18;
-const MIN_GRAPH_LAYOUT_SCALE = 0.82;
-const CATEGORY_RADIUS_SCALE = 0.9;
+const MIN_GRAPH_LAYOUT_SCALE = 0.8;
+const CATEGORY_RADIUS_SCALE = 0.92;
 const CLUSTER_SLOT_SPACING = 22;
 const CLUSTER_PADDING = 26;
-const CLUSTER_GAP = 34;
+const CLUSTER_GAP = 38;
 const GROUP_PADDING = 40;
 const GROUP_GAP = 108;
+const CLUSTER_FILL_MARGIN = 24;
+const CLUSTER_FILL_STRENGTH = 0.92;
+const GROUP_FILL_STRENGTH_X = 0.94;
+const GROUP_FILL_STRENGTH_Y = 0.9;
+const STRAY_FILL_STRENGTH_X = 0.9;
+const STRAY_FILL_STRENGTH_Y = 0.82;
 
 type NodeType = SimulationNodeDatum &
   GroupedRelationNode & {
@@ -102,6 +108,16 @@ function getStableHash(value: string) {
 
 function getCellKey(cell: HexCell) {
   return `${cell.q},${cell.r}`;
+}
+
+function normalizeAngle(angle: number) {
+  const fullTurn = Math.PI * 2;
+  return ((angle % fullTurn) + fullTurn) % fullTurn;
+}
+
+function angularDistance(left: number, right: number) {
+  const difference = Math.abs(normalizeAngle(left) - normalizeAngle(right));
+  return Math.min(difference, Math.PI * 2 - difference);
 }
 
 function axialToPoint(cell: HexCell): Point {
@@ -372,6 +388,225 @@ function packCircles(
   };
 }
 
+function measureClusterLayouts(layouts: Iterable<ClusterLayout>) {
+  let minX = Number.POSITIVE_INFINITY;
+  let maxX = Number.NEGATIVE_INFINITY;
+  let minY = Number.POSITIVE_INFINITY;
+  let maxY = Number.NEGATIVE_INFINITY;
+  let outerRadius = 0;
+  let hasLayout = false;
+
+  for (const layout of layouts) {
+    const halfWidth = layout.width / 2;
+    const halfHeight = layout.height / 2;
+    hasLayout = true;
+
+    minX = Math.min(minX, layout.center.x - halfWidth);
+    maxX = Math.max(maxX, layout.center.x + halfWidth);
+    minY = Math.min(minY, layout.center.y - halfHeight);
+    maxY = Math.max(maxY, layout.center.y + halfHeight);
+    outerRadius = Math.max(
+      outerRadius,
+      Math.hypot(layout.center.x - halfWidth, layout.center.y - halfHeight),
+      Math.hypot(layout.center.x - halfWidth, layout.center.y + halfHeight),
+      Math.hypot(layout.center.x + halfWidth, layout.center.y - halfHeight),
+      Math.hypot(layout.center.x + halfWidth, layout.center.y + halfHeight),
+    );
+  }
+
+  if (!hasLayout) {
+    return {
+      radius: 0,
+      bounds: {
+        minX: 0,
+        maxX: 0,
+        minY: 0,
+        maxY: 0,
+      },
+    };
+  }
+
+  return {
+    radius: outerRadius,
+    bounds: {
+      minX,
+      maxX,
+      minY,
+      maxY,
+    },
+  };
+}
+
+function scaleClusterLayoutCenters(
+  layouts: Map<string, ClusterLayout>,
+  scaleX: number,
+  scaleY = scaleX,
+) {
+  return new Map(
+    Array.from(layouts.entries()).map(([layoutId, layout]) => [
+      layoutId,
+      {
+        ...layout,
+        center: {
+          x: layout.center.x * scaleX,
+          y: layout.center.y * scaleY,
+        },
+      },
+    ]),
+  );
+}
+
+function spreadClusterLayoutsWithinRadius(
+  layouts: Map<string, ClusterLayout>,
+  targetRadius: number,
+  strength: number,
+) {
+  if (layouts.size <= 1 || targetRadius <= 0) {
+    return layouts;
+  }
+
+  const initialMeasurement = measureClusterLayouts(layouts.values());
+  if (initialMeasurement.radius <= 0 || initialMeasurement.radius >= targetRadius) {
+    return layouts;
+  }
+
+  let low = 1;
+  let high = 1.25;
+
+  while (
+    high < 6 &&
+    measureClusterLayouts(scaleClusterLayoutCenters(layouts, high).values()).radius <=
+      targetRadius
+  ) {
+    low = high;
+    high *= 1.35;
+  }
+
+  for (let iteration = 0; iteration < 18; iteration += 1) {
+    const candidate = (low + high) / 2;
+    const candidateRadius = measureClusterLayouts(
+      scaleClusterLayoutCenters(layouts, candidate).values(),
+    ).radius;
+
+    if (candidateRadius <= targetRadius) {
+      low = candidate;
+    } else {
+      high = candidate;
+    }
+  }
+
+  const spread = 1 + (low - 1) * strength;
+  return scaleClusterLayoutCenters(layouts, spread);
+}
+
+function spreadCircleCentersWithinRect(
+  layouts: Map<string, GroupLayout>,
+  bounds: { left: number; top: number; width: number; height: number },
+  strengthX: number,
+  strengthY: number,
+) {
+  if (layouts.size <= 1) {
+    return layouts;
+  }
+
+  const centerX = bounds.left + bounds.width / 2;
+  const centerY = bounds.top + bounds.height / 2;
+  const halfWidth = bounds.width / 2;
+  const halfHeight = bounds.height / 2;
+  let maxScaleX = Number.POSITIVE_INFINITY;
+  let maxScaleY = Number.POSITIVE_INFINITY;
+
+  layouts.forEach((layout) => {
+    const dx = layout.center.x - centerX;
+    const dy = layout.center.y - centerY;
+
+    if (Math.abs(dx) > 0.001) {
+      maxScaleX = Math.min(maxScaleX, Math.max(1, (halfWidth - layout.radius) / Math.abs(dx)));
+    }
+
+    if (Math.abs(dy) > 0.001) {
+      maxScaleY = Math.min(maxScaleY, Math.max(1, (halfHeight - layout.radius) / Math.abs(dy)));
+    }
+  });
+
+  const scaleX =
+    Number.isFinite(maxScaleX) && maxScaleX > 1
+      ? 1 + (maxScaleX - 1) * strengthX
+      : 1;
+  const scaleY =
+    Number.isFinite(maxScaleY) && maxScaleY > 1
+      ? 1 + (maxScaleY - 1) * strengthY
+      : 1;
+
+  return new Map(
+    Array.from(layouts.entries()).map(([layoutId, layout]) => [
+      layoutId,
+      {
+        ...layout,
+        center: {
+          x: centerX + (layout.center.x - centerX) * scaleX,
+          y: centerY + (layout.center.y - centerY) * scaleY,
+        },
+      },
+    ]),
+  );
+}
+
+function spreadClusterLayoutsWithinRect(
+  layouts: Map<string, ClusterLayout>,
+  bounds: { left: number; top: number; width: number; height: number },
+  strengthX: number,
+  strengthY: number,
+) {
+  if (layouts.size <= 1) {
+    return layouts;
+  }
+
+  const centerX = bounds.left + bounds.width / 2;
+  const centerY = bounds.top + bounds.height / 2;
+  const halfWidth = bounds.width / 2;
+  const halfHeight = bounds.height / 2;
+  let maxScaleX = Number.POSITIVE_INFINITY;
+  let maxScaleY = Number.POSITIVE_INFINITY;
+
+  layouts.forEach((layout) => {
+    const dx = layout.center.x - centerX;
+    const dy = layout.center.y - centerY;
+    const availableWidth = halfWidth - layout.width / 2;
+    const availableHeight = halfHeight - layout.height / 2;
+
+    if (Math.abs(dx) > 0.001) {
+      maxScaleX = Math.min(maxScaleX, Math.max(1, availableWidth / Math.abs(dx)));
+    }
+
+    if (Math.abs(dy) > 0.001) {
+      maxScaleY = Math.min(maxScaleY, Math.max(1, availableHeight / Math.abs(dy)));
+    }
+  });
+
+  const scaleX =
+    Number.isFinite(maxScaleX) && maxScaleX > 1
+      ? 1 + (maxScaleX - 1) * strengthX
+      : 1;
+  const scaleY =
+    Number.isFinite(maxScaleY) && maxScaleY > 1
+      ? 1 + (maxScaleY - 1) * strengthY
+      : 1;
+
+  return new Map(
+    Array.from(layouts.entries()).map(([layoutId, layout]) => [
+      layoutId,
+      {
+        ...layout,
+        center: {
+          x: centerX + (layout.center.x - centerX) * scaleX,
+          y: centerY + (layout.center.y - centerY) * scaleY,
+        },
+      },
+    ]),
+  );
+}
+
 function buildStrayZone(width: number, height: number): StrayZone {
   const zoneWidth = Math.max(200, Math.min(320, width * 0.28));
 
@@ -416,11 +651,16 @@ function buildClusterCenters(
       }),
       CLUSTER_GAP,
     );
+    const radius = packedClusters.radius * CATEGORY_RADIUS_SCALE + GROUP_PADDING;
 
     return {
       group,
-      radius: packedClusters.radius * CATEGORY_RADIUS_SCALE + GROUP_PADDING,
-      clusterLayouts: packedClusters.layouts,
+      radius,
+      clusterLayouts: spreadClusterLayoutsWithinRadius(
+        packedClusters.layouts,
+        Math.max(packedClusters.radius, radius - CLUSTER_FILL_MARGIN),
+        CLUSTER_FILL_STRENGTH,
+      ),
     };
   });
 
@@ -453,6 +693,8 @@ function buildClusterCenters(
     (availableHeight - packedHeight * scale) / 2 -
     packedGroups.bounds.minY * scale;
 
+  const initialGroupLayouts = new Map<string, GroupLayout>();
+
   categoryBlueprints.forEach((blueprint) => {
     const packedGroup = packedGroups.layouts.get(blueprint.group.id);
     if (!packedGroup) {
@@ -465,16 +707,37 @@ function buildClusterCenters(
     };
     const groupRadius = blueprint.radius * scale;
 
-    groupLayouts.set(blueprint.group.id, {
+    initialGroupLayouts.set(blueprint.group.id, {
       center: groupCenter,
       radius: groupRadius,
     });
+  });
+
+  const spreadGroupLayouts = spreadCircleCentersWithinRect(
+    initialGroupLayouts,
+    {
+      left: usableLeft,
+      top: usableTop,
+      width: availableWidth,
+      height: availableHeight,
+    },
+    GROUP_FILL_STRENGTH_X,
+    GROUP_FILL_STRENGTH_Y,
+  );
+
+  categoryBlueprints.forEach((blueprint) => {
+    const groupLayout = spreadGroupLayouts.get(blueprint.group.id);
+    if (!groupLayout) {
+      return;
+    }
+
+    groupLayouts.set(blueprint.group.id, groupLayout);
 
     blueprint.clusterLayouts.forEach((clusterLayout, clusterId) => {
       const absoluteLayout = {
         center: {
-          x: groupCenter.x + clusterLayout.center.x * scale,
-          y: groupCenter.y + clusterLayout.center.y * scale,
+          x: groupLayout.center.x + clusterLayout.center.x * scale,
+          y: groupLayout.center.y + clusterLayout.center.y * scale,
         },
         radius: clusterLayout.radius * scale,
         width: clusterLayout.width * scale,
@@ -526,9 +789,10 @@ function buildClusterCenters(
       strayZone.y +
       (strayZone.height - strayPackedHeight * strayScale) / 2 -
       packedStrayClusters.bounds.minY * strayScale;
+    const absoluteStrayLayouts = new Map<string, ClusterLayout>();
 
     packedStrayClusters.layouts.forEach((clusterLayout, clusterId) => {
-      const absoluteLayout = {
+      absoluteStrayLayouts.set(clusterId, {
         center: {
           x: clusterLayout.center.x * strayScale + strayTranslateX,
           y: clusterLayout.center.y * strayScale + strayTranslateY,
@@ -540,7 +804,22 @@ function buildClusterCenters(
           x: slot.x * strayScale,
           y: slot.y * strayScale,
         })),
-      };
+      });
+    });
+
+    const spreadStrayLayouts = spreadClusterLayoutsWithinRect(
+      absoluteStrayLayouts,
+      {
+        left: strayZone.x,
+        top: strayZone.y,
+        width: strayZone.width,
+        height: strayZone.height,
+      },
+      STRAY_FILL_STRENGTH_X,
+      STRAY_FILL_STRENGTH_Y,
+    );
+
+    spreadStrayLayouts.forEach((absoluteLayout, clusterId) => {
       centers.set(clusterId, absoluteLayout.center);
       clusterLayouts.set(clusterId, absoluteLayout);
     });
@@ -560,8 +839,12 @@ function placeNodesAroundClusterCenters(
   clusterLayouts: Map<string, ClusterLayout>,
 ) {
   const nodeDegrees = new Map<string, number>();
+  const nodeById = new Map<string, NodeType>();
+  const connectedNodeIds = new Map<string, string[]>();
   nodes.forEach((node) => {
+    nodeById.set(node.id, node);
     nodeDegrees.set(node.id, 0);
+    connectedNodeIds.set(node.id, []);
   });
 
   links.forEach((graphLink) => {
@@ -569,6 +852,8 @@ function placeNodesAroundClusterCenters(
     const targetId = getNodeId(graphLink.target);
     nodeDegrees.set(sourceId, (nodeDegrees.get(sourceId) ?? 0) + 1);
     nodeDegrees.set(targetId, (nodeDegrees.get(targetId) ?? 0) + 1);
+    connectedNodeIds.get(sourceId)?.push(targetId);
+    connectedNodeIds.get(targetId)?.push(sourceId);
   });
 
   const nodesByCluster = new Map<string, NodeType[]>();
@@ -582,19 +867,125 @@ function placeNodesAroundClusterCenters(
     const clusterLayout = clusterLayouts.get(clusterKey);
     const center = clusterLayout?.center ?? { x: 0, y: 0 };
     const slotLayout = clusterLayout?.slots ?? [{ x: 0, y: 0 }];
-    const sortedClusterNodes = [...clusterNodes].sort((a, b) => {
-      const degreeDifference =
-        (nodeDegrees.get(b.id) ?? 0) - (nodeDegrees.get(a.id) ?? 0);
+    const maxSlotRadius = Math.max(
+      1,
+      ...slotLayout.map((slot) => Math.hypot(slot.x, slot.y)),
+    );
+    const availableSlots = slotLayout.map((slot) => ({
+      slot,
+      angle: Math.atan2(slot.y, slot.x),
+      radius: Math.hypot(slot.x, slot.y),
+    }));
+    const nodePlacementPlan = clusterNodes
+      .map((node) => {
+        const neighborIds = connectedNodeIds.get(node.id) ?? [];
+        let internalCount = 0;
+        let externalCount = 0;
+        let pullX = 0;
+        let pullY = 0;
 
-      if (degreeDifference !== 0) {
-        return degreeDifference;
-      }
+        neighborIds.forEach((neighborId) => {
+          const neighborNode = nodeById.get(neighborId);
+          if (!neighborNode) {
+            return;
+          }
 
-      return a.id.localeCompare(b.id, undefined, { sensitivity: 'base' });
-    });
+          if (neighborNode.clusterKey === node.clusterKey) {
+            internalCount += 1;
+            return;
+          }
 
-    sortedClusterNodes.forEach((node, index) => {
-      const slot = slotLayout[index] ?? { x: 0, y: 0 };
+          externalCount += 1;
+          const neighborCenter =
+            clusterLayouts.get(neighborNode.clusterKey)?.center ?? center;
+          pullX += neighborCenter.x - center.x;
+          pullY += neighborCenter.y - center.y;
+        });
+
+        const degree = nodeDegrees.get(node.id) ?? 0;
+        const preferredAngle =
+          externalCount > 0 && (pullX !== 0 || pullY !== 0)
+            ? Math.atan2(pullY, pullX)
+            : normalizeAngle((getStableHash(node.id) % 360) * (Math.PI / 180));
+        const desiredRadius =
+          externalCount > 0
+            ? Math.min(1, 0.68 + externalCount * 0.08)
+            : Math.max(0.08, 0.28 - degree * 0.035 + internalCount * 0.02);
+
+        return {
+          node,
+          degree,
+          internalCount,
+          externalCount,
+          preferredAngle,
+          desiredRadius,
+        };
+      })
+      .sort((left, right) => {
+        if (left.externalCount !== right.externalCount) {
+          return right.externalCount - left.externalCount;
+        }
+
+        if (left.degree !== right.degree) {
+          return right.degree - left.degree;
+        }
+
+        if (left.internalCount !== right.internalCount) {
+          return right.internalCount - left.internalCount;
+        }
+
+        return left.node.id.localeCompare(right.node.id, undefined, {
+          sensitivity: 'base',
+        });
+      });
+
+    nodePlacementPlan.forEach(({ node, externalCount, preferredAngle, desiredRadius }) => {
+      const bestSlotIndex = availableSlots.reduce(
+        (bestIndex, slotInfo, index, slots) => {
+          const normalizedRadius = slotInfo.radius / maxSlotRadius;
+          const radiusCost = Math.abs(normalizedRadius - desiredRadius);
+          const angleCost =
+            externalCount > 0 && normalizedRadius > 0.05
+              ? angularDistance(slotInfo.angle, preferredAngle) / Math.PI
+              : 0;
+          const centerPreference = externalCount === 0 ? normalizedRadius : 0;
+          const score =
+            radiusCost * 1.75 + angleCost * 1.1 + centerPreference * 0.45;
+          const bestScore =
+            bestIndex === -1
+              ? Number.POSITIVE_INFINITY
+              : (() => {
+                  const currentBest = slots[bestIndex];
+                  if (!currentBest) {
+                    return Number.POSITIVE_INFINITY;
+                  }
+
+                  const currentRadius = currentBest.radius / maxSlotRadius;
+                  const currentRadiusCost = Math.abs(currentRadius - desiredRadius);
+                  const currentAngleCost =
+                    externalCount > 0 && currentRadius > 0.05
+                      ? angularDistance(currentBest.angle, preferredAngle) / Math.PI
+                      : 0;
+                  const currentCenterPreference =
+                    externalCount === 0 ? currentRadius : 0;
+
+                  return (
+                    currentRadiusCost * 1.75 +
+                    currentAngleCost * 1.1 +
+                    currentCenterPreference * 0.45
+                  );
+                })();
+
+          return score < bestScore ? index : bestIndex;
+        },
+        -1,
+      );
+      const slotInfo =
+        availableSlots.splice(bestSlotIndex === -1 ? 0 : bestSlotIndex, 1)[0] ??
+        availableSlots.shift() ?? {
+          slot: { x: 0, y: 0 },
+        };
+      const slot = slotInfo.slot;
 
       node.anchorX = center.x + slot.x;
       node.anchorY = center.y + slot.y;
@@ -804,6 +1195,7 @@ export default function RelationGraph({
       ...node,
       clusterKey: `${node.groupId}-${node.cluster}`,
     }));
+    const nodeLookup = new Map(nodes.map((node) => [node.id, node]));
     const links: LinkType[] = graphData.links.map((link) => ({
       ...link,
       source: link.source,
@@ -1105,14 +1497,41 @@ export default function RelationGraph({
           .forceLink<NodeType, LinkType>(links)
           .id((d) => d.id)
           .distance((graphLink) => {
-            const baseDistance = graphLink.reciprocal ? 104 : 126;
-            return Math.max(84, baseDistance - graphLink.strength * 2.2);
+            const sourceId = getNodeId(graphLink.source);
+            const targetId = getNodeId(graphLink.target);
+            const sourceNode = nodeLookup.get(sourceId);
+            const targetNode = nodeLookup.get(targetId);
+            const isSameCluster =
+              sourceNode?.clusterKey !== undefined &&
+              sourceNode.clusterKey === targetNode?.clusterKey;
+            const baseDistance = isSameCluster
+              ? graphLink.reciprocal
+                ? 104
+                : 124
+              : graphLink.reciprocal
+                ? 146
+                : 170;
+
+            return Math.max(
+              isSameCluster ? 84 : 126,
+              baseDistance - graphLink.strength * (isSameCluster ? 2.2 : 1.8),
+            );
           })
-          .strength((graphLink) =>
-            Math.min(0.68, 0.14 + graphLink.strength * 0.05),
-          ),
+          .strength((graphLink) => {
+            const sourceId = getNodeId(graphLink.source);
+            const targetId = getNodeId(graphLink.target);
+            const sourceNode = nodeLookup.get(sourceId);
+            const targetNode = nodeLookup.get(targetId);
+            const isSameCluster =
+              sourceNode?.clusterKey !== undefined &&
+              sourceNode.clusterKey === targetNode?.clusterKey;
+
+            return isSameCluster
+              ? Math.min(0.72, 0.16 + graphLink.strength * 0.05)
+              : Math.min(0.5, 0.1 + graphLink.strength * 0.03);
+          }),
       )
-      .force('charge', d3.forceManyBody().strength(-162))
+      .force('charge', d3.forceManyBody().strength(-176))
       .force(
         'x',
         d3

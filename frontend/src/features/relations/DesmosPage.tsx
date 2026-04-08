@@ -207,14 +207,14 @@ export default function DesmosPage() {
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4">
         <section className={glassPanelClass}>
           <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
-            Desmos
+            Node Graph
           </p>
           <Heading1 className="mt-1 text-4xl leading-tight tracking-tight">
-            Relationship Graph
+            Desmos
           </Heading1>
           <p className="mt-2 max-w-4xl text-sm text-slate-600">
-            Explore glossary terms as category planets, mini-clusters, and stray
-            nodes. Search to focus a specific tag inside the graph.
+            Explore glossary terms as an interactive node graph. Search for a tag
+            or category to focus the view and inspect how terms connect.
           </p>
         </section>
 
