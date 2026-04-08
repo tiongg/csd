@@ -22,7 +22,7 @@ export function ReviewQueueCourseItem({ course }: ReviewQueueCourseItemProps) {
       className="group block rounded-xl border border-slate-300 bg-white p-3 transition-colors hover:border-slate-400"
     >
       <div className="flex gap-3">
-        <div className="w-32 shrink-0 self-stretch overflow-hidden rounded-lg bg-slate-200">
+        <div className="h-24 w-36 shrink-0 overflow-hidden rounded-lg bg-slate-200 sm:h-28 sm:w-44">
           {course.imageUrl ? (
             <img
               src={course.imageUrl}
