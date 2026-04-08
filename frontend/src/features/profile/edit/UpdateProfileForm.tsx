@@ -20,9 +20,9 @@ import { useAuth } from '@/context/AuthContext';
 import { apiQueryOptions, useApiMutation } from '@/lib/fetch-client';
 import { uploadProfilePicture } from '@/lib/file-upload';
 import { capitalizeFirst, cn } from '@/lib/utils';
-import { Link } from '@tanstack/react-router';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQueryClient } from '@tanstack/react-query';
+import { Link } from '@tanstack/react-router';
 import { User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -112,7 +112,11 @@ export default function UpdateProfileForm() {
     setProfilePictureUrl(user.profilePictureUrl ?? null);
   }, [user, reset]);
 
-  const { mutateAsync: updateAccount } = useApiMutation('patch', '/api/account/', {});
+  const { mutateAsync: updateAccount } = useApiMutation(
+    'patch',
+    '/api/account/',
+    {},
+  );
 
   const { mutateAsync: applyContributor } = useApiMutation(
     'post',
@@ -151,7 +155,8 @@ export default function UpdateProfileForm() {
       });
     } catch (error) {
       setError('root', {
-        message: error instanceof Error ? error.message : 'Failed to update account',
+        message:
+          error instanceof Error ? error.message : 'Failed to update account',
       });
     }
   };
@@ -172,7 +177,8 @@ export default function UpdateProfileForm() {
       setPasswordDialogOpen(false);
     } catch (error) {
       setPasswordError('root', {
-        message: error instanceof Error ? error.message : 'Failed to update password',
+        message:
+          error instanceof Error ? error.message : 'Failed to update password',
       });
     }
   };
@@ -226,7 +232,7 @@ export default function UpdateProfileForm() {
   const handleRemovePicture = async () => {
     try {
       await updateAccount({
-        body: { profilePictureUrl: undefined },
+        body: { profilePictureUrl: '' },
       });
       await refreshAuthUser();
       setProfilePictureUrl(null);
@@ -353,7 +359,10 @@ export default function UpdateProfileForm() {
               name="username"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="username" className="text-sm text-slate-700">
+                  <FieldLabel
+                    htmlFor="username"
+                    className="text-sm text-slate-700"
+                  >
                     Username
                   </FieldLabel>
                   <Input
@@ -377,7 +386,10 @@ export default function UpdateProfileForm() {
               name="realName"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="realName" className="text-sm text-slate-700">
+                  <FieldLabel
+                    htmlFor="realName"
+                    className="text-sm text-slate-700"
+                  >
                     Name
                   </FieldLabel>
                   <Input

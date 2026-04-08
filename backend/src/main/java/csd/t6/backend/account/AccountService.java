@@ -86,7 +86,11 @@ public class AccountService {
     }
 
     if (updateDTO.profilePictureUrl() != null) {
-      existingAccount.setProfilePictureUrl(updateDTO.profilePictureUrl());
+      if (updateDTO.profilePictureUrl().isEmpty()) {
+        existingAccount.setProfilePictureUrl(null);
+      } else {
+        existingAccount.setProfilePictureUrl(updateDTO.profilePictureUrl());
+      }
     }
 
     if (updateDTO.password() != null) {
