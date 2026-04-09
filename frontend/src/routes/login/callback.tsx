@@ -22,5 +22,9 @@ function RouteComponent() {
     navigate({ to: '/' });
   }, [exchangeData, navigate, setAccessToken]);
 
-  return <div>Redirecting...</div>;
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <p>Redirecting...</p>
+    </div>
+  );
 }
