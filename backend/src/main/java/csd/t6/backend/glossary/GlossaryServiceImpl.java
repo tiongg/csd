@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import csd.t6.backend.ai.AIService;
-import csd.t6.backend.exceptions.BadRequestException;
 import csd.t6.backend.glossary.dto.request.GlossaryUpdateRequest;
 import csd.t6.backend.glossary.dto.response.GlossaryResponse;
 import csd.t6.jooq.public_.tables.records.GlossaryTermRecord;
@@ -35,9 +34,10 @@ public class GlossaryServiceImpl implements GlossaryService {
     List<String> unresolvedTerms = glossaryRepository.getAllUnresolvedTerms();
     List<GlossaryTermRecord> existingTerms = glossaryRepository.getAll();
     List<String> uncategorizedTerms = existingTerms.stream()
-        .filter(record -> record.getCategory() == null || record.getCategory().isBlank()).map(record -> record.getTitle())
+        .filter(record -> record.getCategory() == null || record.getCategory().isBlank())
+        .map(record -> record.getTitle()).toList();
+    List<String> pendingTerms = Stream.concat(unresolvedTerms.stream(), uncategorizedTerms.stream()).distinct()
         .toList();
-    List<String> pendingTerms = Stream.concat(unresolvedTerms.stream(), uncategorizedTerms.stream()).distinct().toList();
 
     if (pendingTerms.isEmpty()) {
       return;
@@ -46,10 +46,11 @@ public class GlossaryServiceImpl implements GlossaryService {
     Set<String> pendingTermSet = Set.copyOf(pendingTerms);
     List<String> existingGlossaryTerms = existingTerms.stream().map(record -> record.getTitle())
         .filter(title -> !pendingTermSet.contains(title)).toList();
-    List<String> existingCategories = existingTerms.stream().map(record -> record.getCategory()).filter(Objects::nonNull)
-        .filter(category -> !category.isBlank()).distinct().toList();
+    List<String> existingCategories = existingTerms.stream().map(record -> record.getCategory())
+        .filter(Objects::nonNull).filter(category -> !category.isBlank()).distinct().toList();
 
-    List<GlossaryUpdateRequest> generatedTags = aiService.generateTags(pendingTerms, existingGlossaryTerms, existingCategories);
+    List<GlossaryUpdateRequest> generatedTags = aiService.generateTags(pendingTerms, existingGlossaryTerms,
+        existingCategories);
     // Avoid using updateGlossaryTerm here as it is a batch call
     // This means that it is possible that pending tags reference each other,
     // but are not inserted into the db yet, which would cause the relationship
@@ -69,11 +70,12 @@ public class GlossaryServiceImpl implements GlossaryService {
     GlossaryTermRecord parentTerm = this.glossaryRepository.upsert(request);
     List<GlossaryTermRecord> childTerms = this.glossaryRepository.getByTitles(request.relationships());
 
-    if (childTerms.size() != request.relationships().size()) {
-      throw new BadRequestException("Some relationships could not be found in the glossary");
+    // Filter out terms that cannot be found in the glossary
+    if (childTerms.isEmpty()) {
+      return;
     }
 
-    // Update relationships
+    // Update relationships only for found terms
     this.glossaryRelationRepository.setRelationships(parentTerm.getId(),
         childTerms.stream().map(record -> record.getId()).toList());
   }
