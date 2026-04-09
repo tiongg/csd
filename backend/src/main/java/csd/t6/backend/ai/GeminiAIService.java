@@ -40,9 +40,9 @@ public class GeminiAIService implements AIService {
                 - Use only logical, high-confidence relationships. Do NOT infer beyond the given tags.
             2. Generate Metadata
                 - For each pending tag, provide:
-                    - Description: Clear, concise explanation (1-2 sentences, factual, no speculation)
+                    - Description: Clear, concise explanation (2-3 sentences, factual, no speculation)
                     - Context: Maximum 5 words
-                    - Example: A realistic sentence showing how the tag is used in conversation
+                    - Example: A realistic sentence showing how the tag is used in conversation amongst gen-alphas
                     - Category: Reuse an existing category when possible. Only create a new short category if none fit.
 
             # Inputs:
@@ -88,8 +88,8 @@ public class GeminiAIService implements AIService {
         .candidateCount(1).responseSchema(schema)
         .thinkingConfig(ThinkingConfig.builder().thinkingLevel(ThinkingLevel.Known.HIGH).build()).build();
 
-    // String model = "gemini-3-flash-preview";
-    String model = "gemini-3.1-flash-lite-preview";
+    // String model = "gemini-3.1-pro-preview";
+    String model = "gemini-3.1-pro-preview";
     GenerateContentResponse response = client.models.generateContent(model, prompt, config);
 
     try {
