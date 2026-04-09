@@ -43,7 +43,7 @@ public class GeminiAIService implements AIService {
                     - Description: Clear, concise explanation (2-3 sentences, factual, no speculation)
                     - Context: Maximum 5 words
                     - Example: A realistic sentence showing how the tag is used in conversation amongst gen-alphas
-                    - Category: Reuse an existing category when possible. Only create a new short category if none fit.
+                    - Category: Reuse an existing category only when it is a strong semantic fit to the tag's meaning; otherwise create a new short accurate category.
 
             # Inputs:
             ## Pending Tags:
