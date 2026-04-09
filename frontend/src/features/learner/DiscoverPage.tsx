@@ -179,6 +179,7 @@ export default function DiscoverPage() {
         <section className={`${glassPanelClass} flex flex-1 flex-col gap-6`}>
           <DiscoverBrowseToolbar
             onSearchQueryChange={setSearchQuery}
+            searchQuery={searchQuery}
             categoryFilter={categoryFilter}
             onCategoryFilterChange={setCategoryFilter}
             categoryOptions={categoryOptions}

@@ -269,6 +269,7 @@ export default function UserManagementForm() {
                     placeholder="Search users by name or email"
                     className="h-9 rounded-lg border-slate-300 bg-white/85"
                     onSearch={setUserSearchQuery}
+                    value={userSearchQuery}
                   />
                 </div>
                 <div className="flex items-center gap-x-2">
@@ -296,6 +297,7 @@ export default function UserManagementForm() {
                   placeholder="Search users by name or email"
                   className="h-9 rounded-lg border-slate-300 bg-white/85"
                   onSearch={setUserSearchQuery}
+                  value={userSearchQuery}
                 />
               </div>
             )}

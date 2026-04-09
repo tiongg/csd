@@ -11,6 +11,7 @@ type DiscoverBrowseToolbarProps = {
   title?: string;
   searchPlaceholder?: string;
   onSearchQueryChange: (value: string) => void;
+  searchQuery?: string;
   categoryFilter: string;
   onCategoryFilterChange: (value: string) => void;
   categoryOptions: string[];
@@ -21,6 +22,7 @@ export function DiscoverBrowseToolbar({
   title = 'Browse',
   searchPlaceholder = 'Search title, description, tags',
   onSearchQueryChange,
+  searchQuery,
   categoryFilter,
   onCategoryFilterChange,
   categoryOptions,
@@ -35,6 +37,7 @@ export function DiscoverBrowseToolbar({
             placeholder={searchPlaceholder}
             className="h-9 rounded-lg border-slate-300 bg-white/85"
             onSearch={onSearchQueryChange}
+            value={searchQuery}
           />
         </div>
         <Select value={categoryFilter} onValueChange={onCategoryFilterChange}>

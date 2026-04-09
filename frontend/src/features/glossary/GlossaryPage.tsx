@@ -133,7 +133,8 @@ export default function GlossaryPage({
                 <SearchBar
                   placeholder="Search term, meaning, context, or example"
                   onSearch={setQuery}
-                  className="h-10 border-slate-300/85 bg-slate-100/70"
+                  value={query}
+                  className="border-slate-300/85 bg-slate-100/70"
                 />
               </div>
 

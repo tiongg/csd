@@ -42,6 +42,7 @@ export default function MyCoursesPage() {
               onCategoryFilterChange={setCategoryFilter}
               categoryOptions={categoryOptions}
               showMyPreferencesOption={false}
+              searchQuery={searchQuery}
             />
 
             <div className="flex flex-1">

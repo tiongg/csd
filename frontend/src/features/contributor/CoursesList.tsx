@@ -166,6 +166,7 @@ export default function CoursesList({ team }: CourseListProps) {
             placeholder="Search title, tags, category"
             className="h-9 rounded-lg border-slate-300 bg-white/90"
             onSearch={setCourseSearchQuery}
+            value={courseSearchQuery}
           />
         </div>
         <Select value={categoryFilter} onValueChange={setCategoryFilter}>

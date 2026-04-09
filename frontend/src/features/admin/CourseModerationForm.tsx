@@ -177,6 +177,7 @@ export default function CourseModerationForm() {
                   placeholder={moderationSearchPlaceholder}
                   className="h-9 rounded-lg border-slate-300 bg-white/85"
                   onSearch={setAllCoursesSearchQuery}
+                  value={allCoursesSearchQuery}
                 />
               </div>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
