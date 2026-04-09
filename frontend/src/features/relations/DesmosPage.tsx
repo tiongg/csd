@@ -273,7 +273,7 @@ export default function DesmosPage() {
                   />
                 </div>
                 <p className="mt-2 text-xs text-slate-500">
-                  Click a tag to focus it in the graph.
+                  Click on or hover over a tag to find out more.
                 </p>
               </div>
 

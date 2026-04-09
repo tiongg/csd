@@ -28,7 +28,7 @@ export default function MyCoursesPage() {
           </p>
           <Heading1 className="mt-3 text-slate-900">My Courses</Heading1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Browse your enrolled courses in a simpler list and jump back into the next lesson faster.
+            Browse your enrolled courses and jump back into the next lesson faster.
           </p>
         </section>
 

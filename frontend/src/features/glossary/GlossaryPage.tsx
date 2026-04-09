@@ -118,8 +118,7 @@ export default function GlossaryPage({
             Gen-Alpha Glossary
           </Heading1>
           <p className="mt-2 text-sm leading-6 text-slate-700">
-            Expanded slang and meme vocabulary with practical conversation
-            examples for writing, moderation, and learner context.
+            Understand slang and meme vocabulary with practical conversation examples.
           </p>
         </section>
 

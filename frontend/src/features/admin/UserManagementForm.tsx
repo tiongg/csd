@@ -201,8 +201,7 @@ export default function UserManagementForm() {
           </div>
           <Heading1 className="mt-3 text-slate-900">User Management</Heading1>
           <p className="mt-2 text-sm text-slate-600">
-            Review contributor requests and manage platform access for all
-            users.
+            Review contributor requests and manage roles for all users.
           </p>
         </section>
 
@@ -242,7 +241,7 @@ export default function UserManagementForm() {
                   >
                     <span className="inline-flex items-center gap-2">
                       <span>
-                        {tab === 'pending' ? 'Pending Approvals' : 'All Users'}
+                        {tab === 'pending' ? 'Contributor Requests' : 'All Users'}
                       </span>
                       <span
                         className={cn(

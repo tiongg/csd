@@ -243,7 +243,7 @@ export default function CourseReview() {
                   Review Queue
                 </CardTitle>
                 <CardDescription className="text-slate-600">
-                  Past review decisions for this course version timeline.
+                  See past review decisions for this course.
                 </CardDescription>
               </CardHeader>
               <CardContent>

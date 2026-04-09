@@ -58,7 +58,7 @@ export default function ContributorDashboardPage() {
 
           <TopTrendsTable
             title="Trending"
-            description="Top signals to monitor."
+            description="Monitor top signals."
             onTrendClick={(trendName) => {
               setKeywordSearch(trendName);
               setIsCourseMatchOpen(true);

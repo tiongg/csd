@@ -45,7 +45,7 @@ export default function ContributorAnalytics() {
     return (
       <DashboardAnalyticsSkeleton
         title="Contributor Analytics"
-        description="Course metrics that spotlight engagement, output, and enrollment trends."
+        description="View course metrics that reveal engagement, output, and enrollment trends."
       />
     );
   }
@@ -124,7 +124,7 @@ export default function ContributorAnalytics() {
   return (
     <DashboardAnalyticsSection
       title="Contributor Analytics"
-      description="Course metrics that spotlight engagement, output, and enrollment trends."
+      description="View course metrics that reveal engagement, output, and enrollment trends."
       timeframe={timeframe}
       timeframeOptions={['1W', '1M', '3M', '1Y'] as const}
       onTimeframeChange={setTimeframe}
