@@ -34,7 +34,7 @@ export default function AuthSplitShell({
 }: AuthSplitShellProps) {
   return (
     <div className="relative z-10 grid w-full max-w-6xl overflow-hidden rounded-3xl border border-slate-300 bg-white/85 shadow-2xl shadow-slate-300/35 lg:grid-cols-[1.1fr_1fr]">
-      <section className="relative border-b border-slate-300 p-8 lg:border-r lg:border-b-0 lg:p-10">
+      <section className="relative border-b border-slate-300 p-8 lg:border-r lg:border-b-0 lg:p-10 hidden lg:block">
         <div className="relative space-y-7">
           <div className="space-y-4">
             <h2 className="text-3xl leading-tight font-semibold text-slate-900 md:text-4xl">
