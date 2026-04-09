@@ -4,6 +4,10 @@ on:
   pull_request:
     branches: [dev]
 
+permissions:
+  pull-requests: write
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -40,8 +44,8 @@ jobs:
             -locations="filesystem:./backend/src/main/resources/db/migration" \
             -outOfOrder=true
 
-      - name: Run tests
+      - name: Run tests with coverage
         env:
           GOOGLE_API_KEY: dummy_key
-        run: mvn verify -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
+        run: mvn verify jacoco:report -Djooq.jdbc.url=jdbc:postgresql://db:5432/postgres -Djooq.jdbc.user=postgres -Djooq.jdbc.password=password
         working-directory: ./backend
