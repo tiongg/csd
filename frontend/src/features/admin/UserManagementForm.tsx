@@ -19,8 +19,8 @@ import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import ConfirmActionDialog from './ConfirmActionDialog';
 import { AdminTable, AdminTableMessageRow } from './AdminTable';
+import ConfirmActionDialog from './ConfirmActionDialog';
 import PendingContributorsForm from './PendingContributorsForm';
 
 const glassPanelClass =
@@ -72,6 +72,9 @@ export default function UserManagementForm() {
             'get',
             '/api/admins/contributor-applications',
           ).queryKey,
+        });
+        await queryClient.invalidateQueries({
+          queryKey: apiQueryOptions('get', '/api/account/').queryKey,
         });
       },
       onError: () => {
@@ -141,7 +144,9 @@ export default function UserManagementForm() {
     void queryClient.prefetchQuery(
       apiQueryOptions('get', '/api/content-versions/pending'),
     );
-    void queryClient.prefetchQuery(apiQueryOptions('get', '/api/courses/published'));
+    void queryClient.prefetchQuery(
+      apiQueryOptions('get', '/api/courses/published'),
+    );
   }, [queryClient]);
 
   function setSelected(uuid: string, checked: boolean) {
@@ -236,7 +241,9 @@ export default function UserManagementForm() {
                     onClick={() => setActiveTab(tab)}
                   >
                     <span className="inline-flex items-center gap-2">
-                      <span>{tab === 'pending' ? 'Pending Approvals' : 'All Users'}</span>
+                      <span>
+                        {tab === 'pending' ? 'Pending Approvals' : 'All Users'}
+                      </span>
                       <span
                         className={cn(
                           'inline-flex h-5 min-w-5 items-center justify-center rounded-full border px-1 text-[11px] font-bold',
@@ -245,7 +252,9 @@ export default function UserManagementForm() {
                             : 'border-slate-300 bg-slate-100 text-slate-600',
                         )}
                       >
-                        {tab === 'pending' ? pendingCountLabel : usersCountLabel}
+                        {tab === 'pending'
+                          ? pendingCountLabel
+                          : usersCountLabel}
                       </span>
                     </span>
                   </button>
