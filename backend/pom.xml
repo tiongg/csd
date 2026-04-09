@@ -175,6 +175,7 @@
 								<format>XML</format>
 							</formats>
 							<excludes>
+								<exclude>**/dto/**</exclude>
 								<exclude>**/jooq/**</exclude>
 							</excludes>
 						</configuration>
