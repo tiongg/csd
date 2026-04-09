@@ -150,14 +150,14 @@ export default function DiscoverPage() {
   }, [categoryFilter, categoryRows, preferredCategories, searchQuery]);
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col bg-slate-100/70 p-6 md:p-8">
-      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col gap-6">
+    <div className="flex">
+      <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-6">
         <section className={glassPanelClass}>
-          <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
+          <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
             Discover
-          </div>
+          </p>
           <Heading1 className="mt-3 text-slate-900">Explore Courses</Heading1>
-          <p className="mt-2 text-sm text-slate-600">
+          <p className="mt-2 text-sm leading-6 text-slate-600">
             Browse featured releases and category collections.
           </p>
         </section>
@@ -179,6 +179,7 @@ export default function DiscoverPage() {
         <section className={`${glassPanelClass} flex flex-1 flex-col gap-6`}>
           <DiscoverBrowseToolbar
             onSearchQueryChange={setSearchQuery}
+            searchQuery={searchQuery}
             categoryFilter={categoryFilter}
             onCategoryFilterChange={setCategoryFilter}
             categoryOptions={categoryOptions}

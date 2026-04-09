@@ -7,6 +7,7 @@ import {
 import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import { createFileRoute } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
+import { Heading1 } from '@/components/ui/typography';
 
 export const Route = createFileRoute('/_authenticated/contributor/faq')({
   component: RouteComponent,
@@ -40,8 +41,11 @@ const items = [
 
 function RouteComponent() {
   return (
-    <PageWithNavBar className="h-[calc(100vh-4rem)] overflow-hidden">
+    <PageWithNavBar className="min-h-[calc(100vh-52px)] px-4 py-6 md:px-8 md:py-10 bg-slate-100/70">
       <div className="flex h-full w-full flex-col items-center justify-center gap-8">
+        <Heading1>
+          Contributor - Frequently Asked Questions
+        </Heading1>
         <Accordion
           type="multiple"
           className="w-full max-w-xl"

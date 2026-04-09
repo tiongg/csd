@@ -193,16 +193,15 @@ export default function UserManagementForm() {
   const usersCountLabel = allUsers == null ? '...' : String(allUsers.length);
 
   return (
-    <div className="flex min-h-0 w-full flex-1 bg-slate-100/70 p-6 md:p-8">
-      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col gap-5">
+    <div className="flex">
+      <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-5">
         <section className={glassPanelClass}>
           <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
             Admin Console
           </div>
           <Heading1 className="mt-3 text-slate-900">User Management</Heading1>
           <p className="mt-2 text-sm text-slate-600">
-            Review contributor requests and manage platform access for all
-            users.
+            Review contributor requests and manage roles for all users.
           </p>
         </section>
 
@@ -242,7 +241,7 @@ export default function UserManagementForm() {
                   >
                     <span className="inline-flex items-center gap-2">
                       <span>
-                        {tab === 'pending' ? 'Pending Approvals' : 'All Users'}
+                        {tab === 'pending' ? 'Contributor Requests' : 'All Users'}
                       </span>
                       <span
                         className={cn(
@@ -269,6 +268,7 @@ export default function UserManagementForm() {
                     placeholder="Search users by name or email"
                     className="h-9 rounded-lg border-slate-300 bg-white/85"
                     onSearch={setUserSearchQuery}
+                    value={userSearchQuery}
                   />
                 </div>
                 <div className="flex items-center gap-x-2">
@@ -296,6 +296,7 @@ export default function UserManagementForm() {
                   placeholder="Search users by name or email"
                   className="h-9 rounded-lg border-slate-300 bg-white/85"
                   onSearch={setUserSearchQuery}
+                  value={userSearchQuery}
                 />
               </div>
             )}

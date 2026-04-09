@@ -8,10 +8,8 @@ export const Route = createFileRoute('/_authenticated/admin/settings')({
 
 function RouteComponent() {
   return (
-    <PageWithNavBar>
-      <div className="flex min-h-[calc(100dvh-4rem)] w-full items-start justify-center px-4 pt-10 pb-8 md:pt-14">
-        <UpdateProfileForm />
-      </div>
+    <PageWithNavBar className="min-h-[calc(100vh-52px)] px-4 py-6 md:px-8 md:py-10 bg-slate-100/70">
+      <UpdateProfileForm />
     </PageWithNavBar>
   );
 }

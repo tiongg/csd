@@ -106,8 +106,8 @@ export default function CourseModerationForm() {
   }, [activeTab, pendingCourses, publishedCourses]);
 
   return (
-    <div className="flex min-h-0 w-full flex-1 bg-slate-100/70 p-6 md:p-8">
-      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col gap-5">
+    <div className="flex">
+      <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-5">
         <section className={glassPanelClass}>
           <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold tracking-[0.08em] text-sky-700 uppercase">
             Admin Console
@@ -177,6 +177,7 @@ export default function CourseModerationForm() {
                   placeholder={moderationSearchPlaceholder}
                   className="h-9 rounded-lg border-slate-300 bg-white/85"
                   onSearch={setAllCoursesSearchQuery}
+                  value={allCoursesSearchQuery}
                 />
               </div>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>

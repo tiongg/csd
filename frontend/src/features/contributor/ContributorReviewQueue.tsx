@@ -86,7 +86,7 @@ export function ContributorReviewQueue() {
         <p className="text-sm text-slate-500">{pendingCount} pending</p>
       </div>
       <p className="mt-1 text-sm text-slate-600">
-        Courses awaiting contributor action.
+        See courses awaiting admin review.
       </p>
 
       {pendingCourses.length > 0 ? (

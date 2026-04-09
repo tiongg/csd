@@ -203,16 +203,16 @@ export default function DesmosPage() {
   }, [filteredCategories, filteredStrayGroup, searchQuery]);
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col bg-slate-100/70 p-4 md:p-6">
+    <div className="flex">
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4">
         <section className={glassPanelClass}>
           <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
             Node Graph
           </p>
-          <Heading1 className="mt-1 text-4xl leading-tight tracking-tight">
+          <Heading1 className="mt-3">
             Desmos
           </Heading1>
-          <p className="mt-2 max-w-4xl text-sm text-slate-600">
+          <p className="mt-2 text-sm leading-6 text-slate-600">
             Explore glossary terms as an interactive node graph. Search for a tag
             or category to focus the view and inspect how terms connect.
           </p>
@@ -273,7 +273,7 @@ export default function DesmosPage() {
                   />
                 </div>
                 <p className="mt-2 text-xs text-slate-500">
-                  Click a tag to focus it in the graph.
+                  Click on or hover over a tag to find out more.
                 </p>
               </div>
 

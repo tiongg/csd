@@ -20,16 +20,15 @@ export default function MyCoursesPage() {
   }, [enrolledCourses]);
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col bg-slate-100 p-6 md:p-8">
-      <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col gap-6">
-        <section className="rounded-3xl border border-slate-200 bg-white px-6 py-6 shadow-sm md:px-8">
-          <p className="text-xs font-semibold tracking-[0.16em] text-slate-500 uppercase">
-            My learning
+    <div className="flex">
+      <div className="mx-auto flex min-h-0 w-full max-w-7xl flex-1 flex-col gap-6">
+        <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6">
+          <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
+            My Learning
           </p>
           <Heading1 className="mt-3 text-slate-900">My Courses</Heading1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            Browse your enrolled courses in a simpler list and jump back into
-            the next lesson faster.
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Browse your enrolled courses and jump back into the next lesson faster.
           </p>
         </section>
 
@@ -43,6 +42,7 @@ export default function MyCoursesPage() {
               onCategoryFilterChange={setCategoryFilter}
               categoryOptions={categoryOptions}
               showMyPreferencesOption={false}
+              searchQuery={searchQuery}
             />
 
             <div className="flex flex-1">

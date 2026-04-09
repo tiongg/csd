@@ -18,7 +18,7 @@ export default function PublishedOutputMetric({
           Published Output Trend
         </p>
         <p className="text-xs text-slate-500">
-          Courses/releases shipped in this period
+          Courses published in this period
         </p>
       </div>
       {!hasData ? (
