@@ -2,10 +2,10 @@ import { Button } from '@/components/ui/button';
 import useEnrolledCourse from '@/context/EnrolledCourseContext';
 import { useApiQuery } from '@/lib/fetch-client';
 import type { Course } from '@/lib/utils';
-import { CheckCircleIcon } from '@heroicons/react/24/outline';
 import { Link } from '@tanstack/react-router';
 import { useMemo } from 'react';
 import { EnrolledCourseRow } from './EnrolledCourseRow';
+import { CompassIcon } from 'lucide-react';
 
 type EnrolledCoursesProps = {
   searchQuery: string;
@@ -82,7 +82,7 @@ export function EnrolledCourses({
               to="/learner/discover"
               className="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-white transition-colors hover:bg-sky-700"
             >
-              <CheckCircleIcon className="size-5" />
+              <CompassIcon className="size-5" />
               Explore Courses
             </Link>
           </Button>
