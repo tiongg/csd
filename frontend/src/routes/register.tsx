@@ -7,7 +7,7 @@ export const Route = createFileRoute('/register')({
 
 function RegisterPage() {
   return (
-    <div className="relative flex h-[calc(100vh-52px)] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top_left,_#ffffff,_#f8fafc_42%,_#e2e8f0)] p-4 md:p-8">
+    <div className="relative flex min-h-[calc(100vh-52px)] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top_left,_#ffffff,_#f8fafc_42%,_#e2e8f0)] p-4 md:p-8">
       <RegistrationForm />
     </div>
   );
