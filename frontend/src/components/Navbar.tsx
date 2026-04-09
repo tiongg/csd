@@ -183,7 +183,7 @@ export default function Navbar() {
         className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-slate-300/80 to-transparent"
       />
       <div className="flex h-16 w-full items-center justify-between gap-4 px-4 md:px-8">
-        <div className="flex min-w-0 items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3 hidden sm:block">
           <Link
             className="flex items-center gap-x-3 rounded-full px-2 py-1 transition-colors hover:bg-white/70"
             to="/"
@@ -310,9 +310,8 @@ export default function Navbar() {
                         .exhaustive()}
                     </span>
                     <ChevronDown
-                      className={`size-4 text-slate-500 transition-transform ${
-                        roleMenuOpen ? 'rotate-180' : ''
-                      }`}
+                      className={`size-4 text-slate-500 transition-transform ${roleMenuOpen ? 'rotate-180' : ''
+                        }`}
                     />
                   </button>
                 </DropdownMenuTrigger>
