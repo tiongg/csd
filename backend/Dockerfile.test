@@ -5,4 +5,7 @@ WORKDIR /usr/src/maven
 COPY pom.xml .
 RUN mvn dependency:go-offline -B
 
-CMD ["mvn", "test", "-Dspring.profiles.active=test"]
+# Create directory for coverage reports
+RUN mkdir -p /usr/src/maven/target/site/jacoco
+
+CMD ["mvn", "clean", "test", "-Dspring.profiles.active=test", "jacoco:report"]
