@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Heading1 } from '@/components/ui/typography';
 
 import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import { createFileRoute } from '@tanstack/react-router';
@@ -16,7 +17,7 @@ export const Route = createFileRoute('/_authenticated/admin/faq')({
 const items = [
   {
     value: 'addAdmin',
-    trigger: 'How do i add an admin?',
+    trigger: 'How do I add an admin?',
     content:
       'Go to User Management -> All Users. Search for the user and assign them with the admin role by clicking on the pencil icon.',
   },
@@ -42,8 +43,11 @@ const items = [
 
 function RouteComponent() {
   return (
-    <PageWithNavBar className="h-[calc(100vh-4rem)] overflow-hidden">
+    <PageWithNavBar className="min-h-[calc(100vh-52px)] px-4 py-6 md:px-8 md:py-10 bg-slate-100/70">
       <div className="flex h-full w-full flex-col items-center justify-center gap-8">
+        <Heading1>
+          Admin - Frequently Asked Questions
+        </Heading1>
         <Accordion
           type="multiple"
           className="w-full max-w-xl"
