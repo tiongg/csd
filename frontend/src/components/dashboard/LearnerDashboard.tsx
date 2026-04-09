@@ -8,7 +8,7 @@ export function LearnerDashboard() {
   const totalPublishedCourses = (allCourses ?? []).length;
 
   return (
-    <div className="flex h-full w-full flex-col gap-4">
+    <div>
       <div className="flex justify-between gap-4">
         <InfoCard title="Daily Streak" value="4" variant="danger" />
         <InfoCard title="Current Rank" value="Top 10%" variant="default" />

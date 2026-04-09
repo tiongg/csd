@@ -108,16 +108,16 @@ export default function GlossaryPage({
   }, [categoryFilter, query, glossaryItems]);
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col bg-slate-100/70 p-4 md:p-6">
+    <div className="flex">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
         <section className={glassPanelClass}>
           <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
             Reference
           </p>
-          <Heading1 className="mt-1 text-4xl leading-tight tracking-tight">
+          <Heading1 className="mt-3">
             Gen-Alpha Glossary
           </Heading1>
-          <p className="mt-2 max-w-4xl text-sm text-slate-600">
+          <p className="mt-2 text-sm leading-6 text-slate-700">
             Expanded slang and meme vocabulary with practical conversation
             examples for writing, moderation, and learner context.
           </p>

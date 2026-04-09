@@ -1,3 +1,4 @@
+import PageWithNavBar from '@/components/wrappers/PageWithNavBar';
 import GlossaryPage from '@/features/glossary/GlossaryPage';
 import EditGlossaryDialog from '@/features/glossary/components/EditGlossaryDialog';
 import { normalizeGlossaryCategory } from '@/features/relations/graph-data';
@@ -31,7 +32,7 @@ function AdminGlossaryPage() {
   };
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col">
+    <PageWithNavBar className="min-h-[calc(100vh-52px)] px-4 py-6 md:px-8 md:py-10 bg-slate-100/70 flex">
       <GlossaryPage onEditClick={handleEditClick} showGenerateButton />
       <EditGlossaryDialog
         open={isDialogOpen}
@@ -40,6 +41,6 @@ function AdminGlossaryPage() {
         allTitles={allTitles}
         allCategories={allCategories}
       />
-    </div>
+    </PageWithNavBar>
   );
 }

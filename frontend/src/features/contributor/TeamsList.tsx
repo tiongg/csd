@@ -30,36 +30,41 @@ export default function TeamsList() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
-            Team Management
-          </p>
-          <Heading1 className="bg-none text-4xl leading-tight tracking-tight">
-            Your Teams
-          </Heading1>
-          <p className="font-subtitle text-slate-600">
-            Create, organize, and enter each team workspace.
-          </p>
+      <section className="relative overflow-hidden rounded-2xl border border-white/75 bg-white/45 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_18px_40px_-30px_rgba(15,23,42,0.5)] shadow-sm ring-1 shadow-slate-900/5 ring-slate-300/55 backdrop-blur-2xl before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-12 before:bg-gradient-to-b before:from-white/50 before:to-transparent md:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold tracking-[0.14em] text-sky-700 uppercase">
+              Team Management
+            </p>
+            <Heading1 className="mt-3 text-slate-900">
+              Your Teams
+            </Heading1>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Create, organize, and enter each team workspace.
+            </p>
+          </div>
+          <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
+            {(teams ?? []).length} team{(teams ?? []).length === 1 ? '' : 's'}
+          </div>
         </div>
-        <div className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm">
-          {(teams ?? []).length} team{(teams ?? []).length === 1 ? '' : 's'}
-        </div>
-      </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <CreateTeamCard onInteract={openCreateTeamDialog} />
-        {isLoading
-          ? Array.from({ length: 3 }).map((_, idx) => (
+      </section>
+
+      <section>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <CreateTeamCard onInteract={openCreateTeamDialog} />
+          {isLoading
+            ? Array.from({ length: 3 }).map((_, idx) => (
               <LoadingTeamCard key={idx} />
             ))
-          : (teams ?? []).map((team) => (
+            : (teams ?? []).map((team) => (
               <TeamCard
                 team={team}
                 key={team.id}
                 accountProfilePictureMap={accountProfilePictureMap}
               />
             ))}
-      </div>
+        </div>
+      </section>
 
       <CreateNewTeamDialog
         isOpen={isCreateTeamDialogOpen}

@@ -413,7 +413,7 @@ export default function UpdateProfileForm() {
             </div>
           )}
 
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col sm:flex-row justify-center sm:justify-end gap-3">
             <Dialog
               open={passwordDialogOpen}
               onOpenChange={(open) => {
