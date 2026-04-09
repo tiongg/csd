@@ -43,8 +43,8 @@ public class GeminiAIService implements AIService {
                     - Description: Clear, concise explanation (2-3 sentences, factual, no speculation)
                     - Context: Maximum 5 words
                     - Example: A realistic sentence showing how the tag is used in conversation amongst gen-alphas
-                    - Category: Reuse an existing category only when it is a strong semantic fit to the tag's meaning; otherwise create a new short accurate category.
-
+                    - Category: Reuse an existing category only when it directly reflects the tag's primary cultural domain (not just its digital medium or online usage). Do not place broad slang, identity, behaviour, or social-expression terms under Technology unless the term is explicitly about tools, platforms, AI, software, devices, or technical systems. Otherwise create a new short accurate category.
+                    
             # Inputs:
             ## Pending Tags:
             %s
