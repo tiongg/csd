@@ -5,13 +5,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { cn } from '@/lib/utils';
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import type { Account } from '@/context/AuthContext';
 import { useAuth } from '@/context/AuthContext';
 import useActiveRole from '@/hooks/useActiveRole';
+import { cn } from '@/lib/utils';
 import type { LinkOptions } from '@tanstack/react-router';
 import { Link, useLocation, useNavigate } from '@tanstack/react-router';
-import { ChevronDown, UserCircle2 } from 'lucide-react';
+import { ChevronDown, Menu, UserCircle2 } from 'lucide-react';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { match } from 'ts-pattern';
 import NotificationBell from './notifications/NotificationBell';
@@ -115,6 +123,7 @@ function isPrimaryNavItemActive(
 export default function Navbar() {
   const { user, logout } = useAuth();
   const [roleMenuOpen, setRoleMenuOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activePill, setActivePill] = useState({
     left: 0,
     width: 0,
@@ -184,11 +193,55 @@ export default function Navbar() {
               alt="six seven logo"
               className="aspect-square size-8 rounded-full"
             />
-            <div className="truncate font-[Noto_Sans] text-xl font-semibold text-slate-900 italic">
+            <div className="hidden truncate font-[Noto_Sans] text-xl font-semibold text-slate-900 italic md:block">
               The Six Seven
             </div>
           </Link>
         </div>
+
+        {user && (
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="lg:hidden"
+                aria-label="Open menu"
+              >
+                <Menu className="size-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-64">
+              <SheetHeader>
+                <SheetTitle>Navigation</SheetTitle>
+              </SheetHeader>
+              <nav className="mt-6 flex flex-col gap-2">
+                {primaryNavItems.map((item) => {
+                  const isActive = isPrimaryNavItemActive(
+                    item,
+                    pathname,
+                    navRole,
+                  );
+                  return (
+                    <SheetClose key={item.label} asChild>
+                      <Link
+                        to={item.to}
+                        className={cn(
+                          'rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-slate-100',
+                          isActive
+                            ? 'bg-slate-100 text-slate-900'
+                            : 'text-slate-700',
+                        )}
+                      >
+                        {item.label}
+                      </Link>
+                    </SheetClose>
+                  );
+                })}
+              </nav>
+            </SheetContent>
+          </Sheet>
+        )}
 
         {user ? (
           <nav className="hidden flex-1 items-center justify-center lg:flex">
@@ -206,7 +259,11 @@ export default function Navbar() {
                 }}
               />
               {primaryNavItems.map((item) => {
-                const isActive = isPrimaryNavItemActive(item, pathname, navRole);
+                const isActive = isPrimaryNavItemActive(
+                  item,
+                  pathname,
+                  navRole,
+                );
                 return (
                   <Link
                     key={item.label}
