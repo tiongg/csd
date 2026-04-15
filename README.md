@@ -35,11 +35,11 @@ The Six Seven is a Learning Management System (LMS) designed to facilitate explo
 
 ## Contributors
 
-- [@tiongg](https://github.com/tiongg) - Tan Tiong Guan
-- [@WyattLeoz](https://github.com/WyattLeoz) - Loh Kai Zhe
-- [@lineonthepaper](https://github.com/lineonthepaper)
-- [@Shutowith3e](https://github.com/Shutowith3e) - Joey Chik
-- [@limweiyau](https://github.com/limweiyau) - Lim Wei Yau
+- [@tiongg](https://github.com/tiongg) - Tiong Guan
+- [@WyattLeoz](https://github.com/WyattLeoz) - Kai Zhe
+- [@lineonthepaper](https://github.com/lineonthepaper) - Riley
+- [@Shutowith3e](https://github.com/Shutowith3e) - Joey
+- [@limweiyau](https://github.com/limweiyau) - Wei Yau
 
 ---
 
@@ -63,7 +63,7 @@ Copy the `.env.sample` file to `.env` and fill in the required values.
 cp .env.sample .env
 ```
 
-You'll now need a Google auth client. Follow the instructions at [docs/001.%20Google%20oauth%20setup.md](docs/001.%20Google%20oauth%20setup.md) to set this up.
+You'll now need a Google auth client. Follow the instructions at [docs/001. Google oauth setup.md](docs/001.%20Google%20oauth%20setup.md) to set this up.
 
 ## Running the Project
 
@@ -84,8 +84,8 @@ docker compose up
 
 # Deployment
 
-For more details on deployment, please refer to [docs/002.%20Deployment.md](docs/002.%20Deployment.md).
+For more details on deployment, please refer to [docs/002. Deployment.md](docs/002.%20Deployment.md).
 
 # Testing
 
-For details regarding testing, please refer to [docs/003.%20Testing.md](docs/003.%20Testing.md).
+For details regarding testing, please refer to [docs/003. Testing.md](docs/003.%20Testing.md).
