@@ -1,4 +1,8 @@
-# The six seven
+<div align="center">
+  <img src="frontend/public/assets/logo.jpg" alt="The Six Seven Logo" width="200" height="200">
+  
+  # The Six Seven
+</div>
 
 The Six Seven is a Learning Management System (LMS) designed to facilitate exploration into Gen Alpha Culture. It provides a platform for contributors to create and manage courses, and for students to access course material and quiz themselves. Moreover, trend visualization allows users to turn fragmented Gen-Alpha trend signals into structured, decision-ready intelligence.
 
